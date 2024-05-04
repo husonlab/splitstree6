@@ -19,6 +19,7 @@
 
 package splitstree6.window;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
@@ -48,6 +49,7 @@ public class AlgorithmTabsManager {
 			while (e.next()) {
 				if (e.wasAdded()) {
 					for (var node : e.getAddedSubList()) {
+						Platform.runLater(() -> {
 						if (node instanceof AlgorithmNode algorithmNode) {
 							AlgorithmTab tab;
 							if (algorithmNode.getAlgorithm().getClass().equals(TaxaFilter.class))
@@ -59,6 +61,7 @@ public class AlgorithmTabsManager {
 							tab.setOnCloseRequest(t -> showTab(algorithmNode, false));
 							nodeTabMap.put(node, tab);
 						}
+						});
 					}
 				} else if (e.wasRemoved()) {
 					for (var node : e.getRemoved()) {

@@ -25,6 +25,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.ZoomableScrollPane;
@@ -35,6 +36,9 @@ import jloda.fx.util.DraggableLabel;
 public class WorldMapController {
 	@FXML
 	private AnchorPane anchorPane;
+
+	@FXML
+	private BorderPane borderPane;
 
 	@FXML
 	private CheckMenuItem continentNamesCheckMenuItem;
@@ -118,6 +122,10 @@ public class WorldMapController {
 		});
 
 		DraggableLabel.makeDraggable(formatVBox);
+
+		borderPane.setCenter(borderPane.getCenter());
+		borderPane.setBottom(borderPane.getBottom());
+		borderPane.setTop(borderPane.getTop());
 	}
 
 	public AnchorPane getAnchorPane() {

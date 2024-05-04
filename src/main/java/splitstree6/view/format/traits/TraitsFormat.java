@@ -204,17 +204,12 @@ public class TraitsFormat extends Pane {
 					var nodeShape = nodeShapeMap.get(v);
 					if (nodeShape != null) {
 						nodeShape.getChildren().removeAll(BasicFX.getAllRecursively(nodeShape, BasicPieChart.class));
+						var updated = false;
 
 						if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1) {
 							var taxonId = graph.getTaxon(v);
 
-							if (isNoneTraitsActive()) {
-								for (var shape : BasicFX.getAllRecursively(nodeShape, Shape.class)) {
-									if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
-										circle.setRadius(v.getOutDegree() == 1 ? 1 : 0.5);
-									}
-								}
-							} else {
+							{
 								var chart = new BasicPieChart(workingTaxa.get().getLabel(taxonId));
 								chart.setColorScheme(legend.getColorSchemeName());
 
@@ -223,7 +218,7 @@ public class TraitsFormat extends Pane {
 								var sum = 0.0;
 								for (var traitId : traitsBlock.numericalTraits()) {
 									var label = traitsBlock.getTraitLabel(traitId);
-									if (isTraitActive(label)) {
+									if (!isNoneTraitsActive() && isTraitActive(label)) {
 										var value = traitsBlock.getTraitValue(taxonId, traitId);
 										if (value > 0) {
 											tooltipBuf.append(String.format("%s: %,.2f%n", label, value));
@@ -237,9 +232,9 @@ public class TraitsFormat extends Pane {
 								if (sum > 0) {
 									var pieSize = (Math.sqrt(sum) / Math.sqrt(maxOverAllNodes)) * getOptionMaxCircleRadius();
 									chart.setRadius(pieSize);
+									updated = true;
 
-									var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
-									for (var shape : shapes) {
+									for (var shape : BasicFX.getAllRecursively(nodeShape, Shape.class)) {
 										if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
 											circle.setRadius(pieSize);
 										}
@@ -251,6 +246,14 @@ public class TraitsFormat extends Pane {
 									}
 								}
 							}
+						}
+						if (!updated) {
+							for (var shape : BasicFX.getAllRecursively(nodeShape, Shape.class)) {
+								if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
+									circle.setRadius(2);
+								}
+							}
+
 						}
 					}
 				}

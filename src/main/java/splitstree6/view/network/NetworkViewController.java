@@ -131,6 +131,10 @@ public class NetworkViewController {
 			}
 		});
 
+		borderPane.setCenter(borderPane.getCenter());
+		borderPane.setBottom(borderPane.getBottom());
+		borderPane.setTop(borderPane.getTop());
+
 		DraggableLabel.makeDraggable(formatVBox);
 	}
 
@@ -176,6 +180,10 @@ public class NetworkViewController {
 
 	public AnchorPane getInnerAnchorPane() {
 		return innerAnchorPane;
+	}
+
+	public AnchorPane getOuterAnchorPane() {
+		return outerAnchorPane;
 	}
 
 	public StackPane getCenterPane() {

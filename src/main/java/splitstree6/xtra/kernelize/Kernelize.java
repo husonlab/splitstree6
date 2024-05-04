@@ -24,7 +24,6 @@ import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.algorithms.IsDAG;
-import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
@@ -42,6 +41,8 @@ import java.util.stream.Collectors;
  * Daniel Huson, 10.23
  */
 public class Kernelize {
+	private static boolean verbose = false;
+
 	/**
 	 * run the given algorithm on each minimal subproblem
 	 *
@@ -58,13 +59,17 @@ public class Kernelize {
 
 		// setup incompatibility graph
 		var incompatibilityGraph = ClusterIncompatibilityGraph.apply(inputTrees);
-		System.err.println("Compatible clusters:   " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() == 0).count());
-		System.err.println("Incompatible clusters: " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() > 0).count());
+		if (verbose) {
+			System.err.println("Compatible clusters:   " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() == 0).count());
+			System.err.println("Incompatible clusters: " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() > 0).count());
+		}
 
 		// extract all incompatibility components
 		var components = incompatibilityGraph.extractAllConnectedComponents();
-		System.err.println("Components:     " + components.stream().filter(c -> c.getNumberOfNodes() > 1).count());
-		System.err.println();
+		if (verbose) {
+			System.err.println("Components:     " + components.stream().filter(c -> c.getNumberOfNodes() > 1).count());
+			System.err.println();
+		}
 
 		// compute the blob-tree:
 		var blobTree = new PhyloTree();
@@ -91,7 +96,7 @@ public class Kernelize {
 			blobTreeClusters.sort((a, b) -> -Integer.compare(a.cardinality(), b.cardinality()));
 		}
 
-		if (true) { // report incompatibility components and the associated reduced trees:
+		if (verbose) { // report incompatibility components and the associated reduced trees:
 			var count = 0;
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
@@ -105,7 +110,8 @@ public class Kernelize {
 			}
 		}
 
-		System.err.println("Blob tree: " + NewickIO.toString(blobTree, false) + ";");
+		if (verbose)
+			System.err.println("Blob tree: " + NewickIO.toString(blobTree, false) + ";");
 		if (true) {
 			var tree = new PhyloTree(blobTree);
 			for (var v : tree.nodes()) {
@@ -113,7 +119,8 @@ public class Kernelize {
 					tree.setLabel(v, "t" + tree.getTaxon(v));
 				}
 			}
-			System.err.println("Blob tree: " + NewickIO.toString(tree, false) + ";");
+			if (verbose)
+				System.err.println("Blob tree: " + NewickIO.toString(tree, false) + ";");
 			checkNetwork("Blob tree", blobTree);
 		}
 
@@ -122,13 +129,23 @@ public class Kernelize {
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
 					var reducedTreesAndTaxonClasses = extractTrees(component, blobTreeClusters);
+					for (var tree : reducedTreesAndTaxonClasses.trees())
+						TreesUtils.addLabels(tree, taxaBlock::getLabel);
 
-					System.err.println("Subproblem input: " + NewickIO.toString(reducedTreesAndTaxonClasses.trees(), false));
+					if (verbose)
+						System.err.println("Subproblem input: " + NewickIO.toString(reducedTreesAndTaxonClasses.trees(), false));
 					for (var tree : reducedTreesAndTaxonClasses.trees()) {
 						checkNetwork("subproblem input", tree);
 					}
 
 					var networks = algorithm.apply(reducedTreesAndTaxonClasses.trees(), progress);
+
+					if (verbose) {
+						for (var network : networks) {
+							System.err.println("Number of nodes: " + network.getNumberOfNodes());
+						}
+					}
+
 					// restore equivalent taxa
 					if (false) {
 						var taxonEquivalenceClassMap = new HashMap<Integer, BitSet>();
@@ -170,7 +187,15 @@ public class Kernelize {
 							}
 						}
 					}
-					System.err.println("Subproblem networks: " + NewickIO.toString(networks, false));
+					if (verbose) {
+						for (var network : networks) {
+							System.err.println("Number of nodes: " + network.getNumberOfNodes());
+							System.err.println("Number of isolated nodes: " + network.nodeStream().filter(v -> v.getDegree() == 0).count());
+							TreesUtils.addLabels(network, taxaBlock::getLabel);
+						}
+						System.err.println("Subproblem networks: " + NewickIO.toString(networks, false));
+					}
+
 					for (var network : networks) {
 						checkNetwork("Subproblem networks", network);
 					}
@@ -190,14 +215,16 @@ public class Kernelize {
 				throw new IOException(ex);
 			}
 			for (var network : networks) {
+				if (network.getRoot().getOutDegree() > 1) {
+					var root = network.newNode();
+					network.newEdge(root, network.getRoot());
+					network.setRoot(root);
+				}
 				for (var v : network.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
 					network.delDivertex(v);
 				}
-				for (var e : network.edges()) {
-					network.setReticulate(e, e.getTarget().getInDegree() > 1);
-				}
-				LSAUtils.computeLSAChildrenMap(network, network.newNodeArray());
-				System.err.println(NewickIO.toString(network, false) + ";");
+				if (verbose)
+					System.err.println(NewickIO.toString(network, false) + ";");
 				if (!checkNetwork("output", network))
 					throw new IOException("Bad output");
 
@@ -498,8 +525,10 @@ public class Kernelize {
 			System.err.println(label + ": Error: internal nodes with taxa: " + internalWithTaxa);
 			ok = false;
 		}
-		if (ok)
-			System.err.println(label + ": looks ok");
+		if (verbose) {
+			if (ok)
+				System.err.println(label + ": looks ok");
+		}
 		return ok;
 
 	}

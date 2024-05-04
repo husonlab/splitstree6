@@ -44,7 +44,7 @@ public class Option<T> {
 	Option(Property<T> property, String name, String toolTipText) {
 		this.property = property;
 		this.name = name;
-		if (toolTipText != null && toolTipText.length() > 0)
+		if (toolTipText != null && !toolTipText.isEmpty())
 			this.toolTipText = toolTipText;
 		else
 			this.toolTipText = StringUtils.fromCamelCase(name);
@@ -146,8 +146,7 @@ public class Option<T> {
 				var result = listOptionsMethod.invoke(optionsCarrier);
 				if (result instanceof List<?> namesList) {
 					listedOptions.addAll(namesList.stream().map(Object::toString)
-							.map(name -> name.replaceAll("^option", "").replaceAll("Property$", ""))
-							.collect(Collectors.toList()));
+							.map(name -> name.replaceAll("^option", "").replaceAll("Property$", "")).toList());
 				}
 			} catch (Exception ignored) {
 			}

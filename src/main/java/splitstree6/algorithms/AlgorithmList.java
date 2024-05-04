@@ -130,8 +130,8 @@ public class AlgorithmList {
 		add(algorithms, names, new AutumnAlgorithm());
 		add(algorithms, names, new ALTSNetwork());
 		add(algorithms, names, new ALTSExternal());
+		add(algorithms, names, new MaltsNetwork());
 
-		add(algorithms, names, new AntiConsensusNetwork());
 		add(algorithms, names, new AverageConsensus());
 		add(algorithms, names, new BlobTree());
 		add(algorithms, names, new BootstrapSplits());

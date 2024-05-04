@@ -34,6 +34,8 @@ public class TreeNewickQR {
 	}
 
 	public static String apply(PhyloTree tree0, boolean showWeights, boolean showConfidences, boolean showProbabilities, int maxLength) {
+		if (tree0 == null)
+			return "";
 		var tree = new PhyloTree(tree0);
 
 		var newickIO = new NewickIO();

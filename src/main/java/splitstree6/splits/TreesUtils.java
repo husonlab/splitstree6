@@ -25,6 +25,7 @@ import jloda.graph.NodeArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
+import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CollectionUtils;
 import jloda.util.NumberUtils;
@@ -277,6 +278,26 @@ public class TreesUtils {
 		}
 		clusters.add(set);
 		return set;
+	}
+
+	/**
+	 * add labels to tree
+	 *
+	 * @param tree               the tree
+	 * @param taxonLabelFunction maps taxon ids to labels
+	 */
+	public static void addLabels(PhyloTree tree, Function<Integer, String> taxonLabelFunction) {
+		for (var v : tree.nodes()) {
+			try {
+				if (tree.hasTaxa(v)) {
+					var t = tree.getTaxon(v);
+					var label = taxonLabelFunction.apply(t);
+					tree.setLabel(v, label != null ? label : "t" + t);
+				}
+			} catch (Exception ex) {
+				Basic.caught(ex);
+			}
+		}
 	}
 
 

@@ -122,6 +122,7 @@ public class NetworkLayout {
 				try {
 					var point = nodePointMap.get(v);
 					var labeledNode = new LabeledNodeShape();
+					labeledNode.setId("graph-node");
 					labeledNode.setTranslateX(point.getX());
 					labeledNode.setTranslateY(point.getY());
 
@@ -133,19 +134,15 @@ public class NetworkLayout {
 						labeledNode.setShape(RichTextLabel.getMark(label.getText()));
 					} else {
 						var circle = new Circle(v.getDegree() == 1 ? 3 : 2);
-						circle.setFill(Color.BLACK);
+						circle.setFill(Color.WHITE);
 						circle.setStroke(Color.BLACK);
-						{
-							var stroke = 1 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
-							circle.setStyle("-fx-stroke-width: " + stroke + ";");
-						}
 						labeledNode.setShape(circle, true);
 					}
 
+					if (false)
 					for (var node : labeledNode.getChildren()) {
 						if ("iceberg".equals(node.getId())) {
-							var stroke = 20 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
-							node.setStyle("-fx-stroke-width: " + stroke + ";");
+							node.setStyle("-fx-stroke: green;");
 						}
 					}
 

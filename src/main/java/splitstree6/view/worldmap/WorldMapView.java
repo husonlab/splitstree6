@@ -61,13 +61,13 @@ public class WorldMapView implements IView {
 	private final BooleanProperty optionShowCountryNames = new SimpleBooleanProperty(this, "optionShowContinentNames");
 	private final BooleanProperty optionShowOceanNames = new SimpleBooleanProperty(this, "optionShowOceanNames");
 
-	private final DoubleProperty optionMaxCircleRadius = new SimpleDoubleProperty(this, "optionMaxCircleRadius", 32.0);
+	private final DoubleProperty optionMaxCircleRadius = new SimpleDoubleProperty(this, "optionMaxCircleRadius", 16.0);
 
 	private final BooleanProperty optionShowBoundingBox = new SimpleBooleanProperty(this, "optionShowBoundingBox");
 
 	private final BooleanProperty optionShowGrid = new SimpleBooleanProperty(this, "optionShowGrid");
 
-	private final BooleanProperty optionShowData = new SimpleBooleanProperty(this, "optionShowData");
+	private final BooleanProperty optionShowData = new SimpleBooleanProperty(this, "optionShowData", true);
 	private final BooleanProperty optionTwoCopies = new SimpleBooleanProperty(this, "optionTwoCopies");
 
 	private final ObjectProperty<TaxaBlock> workingTaxa = new SimpleObjectProperty<>();
@@ -87,7 +87,6 @@ public class WorldMapView implements IView {
 		ProgramProperties.track(optionShowGrid, false);
 		ProgramProperties.track(optionShowBoundingBox, true);
 		ProgramProperties.track(optionTwoCopies, false);
-		ProgramProperties.track(optionShowData, true);
 	}
 
 	public List<String> listOptions() {
@@ -109,9 +108,12 @@ public class WorldMapView implements IView {
 		var formatter = new LocationsFormat(mainWindow, undoManager);
 		controller.getFormatVBox().getChildren().addAll(formatter);
 		controller.getFormatVBox().setDisable(false);
-		optionMaxCircleRadius.addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
-		formatter.getLegend().maxCircleRadiusProperty().addListener((v, o, n) -> Platform.runLater(() -> setOptionMaxCircleRadius(n.doubleValue())));
-		optionMaxCircleRadius.addListener((v, o, n) -> Platform.runLater(() -> formatter.getLegend().setMaxCircleRadius(n.doubleValue())));
+		formatter.getLegend().maxCircleRadiusProperty().bindBidirectional(optionMaxCircleRadius);
+		formatter.getLegend().setMaxCircleRadius(optionMaxCircleRadius.get());
+		formatter.getLegend().maxCircleRadiusProperty().addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
+
+		Platform.runLater(() -> formatter.getLegend().setMaxCircleRadius(optionMaxCircleRadius.get()));
+
 		colorSchemeName.bindBidirectional(formatter.getLegend().colorSchemeNameProperty());
 
 		formatter.getLegend().setClickOnLabel((e, label) -> {
@@ -123,14 +125,14 @@ public class WorldMapView implements IView {
 		});
 
 		traitsBlock.addListener(e -> {
-			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, controller, colorSchemeName.get(), getOptionMaxCircleRadius());
+			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, controller, colorSchemeName.get(), formatter.getLegend().getMaxCircleRadius());
 			formatter.getLegend().setMaxCount(maxCount);
 		});
 
 		AnchorPane.setLeftAnchor(formatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(formatter.getLegend(), 30.0);
-		controller.getInnerAnchorPane().getChildren().add(formatter.getLegend());
 		DraggableLabel.makeDraggable(formatter.getLegend());
+		controller.getInnerAnchorPane().getChildren().add(formatter.getLegend());
 
 		validListener = e -> {
 			if (mainWindow.getWorkflow().isValid()) {
@@ -337,17 +339,5 @@ public class WorldMapView implements IView {
 			max = Math.max(max, count);
 		}
 		return max;
-	}
-
-	public double getOptionMaxCircleRadius() {
-		return optionMaxCircleRadius.get();
-	}
-
-	public DoubleProperty optionMaxCircleRadiusProperty() {
-		return optionMaxCircleRadius;
-	}
-
-	public void setOptionMaxCircleRadius(double optionMaxCircleRadius) {
-		this.optionMaxCircleRadius.set(optionMaxCircleRadius);
 	}
 }

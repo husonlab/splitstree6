@@ -96,6 +96,8 @@ public class SplitsView implements IView {
 
 	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize", 32);
 
+	private final DoubleProperty optionMaxCircleRadius = new SimpleDoubleProperty(this, "optionMaxCircleRadius", 32.0);
+
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
 	private final BooleanProperty optionShowQRCode = new SimpleBooleanProperty(this, "optionShowQRCode");
@@ -115,7 +117,7 @@ public class SplitsView implements IView {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(),
 				optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(), optionPaneLabel.getName(),
-				optionLabelSplitsBy.getName(), optionShowQRCode.getName());
+				optionLabelSplitsBy.getName(), optionShowQRCode.getName(), optionMaxCircleRadius.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {

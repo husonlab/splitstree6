@@ -80,7 +80,7 @@ public class ShortestCommonHyperSequence {
 		}
 
 
-		if (true) { // write out the trace:
+		if (false) { // write out the trace:
 			var bufA = new StringBuilder();
 			var bufB = new StringBuilder();
 

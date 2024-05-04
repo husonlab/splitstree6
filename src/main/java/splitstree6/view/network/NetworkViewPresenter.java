@@ -90,12 +90,14 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().getItems().addAll(DiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
+		var reopenAfterRotateOrFlipBroken = new SimpleBooleanProperty(true);
+
 		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft()));
-		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
+		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()).or(reopenAfterRotateOrFlipBroken));
 		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
-		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty().or(reopenAfterRotateOrFlipBroken));
 		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipHorizontal()));
-		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty().or(reopenAfterRotateOrFlipBroken));
 
 		var paneWidth = new SimpleDoubleProperty();
 		var paneHeight = new SimpleDoubleProperty();

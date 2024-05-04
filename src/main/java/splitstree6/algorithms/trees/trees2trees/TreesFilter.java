@@ -19,8 +19,8 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
@@ -28,20 +28,28 @@ import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Trees filter
  * Daniel Huson, 12/31/16, 2/2/2022
  */
 public class TreesFilter extends Trees2Trees implements IFilter {
-	private final ObservableList<String> OptionDisabledTrees = FXCollections.observableArrayList();
+	private ObjectProperty<String[]> optionDisabledTrees = new SimpleObjectProperty<>(this, "optionDisabledTrees", new String[0]);
+
+
+	@Override
+	public List<String> listOptions() {
+		return List.of(optionDisabledTrees.getName());
+	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		return switch (optionName) {
-			case "optionDisabledTrees" -> "List of trees currently disabled";
-			default -> optionName;
-		};
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		if (optionName.equals(optionDisabledTrees.getName()))
+			return "List of trees currently disabled";
+		else return optionName;
 	}
 
 	@Override
@@ -54,9 +62,9 @@ public class TreesFilter extends Trees2Trees implements IFilter {
 		final var totalTaxa = taxaBlock.getNtax();
 		var partial = false;
 
-		progress.setMaximum(parent.getNTrees() - getOptionDisabledTrees().size());
+		progress.setMaximum(parent.getNTrees() - getOptionDisabledTrees().length);
 
-		var disabledSet = new HashSet<>(getOptionDisabledTrees());
+		var disabledSet = new HashSet<>(List.of(getOptionDisabledTrees()));
 
 		for (var tree : parent.getTrees()) {
 			if (!disabledSet.contains(tree.getName())) {
@@ -68,7 +76,7 @@ public class TreesFilter extends Trees2Trees implements IFilter {
 		}
 		child.setPartial(partial);
 
-		if (OptionDisabledTrees.isEmpty())
+		if (getOptionDisabledTrees().length == 0)
 			setShortDescription("using all " + parent.size() + " trees");
 		else
 			setShortDescription("using " + child.size() + " of " + parent.size() + " trees");
@@ -78,15 +86,23 @@ public class TreesFilter extends Trees2Trees implements IFilter {
 
 	@Override
 	public void clear() {
-		OptionDisabledTrees.clear();
+		setOptionDisabledTrees(new String[0]);
 	}
 
-	public ObservableList<String> getOptionDisabledTrees() {
-		return OptionDisabledTrees;
+	public String[] getOptionDisabledTrees() {
+		return optionDisabledTrees.get();
+	}
+
+	public ObjectProperty<String[]> optionDisabledTreesProperty() {
+		return optionDisabledTrees;
+	}
+
+	public void setOptionDisabledTrees(String[] optionDisabledTrees) {
+		this.optionDisabledTrees.set(optionDisabledTrees);
 	}
 
 	@Override
 	public boolean isActive() {
-		return OptionDisabledTrees.size() > 0;
+		return getOptionDisabledTrees().length > 0;
 	}
 }

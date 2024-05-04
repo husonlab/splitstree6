@@ -40,6 +40,15 @@ public class ProgressiveSCS {
 	 * @return shortest common hyper sequence
 	 */
 	public static HyperSequence apply(ArrayList<HyperSequence> sequences) {
+		if (sequences.size() == 1)
+			return sequences.get(0);
+		else if (sequences.size() == 2) {
+			return ShortestCommonHyperSequence.align(sequences.get(0), sequences.get(1));
+		} else if (sequences.size() == 3) {
+			var one = ShortestCommonMultiHyperSequence.align(sequences.get(0).expand(), sequences.get(1).expand());
+			var all = ShortestCommonMultiHyperSequence.align(one, sequences.get(2).expand());
+			return all.flatten();
+		}
 		// setup distances for UPGMA
 		var taxa = new TaxaBlock();
 		for (var t = 0; t < sequences.size(); t++) {

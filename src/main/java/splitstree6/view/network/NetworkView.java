@@ -65,7 +65,7 @@ public class NetworkView implements IView {
 	private final ObjectProperty<NetworkBlock> networkBlock = new SimpleObjectProperty<>(this, "networkBlock");
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
+	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
 
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
@@ -87,12 +87,11 @@ public class NetworkView implements IView {
 
 	{
 		ProgramProperties.track(optionDiagram, DiagramType::valueOf, DiagramType.Network);
-		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionSitesStyle, SitesStyle::valueOf, SitesStyle.Hatches);
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionOrientation.getName(),
+		return List.of(optionDiagram.getName(),
 				optionFontScaleFactor.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(), optionSitesStyle.getName(),
 				optionEdits.getName());
 	}

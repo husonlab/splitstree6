@@ -159,7 +159,7 @@ public enum OptionValueType {
 				var buf = new StringBuilder();
 				var array = (int[]) object;
 				for (var value : array) {
-					if (buf.length() > 0)
+					if (!buf.isEmpty())
 						buf.append(" ");
 					buf.append(StringUtils.removeTrailingZerosAfterDot("%d", value));
 				}
@@ -169,7 +169,7 @@ public enum OptionValueType {
 				var buf = new StringBuilder();
 				var array = (double[]) object;
 				for (double value : array) {
-					if (buf.length() > 0)
+					if (!buf.isEmpty())
 						buf.append(" ");
 					buf.append(StringUtils.removeTrailingZerosAfterDot("%.4f", value));
 				}
