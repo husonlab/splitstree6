@@ -19,36 +19,22 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import jloda.fx.window.NotificationManager;
-import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.MutualRefinement;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.ProgressMover;
 import splitstree6.xtra.alts.AltsNonBinary;
-import splitstree6.xtra.kernelize.Kernelize;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * this runs the non-binary ALTSNetwork network algorithm
  * Daniel Huson, 2.2024
  */
 public class ALTSNetwork extends Trees2Trees {
-	private static boolean warned = false;
-
-	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", false);
-
-	private final BooleanProperty optionKernelization = new SimpleBooleanProperty(this, "optionKernelization", false);
-
-	private final BooleanProperty optionRemoveDuplicates = new SimpleBooleanProperty(this, "optionRemoveDuplicates", false);
 
 	@Override
 	public String getCitation() {
@@ -62,51 +48,22 @@ public class ALTSNetwork extends Trees2Trees {
 		return "Computes one or more rooted networks that contain all input trees using the M-ALTS algorithm.";
 	}
 
-	@Override
-	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName(), optionRemoveDuplicates.getName(), optionKernelization.getName());
-	}
-
-	@Override
-	public String getToolTip(String optionName) {
-		if (!optionName.startsWith("option")) {
-			optionName = "option" + optionName;
-		}
-		return switch (optionName) {
-			case "optionMutualRefinement" -> "mutually refine trees during preprocessing";
-			case "optionKernelization" -> "perform kernelization during preprocessing";
-			case "optionRemoveDuplicates" -> "remove duplicate networks in output";
-			default -> super.getToolTip(optionName);
-		};
-	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
-		if (!warned) {
-			NotificationManager.showWarning("This is experimental code, under development");
-			warned = true;
-		}
 		progress.setTasks("Computing hybridization networks", "(Unknown how long this will really take)");
 		try (var progressMover = new ProgressMover(progress)) {
 			Collection<PhyloTree> result;
 
-			Collection<PhyloTree> inputTrees;
-			if (getOptionMutualRefinement()) {
-				inputTrees = MutualRefinement.apply(treesBlock.getTrees(), MutualRefinement.Strategy.All, true);
-				if (true)
-					System.err.println("Refined:\n" + NewickIO.toString(inputTrees, false));
-			} else {
-				inputTrees = new ArrayList<>();
+			Collection<PhyloTree> inputTrees = new ArrayList<>();
 				for (var tree : treesBlock.getTrees()) {
 					inputTrees.add(new PhyloTree(tree));
 				}
-			}
+
 			if (inputTrees.size() <= 1) {
 				result = inputTrees;
-			} else if (!getOptionKernelization()) {
-				result = AltsNonBinary.apply(inputTrees, progress);
 			} else {
-				result = Kernelize.apply(progress, taxaBlock, inputTrees, AltsNonBinary::apply, 100000);
+				result = AltsNonBinary.apply(inputTrees, progress);
 			}
 			for (var tree : result) {
 				for (var v : tree.nodeStream().filter(v -> tree.getLabel(v) != null).toList()) {
@@ -121,37 +78,5 @@ public class ALTSNetwork extends Trees2Trees {
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
 		return !datablock.isReticulated() && datablock.getNTrees() > 1;
-	}
-
-	public boolean getOptionKernelization() {
-		return optionKernelization.get();
-	}
-
-	public BooleanProperty optionKernelizationProperty() {
-		return optionKernelization;
-	}
-
-	public void setOptionKernelization(boolean optionKernelization) {
-		this.optionKernelization.set(optionKernelization);
-	}
-
-	public boolean getOptionMutualRefinement() {
-		return optionMutualRefinement.get();
-	}
-
-	public BooleanProperty optionMutualRefinementProperty() {
-		return optionMutualRefinement;
-	}
-
-	public void setOptionMutualRefinement(boolean optionMutualRefinement) {
-		this.optionMutualRefinement.set(optionMutualRefinement);
-	}
-
-	public boolean isOptionRemoveDuplicates() {
-		return optionRemoveDuplicates.get();
-	}
-
-	public BooleanProperty optionRemoveDuplicatesProperty() {
-		return optionRemoveDuplicates;
 	}
 }
