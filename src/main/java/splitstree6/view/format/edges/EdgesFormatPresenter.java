@@ -1,5 +1,5 @@
 /*
- *  EdgesFormatPresenter.java Copyright (C) 2024 Daniel H. Huson
+ *  EdgeLabelPresenter.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -31,8 +31,8 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.graph.Edge;
-import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.LabeledEdgeShape;
+import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.treeview.TreeEdits;
 
 import java.util.ArrayList;
@@ -54,31 +54,11 @@ public class EdgesFormatPresenter {
 
 	private Consumer<LabelEdgesBy> updateLabelsConsumer;
 
-	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, ObjectProperty<LabelEdgesBy> optionLabelEdgesBy, SelectionModel<Edge> edgeSelectionModel,
+	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, SelectionModel<Edge> edgeSelectionModel,
 								Map<Edge, LabeledEdgeShape> edgeShapeMap, ObjectProperty<String[]> editsProperty) {
 		this.undoManager = undoManager;
 		this.controller = controller;
 
-		controller.getLabelByNoneMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.None));
-		controller.getLabelByWeightMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Weight));
-		controller.getLabelByConfidenceMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Confidence));
-		controller.getLabelByConfidenceX100MenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.ConfidenceX100));
-		controller.getLabelByProbabilityMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Probability));
-		optionLabelEdgesBy.addListener((v, o, n) -> {
-			if (n != null) {
-				switch (n) {
-					case None -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByNoneMenuItem());
-					case Weight ->
-							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByWeightMenuItem());
-					case Confidence ->
-							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceMenuItem());
-					case ConfidenceX100 ->
-							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceX100MenuItem());
-					case Probability ->
-							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByProbabilityMenuItem());
-				}
-			}
-		});
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
@@ -181,25 +161,5 @@ public class EdgesFormatPresenter {
 		//selectionModel.getSelectedItems().addListener(selectionListener);
 		edgeSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));
 		selectionListener.invalidated(null);
-	}
-
-	public void setUpdateLabelsConsumer(Consumer<LabelEdgesBy> updateLabelsConsumer) {
-		this.updateLabelsConsumer = updateLabelsConsumer;
-
-
-	}
-
-	public void updateMenus(PhyloTree tree) {
-		controller.getLabelByWeightMenuItem().setDisable(tree == null || !tree.hasEdgeWeights());
-		controller.getLabelByConfidenceMenuItem().setDisable(tree == null || !tree.hasEdgeConfidences());
-		controller.getLabelByConfidenceX100MenuItem().setDisable(tree == null || !tree.hasEdgeConfidences());
-		controller.getLabelByProbabilityMenuItem().setDisable(tree == null || !tree.hasEdgeProbabilities());
-
-		if (controller.getLabelByWeightMenuItem().isSelected() && controller.getLabelByWeightMenuItem().isDisable()
-			|| controller.getLabelByConfidenceMenuItem().isSelected() && controller.getLabelByConfidenceMenuItem().isDisable()
-			|| controller.getLabelByConfidenceX100MenuItem().isSelected() && controller.getLabelByConfidenceMenuItem().isDisable()
-			|| controller.getLabelByProbabilityMenuItem().isSelected() && controller.getLabelByProbabilityMenuItem().isDisable()) {
-			Platform.runLater(() -> controller.getLabelByNoneMenuItem().setSelected(true));
-		}
 	}
 }

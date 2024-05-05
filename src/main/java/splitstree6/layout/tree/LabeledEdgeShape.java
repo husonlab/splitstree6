@@ -32,9 +32,7 @@ public class LabeledEdgeShape extends Group {
 	private RichTextLabel label;
 
 	public LabeledEdgeShape() {
-
 		getStyleClass().add("graph-edge");
-		label.setStyle("-fx-display-caret: false;");
 	}
 
 	public LabeledEdgeShape(Shape shape) {
@@ -57,6 +55,7 @@ public class LabeledEdgeShape extends Group {
 	public void setLabel(RichTextLabel label) {
 		this.label = label;
 		if (label != null) {
+			label.setFontSize(10);
 			MouseDragToTranslate.setup(label);
 		}
 	}

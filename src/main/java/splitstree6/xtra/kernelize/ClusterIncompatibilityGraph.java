@@ -22,7 +22,7 @@ package splitstree6.xtra.kernelize;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import splitstree6.autumn.Cluster;
+import splitstree6.compute.autumn.Cluster;
 import splitstree6.splits.TreesUtils;
 
 import java.util.BitSet;

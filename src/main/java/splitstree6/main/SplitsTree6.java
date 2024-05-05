@@ -24,6 +24,7 @@ import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.stage.Stage;
 import jloda.fx.util.ArgsOptions;
+import jloda.fx.util.Icebergs;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.MainWindowManager;
@@ -125,6 +126,8 @@ public class SplitsTree6 extends Application {
 		System.err.println("Java version: " + System.getProperty("java.version"));
 
 		ProgramProperties.load(propertiesFile);
+
+		Icebergs.setEnabled(true);
 
 		if (silentMode) {
 			Basic.stopCollectingStdErr();

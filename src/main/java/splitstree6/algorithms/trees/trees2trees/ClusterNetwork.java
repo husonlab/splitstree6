@@ -32,7 +32,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
-import splitstree6.autumn.HasseDiagram;
+import splitstree6.compute.autumn.HasseDiagram;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.splits.TreesUtils;

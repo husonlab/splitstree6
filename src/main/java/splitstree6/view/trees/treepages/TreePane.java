@@ -45,7 +45,7 @@ import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.*;
-import splitstree6.view.format.edges.LabelEdgesBy;
+import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.InteractionSetup;
 
 import java.util.OptionalDouble;

@@ -25,7 +25,9 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Separator;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
@@ -34,6 +36,8 @@ import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.edgelabel.EdgeLabelFormat;
+import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.format.taxlabel.TaxonLabelFormat;
 import splitstree6.view.format.taxmark.TaxonMark;
 import splitstree6.view.utils.IView;
@@ -69,6 +73,8 @@ public class TanglegramView implements IView {
 
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
 
+	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
+
 	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames");
 	private final BooleanProperty optionShowTreeInfo = new SimpleBooleanProperty(this, "optionShowTreeInfo");
 
@@ -86,13 +92,14 @@ public class TanglegramView implements IView {
 		ProgramProperties.track(optionShowTreeNames, true);
 		ProgramProperties.track(optionShowTreeInfo, true);
 		ProgramProperties.track(optionShowInternalLabels, true);
+		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionTree1.getName(), optionDiagram1.getName(), optionAveraging1.getName(),
 				optionTree2.getName(), optionDiagram2.getName(), optionAveraging2.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName(),
-				optionShowTreeNames.getName(), optionShowTreeInfo.getName(), optionShowInternalLabels.getName());
+				optionShowTreeNames.getName(), optionShowTreeInfo.getName(), optionShowInternalLabels.getName(), optionLabelEdgesBy.getName());
 	}
 
 	public TanglegramView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -133,9 +140,13 @@ public class TanglegramView implements IView {
 				n.emptyProperty().bind(empty);
 		});
 
+		var edgeLabelFormat = new EdgeLabelFormat(undoManager);
+		edgeLabelFormat.optionLabelEdgesByProperty().bindBidirectional(optionLabelEdgesBy);
+
 		empty.bind(Bindings.isEmpty(getTrees()));
 
-		controller.getFormatVBox().getChildren().addAll(new TaxonLabelFormat(mainWindow, undoManager), new TaxonMark(mainWindow, undoManager));
+		controller.getFormatVBox().getChildren().addAll(new TaxonLabelFormat(mainWindow, undoManager), new TaxonMark(mainWindow, undoManager),
+				new Separator(Orientation.HORIZONTAL), edgeLabelFormat);
 
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "n: %,d, t: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
 	}
@@ -349,6 +360,18 @@ public class TanglegramView implements IView {
 
 	public void setOptionShowInternalLabels(boolean optionShowInternalLabels) {
 		this.optionShowInternalLabels.set(optionShowInternalLabels);
+	}
+
+	public LabelEdgesBy getOptionLabelEdgesBy() {
+		return optionLabelEdgesBy.get();
+	}
+
+	public ObjectProperty<LabelEdgesBy> optionLabelEdgesByProperty() {
+		return optionLabelEdgesBy;
+	}
+
+	public void setOptionLabelEdgesBy(LabelEdgesBy optionLabelEdgesBy) {
+		this.optionLabelEdgesBy.set(optionLabelEdgesBy);
 	}
 
 	@Override

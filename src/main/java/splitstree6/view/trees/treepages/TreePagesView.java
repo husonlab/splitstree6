@@ -24,7 +24,9 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.Pane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
@@ -35,6 +37,8 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.edgelabel.EdgeLabelFormat;
+import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.format.taxlabel.TaxonLabelFormat;
 import splitstree6.view.format.taxmark.TaxonMark;
 import splitstree6.view.utils.IView;
@@ -73,7 +77,10 @@ public class TreePagesView implements IView {
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
+	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
+
 	{
+		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
 		ProgramProperties.track(optionRows, 2);
 		ProgramProperties.track(optionCols, 3);
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
@@ -83,7 +90,7 @@ public class TreePagesView implements IView {
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRows.getName(), optionCols.getName(),
 				pageNumber.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName(),
-				optionTreeLabels.getName());
+				optionTreeLabels.getName(), optionLabelEdgesBy.getName());
 	}
 
 	/**
@@ -116,7 +123,11 @@ public class TreePagesView implements IView {
 
 		var taxLabelFormatter = new TaxonLabelFormat(mainWindow, undoManager);
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager));
+		var edgeLabelFormat = new EdgeLabelFormat(undoManager);
+		edgeLabelFormat.optionLabelEdgesByProperty().bindBidirectional(optionLabelEdgesBy);
+
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager),
+				new Separator(Orientation.HORIZONTAL), edgeLabelFormat);
 
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> {
 					if (mainWindow.getWorkingTaxa() == null)
@@ -295,6 +306,18 @@ public class TreePagesView implements IView {
 
 	public void setOptionTreeLabels(PaneLabel optionPaneLabel) {
 		this.optionTreeLabels.set(optionPaneLabel);
+	}
+
+	public LabelEdgesBy getOptionLabelEdgesBy() {
+		return optionLabelEdgesBy.get();
+	}
+
+	public ObjectProperty<LabelEdgesBy> optionLabelEdgesByProperty() {
+		return optionLabelEdgesBy;
+	}
+
+	public void setOptionLabelEdgesBy(LabelEdgesBy optionLabelEdgesBy) {
+		this.optionLabelEdgesBy.set(optionLabelEdgesBy);
 	}
 
 	public ViewTab getViewTab() {

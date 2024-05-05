@@ -79,9 +79,9 @@ public class RunKernelize {
 		System.err.println();
 
 		// setup the algorithm that is used to resolve each incompatibility component
-		Kernelize.TriFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Integer, Collection<PhyloTree>> algorithm =
+		Kernelize.BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm =
 				switch (algorithmName) {
-					case "clusternetwork" -> (trees, p, n) -> {
+					case "clusternetwork" -> (trees, p) -> {
 						var clusters = new HashSet<BitSet>();
 						for (var tree : trees) {
 							clusters.addAll(TreesUtils.extractClusters(tree).values());
@@ -90,8 +90,8 @@ public class RunKernelize {
 						ClusterPoppingAlgorithm.apply(clusters, network);
 						return List.of(network);
 					};
-					case "trees" -> (trees, p, n) -> trees;
-					case "alts" -> (trees, p, n) -> {
+					case "trees" -> (trees, p) -> trees;
+					case "alts" -> (trees, p) -> {
 						throw new RuntimeException("--algorithm alts: not implemented");
 					};
 					default -> throw new RuntimeException("--algorithm " + algorithmName + ": not implemented");
