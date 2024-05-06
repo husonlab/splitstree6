@@ -19,15 +19,17 @@
 
 package splitstree6.xtra.alts;
 
+import splitstree6.xtra.hyperstrings.HyperSequence;
+
 import java.util.*;
 
 public class HybridizationResult {
     private final int hybridizationScore;
-    private final Map<Integer, String> alignments;
+    private final Map<Integer, HyperSequence> alignments;
 
     private final LinkedList<Integer> order;
 
-    public HybridizationResult(int hybridizationScore, Map<Integer, String> alignments, LinkedList<Integer> order) {
+    public HybridizationResult(int hybridizationScore, Map<Integer, HyperSequence> alignments, LinkedList<Integer> order) {
         this.hybridizationScore = hybridizationScore;
         this.alignments = alignments;
         this.order = order;
@@ -36,7 +38,7 @@ public class HybridizationResult {
     public int getHybridizationScore() {
         return hybridizationScore;
     }
-    public Map<Integer, String> getAlignments() {
+    public Map<Integer, HyperSequence> getAlignments() {
         return Collections.unmodifiableMap(alignments);
     }
     public LinkedList<Integer> getOrder() {return order;}
