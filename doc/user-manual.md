@@ -2,7 +2,20 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.12, built 24 Apr 2024)
+SplitsTree App (version 6.3.13, built 22 Apr 2024)
+
+---
+author:
+
+- Daniel H. Huson and David Bryant
+  bibliography:
+- main.bib
+  title: |
+  The SplitsTree App User-Manual\
+  SplitsTree App (version 6.3.13, built 22 Apr 2024)
+
+---
+
 ## Introduction
 
 The SplitsTree App is new software for exploring and analyzing
@@ -502,23 +515,15 @@ program and then compared against a set of GTDB reference genomes
 represented as a phylogenetic outline.
 
 The dialog is opened using the `File->Analyze Draft Genomes...` menu
-item and is setup using three tabs, as shown in the Figure.
+item and is setup using three tabs, as shown in the Figure .
 
-<figure>
-<div class="tabular">
-<p><span>cc</span> <img src="figs/draft-genomes-a.png" style="height:5cm" alt="image" />&amp; <img src="figs/draft-genomes-b.png" style="height:5cm" alt="image" /><br />
-<span><img src="figs/draft-genomes-c.png" style="height:6cm" alt="image" /></span><br />
-</p>
-</div>
-<figcaption> The first tab is used to specify the input files, the type
-of input (DNA or protein sequences) and whether to use files or FastA
-records as input genomes. Also, specify the output file (and whether to
-store input sequences as sequences or as references to files). The
-second tab is used to edit the labels of genomes. The third tab is used
-to specify the database to compare against (downloaded from the
-SplitsTree page), the distance to search in, and distance within which
-to include references. </figcaption>
-</figure>
+![The first tab is used to specify the input files, the type of input
+(DNA or protein sequences) and whether to use files or FastA records as
+input genomes. Also, specify the output file (and whether to store input
+sequences as sequences or as references to files). The second tab is
+used to edit the labels of genomes. The third tab is used to specify the
+database to compare against (downloaded from the SplitsTree page), the
+distance to search in, and distance within which to include references.](figs/draft-genomes.png)
 
 # Building trees and networks
 
@@ -784,34 +789,66 @@ displaying all their clusters as a rooted network (in the hardwired
 sense [@Husonetal2012]). Here, the reticulate nodes do not have a direct
 biological interpretation.
 
-### Hybrization networks
+### Hybridization networks
 
-![On the left we see two different gene trees on waterlilies
-[@Gruenstaeudl2019] and on the right we see one of three different
-hybridization networks with hybridization number $h=4$, computed using
-the Autumn algorithm.](figs/autumn-example.png)
+![On the left we see 10 different gene trees for the NADH
+dehydrogenase-like complex in waterlilies [@Gruenstaeudl2019] and on the
+right we see a hybridization network with hybridization number $h=5$,
+computed using the PhyloFusion
+algorithm.](figs/phylofusion-ndh-genes.png)
 
 In mathematical phylogenetics, a *hybrization network* is a rooted
 phylogenetic network that contains or displays an input set of rooted
 phylogenetic trees. Usually, the requirement is that such a network
-minimizes the "hybridization number".
+minimizes the "hybridization number", that is, the number of
+reticulations. (To be precise, a reticulation node of indegree $k$
+contributes $k-1$ toward the hybridization number.)
 
-SplitsTree currently offers two algorithms for computing such networks.
-The Autumn algorithm [@HusonLinz2018] ) takes as input two rooted
-phylogenetic trees and computes, as output the list of all different
-hybridization networks that contain the two trees. This algorithm is
-designed for real-world applications and so input trees may have
-multifurcations and unequal taxon sets. This algorithm aims at providing
-an exact solution (networks that minimize the hybridization) of a
-computational hard problem, so it might not terminate if the input trees
-have too many conflicts.
+SplitsTree currently offers two algorithms for computing such networks
+for real world data. The Autumn algorithm [@HusonLinz2018] takes as
+input two rooted phylogenetic trees and computes, as output the list of
+all different hybridization networks that contain the two trees. The
+input trees may have multifurcations and unequal taxon sets. This
+algorithm aims at providing an exact solution (networks that minimize
+the hybridization) of a computational hard problem, so it might not
+terminate if the input trees have too many conflicts.
 
-The PhyloFusion algorithm [@Zhangetal2023; @Zhangetal2024] takes as input
-multiple rooted trees and computes one or more rooted phylogenetic
-networks that display all the input trees. This heuristic aims at
+The PhyloFusion algorithm [@Zhangetal2023; @Zhangetal2024] takes as
+input multiple rooted trees and computes one or more rooted phylogenetic
+networks that display all the input trees. Again, we allow
+multifurcations and missing taxa. This very fast heuristic aims at
 minimizing the hybridization number. With this, we provide a versatile
 method for exploring the practical use of rooted networks in
-phylogenetics.
+phylogenetics .
+
+### How to compute a rooted network from rooted trees
+
+Assume that you have a collection of phylogenetic trees for which you
+would like to explore the use of rooted phylogenetic networks to
+represent them. To obtained a useful network, you must setup a pipeline
+consisting of several steps . In this analysis, incorrect edges are
+particularly harmful because they generate unnecessary reticulations and
+so it is important that the input trees have confidence values (such as
+bootstrap support values, say) associated with the edges so that
+low-confidence can be ignored.
+
+![For a set of 48 genes in waterlilies [@Gruenstaeudl2019], on the left
+we see that 10 different gene trees for the NADH dehydrogenase-like
+complex have bee selected. On the right we see the resulting rooted network, computed using the
+PhyloFusion algorithm.](figs/phylofusion-full.png)
+
+- First, use the *Reroot or Reorder* algorithm to ensure that all
+  trees are correctly rooted (using either midpoint- or outgroup
+  rooting).
+
+- Second, use the *Trees Filter* to select the subset of trees that
+  you would like to place into the network.
+
+- Third, use the *Trees Edges Filter* to contract any low-confidence
+  edges. By default, the confidence threshold is set to 70.
+
+- Finally, use the *Phylo Fusion* algorithm to compute a rooted
+  network that contains all input trees.
 
 ### Cluster networks
 
@@ -1545,7 +1582,7 @@ Here we list of all provided algorithms, organized by input data.
 
 The *P Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It computes the normalized Hamming
-distance. The algorithm has the following options:
+editDistance. The algorithm has the following options:
 
 `HandleAmbiguousStates = {Ignore | AverageStates | MatchStates}` -
 choose how to handle ambiguous states (nucleotide data only)
@@ -1555,9 +1592,9 @@ Reference: [@Hamming1950]
 #### Hamming Distance
 
 The *Hamming Distance* algorithm takes a Characters block as input and
-produces a Distances block as output. It computes the Hamming distance,
-that is the number of differences between sequences The algorithm has
-the following options:
+produces a Distances block as output. It computes the Hamming
+editDistance, that is the number of differences between sequences The
+algorithm has the following options:
 
 `HandleAmbiguousStates = {Ignore | AverageStates | MatchStates}` -
 choose how to handle ambiguous states (nucleotide data only)
@@ -1718,7 +1755,7 @@ Reference: [@Swoffordetal1996]
 
 The *Dice Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It computes distances using the
-DiceDistance coefficient distance.
+DiceDistance coefficient editDistance.
 
 Reference: [@Dice1945]
 
@@ -1742,7 +1779,7 @@ Reference: [@HusonSteel2004]
 
 The *Gene Sharing Distance* algorithm takes a Characters block as input
 and produces a Distances block as output. It computes distances using
-the gene-sharing distance.
+the gene-sharing editDistance.
 
 Reference: [@Sneletal1997]
 
@@ -1945,7 +1982,7 @@ The *Min Spanning Network* algorithm takes a Distances block as input
 and produces a Network block as output. It computes a minimum spanning
 network. The algorithm has the following options:
 
-`Epsilon =  <Double>` - weighted genetic distance measure. Low:
+`Epsilon =  <Double>` - weighted genetic editDistance measure. Low:
 MedianJoining, High: full median network
 
 `MinSpanningTree =  <Boolean>` - calculate minimum spanning tree
@@ -2077,7 +2114,7 @@ Reference: [@Volkmannetal2014]
 
 #### Autumn Algorithm
 
-The *Autumn Algorithm* takes a Trees block as input and
+The *Autumn Algorithm* algorithm takes a Trees block as input and
 produces a Trees block as output. It computes all minimum hybridization
 networks using the Autumn algorithm The algorithm has the following
 options:
@@ -2093,11 +2130,11 @@ Reference: [@HusonLinz2018]
 
 #### Phylo Fusion
 
-The *Phylo Fusion* algorithm takes a Trees block as input and produces a Trees block as output.
-It combines multiple rooted phylogenetic trees into a rooted netwok using the phylo-fusion algorithm.
-The algorithm has the following options:
+The *Phylo Fusion* algorithm takes a Trees block as input and produces a
+Trees block as output. It combines multiple rooted phylogenetic trees
+into a rooted netwok using the phylo-fusion algorithm. The algorithm has
+the following options:
 
-{\footnotesize
 `MinConfidence =  <Double>` - minimum input tree-edge confidence
 
 `MutualRefinement =  <Boolean>` - mutually refine input trees
@@ -2349,11 +2386,11 @@ The *Trees Edges Filter* algorithm takes a Trees block as input and
 produces a Trees block as output. It provides several options for
 filtering trees. The algorithm has the following options:
 
-`MinEdgeLength =  <Double>` - keep only edges that have this minimum
-length
-
 `MinConfidence =  <Double>` - keep only edges that have this minimum
 confidence value
+
+`MinEdgeLength =  <Double>` - keep only edges that have this minimum
+length
 
 `UniformEdgeLengths =  <Boolean>` - change all edge weights to 1
 
@@ -2378,7 +2415,7 @@ its splits. The algorithm has the following options:
 #### Unique Topologies
 
 The *Unique Topologies* algorithm takes a Trees block as input and
-produces a Trees block as output. Filter trees or rooted networks
+produces a Trees block as output. It filter trees or rooted networks
 returning all unique topologies (using hardwired clusters). The
 algorithm has the following options:
 
@@ -2614,9 +2651,9 @@ seq_7	0	0	5	0	0
 ```
 
 The program also supports a second way of specifying taxon-trait
-associations. After specifying the first one or two lines, the taxon-trait
-counts can also be specified by listing a taxon, a trait and then the
-desired count, like this:
+associations. After specifying the first (one or two) lines, the
+taxon-trait counts can also be specified by listing a taxon, a trait and
+then the desired count, like this:
 
 ``` 
 Traits	Europe   Asia    Africa  Australia   America
@@ -2627,9 +2664,8 @@ seq_2   Europe  10
 seq_2   Asia  5
 seq_2   Australia  6
 ...
-
-
 ```
+
 # Workflow
 
 SplitsTree is designed around the concept of a workflow. This is a
@@ -2826,8 +2862,8 @@ Here is a summary of the most important options:
   written to the console. If output files end on `.gz` then the will
   be written in gzip format.
 
-- Use the `-n` option to specify a specific data node to be saved to output.
-  For example, if your analysis generates a trees block called
+- Use the `-n` option to specify a specific data node to be saved to
+  output. For example, if your analysis generates a trees block called
   `Trees`, then you can specify `-n Trees` to output the trees. If
   this option is not specified, then the whole workflow is output
   containing all input and computed data.
@@ -3151,6 +3187,6 @@ Zhang, L., N. Abhari, C. Colijn, and Y. Wu. 2023. “A Fast and Scalable
 Method for Inferring Phylogenetic Networks from Trees by Aligning
 Lineage Taxon Strings.” *Genome Res*.
 
-Zhang, L., B. Cetinkaya, and DH Huson. TBD. “Hybrization Networks from
-Multiple Trees, in Preparation.” *TBD*, TBD.
+Zhang, L., B. Cetinkaya, and DH Huson. 2024. “PhyloFusion- Fast and Easy
+Fusion of Rooted Phylogenetic Trees into a Network.”
 

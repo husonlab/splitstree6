@@ -1,5 +1,5 @@
 /*
- *  Version.java Copyright (C) 2024 Daniel H. Huson
+ *  IExperimental.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,15 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.main;
+package splitstree6.algorithms;
 
-/**
- * The version string
- * Daniel Huson, 6.2017
- */
-public class Version {
-	static public final String NAME = "SplitsTree App";
-	static public final String SHORT_DESCRIPTION = "SplitsTree App (version 6.3.17, built 6 May 2024)";
-	static public final String VERSION = "6.0.0";
-
+public interface IExperimental {
 }

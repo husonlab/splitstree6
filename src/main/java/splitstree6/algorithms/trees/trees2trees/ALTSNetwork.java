@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.IExperimental;
 import splitstree6.algorithms.utils.MutualRefinement;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -39,9 +40,9 @@ import java.util.List;
  * this runs the non-binary ALTSNetwork network algorithm
  * Daniel Huson, 2.2024
  */
-public class ALTSNetwork extends Trees2Trees {
+public class ALTSNetwork extends Trees2Trees implements IExperimental {
 
-	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", false);
+	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
 
 	@Override
 	public List<String> listOptions() {

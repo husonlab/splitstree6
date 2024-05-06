@@ -22,6 +22,7 @@ package splitstree6.xtra.latex;
 import jloda.util.StringUtils;
 import org.apache.commons.collections4.list.TreeList;
 import splitstree6.algorithms.AlgorithmList;
+import splitstree6.algorithms.IExperimental;
 import splitstree6.options.OptionIO;
 import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
@@ -44,7 +45,7 @@ public class AlgorithmsToLaTeX {
 		var labels = new HashSet<String>();
 
 		for (var algorithm : AlgorithmList.list()) {
-			if (!(algorithm instanceof DataTaxaFilter || algorithm instanceof DoNotLoadThisAlgorithm)) {
+			if (!(algorithm instanceof DataTaxaFilter || algorithm instanceof DoNotLoadThisAlgorithm || algorithm instanceof IExperimental)) {
 				var method = StringUtils.fromCamelCase(algorithm.getClass().getSimpleName());
 				var fromName = StringUtils.fromCamelCase(algorithm.getFromClass().getSimpleName());
 				var toName = StringUtils.fromCamelCase(algorithm.getToClass().getSimpleName());
@@ -57,7 +58,7 @@ public class AlgorithmsToLaTeX {
 					label = algorithm.getClass().getSimpleName() + count;
 				}
 				labels.add(label);
-				buf.append("\\subsubsection{%s}\\index{%s}\\label{alg:%s}%n%n"
+				buf.append("\\subsubsection{%s}\\index{%s algorithm}\\label{alg:%s}%n%n"
 						.formatted(name, name, label));
 				buf.append("The {\\em %s} algorithm takes a %s as input and produces a %s as output.".formatted(
 						method, fromName.replaceAll("Block", "block"), toName.replaceAll("Block", "block")));

@@ -19,8 +19,10 @@
 
 package splitstree6.workflow;
 
+import jloda.fx.window.NotificationManager;
 import jloda.util.Basic;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.IExperimental;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.cite.IHasCitations;
 import splitstree6.data.TaxaBlock;
@@ -30,9 +32,7 @@ import splitstree6.workflow.interfaces.HasFromClass;
 import splitstree6.workflow.interfaces.HasToClass;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * SplitsTree algorithm
@@ -43,6 +43,8 @@ import java.util.List;
  */
 public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extends jloda.fx.workflow.Algorithm implements HasFromClass<S>, HasToClass<T>, IOptionsCarrier, IHasCitations {
 	public static final String BLOCK_NAME = "ALGORITHM";
+
+	private static final Set<String> warned = new HashSet<>();
 
 	private final Class<S> fromClass;
 	private final Class<T> toClass;
@@ -87,6 +89,10 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 		} else if (taxaBlock != null && inputBlock != null && outputBlock != null) {
 			if (!isApplicable(taxaBlock, inputBlock))
 				throw new IOException("Algorithm is not applicable to given input data");
+			if (this instanceof IExperimental && !warned.contains(getName())) {
+				NotificationManager.showWarning(getName() + ": this is experimental code");
+				warned.add(getName());
+			}
 			compute(progress, taxaBlock, inputBlock, outputBlock);
 		}
 	}

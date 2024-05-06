@@ -62,7 +62,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public String getShortDescription() {
-		return "Combines multiple rooted phylogenetic trees into a rooted netwok using the phylo-fusion algorithm.";
+		return "Combines multiple rooted phylogenetic trees into a rooted netwok.";
 	}
 
 	@Override
@@ -84,11 +84,11 @@ public class PhyloFusion extends Trees2Trees {
 	}
 
 	/**
-	 * run the MALTS algorithm
+	 * run the algorithm
 	 */
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
-		progress.setTasks("Computing hybridization result", "(Unknown how long this will really take)");
+		progress.setTasks("Computing network", "(Unknown how long this will really take)");
 
 		var inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
 
