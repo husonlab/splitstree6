@@ -41,7 +41,7 @@ public class BlobTree extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getShortDescription() {
-		return "Extract the blob tree from a rooted network (by contracting all non-trivial bi-connected components).";
+		return "Extracts the blob tree from a rooted network (by contracting all non-trivial bi-connected components).";
 	}
 
 	@Override
