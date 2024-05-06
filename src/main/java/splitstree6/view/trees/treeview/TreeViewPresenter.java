@@ -56,7 +56,7 @@ import splitstree6.qr.QRViewUtils;
 import splitstree6.qr.TreeNewickQR;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.format.edges.LabelEdgesBy;
+import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;

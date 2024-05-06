@@ -131,20 +131,38 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 				rowsAndCols.set(new RowsCols(rowsAndCols.get().rows(), n.intValue()));
 		});
 
+		var changing = new SimpleBooleanProperty(false);
+
 		rowsAndCols.addListener((v, o, n) -> {
 			if (n != null) {
 				view.setOptionRows(n.rows());
 				view.setOptionCols(n.cols());
 				view.setOptionZoomFactor(1);
 				view.setOptionFontScaleFactor(1);
-				Platform.runLater(() -> controller.getRowsColsCBox().setValue(n.toString()));
+				if (!changing.get()) {
+					changing.set(true);
+					try {
+						controller.getRowsColsCBox().setValue(n.toString());
+					} finally {
+						changing.set(false);
+					}
+
+				}
 			}
 		});
 
 		controller.getRowsColsCBox().valueProperty().addListener((v, o, n) -> {
 			var rowsCols = RowsCols.valueOf(n);
-			if (rowsCols != null)
-				rowsAndCols.set(rowsCols);
+			if (rowsCols != null) {
+				if (!changing.get()) {
+					changing.set(true);
+					try {
+						rowsAndCols.set(rowsCols);
+					} finally {
+						changing.set(false);
+					}
+				}
+			}
 		});
 
 		rowsAndCols.set(new RowsCols(view.getOptionRows(), view.getOptionCols()));

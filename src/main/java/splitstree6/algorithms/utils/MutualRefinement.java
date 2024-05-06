@@ -61,6 +61,23 @@ public class MutualRefinement {
 			case Majority -> extract(trees, (int) Math.ceil(0.5 * trees.size()));
 		};
 
+
+		var globalClusterWeights = new HashMap<BitSet, Double>();
+		{
+			var clusterWeightsMap = new HashMap<BitSet, ArrayList<Double>>();
+			for (var tree : trees) {
+				var treeLength = tree.edgeStream().mapToDouble(tree::getWeight).sum();
+				try (var nodeCluster = TreesUtils.extractClusters(tree)) {
+					for (var e : tree.edges()) {
+						clusterWeightsMap.computeIfAbsent(nodeCluster.get(e.getTarget()), k -> new ArrayList<>()).add(tree.getWeight(e) / treeLength);
+					}
+				}
+				for (var cluster : clusterWeightsMap.keySet()) {
+					globalClusterWeights.put(cluster, clusterWeightsMap.get(cluster).stream().mapToDouble(w -> w).average().orElse(0));
+				}
+			}
+		}
+
 		var result = new ArrayList<PhyloTree>();
 		var seen = new HashSet<Set<BitSet>>();
 		var idLabelMap = new HashMap<Integer, String>();
@@ -69,41 +86,61 @@ public class MutualRefinement {
 			tree.nodeStream().filter(v -> tree.getLabel(v) != null && tree.hasTaxa(v)).forEach(v -> idLabelMap.put(tree.getTaxon(v), tree.getLabel(v)));
 
 			var taxa = BitSetUtils.asBitSet(tree.getTaxa());
-			var treeClusters = TreesUtils.collectAllHardwiredClusters(tree);
 
-			var added = false;
+			var treeClusters = new HashSet<BitSet>();
+			var treeClusterWeights = new HashMap<BitSet, Double>();
+			{
+				var treeLength = tree.edgeStream().mapToDouble(tree::getWeight).sum();
+				try (var nodeCluster = TreesUtils.extractClusters(tree)) {
+					for (var e : tree.edges()) {
+						treeClusterWeights.put(nodeCluster.get(e.getTarget()), tree.getWeight(e) / treeLength);
+					}
+					treeClusters.addAll(nodeCluster.values());
+				}
+			}
+
 			for (var cluster : allClusters) {
 				if (BitSetUtils.contains(taxa, cluster) && !treeClusters.contains(cluster) && isCompatibleWithAll(cluster, treeClusters)) {
 					treeClusters.add(cluster);
-					added = true;
 				}
 			}
 			if (!removeDuplicates || !seen.contains(treeClusters)) {
-				if (!added) {
-					result.add(new PhyloTree(tree));
-				} else {
-					var newtree = new PhyloTree();
-					newtree.setName(tree.getName() + "-refined");
+				var newtree = new PhyloTree();
+				newtree.setName(tree.getName() + "-refined");
 
-					for (var cluster : treeClusters) {
-						for (var t : BitSetUtils.members(cluster)) {
-							if (!idLabelMap.containsKey(t))
-								System.err.println("Taxon with missing label: " + t);
-						}
+				for (var cluster : treeClusters) {
+					for (var t : BitSetUtils.members(cluster)) {
+						if (!idLabelMap.containsKey(t))
+							System.err.println("Taxon with missing label: " + t);
 					}
-
-					ClusterPoppingAlgorithm.apply(treeClusters, newtree);
-					if (newtree.getRoot().getOutDegree() == 1) {
-						var v = newtree.getRoot().getFirstOutEdge().getTarget();
-						newtree.deleteNode(newtree.getRoot());
-						newtree.setRoot(v);
-					}
-					newtree.nodeStream().filter(newtree::hasTaxa).forEach(v -> newtree.setLabel(v, idLabelMap.get(newtree.getTaxon(v))));
-					result.add(newtree);
 				}
-				if (removeDuplicates)
-					seen.add(treeClusters);
+
+				ClusterPoppingAlgorithm.apply(treeClusters, newtree);
+				if (newtree.getRoot().getOutDegree() == 1) {
+					var v = newtree.getRoot().getFirstOutEdge().getTarget();
+					newtree.deleteNode(newtree.getRoot());
+					newtree.setRoot(v);
+				}
+
+				try (var nodeCluster = TreesUtils.extractClusters(newtree)) {
+					for (var e : newtree.edges()) {
+						var cluster = nodeCluster.get(e.getTarget());
+						if (treeClusterWeights.containsKey(cluster)) {
+							newtree.setWeight(e, treeClusterWeights.get(cluster));
+						} else if (globalClusterWeights.containsKey(cluster)) {
+							newtree.setWeight(e, globalClusterWeights.get(cluster));
+						} else
+							newtree.setWeight(e, 0);
+					}
+					treeClusters.addAll(nodeCluster.values());
+				}
+
+
+				newtree.nodeStream().filter(newtree::hasTaxa).forEach(v -> newtree.setLabel(v, idLabelMap.get(newtree.getTaxon(v))));
+				result.add(newtree);
 			}
+			if (removeDuplicates)
+				seen.add(treeClusters);
 		}
 		return result;
 	}

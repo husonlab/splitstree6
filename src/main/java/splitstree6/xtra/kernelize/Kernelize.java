@@ -55,7 +55,7 @@ public class Kernelize {
 	 * @return computed networks
 	 */
 	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, Collection<PhyloTree> inputTrees,
-										TriFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Integer, Collection<PhyloTree>> algorithm,
+										BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm,
 										int maxNumberOfResults) throws IOException {
 
 		// setup incompatibility graph
@@ -139,7 +139,7 @@ public class Kernelize {
 						checkNetwork("subproblem input", tree);
 					}
 
-					var networks = algorithm.apply(reducedTreesAndTaxonClasses.trees(), progress, maxNumberOfResults);
+					var networks = algorithm.apply(reducedTreesAndTaxonClasses.trees(), progress);
 
 					if (verbose) {
 						for (var network : networks) {
@@ -224,6 +224,7 @@ public class Kernelize {
 				for (var v : network.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
 					network.delDivertex(v);
 				}
+				network.edgeStream().forEach(e -> network.setReticulate(e, e.getTarget().getInDegree() > 1));
 				if (verbose)
 					System.err.println(NewickIO.toString(network, false) + ";");
 				if (!checkNetwork("output", network))
@@ -561,7 +562,7 @@ public class Kernelize {
 		}
 	}
 
-	public interface TriFunctionWithIOException<S, T, U, R> {
-		R apply(S s, T t, U u) throws IOException;
+	public interface BiFunctionWithIOException<S, T, R> {
+		R apply(S s, T t) throws IOException;
 	}
 }

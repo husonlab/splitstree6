@@ -653,7 +653,7 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getMedianJoiningMenuItem(), new MedianJoining());
 
 		setupAlgorithmMenuItem(controller.getMinSpanningNetworkMenuItem(), new MinSpanningNetwork());
-		setupAlgorithmMenuItem(controller.getHybridizationNetworkMenuItem(), new AutumnAlgorithm());
+		setupAlgorithmMenuItem(controller.getHybridizationNetworkMenuItem(), new PhyloFusion());
 		setupAlgorithmMenuItem(controller.getClusterNetworkMenuItem(), new ClusterNetwork());
 
 		setupAlgorithmMenuItem(controller.getPcoaMenuItem(), new PCOA());

@@ -43,8 +43,9 @@ import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.*;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.edgelabel.EdgeLabelFormat;
+import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.format.edges.EdgesFormat;
-import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.taxlabel.TaxonLabelFormat;
 import splitstree6.view.format.taxmark.TaxonMark;
@@ -147,14 +148,16 @@ public class TreeView implements IView {
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
 		var edgesFormatter = new EdgesFormat(undoManager, edgeSelectionModel, edgeShapeMap, optionEditsProperty());
-		optionLabelEdgesBy.bindBidirectional(edgesFormatter.optionLabelEdgesByProperty());
+
+		var edgeLabelFormat = new EdgeLabelFormat(undoManager);
+		optionLabelEdgesBy.bindBidirectional(edgeLabelFormat.optionLabelEdgesByProperty());
 
 		treeProperty().addListener((v, o, n) -> {
-			edgesFormatter.getPresenter().updateMenus(n);
+			edgeLabelFormat.getPresenter().updateMenus(n);
 		});
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow),
-				new Separator(Orientation.HORIZONTAL), edgesFormatter);
+				new Separator(Orientation.HORIZONTAL), edgeLabelFormat, edgesFormatter);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);

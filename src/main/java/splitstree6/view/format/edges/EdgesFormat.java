@@ -1,5 +1,5 @@
 /*
- *  EdgesFormat.java Copyright (C) 2024 Daniel H. Huson
+ *  EdgeLabelFormat.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -20,7 +20,6 @@
 package splitstree6.view.format.edges;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Group;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -38,22 +37,17 @@ public class EdgesFormat extends Group {
 
 	private final EdgesFormatPresenter presenter;
 
-	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
-
 	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, LabeledEdgeShape> edgeShapeMap,
 					   ObjectProperty<String[]> editsProperty) {
 		var loader = new ExtendedFXMLLoader<EdgesFormatController>(EdgesFormatController.class);
 		EdgesFormatController controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new EdgesFormatPresenter(undoManager, controller, optionLabelEdgesBy, edgeSelectionModel, edgeShapeMap, editsProperty);
+		presenter = new EdgesFormatPresenter(undoManager, controller, edgeSelectionModel, edgeShapeMap, editsProperty);
 	}
 
 	public EdgesFormatPresenter getPresenter() {
 		return presenter;
 	}
 
-	public ObjectProperty<LabelEdgesBy> optionLabelEdgesByProperty() {
-		return optionLabelEdgesBy;
-	}
 }

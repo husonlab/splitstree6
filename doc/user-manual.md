@@ -806,11 +806,10 @@ an exact solution (networks that minimize the hybridization) of a
 computational hard problem, so it might not terminate if the input trees
 have too many conflicts.
 
-The ALTS algorithm [@Zhangetal2023; @Zhangetal2024] takes as input
+The PhyloFusion algorithm [@Zhangetal2023; @Zhangetal2024] takes as input
 multiple rooted trees and computes one or more rooted phylogenetic
 networks that display all the input trees. This heuristic aims at
-minimizing the hybridization number. The implementation in SplitsTree is
-currently under development. We hope this will provide a versatile
+minimizing the hybridization number. With this, we provide a versatile
 method for exploring the practical use of rooted networks in
 phylogenetics.
 
@@ -2078,7 +2077,7 @@ Reference: [@Volkmannetal2014]
 
 #### Autumn Algorithm
 
-The *Autumn Algorithm* algorithm takes a Trees block as input and
+The *Autumn Algorithm* takes a Trees block as input and
 produces a Trees block as output. It computes all minimum hybridization
 networks using the Autumn algorithm The algorithm has the following
 options:
@@ -2092,36 +2091,18 @@ hybridization number
 
 Reference: [@HusonLinz2018]
 
-#### ALTS Network
+#### Phylo Fusion
 
-The *ALTS Network* algorithm takes a Trees block as input and produces a
-Trees block as output. It computes one or more rooted networks that
-contain all input trees using the M-ALTS algorithm. The algorithm has
-the following options:
+The *Phylo Fusion* algorithm takes a Trees block as input and produces a Trees block as output.
+It combines multiple rooted phylogenetic trees into a rooted netwok using the phylo-fusion algorithm.
+The algorithm has the following options:
 
-`MutualRefinement =  <Boolean>` - mutually refine trees during
-preprocessing
+{\footnotesize
+`MinConfidence =  <Double>` - minimum input tree-edge confidence
 
-`RemoveDuplicates =  <Boolean>` - remove duplicate networks in output
-
-`Kernelization =  <Boolean>` - perform kernelization during
-preprocessing
+`MutualRefinement =  <Boolean>` - mutually refine input trees
 
 References: [@Zhangetal2023; @Zhangetal2024]
-
-#### ALTS External
-
-The *ALTS External* algorithm takes a Trees block as input and produces
-a Trees block as output. It runs an external implementation of the ALTS
-algorithm. The algorithm has the following options:
-
-`ALTSExecutableFile =  <String>` - download and compile ALTSNetwork
-program from https://github.com/LX-Zhang/AAST, then set this parameter
-to the executable.
-
-`Note that the program requires fully resolved trees as input and any unresolved trees will be ignored`
-
-Reference: [@Zhangetal2023]
 
 #### Average Consensus
 

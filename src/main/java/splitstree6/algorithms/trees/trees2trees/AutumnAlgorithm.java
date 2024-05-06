@@ -27,8 +27,8 @@ import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
-import splitstree6.autumn.hybridnetwork.ComputeHybridizationNetwork;
-import splitstree6.autumn.hybridnumber.RerootByHybridNumber;
+import splitstree6.compute.autumn.hybridnetwork.ComputeHybridizationNetwork;
+import splitstree6.compute.autumn.hybridnumber.RerootByHybridNumber;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 

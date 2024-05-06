@@ -49,7 +49,7 @@ public class TreesEdgesFilter extends Trees2Trees implements IFilter {
 
 
 	public List<String> listOptions() {
-		return List.of(optionMinEdgeLength.getName(), optionMinConfidence.getName(), optionUniformEdgeLengths.getName(), optionRescale.getName());
+		return List.of(optionMinConfidence.getName(), optionMinEdgeLength.getName(), optionUniformEdgeLengths.getName(), optionRescale.getName());
 	}
 
 	@Override

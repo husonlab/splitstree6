@@ -35,7 +35,7 @@ import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.*;
-import splitstree6.view.format.edges.LabelEdgesBy;
+import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.treepages.TreePane;
 
 /**
@@ -52,7 +52,7 @@ public class TanglegramTreePane extends Group {
 
 	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
-							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
+							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LabelEdgesBy> labelByEdges, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
 							  ReadOnlyDoubleProperty fontScaleFactor, ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
@@ -60,7 +60,7 @@ public class TanglegramTreePane extends Group {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
 						treePane = new TreePane(stage, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), LabelEdgesBy.None, optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
+								optionDiagram.get(), labelByEdges.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
 								null, nodeShapeMap, FXCollections.observableHashMap());
 
 						changingOrientation.bind(treePane.changingOrientationProperty());
@@ -73,6 +73,7 @@ public class TanglegramTreePane extends Group {
 
 		tree.addListener(new WeakInvalidationListener(updater));
 		optionDiagram.addListener(new WeakInvalidationListener(updater));
+		labelByEdges.addListener(new WeakInvalidationListener(updater));
 		// optionOrientation.addListener(new WeakInvalidationListener(updater)); // treepane listens for changes of orientation
 		dimensions.addListener(new WeakInvalidationListener(updater));
 		optionAveraging.addListener(new WeakInvalidationListener(updater));

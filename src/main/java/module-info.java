@@ -166,6 +166,7 @@ module splitstreesix {
 	opens splitstree6.view.format.selecttraits;
 	opens splitstree6.view.format.sites;
 	opens splitstree6.view.format.edges;
+	opens splitstree6.view.format.edgelabel;
 
 	opens splitstree6.view.alignment;
 	opens splitstree6.view.trees;

@@ -1,5 +1,5 @@
 /*
- *  EdgesFormatController.java Copyright (C) 2024 Daniel H. Huson
+ *  EdgeLabelController.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -20,7 +20,10 @@
 package splitstree6.view.format.edges;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleGroup;
 import javafx.util.converter.FormatStringConverter;
 
 import java.text.NumberFormat;
@@ -30,23 +33,6 @@ public class EdgesFormatController {
 	@FXML
 	private ComboBox<Number> widthCBox;
 
-	@FXML
-	private RadioMenuItem labelByConfidenceMenuItem;
-
-	@FXML
-	private RadioMenuItem labelByConfidenceX100MenuItem;
-
-	@FXML
-	private MenuButton labelByMenuButton;
-
-	@FXML
-	private RadioMenuItem labelByNoneMenuItem;
-
-	@FXML
-	private RadioMenuItem labelByProbabilityMenuItem;
-
-	@FXML
-	private RadioMenuItem labelByWeightMenuItem;
 
 	@FXML
 	private ColorPicker colorPicker;
@@ -59,11 +45,6 @@ public class EdgesFormatController {
 	@FXML
 	private void initialize() {
 		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
-		labelByToggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelByConfidenceX100MenuItem, labelByProbabilityMenuItem);
-		labelByToggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
-			if (n != null)
-				labelByMenuButton.setText(((RadioMenuItem) n).getText());
-		});
 	}
 
 	public ComboBox<Number> getWidthCBox() {
@@ -76,26 +57,6 @@ public class EdgesFormatController {
 
 	public TitledPane getTitledPane() {
 		return titledPane;
-	}
-
-	public RadioMenuItem getLabelByConfidenceMenuItem() {
-		return labelByConfidenceMenuItem;
-	}
-
-	public RadioMenuItem getLabelByConfidenceX100MenuItem() {
-		return labelByConfidenceX100MenuItem;
-	}
-
-	public RadioMenuItem getLabelByNoneMenuItem() {
-		return labelByNoneMenuItem;
-	}
-
-	public RadioMenuItem getLabelByProbabilityMenuItem() {
-		return labelByProbabilityMenuItem;
-	}
-
-	public RadioMenuItem getLabelByWeightMenuItem() {
-		return labelByWeightMenuItem;
 	}
 
 	public ToggleGroup getLabelByToggleGroup() {
