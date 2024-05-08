@@ -29,8 +29,8 @@ import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.MutualRefinement;
-import splitstree6.compute.treenetmerge.NetworkUtils;
-import splitstree6.compute.treenetmerge.PhyloFusionAlgorithm;
+import splitstree6.compute.phylofusion.NetworkUtils;
+import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.splits.TreesUtils;
@@ -117,7 +117,7 @@ public class PhyloFusion extends Trees2Trees {
 			for (var e : network.edges()) {
 				network.setReticulate(e, e.getTarget().getInDegree() > 1);
 			}
-			NetworkUtils.setEdgeWeights(inputTrees, network, 1000);
+			NetworkUtils.setEdgeWeights(inputTrees, network, 1500);
 		}
 
 

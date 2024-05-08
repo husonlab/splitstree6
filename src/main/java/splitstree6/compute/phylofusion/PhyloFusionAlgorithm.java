@@ -17,10 +17,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.compute.treenetmerge;
+package splitstree6.compute.phylofusion;
 
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.phylo.PhyloGraph;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
@@ -31,7 +32,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * the MALTS algorithm
+ * the PhyloFusion algorithm
  * Daniel Huson, 5.2024
  */
 public class PhyloFusionAlgorithm {
@@ -44,7 +45,8 @@ public class PhyloFusionAlgorithm {
 	 * @throws IOException user canceled
 	 */
 	public static List<PhyloTree> apply(Collection<PhyloTree> inputTrees, ProgressListener progress) throws IOException {
-		var taxa = new BitSet();
+		var taxa = union(inputTrees.stream().map(PhyloGraph::getTaxa).toList());
+
 		var trees = new ArrayList<PhyloTree>();
 		for (var tree : inputTrees) {
 			tree = new PhyloTree(tree);
@@ -53,7 +55,6 @@ public class PhyloFusionAlgorithm {
 				var e = tree.newEdge(root, tree.getRoot());
 				tree.setWeight(e, 0);
 				tree.setRoot(root);
-				taxa.or(BitSetUtils.asBitSet(tree.getTaxa()));
 			}
 			trees.add(tree);
 		}
@@ -92,7 +93,6 @@ public class PhyloFusionAlgorithm {
 	/**
 	 * compute taxon orderings to consider, using greedy heuristic
 	 *
-	 * @param taxa               input taxa
 	 * @param trees              input trees
 	 * @param maxNumberOrderings number of orderings to consider
 	 * @return taxon rankings
@@ -271,9 +271,10 @@ public class PhyloFusionAlgorithm {
 	 * @return mapping from taxa to hypersequences
 	 */
 	private static Map<Integer, Set<HyperSequence>> computeHyperSequences(BitSet taxa, int[] taxonRank, List<PhyloTree> trees) {
-		var minTaxon = findMin(taxa, taxonRank);
 		var taxonHyperSequencesMap = new HashMap<Integer, Set<HyperSequence>>();
 		for (var tree : trees) {
+			var minTaxon = findMin(BitSetUtils.asBitSet(tree.getTaxa()), taxonRank);
+
 			try (NodeArray<BitSet> nodeLabels = tree.newNodeArray(); NodeArray<BitSet> taxaBelow = tree.newNodeArray()) {
 				// compute labeling:
 				tree.postorderTraversal(v -> {
@@ -305,18 +306,20 @@ public class PhyloFusionAlgorithm {
 				});
 				nodeLabels.computeIfAbsent(tree.getRoot(), k -> new BitSet()).set(minTaxon);
 
-
-				if (true) { // check that each taxon appears exactly twice in a label:
-					var taxonCount = new HashMap<Integer, Integer>();
+				if (false) {
 					for (var v : tree.nodes()) {
-						for (var t : BitSetUtils.members(nodeLabels.get(v))) {
-							taxonCount.put(t, taxonCount.getOrDefault(t, 0) + 1);
+						if (!v.isLeaf()) {
+							tree.setLabel(v, "t" + StringUtils.toString(BitSetUtils.asArrayWith0s(BitSetUtils.max(taxa), nodeLabels.get(v)), ""));
 						}
 					}
-					for (var t : BitSetUtils.members(taxa)) {
-						if (taxonCount.get(t) == null || taxonCount.get(t) != 2)
-							System.err.println("Error: taxon " + t + ": count=" + taxonCount.get(t));
+					System.err.println("ranks: " + StringUtils.toString(taxonRank, " "));
+					System.err.println(tree.toBracketString(false) + ";");
+					for (var v : tree.nodes()) {
+						if (!v.isLeaf()) {
+							tree.setLabel(v, null);
+						}
 					}
+					System.err.println();
 				}
 
 				// extract hyper sequences
@@ -344,6 +347,22 @@ public class PhyloFusionAlgorithm {
 						}
 					}
 				});
+
+				if (true) { // check that each taxon appears exactly twice in a label:
+					var taxonCount = new HashMap<Integer, Integer>();
+					var treeTaxa = new BitSet();
+					for (var v : tree.nodes()) {
+						for (var t : BitSetUtils.members(nodeLabels.get(v))) {
+							taxonCount.put(t, taxonCount.getOrDefault(t, 0) + 1);
+							treeTaxa.set(t);
+						}
+					}
+					for (var t : BitSetUtils.members(treeTaxa)) {
+						if (taxonCount.get(t) == null || taxonCount.get(t) != 2)
+							System.err.println("Error: taxon " + t + ": count=" + taxonCount.get(t));
+					}
+				}
+
 				if (!taxonReverseSequenceMap.isEmpty()) {
 					throw new RuntimeException("taxonReverseSequenceMap: " + taxonReverseSequenceMap.size());
 				}
@@ -403,5 +422,21 @@ public class PhyloFusionAlgorithm {
 				taxonRank[taxon] = ++rank;
 		}
 		return taxonRank;
+	}
+
+	/**
+	 * union of integers
+	 *
+	 * @param sets integer iterables
+	 * @return union
+	 */
+	public static BitSet union(Collection<Iterable<Integer>> sets) {
+		var result = new BitSet();
+		for (var set : sets) {
+			for (var t : set) {
+				result.set(t);
+			}
+		}
+		return result;
 	}
 }

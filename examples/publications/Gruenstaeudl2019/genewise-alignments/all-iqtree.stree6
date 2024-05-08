@@ -12,7 +12,6 @@ Analysis was performed using SplitsTree CE 6.0.0 (Huson and Bryant 2006).
 The original input consisted of 17 taxa and 78 trees.
 A Reroot Or Reorder Trees (default options, except RootBy=MidPoint, OutGroupTaxa=(Ljava.lang.String;@65c0a1d1) was applied so as to be Reroot, or change the order of children, on all trees..
 The Show Trees method was used (default options) so as to obtain a Tree View visualization.
-A Trees Filter (DisabledTrees=(Ljava.lang.String;@60631d2a) was applied so as to be Allows the user to interactively filter trees..
 A Trees Edges Filter (default options, except MinConfidence=70.0) was applied so as to be Provides several options for filtering trees..
 The Phylo Fusion method (Zhang et al 2023, Zhang et al 2024) was used (default options) so as to obtain one rooted network.
 The Show Trees method was used (View=TreePages) so as to obtain a Tree Pages visualization.

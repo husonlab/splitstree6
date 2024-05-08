@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.compute.treenetmerge;
+package splitstree6.compute.phylofusion;
 
 import jloda.graph.Edge;
 import jloda.graph.EdgeArray;
