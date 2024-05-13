@@ -35,12 +35,10 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.compute.autumn.HasseDiagram;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -107,6 +105,39 @@ public class ClusterNetwork extends Trees2Trees {
 			if (entry.getValue().getFirst() >= threshold)
 				clusters.add(entry.getKey());
 		}
+
+		Function<Integer, String> taxonIdLabelFunction = taxaBlock::getLabel;
+
+		Function<BitSet, Double> clusterWeightFunction = cluster -> {
+			var pair = clusterCountWeightMap.get(cluster);
+			if (pair != null && pair.getFirst() > 0) {
+				return switch (getOptionEdgeWeights()) {
+					case Count -> (double) pair.getFirst();
+					case Mean -> // average length
+							pair.getSecond() / pair.getFirst();
+					case Sum -> pair.getSecond();
+					default -> 1.0;
+				};
+			} else return 1.0;
+		};
+
+		var network = computeNetwork(clusters, taxonIdLabelFunction, clusterWeightFunction);
+
+		network.setName("Cluster network");
+		child.getTrees().setAll(network);
+		child.setReticulated(network.nodeStream().anyMatch(v -> v.getInDegree() > 1));
+		child.setRooted(true);
+	}
+
+	/**
+	 * compute the network for a set of clusters
+	 *
+	 * @param clusters           clusters
+	 * @param taxonLabelFunction optional leaf labeling function
+	 * @param weightFunction     optional edge weight function
+	 * @return network
+	 */
+	public static PhyloTree computeNetwork(Collection<BitSet> clusters, Function<Integer, String> taxonLabelFunction, Function<BitSet, Double> weightFunction) {
 		var network = HasseDiagram.constructHasse(clusters.toArray(new BitSet[0]));
 		convertHasseToClusterNetwork(network, null);
 		var additionalLeaves = new ArrayList<Pair<Node, Integer>>();
@@ -133,40 +164,24 @@ public class ClusterNetwork extends Trees2Trees {
 			network.addTaxon(v, pair.getSecond());
 			network.newEdge(pair.getFirst(), v);
 		}
-		for (var v : network.leaves()) {
-			network.setLabel(v, taxaBlock.getLabel(network.getTaxon(v)));
+		if (taxonLabelFunction != null) {
+			for (var v : network.leaves()) {
+				network.setLabel(v, taxonLabelFunction.apply(network.getTaxon(v)));
+			}
 		}
-		try (var nodeClusterMap = TreesUtils.extractClusters(network)) {
-			for (var v : nodeClusterMap.keySet()) {
-				if (v.getInDegree() == 1) {
-					if (getOptionEdgeWeights() == EdgeWeights.Uniform) {
-						network.setWeight(v.getFirstInEdge(), 1.0);
-					} else {
+		if (weightFunction != null) {
+			try (var nodeClusterMap = TreesUtils.extractClusters(network)) {
+				for (var v : nodeClusterMap.keySet()) {
+					if (v.getInDegree() == 1) {
 						var cluster = nodeClusterMap.get(v);
-						var pair = clusterCountWeightMap.get(cluster);
-						if (pair != null && pair.getFirst() > 0) {
-							switch (getOptionEdgeWeights()) {
-								case Count -> {
-									network.setWeight(v.getFirstInEdge(), pair.getFirst());
-								}
-								case Mean -> {
-									var weight = pair.getSecond() / pair.getFirst(); // average length
-									network.setWeight(v.getFirstInEdge(), weight);
-								}
-								case Sum -> {
-									network.setWeight(v.getFirstInEdge(), pair.getSecond());
-								}
-							}
-						}
+						var weight = weightFunction.apply(cluster);
+						if (weight != null)
+							network.setWeight(v.getFirstInEdge(), weight);
 					}
 				}
 			}
 		}
-
-		network.setName("Cluster network");
-		child.getTrees().setAll(network);
-		child.setReticulated(network.nodeStream().anyMatch(v -> v.getInDegree() > 1));
-		child.setRooted(true);
+		return network;
 	}
 
 	public static void convertHasseToClusterNetwork(PhyloTree network, NodeDoubleArray node2weight) {

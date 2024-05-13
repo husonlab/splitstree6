@@ -36,19 +36,16 @@ import splitstree6.xtra.hyperstrings.HyperSequence;
 import splitstree6.xtra.hyperstrings.ProgressiveSCS;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static splitstree6.splits.TreesUtils.addAdhocTaxonIds;
 import static splitstree6.utils.PathMultiplicityDistance.compute;
+import static splitstree6.utils.TreesUtils.addAdhocTaxonIds;
 
 
 /**

@@ -25,7 +25,6 @@ import jloda.util.BitSetUtils;
 import jloda.util.ExecuteInParallel;
 import jloda.util.IteratorUtils;
 import jloda.util.ProgramExecutorService;
-import splitstree6.splits.TreesUtils;
 
 import java.util.*;
 

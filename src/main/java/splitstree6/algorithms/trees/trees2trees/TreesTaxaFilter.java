@@ -25,7 +25,7 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 import splitstree6.workflow.DataTaxaFilter;
 
 import java.io.IOException;

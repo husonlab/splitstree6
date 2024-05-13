@@ -59,14 +59,14 @@ public class PhyloFusionAlgorithm {
 			trees.add(tree);
 		}
 
-		var rankings = computeTaxonRankings(taxa, trees, 1);
+		var rankings = computeTaxonRankings(progress, taxa, trees, 1);
 
 		var bestHybridizationNumber = new Single<>(Integer.MAX_VALUE);
 		var best = new ArrayList<Pair<int[], Map<Integer, HyperSequence>>>();
 
 		try {
 			ExecuteInParallel.apply(rankings, taxonRank -> {
-				var taxonHyperSequencesMap = computeHyperSequences(taxa, taxonRank, trees);
+				var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, taxonRank, trees);
 				var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
 				// todo: take different optimal SCS into account
 				for (var t : taxonHyperSequencesMap.keySet()) {
@@ -97,11 +97,11 @@ public class PhyloFusionAlgorithm {
 	 * @param maxNumberOrderings number of orderings to consider
 	 * @return taxon rankings
 	 */
-	private static Collection<? extends int[]> computeTaxonRankings(BitSet taxa, ArrayList<PhyloTree> trees, int maxNumberOrderings) {
+	private static Collection<? extends int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, int maxNumberOrderings) throws CanceledException {
 		// setting maxNumberOrderings larger than 1 only has the effect that we get the same resulting network multiple times
 		var rankings = new ArrayList<int[]>();
 		var globalScore = new Single<>(Integer.MAX_VALUE);
-		computeTaxonRankingsRec(0, new int[taxa.cardinality()], taxa, BitSetUtils.copy(taxa), trees, globalScore, maxNumberOrderings, rankings);
+		computeTaxonRankingsRec(progress, 0, new int[taxa.cardinality()], taxa, BitSetUtils.copy(taxa), trees, globalScore, maxNumberOrderings, rankings);
 		return rankings;
 	}
 
@@ -115,8 +115,8 @@ public class PhyloFusionAlgorithm {
 	 * @param globalScore   best hybridization number so far
 	 * @param rankings      best orderings
 	 */
-	private static boolean computeTaxonRankingsRec(int pos, int[] order, BitSet allTaxa, BitSet remainingTaxa, ArrayList<PhyloTree> trees,
-												   Single<Integer> globalScore, int maxNumberOrderings, ArrayList<int[]> rankings) {
+	private static boolean computeTaxonRankingsRec(ProgressListener progress, int pos, int[] order, BitSet allTaxa, BitSet remainingTaxa, ArrayList<PhyloTree> trees,
+												   Single<Integer> globalScore, int maxNumberOrderings, ArrayList<int[]> rankings) throws CanceledException {
 		var bestScore = Integer.MAX_VALUE;
 		var bestTaxa = new BitSet();
 
@@ -143,7 +143,7 @@ public class PhyloFusionAlgorithm {
 				}
 			}
 
-			var taxonHyperSequencesMap = computeHyperSequences(allTaxa, ranking(order), trees);
+			var taxonHyperSequencesMap = computeHyperSequences(progress, allTaxa, ranking(order), trees);
 			var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
 			// todo: take different optimal SCS into account
 			for (var t1 : taxonHyperSequencesMap.keySet()) {
@@ -171,7 +171,7 @@ public class PhyloFusionAlgorithm {
 
 				if (remainingTaxa.cardinality() > 0) {
 					if (bestScore <= globalScore.get()) {
-						if (!computeTaxonRankingsRec(pos + 1, order, allTaxa, remainingTaxa, trees, globalScore, maxNumberOrderings, rankings))
+						if (!computeTaxonRankingsRec(progress, pos + 1, order, allTaxa, remainingTaxa, trees, globalScore, maxNumberOrderings, rankings))
 							return false; // done
 					}
 				} else { // completed ordering,
@@ -270,7 +270,7 @@ public class PhyloFusionAlgorithm {
 	 * @param trees     all trees
 	 * @return mapping from taxa to hypersequences
 	 */
-	private static Map<Integer, Set<HyperSequence>> computeHyperSequences(BitSet taxa, int[] taxonRank, List<PhyloTree> trees) {
+	private static Map<Integer, Set<HyperSequence>> computeHyperSequences(ProgressListener progress, BitSet taxa, int[] taxonRank, List<PhyloTree> trees) throws CanceledException {
 		var taxonHyperSequencesMap = new HashMap<Integer, Set<HyperSequence>>();
 		for (var tree : trees) {
 			var minTaxon = findMin(BitSetUtils.asBitSet(tree.getTaxa()), taxonRank);
@@ -367,6 +367,7 @@ public class PhyloFusionAlgorithm {
 					throw new RuntimeException("taxonReverseSequenceMap: " + taxonReverseSequenceMap.size());
 				}
 			}
+			progress.checkForCancel();
 		}
 		return taxonHyperSequencesMap;
 	}

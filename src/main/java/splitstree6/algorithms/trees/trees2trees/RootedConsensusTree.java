@@ -27,6 +27,7 @@ import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.utils.ClusterUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -119,7 +120,7 @@ public class RootedConsensusTree extends Trees2Trees {
 			var selected = new HashSet<BitSet>();
 			for (var pair : list) {
 				var cluster = pair.getSecond();
-				if (isCompatibleWithAll(cluster, selected)) {
+				if (ClusterUtils.isCompatibleWithAll(cluster, selected)) {
 					selected.add(cluster);
 					clusterWeightList.add(new Pair<>(cluster, clusterCountWeightMap.get(cluster).getSecond() / trees.size()));
 				}
@@ -174,16 +175,6 @@ public class RootedConsensusTree extends Trees2Trees {
 			}
 		}
 		return tree;
-	}
-
-	public static boolean isCompatibleWithAll(BitSet a, Collection<BitSet> clusters) {
-		if (a != null) {
-			for (var b : clusters) {
-				if (!(!a.intersects(b) || BitSetUtils.contains(a, b) || BitSetUtils.contains(b, a)))
-					return false;
-			}
-		}
-		return true;
 	}
 
 	public Consensus getOptionConsensus() {

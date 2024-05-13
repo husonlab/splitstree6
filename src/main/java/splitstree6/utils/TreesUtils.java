@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.splits;
+package splitstree6.utils;
 
 import jloda.graph.Edge;
 import jloda.graph.Node;
@@ -29,6 +29,9 @@ import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CollectionUtils;
 import jloda.util.NumberUtils;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.GraphUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -224,7 +227,7 @@ public class TreesUtils {
 	}
 
 	/**
-	 * computes a mapping of tree nodes to represented hardwired cluster. Does not contain the cluster at the root
+	 * computes a mapping of tree or network nodes to represented hardwired cluster. Does not contain the cluster at the root
 	 *
 	 * @param network input tree, may contain reticulations
 	 * @return mapping of tree nodes to corresponding hardwired clusters
@@ -255,7 +258,7 @@ public class TreesUtils {
 				}
 			}
 		}
-		network.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
+		network.nodeStream().filter(v -> v.getInDegree() != 1 && v.getOutDegree() == 1).forEach(nodeClusterMap::remove);
 		return nodeClusterMap;
 	}
 
@@ -410,5 +413,20 @@ public class TreesUtils {
 			list.add(tree);
 		}
 		return list;
+	}
+
+	/**
+	 * checks whether intersection of all tree taxon sets reach or exceed the given min proportion of all taxa
+	 *
+	 * @param trees         trees
+	 * @param minProportion required min proportion
+	 * @throws IOException is thrown if min proportion not met
+	 */
+	public static void checkTaxonIntersection(Collection<PhyloTree> trees, double minProportion) throws IOException {
+		var treeTaxa = trees.stream().map(tree -> BitSetUtils.asBitSet(tree.getTaxa())).toList().toArray(new BitSet[0]);
+		var taxa = BitSetUtils.union(treeTaxa);
+		var intersection = BitSetUtils.intersection(treeTaxa);
+		if (intersection.cardinality() < minProportion * taxa.cardinality())
+			throw new IOException("Intersection of taxa over all input trees must be at least %.1f%%, got: %.1f%%".formatted(minProportion * 100, (100.0 * intersection.cardinality()) / taxa.cardinality()));
 	}
 }

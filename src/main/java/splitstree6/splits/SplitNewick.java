@@ -27,6 +27,7 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.*;
 import jloda.util.progress.ProgressSilent;
+import splitstree6.utils.TreesUtils;
 
 import java.io.*;
 import java.util.*;

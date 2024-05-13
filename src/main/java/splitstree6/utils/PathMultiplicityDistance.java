@@ -30,7 +30,7 @@ import jloda.util.StringUtils;
 import java.io.IOException;
 import java.util.*;
 
-import static splitstree6.splits.TreesUtils.addAdhocTaxonIds;
+import static splitstree6.utils.TreesUtils.addAdhocTaxonIds;
 
 /**
  * computes the path multiplicity editDistance between two rooted trees or networks

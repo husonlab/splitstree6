@@ -42,7 +42,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.io.writers.splits.NexusWriter;
 import splitstree6.layout.splits.algorithms.PhylogeneticOutline;
 import splitstree6.splits.ASplit;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 import splitstree6.view.trees.tanglegram.optimize.LSATree;
 
 import java.io.IOException;

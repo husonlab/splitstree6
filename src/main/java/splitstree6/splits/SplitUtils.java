@@ -26,6 +26,7 @@ import jloda.graph.algorithms.PQTree;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.Pair;
+import splitstree6.utils.TreesUtils;
 
 import java.util.*;
 

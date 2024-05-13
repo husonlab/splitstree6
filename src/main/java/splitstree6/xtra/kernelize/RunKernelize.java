@@ -33,7 +33,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.readers.trees.TreesReader;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;

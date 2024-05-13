@@ -140,7 +140,9 @@ public class TaxaBlock extends DataBlock {
 	public Taxon get(int t) {
 		if (t <= 0)
 			throw new IndexOutOfBoundsException(t - 1);
+		else if (t <= getNtax())
 		return taxa.get(t - 1);
+		else return null;
 	}
 
 	/**

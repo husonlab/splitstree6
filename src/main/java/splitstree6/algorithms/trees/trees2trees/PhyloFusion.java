@@ -20,9 +20,7 @@
 package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
@@ -33,23 +31,20 @@ import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.ProgressMover;
+import splitstree6.utils.TreesUtils;
 import splitstree6.xtra.kernelize.Kernelize;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class PhyloFusion extends Trees2Trees {
-	private final DoubleProperty optionMinConfidence = new SimpleDoubleProperty(this, "optionMinConfidence", 70.0);
-
 	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
 
 	private final BooleanProperty optionKernelization = new SimpleBooleanProperty(this, "optionKernelization", false);
 
 	{
-		ProgramProperties.track(optionMinConfidence, 70.0);
 		ProgramProperties.track(optionMutualRefinement, true);
 	}
 
@@ -67,7 +62,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMinConfidence.getName(), optionMutualRefinement.getName());//, optionKernelization.getName());
+		return List.of(optionMutualRefinement.getName()); // optionKernelization.getName());
 	}
 
 	@Override
@@ -76,7 +71,6 @@ public class PhyloFusion extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
-			case "optionMinConfidence" -> "minimum input tree-edge confidence";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionKernelization" -> "uses kernelization";
 			default -> super.getToolTip(optionName);
@@ -89,58 +83,55 @@ public class PhyloFusion extends Trees2Trees {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
 		progress.setTasks("Computing network", "(Unknown how long this will really take)");
+		try (var progressMover = new ProgressMover(progress)) {
+			TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.25);
+			var inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
 
-		var inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
-
-		if (getOptionMinConfidence() > 0) {
-			for (var tree : inputTrees) {
-				TreesEdgesFilter.contractShortOLowConfidenceEdgesKeepLeafEdges(tree, 0, getOptionMinConfidence());
+			if (isOptionMutualRefinement()) {
+				var refined = MutualRefinement.apply(inputTrees, MutualRefinement.Strategy.All, false);
+				inputTrees.clear();
+				inputTrees.addAll(refined);
+				if (false)
+					System.err.println("Refined:\n" + NewickIO.toString(inputTrees, false));
 			}
-		}
-		if (isOptionMutualRefinement()) {
-			var refined = MutualRefinement.apply(inputTrees, MutualRefinement.Strategy.All, false);
-			inputTrees.clear();
-			inputTrees.addAll(refined);
-			if (false)
-				System.err.println("Refined:\n" + NewickIO.toString(inputTrees, false));
-		}
-		Collection<PhyloTree> result;
-		if (inputTrees.size() <= 1) {
-			result = inputTrees;
-		} else if (!isOptionKernelization()) {
-			result = PhyloFusionAlgorithm.apply(inputTrees, progress);
-		} else { // kernelization is broken
-			result = Kernelize.apply(progress, taxaBlock, inputTrees, PhyloFusionAlgorithm::apply, Integer.MAX_VALUE);
-		}
-
-		for (var network : result) {
-			for (var e : network.edges()) {
-				network.setReticulate(e, e.getTarget().getInDegree() > 1);
+			List<PhyloTree> result;
+			if (inputTrees.size() <= 1) {
+				result = inputTrees;
+			} else if (!isOptionKernelization()) {
+				result = PhyloFusionAlgorithm.apply(inputTrees, progress);
+			} else { // kernelization is broken: blob tree computation doesn't work as intended on unequal taxon sets
+				result = Kernelize.apply(progress, taxaBlock, inputTrees, PhyloFusionAlgorithm::apply, Integer.MAX_VALUE);
 			}
-			NetworkUtils.setEdgeWeights(inputTrees, network, 1500);
-		}
 
-
-		outputBlock.setPartial(false);
-		outputBlock.setRooted(true);
-
-		var count = 0;
-		for (var network : result) {
-			network.setName("N" + (++count));
-			TreesUtils.addLabels(network, taxaBlock::getLabel);
-			outputBlock.getTrees().add(network);
-			if (network.nodeStream().anyMatch(v -> v.getInDegree() > 1)) {
-				outputBlock.setReticulated(true);
+			for (var network : result) {
+				for (var e : network.edges()) {
+					network.setReticulate(e, e.getTarget().getInDegree() > 1);
+				}
+				NetworkUtils.setEdgeWeights(inputTrees, network, 1500);
 			}
-			if (false) { // this takes too long when number of reticulations is large
-				var networkClusters = TreesUtils.collectAllSoftwiredClusters(network);
-				for (var t = 1; t <= treesBlock.getNTrees(); t++) {
-					var tree = treesBlock.getTree(t);
-					if (!networkClusters.containsAll(TreesUtils.collectAllHardwiredClusters(tree))) {
-						System.err.println("ERROR: Network does not contain tree: " + t);
-						for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
-							if (!networkClusters.contains(cluster))
-								System.err.println("ERROR: missing cluster: " + StringUtils.toString(cluster));
+
+			outputBlock.setPartial(false);
+			outputBlock.setRooted(true);
+
+			var count = 0;
+			for (var network : result) {
+				network.setName("N" + (++count));
+				TreesUtils.addLabels(network, taxaBlock::getLabel);
+				outputBlock.getTrees().add(network);
+				if (network.nodeStream().anyMatch(v -> v.getInDegree() > 1)) {
+					outputBlock.setReticulated(true);
+				}
+				NetworkUtils.check(network);
+				if (false) { // this takes too long when number of reticulations is large
+					var networkClusters = TreesUtils.collectAllSoftwiredClusters(network);
+					for (var t = 1; t <= treesBlock.getNTrees(); t++) {
+						var tree = treesBlock.getTree(t);
+						if (!networkClusters.containsAll(TreesUtils.collectAllHardwiredClusters(tree))) {
+							System.err.println("ERROR: Network does not contain tree: " + t);
+							for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
+								if (!networkClusters.contains(cluster))
+									System.err.println("ERROR: missing cluster: " + StringUtils.toString(cluster));
+							}
 						}
 					}
 				}
@@ -170,18 +161,6 @@ public class PhyloFusion extends Trees2Trees {
 
 	public void setOptionKernelization(boolean optionKernelization) {
 		this.optionKernelization.set(optionKernelization);
-	}
-
-	public double getOptionMinConfidence() {
-		return optionMinConfidence.get();
-	}
-
-	public DoubleProperty optionMinConfidenceProperty() {
-		return optionMinConfidence;
-	}
-
-	public void setOptionMinConfidence(double optionMinConfidence) {
-		this.optionMinConfidence.set(optionMinConfidence);
 	}
 
 	@Override

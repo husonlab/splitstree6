@@ -23,7 +23,7 @@ import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import splitstree6.compute.autumn.Cluster;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -64,6 +64,23 @@ public class ClusterIncompatibilityGraph {
 			}
 		}
 		// setup edges:
+		for (var v = graph.getFirstNode(); v != null; v = v.getNext()) {
+			var cv = (BitSet) v.getInfo();
+			for (var w = v.getNext(); w != null; w = w.getNext()) {
+				var cw = (BitSet) w.getInfo();
+				if (Cluster.incompatible(cv, cw)) {
+					graph.newEdge(v, w);
+				}
+			}
+		}
+		return graph;
+	}
+
+	public static Graph applyClusters(Collection<BitSet> clusters) {
+		var graph = new Graph();
+		for (var cluster : clusters) {
+			graph.newNode().setInfo(cluster);
+		}
 		for (var v = graph.getFirstNode(); v != null; v = v.getNext()) {
 			var cv = (BitSet) v.getInfo();
 			for (var w = v.getNext(); w != null; w = w.getNext()) {

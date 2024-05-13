@@ -22,12 +22,12 @@ package splitstree6.algorithms.utils;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.BitSetUtils;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 import splitstree6.xtra.kernelize.ClusterIncompatibilityGraph;
 
 import java.util.*;
 
-import static splitstree6.algorithms.trees.trees2trees.RootedConsensusTree.isCompatibleWithAll;
+import static splitstree6.utils.ClusterUtils.isCompatibleWithAll;
 
 /**
  * mutually refines a collection of trees and removes any topological duplicates

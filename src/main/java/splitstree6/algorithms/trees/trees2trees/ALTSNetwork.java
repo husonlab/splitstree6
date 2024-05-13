@@ -26,9 +26,11 @@ import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IExperimental;
 import splitstree6.algorithms.utils.MutualRefinement;
+import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.ProgressMover;
+import splitstree6.utils.TreesUtils;
 import splitstree6.xtra.alts.AltsNonBinary;
 
 import java.io.IOException;
@@ -77,6 +79,8 @@ public class ALTSNetwork extends Trees2Trees implements IExperimental {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
 		progress.setTasks("Computing hybridization networks", "(Unknown how long this will really take)");
 		try (var progressMover = new ProgressMover(progress)) {
+			TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.25);
+
 			Collection<PhyloTree> result;
 
 			Collection<PhyloTree> inputTrees;
@@ -91,18 +95,18 @@ public class ALTSNetwork extends Trees2Trees implements IExperimental {
 				}
 			}
 
-
 			if (inputTrees.size() <= 1) {
 				result = inputTrees;
 			} else {
 				result = AltsNonBinary.apply(inputTrees, progress);
 			}
 			var count = 0;
-			for (var tree : result) {
-				tree.setName("N" + (++count));
-				for (var v : tree.nodeStream().filter(v -> tree.getLabel(v) != null).toList()) {
-					tree.addTaxon(v, taxaBlock.indexOf(tree.getLabel(v)));
+			for (var network : result) {
+				network.setName("N" + (++count));
+				for (var v : network.nodeStream().filter(v -> network.getLabel(v) != null).toList()) {
+					network.addTaxon(v, taxaBlock.indexOf(network.getLabel(v)));
 				}
+				NetworkUtils.check(network);
 			}
 			outputBlock.getTrees().addAll(result);
 			outputBlock.setReticulated(result.stream().anyMatch(PhyloTree::isReticulated));

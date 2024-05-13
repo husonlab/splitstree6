@@ -30,7 +30,7 @@ import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * Daniel Huson, 10.23
  */
 public class Kernelize {
-	private static boolean verbose = false;
+	private static boolean verbose = true;
 
 
 	/**
@@ -54,7 +54,7 @@ public class Kernelize {
 	 * @param maxNumberOfResults maximum number of solutions to report
 	 * @return computed networks
 	 */
-	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, Collection<PhyloTree> inputTrees,
+	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, List<PhyloTree> inputTrees,
 										BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm,
 										int maxNumberOfResults) throws IOException {
 
@@ -67,7 +67,7 @@ public class Kernelize {
 
 		// extract all incompatibility components
 		var components = incompatibilityGraph.extractAllConnectedComponents();
-		if (verbose) {
+		if (false) {
 			System.err.println("Components:     " + components.stream().filter(c -> c.getNumberOfNodes() > 1).count());
 			System.err.println();
 		}
@@ -102,8 +102,13 @@ public class Kernelize {
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
 					System.err.println("Component " + (++count) + ": " + component.getNumberOfNodes() + " clusters");
+					System.err.print("Clusters:");
 					for (var v : component.nodes())
-						System.err.print(" " + v.getInfo());
+						System.err.print(" " + v.getInfo() + ",");
+					System.err.println();
+					System.err.print("In trees:");
+					for (var v : component.nodes())
+						System.err.print(" " + v.getData() + ",");
 					System.err.println();
 					var reducedTrees = extractTrees(component, blobTreeClusters);
 					System.err.println(reducedTrees.report());
@@ -111,19 +116,8 @@ public class Kernelize {
 			}
 		}
 
-		if (verbose)
-			System.err.println("Blob tree: " + NewickIO.toString(blobTree, false) + ";");
-		if (true) {
-			var tree = new PhyloTree(blobTree);
-			for (var v : tree.nodes()) {
-				if (tree.hasTaxa(v)) {
-					tree.setLabel(v, "t" + tree.getTaxon(v));
-				}
-			}
-			if (verbose)
-				System.err.println("Blob tree: " + NewickIO.toString(tree, false) + ";");
+		report("  blob tree", blobTree);
 			checkNetwork("Blob tree", blobTree);
-		}
 
 		// run the algorithm on all components:
 		try (NodeArray<TreesAndTaxonClasses> blobNetworksMap = blobTree.newNodeArray()) {
@@ -133,48 +127,29 @@ public class Kernelize {
 					for (var tree : reducedTreesAndTaxonClasses.trees())
 						TreesUtils.addLabels(tree, taxaBlock::getLabel);
 
-					if (verbose)
+					if (verbose) {
 						System.err.println("Subproblem input: " + NewickIO.toString(reducedTreesAndTaxonClasses.trees(), false));
-					for (var tree : reducedTreesAndTaxonClasses.trees()) {
-						checkNetwork("subproblem input", tree);
+						if (true) {
+							for (var tree : reducedTreesAndTaxonClasses.trees()) {
+								tree = new PhyloTree(tree);
+								for (var v : tree.nodes()) {
+									if (tree.hasTaxa(v)) {
+										tree.setLabel(v, "t" + tree.getTaxon(v));
+									}
+								}
+								System.err.println("Subproblem input: " + NewickIO.toString(tree, false) + ";");
+							}
+						}
 					}
+
+					for (var tree : reducedTreesAndTaxonClasses.trees()) {
+						checkNetwork("component input", tree);
+					}
+
+					report("component input", reducedTreesAndTaxonClasses.trees().toArray(new PhyloTree[0]));
 
 					var networks = algorithm.apply(reducedTreesAndTaxonClasses.trees(), progress);
 
-					if (verbose) {
-						for (var network : networks) {
-							System.err.println("Number of nodes: " + network.getNumberOfNodes());
-						}
-					}
-
-					// restore equivalent taxa
-					if (false) {
-						var taxonEquivalenceClassMap = new HashMap<Integer, BitSet>();
-						for (var equivalenceClass : reducedTreesAndTaxonClasses.taxonClasses()) {
-							if (equivalenceClass.cardinality() > 1) {
-								for (var t : BitSetUtils.members(equivalenceClass)) {
-									taxonEquivalenceClassMap.put(t, equivalenceClass);
-								}
-							}
-						}
-						for (var network : networks) {
-							var leaves = IteratorUtils.asList(network.leaves());
-							for (var v : leaves) {
-								var taxonId = network.getTaxon(v);
-								if (taxonEquivalenceClassMap.containsKey(taxonId)) {
-									var p = v.getParent();
-									for (var t : BitSetUtils.members(taxonEquivalenceClassMap.get(taxonId))) {
-										if (t != taxonId) {
-											var w = network.newNode();
-											w.setLabel("t" + t);
-											network.addTaxon(w, t);
-											network.newEdge(p, w);
-										}
-									}
-								}
-							}
-						}
-					}
 					if (true) { // todo: algorithm doesn't return taxon ids
 						if (IteratorUtils.size(networks.iterator().next().getTaxa()) == 0) {
 							for (var network : networks) {
@@ -190,11 +165,12 @@ public class Kernelize {
 					}
 					if (verbose) {
 						for (var network : networks) {
+							report("component");
 							System.err.println("Number of nodes: " + network.getNumberOfNodes());
 							System.err.println("Number of isolated nodes: " + network.nodeStream().filter(v -> v.getDegree() == 0).count());
-							TreesUtils.addLabels(network, taxaBlock::getLabel);
+							report("network", network);
+
 						}
-						System.err.println("Subproblem networks: " + NewickIO.toString(networks, false));
 					}
 
 					for (var network : networks) {
@@ -352,7 +328,7 @@ public class Kernelize {
 				list.add(equivalent);
 				mapped.set(s);
 				for (var t : BitSetUtils.members(taxa, s + 1)) {
-					if (!mapped.get(t) && clusters.stream().noneMatch(c -> c.get(s) != c.get(t))) {
+					if (!mapped.get(t) && clusters.stream().noneMatch(c -> c.cardinality() > 1 && c.get(s) != c.get(t))) {
 						equivalent.set(t);
 						mapped.set(t);
 					}
@@ -466,6 +442,24 @@ public class Kernelize {
 		}
 
 		for (var clusters : allClusterSets) {
+			var toDelete = new HashSet<BitSet>();
+			for (var cluster : clusters) {
+				if (cluster.cardinality() == 1) {
+					var ok = false;
+					for (var other : clusters) {
+						if (other.cardinality() > 1 && other.get(cluster.nextSetBit(0))) {
+							ok = true;
+							break;
+						}
+					}
+					if (!ok) {
+						toDelete.add(cluster);
+						break;
+					}
+				}
+			}
+			if (!toDelete.isEmpty())
+				clusters.removeAll(toDelete);
 			var tree = new PhyloTree();
 			ClusterPoppingAlgorithm.apply(clusters, tree);
 			tree.nodeStream().filter(v -> tree.getNumberOfTaxa(v) > 0).forEach(v -> tree.setLabel(v, "t" + tree.getTaxon(v)));
@@ -476,12 +470,12 @@ public class Kernelize {
 				tree.setRoot(root);
 			}
 
-			if (false) {
+			if (true) {
 				System.err.println("Reduced clusters:");
 				for (var cluster : clusters) {
 					System.err.println(StringUtils.toString(cluster, ","));
 				}
-				System.err.println("Resulting tree: " + NewickIO.toString(tree, false));
+				report("tree", tree);
 			}
 			trees.add(tree);
 		}
@@ -559,6 +553,26 @@ public class Kernelize {
 				buf.append(";\n");
 			}
 			return buf.toString();
+		}
+	}
+
+
+	public static void report(String label, PhyloTree... networks) {
+		if (verbose) {
+			var buf = new StringBuilder(label + ": ");
+			if (networks.length != 1)
+				buf.append("\n");
+			for (var network0 : networks) {
+				var network = new PhyloTree(network0);
+				network.nodeStream().filter(network::hasTaxa).forEach(v -> {
+					if (network.getLabel(v) == null)
+						network.setLabel(v, "t" + network.getTaxon(v));
+					else if (false)
+						network.setLabel(v, network.getLabel(v) + "_" + network.getTaxon(v));
+				});
+				buf.append(network.toBracketString(false)).append(";\n");
+			}
+			System.err.print(buf);
 		}
 	}
 

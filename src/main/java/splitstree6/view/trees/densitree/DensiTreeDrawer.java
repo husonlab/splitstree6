@@ -57,14 +57,14 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.main.SplitsTree6;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 import splitstree6.view.trees.InteractionSetup;
 import splitstree6.window.MainWindow;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static splitstree6.algorithms.trees.trees2trees.RootedConsensusTree.isCompatibleWithAll;
+import static splitstree6.utils.ClusterUtils.isCompatibleWithAll;
 
 /**
  * draws a densi-tree on a canvas

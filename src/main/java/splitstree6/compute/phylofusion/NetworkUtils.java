@@ -22,11 +22,12 @@ package splitstree6.compute.phylofusion;
 import jloda.graph.Edge;
 import jloda.graph.EdgeArray;
 import jloda.graph.Node;
+import jloda.graph.algorithms.IsDAG;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -125,4 +126,61 @@ public class NetworkUtils {
 			throw new CanceledException();
 		return set;
 	}
+
+
+	public static boolean check(PhyloTree network) {
+		var ok = true;
+		if (!IsDAG.apply(network)) {
+			System.err.println("Is not a DAG");
+			ok = false;
+		}
+		var roots = network.nodeStream().filter(v -> v.getInDegree() == 0).toList();
+		if (roots.size() != 1) {
+			System.err.println("Wrong number of root nodes: " + roots.size());
+			ok = false;
+		}
+		if (network.getRoot() == null) {
+			System.err.println("Root node not declared");
+
+		} else if (!roots.contains(network.getRoot())) {
+			System.err.println("Network declared root has wrong in-degree: " + network.getRoot().getInDegree());
+		}
+
+		for (var v : network.nodes()) {
+			if (v.isLeaf() && network.getTaxon(v) == -1) {
+				System.err.println("Leaf with no taxon: " + v);
+				ok = false;
+			}
+			if (v.isLeaf() && network.getLabel(v) == null) {
+				System.err.println("Leaf with no label: " + v);
+				ok = false;
+			}
+			if (!v.isLeaf() && network.getTaxon(v) != -1) {
+				System.err.println("Non-leaf with no taxon: " + v);
+				ok = false;
+			}
+			if (!v.isLeaf() && network.getLabel(v) != null) {
+				System.err.println("Non-leaf with label: " + v);
+				ok = false;
+			}
+		}
+		try (var reachableFromRoot = network.newNodeSet()) {
+			network.postorderTraversal(reachableFromRoot::add);
+			if (reachableFromRoot.size() != network.getNumberOfNodes()) {
+				System.err.println("Root reaches " + reachableFromRoot.size() + " of " + network.getNumberOfNodes() + " nodes");
+				ok = false;
+			}
+		}
+		for (var f : network.edges()) {
+			if (f.getTarget().getInDegree() == 1 && network.isReticulateEdge(f)) {
+				System.err.println("Non-reticulate edge marked as reticulate: " + f);
+				ok = false;
+			} else if (f.getTarget().getInDegree() > 1 && !network.isReticulateEdge(f)) {
+				System.err.println("Reticulate edge marked as non-reticulate: " + f);
+				ok = false;
+			}
+		}
+		return ok;
+	}
+
 }

@@ -27,7 +27,7 @@ import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.splits.TreesUtils;
+import splitstree6.utils.TreesUtils;
 import splitstree6.view.trees.tanglegram.optimize.LSATree;
 
 import java.util.*;

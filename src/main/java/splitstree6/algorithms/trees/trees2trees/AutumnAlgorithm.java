@@ -31,6 +31,7 @@ import splitstree6.compute.autumn.hybridnetwork.ComputeHybridizationNetwork;
 import splitstree6.compute.autumn.hybridnumber.RerootByHybridNumber;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.utils.TreesUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -80,10 +81,12 @@ public class AutumnAlgorithm extends Trees2Trees {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputData, TreesBlock outputData) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputData) throws IOException {
+		TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.25);
+
 		var hybridNumber = new Single<>(0);
-		var firstTree = inputData.getTree(Math.max(1, Math.min(getOptionFirstTree(), inputData.getNTrees())));
-		var secondTree = inputData.getTree(Math.max(1, Math.min(getOptionSecondTree(), inputData.getNTrees())));
+		var firstTree = treesBlock.getTree(Math.max(1, Math.min(getOptionFirstTree(), treesBlock.getNTrees())));
+		var secondTree = treesBlock.getTree(Math.max(1, Math.min(getOptionSecondTree(), treesBlock.getNTrees())));
 
 		if (isOptionRerootToMinimize()) {
 			firstTree = new PhyloTree(firstTree);

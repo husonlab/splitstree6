@@ -214,4 +214,5 @@ module splitstreesix {
 	opens splitstree6.utils.worldmap;
 
 	exports splitstree6.xtra.hyperstrings;
+	opens splitstree6.utils;
 }
