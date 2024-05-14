@@ -152,7 +152,8 @@ public class LayoutUtils {
 			while (!queue.isEmpty()) {
 				var node = queue.pop();
 				if (node instanceof RichTextLabel richTextLabel) {
-					richTextLabel.setScale(factor * richTextLabel.getScale());
+					if (!"edge-label".equals(richTextLabel.getId()))
+						richTextLabel.setScale(factor * richTextLabel.getScale());
 				} else if (node instanceof Parent parent)
 					queue.addAll(parent.getChildrenUnmodifiable());
 			}

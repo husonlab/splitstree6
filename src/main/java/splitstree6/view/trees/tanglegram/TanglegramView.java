@@ -87,6 +87,9 @@ public class TanglegramView implements IView {
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
 	{
+		ProgramProperties.track(optionDiagram1, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionDiagram2, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
 		ProgramProperties.track(optionAveraging1, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionAveraging2, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionShowTreeNames, true);

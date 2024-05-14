@@ -55,7 +55,8 @@ public class LabeledEdgeShape extends Group {
 	public void setLabel(RichTextLabel label) {
 		this.label = label;
 		if (label != null) {
-			label.setFontSize(10);
+			label.setFontSize(11);
+			label.setId("edge-label");
 			MouseDragToTranslate.setup(label);
 		}
 	}

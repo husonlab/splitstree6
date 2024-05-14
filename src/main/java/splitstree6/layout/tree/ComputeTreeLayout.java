@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * computes an embedding of a tree
@@ -135,7 +134,7 @@ public class ComputeTreeLayout {
 		}
 		edgeGroup.getChildren().addAll(edgeShapeMap.values());
 
-		otherLabelsGroup.getChildren().addAll(edgeShapeMap.values().stream().filter(LabeledEdgeShape::hasLabel).map(LabeledEdgeShape::getLabel).collect(Collectors.toList()));
+		otherLabelsGroup.getChildren().addAll(edgeShapeMap.values().stream().filter(LabeledEdgeShape::hasLabel).map(LabeledEdgeShape::getLabel).toList());
 
 		var labelConnectorGroup = alignLabels ? new Group() : null;
 

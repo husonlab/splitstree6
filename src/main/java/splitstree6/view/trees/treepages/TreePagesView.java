@@ -80,6 +80,7 @@ public class TreePagesView implements IView {
 	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
 
 	{
+		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
 		ProgramProperties.track(optionRows, 2);
 		ProgramProperties.track(optionCols, 3);

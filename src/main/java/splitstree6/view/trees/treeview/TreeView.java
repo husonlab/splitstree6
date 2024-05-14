@@ -106,6 +106,8 @@ public class TreeView implements IView {
 
 	// create properties:
 	{
+		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionPaneLabel, PaneLabel::valueOf, PaneLabel.ScaleBarNone);
 		ProgramProperties.track(optionShowQRCode, false);
