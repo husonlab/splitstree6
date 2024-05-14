@@ -121,7 +121,9 @@ public class ALTSExternal extends Trees2Trees implements IDesktopOnly {
 			if (count < treesBlock.getNTrees())
 				NotificationManager.showWarning("Ignoring input trees have missing taxa, reticulations or multi-furcations; using %,d of %d".formatted(count, treesBlock.getNTrees()));
 
+			var start = System.currentTimeMillis();
 			runExternalProgramAndWait(progress, executable.getAbsolutePath(), inputFile, String.valueOf(taxaBlock.getNtax()), outFile);
+			System.err.printf("%.1fs%n", (System.currentTimeMillis() - start) / 1000.0);
 
 			var data = new ArrayList<ArrayList<String>>();
 			var networkNumber = -1;

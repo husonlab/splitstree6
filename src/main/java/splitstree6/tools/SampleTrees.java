@@ -21,6 +21,7 @@ package splitstree6.tools;
 
 import jloda.fx.util.ArgsOptions;
 import jloda.graph.Edge;
+import jloda.graph.EdgeArray;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
@@ -84,7 +85,7 @@ public class SampleTrees {
 
 		var replicates = options.getOption("-R", "replicates", "Now replicates per input tree", 1);
 		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
-		var timeOut = options.getOption("-to", "timeOut", "Algorithm killed 'timed out' after this many milliseconds", 120000);
+		var timeOut = options.getOption("-to", "timeOut", "Algorithm killed 'timed out' after this many milliseconds", 300000);
 
 		options.done();
 
@@ -143,6 +144,7 @@ public class SampleTrees {
 						w.write(inputTree.toBracketString(true) + "[&&NHX:GN=in%s];\n".formatted(countInputTrees));
 					var data = new ArrayList<DataPoint>();
 					for (var replicate = 1; replicate <= replicates; replicate++) {
+						System.err.println("Running replicate " + replicate);
 						var outputTrees = new ArrayList<PhyloTree>();
 						for (var t = 0; t < numTrees; t++) {
 							var tree = new PhyloTree(inputTree);
@@ -183,32 +185,39 @@ public class SampleTrees {
 											throw new RuntimeException("Too few edges");
 									}
 									var second = first;
-									while (second == first || second.getSource() == first.getTarget() || second.getTarget() == first.getSource() || second.getSource() == tree.getRoot()) {
+									Collection<BitSet> all = null;
+									while (true) {
 										second = edges.get(randomForSPRs.nextInt(edges.size()));
-										if (++count > 100)
-											throw new RuntimeException("Too few edges");
-									}
-									var before = TreesUtils.collectAllHardwiredClusters(new PhyloTree(tree));
-									applyRootedSPR(first, second, tree);
-									var after = TreesUtils.collectAllHardwiredClusters(tree);
-
-									if (before.equals(after))
-										System.err.println("no change");
-									else {
-										var all = CollectionUtils.union(before, after);
-										var compatible = true;
-										allPairsLoop:
-										for (var a : all) {
-											for (var b : all) {
-												if (a != b && Cluster.incompatible(a, b)) {
-													compatible = false;
-													break allPairsLoop;
+										if (!(second == first || second.getSource() == first.getTarget() || second.getTarget() == first.getSource() || second.getSource() == tree.getRoot())) {
+											try (EdgeArray<Edge> srcTarMap = tree.newEdgeArray()) {
+												var newTree = new PhyloTree();
+												newTree.copy(tree, null, srcTarMap);
+												var before = TreesUtils.collectAllHardwiredClusters(newTree);
+												applyRootedSPR(srcTarMap.get(first), srcTarMap.get(second), newTree);
+												var after = TreesUtils.collectAllHardwiredClusters(newTree);
+												if (!before.equals(after)) {
+													all = CollectionUtils.union(before, after);
+													tree = newTree;
+													break;
 												}
 											}
 										}
-										if (compatible)
-											System.err.println("no rSPR");
+										if (++count > 100)
+											throw new RuntimeException("Too few edges");
 									}
+
+									var compatible = true;
+									allPairsLoop:
+									for (var a : all) {
+										for (var b : all) {
+											if (a != b && Cluster.incompatible(a, b)) {
+												compatible = false;
+												break allPairsLoop;
+											}
+										}
+									}
+									if (compatible)
+										System.err.println("no rSPR");
 								}
 								countOutputTrees++;
 								if (runAlgorithm.isBlank())
