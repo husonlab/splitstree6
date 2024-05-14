@@ -24,6 +24,7 @@ import jloda.graph.Edge;
 import jloda.graph.EdgeArray;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
+import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import jloda.util.*;
 import jloda.util.progress.ProgressSilent;
@@ -75,7 +76,7 @@ public class SampleTrees {
 		var outputFile = options.getOption("-o", "output", "Output file (stdout, *.gz ok)", "stdout");
 
 		options.comment("Options");
-		var numberOfTaxa = options.getOption("-t", "taxa", "Number of taxa to restrict the input tree(s) to (0=keep original size)", 0);
+		var numberOfTaxaRangeString = options.getOption("-t", "taxa", "Number of taxa to restrict the input tree(s) to (range ok, \"\"=keep original size)", "");
 		var rSPRs = options.getOption("-r", "rSPR", "Number of rSPRs", 1);
 		var maxProportionMissingTaxa = options.getOption("-m", "missing", "Proportion of missing taxa", 0.0);
 		var maxProportionContractedInternalEdges = options.getOption("-c", "maxContracted", "Maximum proportion of contracted internal edges", 0.0);
@@ -115,133 +116,167 @@ public class SampleTrees {
 			while (r.ready()) {
 				var line = r.readLine();
 				if (line.startsWith("(")) {
-					var inputTree = NewickIO.valueOf(line);
-					TreesUtils.addAdhocTaxonIds(inputTree, taxIdMap);
-					var inputTaxa = BitSetUtils.asBitSet(inputTree.getTaxa());
+					var inputTree0 = NewickIO.valueOf(line);
+					TreesUtils.addAdhocTaxonIds(inputTree0, taxIdMap);
+					var inputTaxa0 = BitSetUtils.asBitSet(inputTree0.getTaxa());
 
-					if (numberOfTaxa > 0 && numberOfTaxa < inputTaxa.cardinality()) {
-						var array = new int[BitSetUtils.max(inputTaxa) + 1];
-						var count = 0;
-						var newTaxa = new BitSet();
-						for (var t : BitSetUtils.members(inputTaxa)) {
-							count++;
-							array[t] = count;
-							newTaxa.set(count);
-							if (count == numberOfTaxa)
-								break;
+					int[] numberOfTaxaRange;
+					if (numberOfTaxaRangeString.isBlank())
+						numberOfTaxaRange = new int[]{inputTaxa0.cardinality()};
+					else
+						numberOfTaxaRange = StringUtils.parseArrayOfIntegers(numberOfTaxaRangeString);
+
+					for (var numberOfTaxa : numberOfTaxaRange) {
+						if (numberOfTaxaRange.length > 1)
+							System.err.println("NumberOfTaxa: " + numberOfTaxa);
+						BitSet inputTaxa;
+						PhyloTree inputTree;
+						if (numberOfTaxa > 0 && numberOfTaxa < inputTaxa0.cardinality()) {
+							var array = new int[BitSetUtils.max(inputTaxa0) + 1];
+							var count = 0;
+							inputTaxa = new BitSet();
+							for (var t : BitSetUtils.members(inputTaxa0)) {
+								count++;
+								array[t] = count;
+								inputTaxa.set(count);
+								if (count == numberOfTaxa)
+									break;
+							}
+							inputTree = TreesUtils.computeInducedTree(array, inputTree0);
+							assert inputTree != null;
+							assert BitSetUtils.asBitSet(inputTree.getTaxa()).equals(BitSetUtils.asBitSet(BitSetUtils.range(1, numberOfTaxa + 1)));
+						} else {
+							inputTaxa = inputTaxa0;
+							inputTree = inputTree0;
 						}
-						inputTaxa = newTaxa;
-						inputTree = TreesUtils.computeInducedTree(array, inputTree);
-						assert inputTree != null;
-					}
 
-					for (var v : inputTree.nodes()) {
-						if (v.getInDegree() == 1 && v.getOutDegree() == 1)
-							inputTree.delDivertex(v);
-					}
-					countInputTrees++;
-					if (echoInputTree)
-						w.write(inputTree.toBracketString(true) + "[&&NHX:GN=in%s];\n".formatted(countInputTrees));
-					var data = new ArrayList<DataPoint>();
-					for (var replicate = 1; replicate <= replicates; replicate++) {
-						System.err.println("Running replicate " + replicate);
-						var outputTrees = new ArrayList<PhyloTree>();
-						for (var t = 0; t < numTrees; t++) {
-							var tree = new PhyloTree(inputTree);
-							if (maxProportionMissingTaxa > 0) {
-								var missing = (int) (maxProportionMissingTaxa * inputTaxa.cardinality());
-								if (missing > 0) {
-									List<Integer> keep = new ArrayList<>(BitSetUtils.asList(inputTaxa));
-									CollectionUtils.randomize(keep, randomForMissingTaxa);
-									keep = keep.subList(0, keep.size() - missing);
-									var newId = 0;
-									var oldNewId = new int[BitSetUtils.max(inputTaxa) + 1];
-									for (var tax : keep) {
-										oldNewId[tax] = ++newId;
+						for (var v : inputTree.nodes()) {
+							if (v.getInDegree() == 1 && v.getOutDegree() == 1)
+								inputTree.delDivertex(v);
+						}
+						countInputTrees++;
+						if (echoInputTree)
+							w.write(inputTree.toBracketString(true) + "[&&NHX:GN=in%s];\n".formatted(countInputTrees));
+						var data = new ArrayList<DataPoint>();
+						for (var replicate = 1; replicate <= replicates; replicate++) {
+							System.err.println("Running replicate " + replicate);
+							var outputTrees = new ArrayList<PhyloTree>();
+							for (var t = 0; t < numTrees; t++) {
+								var tree = new PhyloTree(inputTree);
+								check(tree);
+								if (maxProportionMissingTaxa > 0) {
+									var missing = (int) (maxProportionMissingTaxa * inputTaxa.cardinality());
+									if (missing > 0) {
+										List<Integer> keep = new ArrayList<>(BitSetUtils.asList(inputTaxa));
+										CollectionUtils.randomize(keep, randomForMissingTaxa);
+										keep = keep.subList(0, keep.size() - missing);
+										var newId = 0;
+										var oldNewId = new int[BitSetUtils.max(inputTaxa) + 1];
+										for (var tax : keep) {
+											oldNewId[tax] = ++newId;
+										}
+										tree = TreesUtils.computeInducedTree(oldNewId, tree);
+										if (tree == null)
+											throw new RuntimeException("Tree is null");
+										check(tree);
 									}
-									tree = TreesUtils.computeInducedTree(oldNewId, tree);
-									if (tree == null)
-										throw new RuntimeException("Tree is null");
 								}
-							}
-							if (maxProportionContractedInternalEdges > 0) {
-								List<Edge> edges = CollectionUtils.randomize(IteratorUtils.asStream(tree.edges()).filter(e -> !e.getTarget().isLeaf()).toList(), randomForContractEdges);
-								var numContractEdges = (int) Math.ceil(maxProportionContractedInternalEdges * edges.size());
-								if (numContractEdges > 0 && numContractEdges < edges.size()) {
-									edges = edges.subList(edges.size() - numContractEdges, edges.size());
+								if (maxProportionContractedInternalEdges > 0) {
+									List<Edge> edges = CollectionUtils.randomize(IteratorUtils.asStream(tree.edges()).filter(e -> !e.getTarget().isLeaf()).toList(), randomForContractEdges);
+									var numContractEdges = (int) Math.ceil(maxProportionContractedInternalEdges * edges.size());
+									if (numContractEdges > 0 && numContractEdges < edges.size()) {
+										edges = edges.subList(edges.size() - numContractEdges, edges.size());
+									}
+									RootedNetworkProperties.contractEdges(tree, new HashSet<>(edges), null);
+									check(tree);
 								}
-								RootedNetworkProperties.contractEdges(tree, new HashSet<>(edges), null);
-							}
-							if (rSPRs > 0) {
-								for (var i = 0; i < rSPRs; i++) {
-									var edges = IteratorUtils.asList(tree.edges());
-									if (edges.size() < 2)
-										throw new RuntimeException("Too few edges");
-									var first = edges.get(randomForSPRs.nextInt(edges.size()));
-									var count = 0;
-									while (first.getSource() == tree.getRoot()) {
-										first = edges.get(randomForSPRs.nextInt(edges.size()));
-										if (++count > 100)
+								if (rSPRs > 0) {
+									for (var i = 0; i < rSPRs; i++) {
+										var edges = IteratorUtils.asList(tree.edges());
+										edges.removeAll(tree.getRoot().outEdgesStream(false).toList());
+										if (edges.size() < 2)
 											throw new RuntimeException("Too few edges");
-									}
-									var second = first;
-									Collection<BitSet> all = null;
-									while (true) {
-										second = edges.get(randomForSPRs.nextInt(edges.size()));
-										if (!(second == first || second.getSource() == first.getTarget() || second.getTarget() == first.getSource() || second.getSource() == tree.getRoot())) {
-											try (EdgeArray<Edge> srcTarMap = tree.newEdgeArray()) {
-												var newTree = new PhyloTree();
-												newTree.copy(tree, null, srcTarMap);
-												var before = TreesUtils.collectAllHardwiredClusters(newTree);
-												applyRootedSPR(srcTarMap.get(first), srcTarMap.get(second), newTree);
-												var after = TreesUtils.collectAllHardwiredClusters(newTree);
-												if (!before.equals(after)) {
-													all = CollectionUtils.union(before, after);
-													tree = newTree;
-													break;
+
+										var movingEdge = edges.get(randomForSPRs.nextInt(edges.size()));
+										edges.removeAll(getEdgesBelow(movingEdge));
+
+										var targetEdge = movingEdge;
+										Collection<BitSet> all;
+
+										var count = 0;
+										while (true) {
+											targetEdge = edges.get(randomForSPRs.nextInt(edges.size()));
+											if (!(targetEdge.getSource() == movingEdge.getTarget() || targetEdge.getTarget() == movingEdge.getSource())) {
+												try (EdgeArray<Edge> srcTarMap = tree.newEdgeArray()) {
+													var newTree = new PhyloTree();
+													newTree.copy(tree, null, srcTarMap);
+													var before = TreesUtils.collectAllHardwiredClusters(newTree);
+													applyRootedSPR(srcTarMap.get(targetEdge), srcTarMap.get(movingEdge), newTree);
+													var after = TreesUtils.collectAllHardwiredClusters(newTree);
+													if (!before.equals(after) && tree.isConnected()) {
+														all = CollectionUtils.union(before, after);
+														tree = newTree;
+														break;
+													}
+												}
+											}
+											if (++count > 100)
+												throw new RuntimeException("Too few edges");
+										}
+
+										var compatible = true;
+										allPairsLoop:
+										for (var a : all) {
+											for (var b : all) {
+												if (a != b && Cluster.incompatible(a, b)) {
+													compatible = false;
+													break allPairsLoop;
 												}
 											}
 										}
-										if (++count > 100)
-											throw new RuntimeException("Too few edges");
+										if (compatible)
+											System.err.println("no rSPR");
+										check(tree);
 									}
+									countOutputTrees++;
+									if (runAlgorithm.isBlank())
+										w.write(tree.toBracketString(true) + "[&&NHX:GN=out%s];\n".formatted(countOutputTrees));
 
-									var compatible = true;
-									allPairsLoop:
-									for (var a : all) {
-										for (var b : all) {
-											if (a != b && Cluster.incompatible(a, b)) {
-												compatible = false;
-												break allPairsLoop;
-											}
-										}
-									}
-									if (compatible)
-										System.err.println("no rSPR");
+									outputTrees.add(tree);
 								}
-								countOutputTrees++;
-								if (runAlgorithm.isBlank())
-									w.write(tree.toBracketString(true) + "[&&NHX:GN=out%s];\n".formatted(countOutputTrees));
-								outputTrees.add(tree);
+							}
+							if (!runAlgorithm.isBlank()) {
+								data.add(runAlgorithm(runAlgorithm, timeOut, replicate, rSPRs, maxProportionContractedInternalEdges, maxProportionMissingTaxa, outputTrees));
 							}
 						}
-						if (!runAlgorithm.isBlank()) {
-							data.add(runAlgorithm(runAlgorithm, timeOut, replicate, rSPRs, maxProportionContractedInternalEdges, maxProportionMissingTaxa, outputTrees));
+						if (!data.isEmpty()) {
+							w.write("#Algorithm: " + runAlgorithm + "\n");
+							w.write(DataPoint.header());
+							for (var d : data) {
+								w.write(d.toString());
+							}
+							w.write("\n" + DataPoint.average(data));
 						}
-					}
-					if (!data.isEmpty()) {
-						w.write("#Algorithm: " + runAlgorithm + "\n");
-						w.write(DataPoint.header());
-						for (var d : data) {
-							w.write(d.toString());
-						}
-						w.write("\n" + DataPoint.average(data));
 					}
 				}
 			}
 			System.err.printf("Input trees:  %,10d%n", countInputTrees);
 			System.err.printf("Output trees:%,11d%n", countOutputTrees);
 		}
+	}
+
+	private Collection<Edge> getEdgesBelow(Edge e) {
+		var list = new ArrayList<Edge>();
+		var stack = new Stack<Edge>();
+		stack.add(e);
+		while (!stack.isEmpty()) {
+			e = stack.pop();
+			list.add(e);
+			for (var f : e.getTarget().outEdges()) {
+				stack.push(f);
+			}
+		}
+		return list;
 	}
 
 	private DataPoint runAlgorithm(String algorithmName, long timeOut, int replicate, int rSPRs, double maxProportionContractedInternalEdges, double maxProportionMissingTaxa, ArrayList<PhyloTree> inputTrees) throws IOException, UsageException {
@@ -301,24 +336,24 @@ public class SampleTrees {
 				rSPRs, h, time / 1000.0);
 	}
 
-	private void applyRootedSPR(Edge first, Edge second, PhyloTree tree) {
-		var p1 = first.getSource();
-		var q1 = first.getTarget();
-		var p2 = second.getSource();
-		var q2 = second.getTarget();
+	private void applyRootedSPR(Edge targetEdge, Edge movingEdge, PhyloTree tree) throws IOException {
+		var p1 = targetEdge.getSource();
+		var q1 = targetEdge.getTarget();
+		var p2 = movingEdge.getSource();
+		var q2 = movingEdge.getTarget();
 
 		var n1 = tree.newNode();
 
 		var e1 = tree.newEdge(p1, n1);
-		tree.setWeight(e1, 0.5 * tree.getWeight(first));
+		tree.setWeight(e1, 0.5 * tree.getWeight(movingEdge));
 		var e2 = tree.newEdge(n1, q1);
-		tree.setWeight(e2, 0.5 * tree.getWeight(first));
+		tree.setWeight(e2, 0.5 * tree.getWeight(movingEdge));
 
-		tree.deleteEdge(first);
+		tree.deleteEdge(movingEdge);
 
 		var f1 = tree.newEdge(n1, q2);
-		tree.setWeight(f1, tree.getWeight(second));
-		tree.deleteEdge(second);
+		tree.setWeight(f1, tree.getWeight(targetEdge));
+		tree.deleteEdge(targetEdge);
 
 		if (p2.getInDegree() == 1 && p2.getOutDegree() == 1)
 			tree.delDivertex(p2);
@@ -361,8 +396,33 @@ public class SampleTrees {
 			var h = data.stream().mapToInt(DataPoint::h).average().orElse(0.0);
 			var time = data.stream().mapToDouble(DataPoint::timeInSeconds).average().orElse(0.0);
 
-			return "av\t%.0f\t%.0f\t%.1f\t%.1f\t%.0f\t%.0f\t%.0f\t%.1f%n".formatted(nTaxa, nTrees, maxProportionContractedInternalEdges, maxProportionMissingTaxa, nSPRs, totalSPRs, h, time);
+			return "av\t%.0f\t%.0f\t%.1f\t%.1f\t%.0f\t%.1f\t%.1f\t%.1f%n".formatted(nTaxa, nTrees, maxProportionContractedInternalEdges, maxProportionMissingTaxa, nSPRs, totalSPRs, h, time);
 		}
 	}
 
+	public static PhyloTree subtree(int nTaxa, PhyloTree tree) {
+		var taxa = BitSetUtils.asBitSet(BitSetUtils.range(1, nTaxa + 1));
+		var clusters = new HashSet<BitSet>();
+		clusters.add(taxa);
+		for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
+			cluster.and(taxa);
+			if (cluster.cardinality() > 0)
+				clusters.add(cluster);
+		}
+		var result = new PhyloTree();
+		ClusterPoppingAlgorithm.apply(clusters, result);
+		result.nodeStream().filter(result::hasTaxa).forEach(v -> result.setLabel(v, "t" + result.getTaxon(v)));
+		return result;
+	}
+
+	public static void check(PhyloTree tree) throws IOException {
+		var recLeaves = new Counter(0);
+		tree.postorderTraversal(v -> {
+			if (v.isLeaf())
+				recLeaves.increment();
+		});
+		var leaves = tree.nodeStream().filter(v -> v.getOutDegree() == 0).count();
+		if (recLeaves.get() != leaves)
+			throw new IOException("leaves != recLeaves");
+	}
 }
