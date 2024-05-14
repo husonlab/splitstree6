@@ -26,6 +26,7 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import jloda.util.*;
 import jloda.util.progress.ProgressSilent;
+import splitstree6.algorithms.trees.trees2trees.ALTSExternal;
 import splitstree6.algorithms.trees.trees2trees.ALTSNetwork;
 import splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm;
 import splitstree6.algorithms.trees.trees2trees.PhyloFusion;
@@ -82,7 +83,7 @@ public class SampleTrees {
 		var echoInputTree = options.getOption("-e", "echoInput", "Echo the input tree to output", false);
 
 		var replicates = options.getOption("-R", "replicates", "Now replicates per input tree", 1);
-		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "Autumn", "ALTSNetwork", ""), "");
+		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
 		var timeOut = options.getOption("-to", "timeOut", "Algorithm killed 'timed out' after this many milliseconds", 120000);
 
 		options.done();
@@ -241,6 +242,8 @@ public class SampleTrees {
 
 		reader.read(new ProgressSilent(), new ListIterator<>(inputTrees.stream().map(t -> t.toBracketString(false) + ";").toList()), taxaBlock, inputBlock);
 
+		if (inputBlock.isReticulated())
+			throw new IOException("Illegal rooted network in input");
 
 		var algorithm = switch (algorithmName.toLowerCase()) {
 			case "phylofusion" -> {
@@ -251,9 +254,20 @@ public class SampleTrees {
 				yield phyloFusion;
 			}
 			case "altsnetwork" -> {
-				var altsnetwork = new ALTSNetwork();
-				altsnetwork.setOptionMutualRefinement(true);
-				yield altsnetwork;
+				var alts = new ALTSNetwork();
+				alts.setOptionMutualRefinement(true);
+				yield alts;
+			}
+			case "altsexternal" -> {
+				if (inputBlock.isPartial())
+					throw new IOException("--algorithm ALTSExternal not applicable to trees with missing taxa");
+				for (var tree : inputTrees) {
+					if (tree.nodeStream().anyMatch(v -> v.getOutDegree() > 2))
+						throw new IOException("--algorithm ALTSExternal not applicable to trees with multifurcations");
+				}
+				var alts = new ALTSExternal();
+				alts.setOptionALTSExecutableFile("/Users/huson/cpp/louxin/alts");
+				yield alts;
 			}
 			case "autumn" -> new AutumnAlgorithm();
 			default -> throw new UsageException("Unknown algorithm " + algorithmName);
@@ -263,9 +277,11 @@ public class SampleTrees {
 		try {
 			algorithm.compute(new ProgressTimeOut(timeOut), taxaBlock, inputBlock, outputBlock);
 		} catch (IOException ex) { // timed out
-			System.err.println("Timed out: " + replicate);
-			return new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
-					maxProportionContractedInternalEdges, maxProportionMissingTaxa, rSPRs, -1, timeOut);
+			if (ex.getMessage().equals(ProgressTimeOut.MESSAGE)) {
+				System.err.println("Timed out: " + replicate);
+				return new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
+						maxProportionContractedInternalEdges, maxProportionMissingTaxa, rSPRs, -1, timeOut);
+			} else throw ex;
 		}
 		time = System.currentTimeMillis() - time;
 

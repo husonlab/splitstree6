@@ -26,6 +26,7 @@ import jloda.util.progress.ProgressListener;
  * progress listener that throws a user canceled expection after a given amount of time
  */
 public class ProgressTimeOut implements ProgressListener {
+	public static final String MESSAGE = "Timed out";
 	private final long endTime;
 
 	/**
@@ -60,7 +61,7 @@ public class ProgressTimeOut implements ProgressListener {
 	@Override
 	public void checkForCancel() throws CanceledException {
 		if (System.currentTimeMillis() > endTime)
-			throw new CanceledException();
+			throw new CanceledException(MESSAGE);
 	}
 
 	@Override
