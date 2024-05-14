@@ -42,7 +42,11 @@ import java.util.List;
 public class PhyloFusion extends Trees2Trees {
 	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
 
+	private final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
+
 	private final BooleanProperty optionKernelization = new SimpleBooleanProperty(this, "optionKernelization", false);
+
+	private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
 
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
@@ -62,7 +66,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName()); // optionKernelization.getName());
+		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName()); // optionKernelization.getName());
 	}
 
 	@Override
@@ -71,7 +75,9 @@ public class PhyloFusion extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
+			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
+			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
 			case "optionKernelization" -> "uses kernelization";
 			default -> super.getToolTip(optionName);
 		};
@@ -107,7 +113,8 @@ public class PhyloFusion extends Trees2Trees {
 				for (var e : network.edges()) {
 					network.setReticulate(e, e.getTarget().getInDegree() > 1);
 				}
-				NetworkUtils.setEdgeWeights(inputTrees, network, 1500);
+				if (isOptionCalculateWeights())
+					NetworkUtils.setEdgeWeights(inputTrees, network, isOptionNormalizeEdgeWeights(), 1500);
 			}
 
 			outputBlock.setPartial(false);
@@ -163,8 +170,32 @@ public class PhyloFusion extends Trees2Trees {
 		this.optionKernelization.set(optionKernelization);
 	}
 
+	public boolean isOptionNormalizeEdgeWeights() {
+		return optionNormalizeEdgeWeights.get();
+	}
+
+	public BooleanProperty optionNormalizeEdgeWeightsProperty() {
+		return optionNormalizeEdgeWeights;
+	}
+
+	public void setOptionNormalizeEdgeWeights(boolean optionNormalizeEdgeWeights) {
+		this.optionNormalizeEdgeWeights.set(optionNormalizeEdgeWeights);
+	}
+
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
 		return !datablock.isReticulated() && datablock.getNTrees() > 1;
+	}
+
+	public boolean isOptionCalculateWeights() {
+		return optionCalculateWeights.get();
+	}
+
+	public BooleanProperty optionCalculateWeightsProperty() {
+		return optionCalculateWeights;
+	}
+
+	public void setOptionCalculateWeights(boolean optionCalculateWeights) {
+		this.optionCalculateWeights.set(optionCalculateWeights);
 	}
 }

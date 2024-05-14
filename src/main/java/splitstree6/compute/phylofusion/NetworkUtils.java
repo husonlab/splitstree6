@@ -24,12 +24,11 @@ import jloda.graph.EdgeArray;
 import jloda.graph.Node;
 import jloda.graph.algorithms.IsDAG;
 import jloda.phylo.PhyloTree;
-import jloda.util.BitSetUtils;
-import jloda.util.CanceledException;
-import jloda.util.StringUtils;
+import jloda.util.*;
 import splitstree6.utils.TreesUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 public class NetworkUtils {
@@ -40,31 +39,36 @@ public class NetworkUtils {
 	 * @param network      network
 	 * @param milliseconds amount of time allowed for computation
 	 */
-	public static void setEdgeWeights(Collection<PhyloTree> trees, PhyloTree network, long milliseconds) {
+	public static void setEdgeWeights(Collection<PhyloTree> trees, PhyloTree network, boolean normalizeEdgeWeights, long milliseconds) {
 		try (var edgeClustersMap = collectAllSoftwiredClusters(network, milliseconds)) {
-			try (EdgeArray<Collection<Double>> edgeWeightsMap = network.newEdgeArray()) {
-				for (var tree : trees) {
-					var treeLength = tree.edgeStream().mapToDouble(tree::getWeight).sum();
-					try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
-						var clusterWeightMap = new HashMap<BitSet, Double>();
-						for (var v : tree.nodes()) {
-							if (v.getInDegree() == 1) {
-								var e = v.getFirstInEdge();
-								clusterWeightMap.put(nodeClusterMap.get(v), tree.getWeight(e));
-							}
+			var edgeWeightsMap = new ConcurrentHashMap<Edge, Collection<Double>>();
+
+			ExecuteInParallel.apply(trees, tree -> {
+				var treeLength = tree.edgeStream().mapToDouble(tree::getWeight).sum();
+				try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
+					var clusterWeightMap = new HashMap<BitSet, Double>();
+					for (var v : tree.nodes()) {
+						if (v.getInDegree() == 1) {
+							var e = v.getFirstInEdge();
+							clusterWeightMap.put(nodeClusterMap.get(v), tree.getWeight(e));
 						}
-						for (var entry : edgeClustersMap.entrySet()) {
-							var e = entry.getKey();
-							var clusters = entry.getValue();
-							for (var cluster : clusters) {
-								var weight = clusterWeightMap.get(cluster);
-								if (weight != null) {
-									edgeWeightsMap.computeIfAbsent(e, k -> new HashSet<>()).add(weight / treeLength);
+					}
+					for (var entry : edgeClustersMap.entrySet()) {
+						var e = entry.getKey();
+						var clusters = entry.getValue();
+						for (var cluster : clusters) {
+							var weight = clusterWeightMap.get(cluster);
+							if (weight != null) {
+								if (normalizeEdgeWeights && treeLength > 0) {
+									weight /= treeLength;
 								}
+								edgeWeightsMap.computeIfAbsent(e, k -> new HashSet<>()).add(weight);
 							}
 						}
 					}
 				}
+			}, ProgramExecutorService.getNumberOfCoresToUse());
+
 				var allTaxa = BitSetUtils.asBitSet(network.getTaxa());
 				for (var e : network.edges()) {
 					var values = edgeWeightsMap.get(e);
@@ -79,9 +83,11 @@ public class NetworkUtils {
 						}
 					}
 				}
-			}
+
 		} catch (CanceledException ex) {
 			System.err.println("Set network edge lengths: timed out");
+			network.edgeStream().forEach(e -> network.setWeight(e, 1.0));
+		} catch (Exception ex) {
 			network.edgeStream().forEach(e -> network.setWeight(e, 1.0));
 		}
 	}
@@ -94,7 +100,6 @@ public class NetworkUtils {
 
 		try (var activeReticulateEdges = network.newEdgeSet()) {
 			collectAllSoftwiredClustersRec(reticulateNodes, 0, network, activeReticulateEdges, edgeClustersMap, timeToStop);
-
 		}
 		return edgeClustersMap;
 	}
