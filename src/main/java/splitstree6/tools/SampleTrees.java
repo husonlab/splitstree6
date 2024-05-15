@@ -88,6 +88,7 @@ public class SampleTrees {
 		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
 		var timeOut = options.getOption("-to", "timeOut", "Algorithm killed 'timed out' after this many milliseconds", 300000);
 
+		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-th", "threads", "Set number of threads to use", 8));
 		options.done();
 
 		FileUtils.checkFileReadableNonEmpty(inputFile);
@@ -286,6 +287,12 @@ public class SampleTrees {
 
 		reader.read(new ProgressSilent(), new ListIterator<>(inputTrees.stream().map(t -> t.toBracketString(false) + ";").toList()), taxaBlock, inputBlock);
 
+		if (false && taxaBlock.getNtax() == 40 && replicate == 9) {
+			System.err.println(replicate + "\t" + taxaBlock.getNtax() + ":");
+			for (var tree : inputBlock.getTrees())
+				System.err.println(tree.toBracketString(false) + ";");
+		}
+
 		if (inputBlock.isReticulated())
 			throw new IOException("Illegal rooted network in input");
 
@@ -324,7 +331,7 @@ public class SampleTrees {
 			if (ex.getMessage().equals(ProgressTimeOut.MESSAGE)) {
 				System.err.println("Timed out: " + replicate);
 				return new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
-						maxProportionContractedInternalEdges, maxProportionMissingTaxa, rSPRs, -1, timeOut);
+						maxProportionContractedInternalEdges, maxProportionMissingTaxa, rSPRs, -1, timeOut / 1000.0);
 			} else throw ex;
 		}
 		time = System.currentTimeMillis() - time;

@@ -39,7 +39,7 @@ public class NetworkUtils {
 	 * @param network      network
 	 * @param milliseconds amount of time allowed for computation
 	 */
-	public static void setEdgeWeights(Collection<PhyloTree> trees, PhyloTree network, boolean normalizeEdgeWeights, long milliseconds) {
+	public static boolean setEdgeWeights(Collection<PhyloTree> trees, PhyloTree network, boolean normalizeEdgeWeights, long milliseconds) {
 		try (var edgeClustersMap = collectAllSoftwiredClusters(network, milliseconds)) {
 			var edgeWeightsMap = new ConcurrentHashMap<Edge, Collection<Double>>();
 
@@ -83,13 +83,14 @@ public class NetworkUtils {
 						}
 					}
 				}
-
+			return true;
 		} catch (CanceledException ex) {
 			System.err.println("Set network edge lengths: timed out");
 			network.edgeStream().forEach(e -> network.setWeight(e, 1.0));
 		} catch (Exception ex) {
 			network.edgeStream().forEach(e -> network.setWeight(e, 1.0));
 		}
+		return false;
 	}
 
 	public static EdgeArray<Set<BitSet>> collectAllSoftwiredClusters(PhyloTree network, long milliseconds) throws CanceledException {

@@ -20,7 +20,9 @@
 package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
@@ -33,7 +35,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.ProgressMover;
 import splitstree6.utils.TreesUtils;
-import splitstree6.xtra.kernelize.Kernelize;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,9 +45,9 @@ public class PhyloFusion extends Trees2Trees {
 
 	private final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
 
-	private final BooleanProperty optionKernelization = new SimpleBooleanProperty(this, "optionKernelization", false);
-
 	private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
+
+	private final IntegerProperty optionMaxSearchSeconds = new SimpleIntegerProperty(this, "optionMaxSearchSeconds", 10);
 
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
@@ -66,7 +67,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName()); // optionKernelization.getName());
+		return List.of(optionMutualRefinement.getName(), optionMaxSearchSeconds.getName(), optionNormalizeEdgeWeights.getName()); //, optionCalculateWeights.getName());
 	}
 
 	@Override
@@ -75,10 +76,10 @@ public class PhyloFusion extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
+			case "optionMaxSearchSeconds" -> "Maximum number of seconds to spend in heuristic search";
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
-			case "optionKernelization" -> "uses kernelization";
 			default -> super.getToolTip(optionName);
 		};
 	}
@@ -103,10 +104,8 @@ public class PhyloFusion extends Trees2Trees {
 			List<PhyloTree> result;
 			if (inputTrees.size() <= 1) {
 				result = inputTrees;
-			} else if (!isOptionKernelization()) {
+			} else {
 				result = PhyloFusionAlgorithm.apply(inputTrees, progress);
-			} else { // kernelization is broken: blob tree computation doesn't work as intended on unequal taxon sets
-				result = Kernelize.apply(progress, taxaBlock, inputTrees, PhyloFusionAlgorithm::apply, Integer.MAX_VALUE);
 			}
 
 			for (var network : result) {
@@ -114,7 +113,8 @@ public class PhyloFusion extends Trees2Trees {
 					network.setReticulate(e, e.getTarget().getInDegree() > 1);
 				}
 				if (isOptionCalculateWeights())
-					NetworkUtils.setEdgeWeights(inputTrees, network, isOptionNormalizeEdgeWeights(), 1500);
+					if (!NetworkUtils.setEdgeWeights(inputTrees, network, isOptionNormalizeEdgeWeights(), 1500))
+						break;
 			}
 
 			outputBlock.setPartial(false);
@@ -158,18 +158,6 @@ public class PhyloFusion extends Trees2Trees {
 		this.optionMutualRefinement.set(optionMutualRefinement);
 	}
 
-	public boolean isOptionKernelization() {
-		return optionKernelization.get();
-	}
-
-	public BooleanProperty optionKernelizationProperty() {
-		return optionKernelization;
-	}
-
-	public void setOptionKernelization(boolean optionKernelization) {
-		this.optionKernelization.set(optionKernelization);
-	}
-
 	public boolean isOptionNormalizeEdgeWeights() {
 		return optionNormalizeEdgeWeights.get();
 	}
@@ -197,5 +185,17 @@ public class PhyloFusion extends Trees2Trees {
 
 	public void setOptionCalculateWeights(boolean optionCalculateWeights) {
 		this.optionCalculateWeights.set(optionCalculateWeights);
+	}
+
+	public int getOptionMaxSearchSeconds() {
+		return optionMaxSearchSeconds.get();
+	}
+
+	public IntegerProperty optionMaxSearchSecondsProperty() {
+		return optionMaxSearchSeconds;
+	}
+
+	public void setOptionMaxSearchSeconds(int optionMaxSearchSeconds) {
+		this.optionMaxSearchSeconds.set(Math.max(0, optionMaxSearchSeconds));
 	}
 }
