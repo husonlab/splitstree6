@@ -131,7 +131,7 @@ public class AlgorithmList {
 		add(algorithms, names, new PhyloFusion());
 
 		add(algorithms, names, new ALTSNetwork());
-		if (true)
+		if (false)
 			add(algorithms, names, new ALTSExternal());
 
 		add(algorithms, names, new AverageConsensus());
