@@ -27,13 +27,17 @@ import jloda.phylo.PhyloGraph;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import jloda.util.progress.ProgressPercentage;
+import jloda.util.progress.ProgressSilent;
 import splitstree6.utils.PathMultiplicityDistance;
 import splitstree6.xtra.hyperstrings.HyperSequence;
 import splitstree6.xtra.hyperstrings.ProgressiveSCS;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Supplier;
 
 /**
  * the PhyloFusion algorithm
@@ -68,6 +72,10 @@ public class PhyloFusionAlgorithm {
 		var bestHybridizationNumber = new Single<>(Integer.MAX_VALUE);
 		var best = new ArrayList<Pair<int[], Map<Integer, HyperSequence>>>();
 
+		progress.setSubtask("calculating");
+		progress.setMaximum(rankings.size());
+		progress.setProgress(0);
+
 		try {
 			ExecuteInParallel.apply(rankings, taxonRank -> {
 				var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, taxonRank, trees);
@@ -85,16 +93,22 @@ public class PhyloFusionAlgorithm {
 					if (hybridizationNumber == bestHybridizationNumber.get()) {
 						best.add(new Pair<>(taxonRank, taxonHyperSequenceMap));
 					}
+					progress.incrementProgress();
 				}
-			}, ProgramExecutorService.getNumberOfCoresToUse(), progress);
+			}, ProgramExecutorService.getNumberOfCoresToUse(), new ProgressSilent());
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
+
+		progress.setSubtask("creating networks");
+		progress.setMaximum(best.size());
+		progress.setProgress(0);
 
 		var result = new ArrayList<PhyloTree>();
 		for (var network : best.stream().map(pair -> computeNetwork(pair.getFirst(), pair.getSecond())).toList()) {
 			if (result.stream().noneMatch(other -> PathMultiplicityDistance.compute(network, other) == 0))
 				result.add(network);
+			progress.incrementProgress();
 		}
 		return result;
 	}
@@ -106,31 +120,70 @@ public class PhyloFusionAlgorithm {
 	 * @param milliseconds time allowed for trying different orders
 	 * @return taxon rankings
 	 */
-	private static Collection<? extends int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, long milliseconds) {
+	private static Collection<? extends int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, long milliseconds) throws CanceledException {
 
 		var rankings = new ArrayList<int[]>();
-		var globalScore = new Single<>(Integer.MAX_VALUE);
-		var stopTime = System.currentTimeMillis() + milliseconds;
 
-		var numberOfRandomOrderings = Math.min(1000, taxa.cardinality() * taxa.cardinality());
+		var nThreads = ProgramExecutorService.getNumberOfCoresToUse();
+		var executor = Executors.newFixedThreadPool(nThreads);
+		try {
+			var globalScore = new Single<>(Integer.MAX_VALUE);
 
-		if (false)
-			System.err.println("numberOfRandomOrderings: " + numberOfRandomOrderings);
+			progress.setSubtask("Searching (%ds)".formatted(milliseconds / 1000));
+			var start = System.currentTimeMillis();
+			var stop = start + milliseconds;
+			progress.setMaximum(milliseconds);
+			progress.setProgress(0);
 
-		try (var monitor = new ProgressPercentage()) {
-			ExecuteInParallel.apply(numberOfRandomOrderings, randomTaxonOrderings(taxa, numberOfRandomOrderings),
-					list -> {
-						if (!monitor.isUserCancelled()) {
-							computeTaxonRankingsRec(progress, 0, new int[taxa.cardinality()], taxa, list, trees, globalScore, rankings);
-							if (globalScore.get() <= 1)
-								monitor.setUserCancelled(true);
-							if (System.currentTimeMillis() > stopTime)
-								monitor.setUserCancelled(true);
+			var queue = new LinkedBlockingQueue<ArrayList<Integer>>(nThreads);
+			var sentinel = new ArrayList<Integer>();
+
+			var countdownLatch = new CountDownLatch(nThreads);
+
+			for (var t = 0; t < nThreads; t++) {
+				var first = (t == 0);
+				executor.submit(() -> {
+					try {
+						var silent = new ProgressSilent();
+						while (true) {
+							var ordering = queue.take();
+							if (ordering == sentinel)
+								break;
+							try {
+								computeTaxonRankingsRec(silent, 0, new int[taxa.cardinality()], taxa, ordering, trees, globalScore, rankings);
+							} catch (CanceledException ignored) {
+							}
+							if (first)
+								progress.setProgress(System.currentTimeMillis() - start);
+							else
+								progress.checkForCancel();
 						}
-					},
-					ProgramExecutorService.getNumberOfCoresToUse(), monitor);
-		} catch (Exception ignored) {
+					} catch (InterruptedException | CanceledException ignored) {
+					} finally {
+						countdownLatch.countDown();
+					}
+				});
+			}
+
+			var randomOrderSupplier = randomTaxonOrderingsSupplier(taxa);
+			do {
+				queue.put(randomOrderSupplier.get());
+			}
+			while (System.currentTimeMillis() < stop);
+
+			for (var t = 0; t < nThreads; t++) {
+				queue.put(sentinel);
+			}
+
+			countdownLatch.await();
+
+		} catch (InterruptedException e) {
+			throw new CanceledException();
+		} finally {
+			executor.shutdownNow();
 		}
+		progress.checkForCancel();
+
 		return rankings;
 	}
 
@@ -485,28 +538,13 @@ public class PhyloFusionAlgorithm {
 		return result;
 	}
 
-	/**
-	 * creates an iterable over given number of random taxon orderings
-	 *
-	 * @param taxa              the taxa
-	 * @param numberOfOrderings number of orderings to generate
-	 * @return iterable over orderings
-	 */
-	public static Iterable<ArrayList<Integer>> randomTaxonOrderings(BitSet taxa, int numberOfOrderings) {
-		return () -> new Iterator<>() {
-			private int i = 0;
-
+	public static Supplier<ArrayList<Integer>> randomTaxonOrderingsSupplier(BitSet taxa) {
+		return new Supplier<ArrayList<Integer>>() {
+			private final Random random = new Random(42L);
 			@Override
-			public boolean hasNext() {
-				return i < numberOfOrderings;
-			}
-
-			@Override
-			public ArrayList<Integer> next() {
-				return CollectionUtils.randomize(BitSetUtils.asList(taxa), (++i) * 23L);
+			public ArrayList<Integer> get() {
+				return CollectionUtils.randomize(BitSetUtils.asList(taxa), random.nextLong());
 			}
 		};
-	}
-
-
+			}
 }

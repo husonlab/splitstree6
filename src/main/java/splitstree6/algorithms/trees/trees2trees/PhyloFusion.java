@@ -32,7 +32,6 @@ import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.PathMultiplicityDistance;
-import splitstree6.utils.ProgressMover;
 import splitstree6.utils.TreesUtils;
 
 import java.io.IOException;
@@ -46,8 +45,11 @@ public class PhyloFusion extends Trees2Trees {
 
 	private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
 
+	private final BooleanProperty optionFastMode = new SimpleBooleanProperty(this, "optionFastMode", false);
+
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
+		ProgramProperties.track(optionFastMode, false);
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionFastMode.getName()); //, optionCalculateWeights.getName());
 	}
 
 	@Override
@@ -73,6 +75,7 @@ public class PhyloFusion extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
+			case "optionFastMode" -> "Fast mode: 0.1 seconds per taxon, otherwise: 3 seconds per taxon";
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
@@ -85,8 +88,8 @@ public class PhyloFusion extends Trees2Trees {
 	 */
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
-		progress.setTasks("Computing network", "(Unknown how long this will really take)");
-		try (var progressMover = new ProgressMover(progress)) {
+		progress.setTasks("PhyloFusion", "init");
+
 			TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.25);
 			var inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
 
@@ -101,7 +104,9 @@ public class PhyloFusion extends Trees2Trees {
 			if (inputTrees.size() <= 1) {
 				result = inputTrees;
 			} else {
-				result = PhyloFusionAlgorithm.apply(30000L, inputTrees, progress);
+				var ntax = taxaBlock.getNtax();
+				var milliseconds = Math.round(1000.0 * ntax * (isOptionFastMode() ? 0.1 : 3.0));
+				result = PhyloFusionAlgorithm.apply(milliseconds, inputTrees, progress);
 			}
 
 			for (var network : result) {
@@ -147,7 +152,6 @@ public class PhyloFusion extends Trees2Trees {
 					}
 				}
 			}
-		}
 	}
 
 	public boolean isOptionMutualRefinement() {
@@ -191,4 +195,15 @@ public class PhyloFusion extends Trees2Trees {
 		this.optionCalculateWeights.set(optionCalculateWeights);
 	}
 
+	public boolean isOptionFastMode() {
+		return optionFastMode.get();
+	}
+
+	public BooleanProperty optionFastModeProperty() {
+		return optionFastMode;
+	}
+
+	public void setOptionFastMode(boolean optionFastMode) {
+		this.optionFastMode.set(optionFastMode);
+	}
 }

@@ -287,7 +287,7 @@ public class SampleTrees {
 
 		reader.read(new ProgressSilent(), new ListIterator<>(inputTrees.stream().map(t -> t.toBracketString(false) + ";").toList()), taxaBlock, inputBlock);
 
-		if (false && taxaBlock.getNtax() == 40 && replicate == 9) {
+		if (true) {
 			System.err.println(replicate + "\t" + taxaBlock.getNtax() + ":");
 			for (var tree : inputBlock.getTrees())
 				System.err.println(tree.toBracketString(false) + ";");
@@ -338,9 +338,13 @@ public class SampleTrees {
 
 		var h = outputBlock.getTree(1).nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
 
-		return new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
+		var dataPoint = new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
 				maxProportionContractedInternalEdges, maxProportionMissingTaxa,
 				rSPRs, h, time / 1000.0);
+
+		System.err.print(dataPoint);
+
+		return dataPoint;
 	}
 
 	private void applyRootedSPR(Edge targetEdge, Edge movingEdge, PhyloTree tree) throws IOException {
@@ -365,6 +369,18 @@ public class SampleTrees {
 		if (p2.getInDegree() == 1 && p2.getOutDegree() == 1)
 			tree.delDivertex(p2);
 	}
+
+	public static void check(PhyloTree tree) throws IOException {
+		var recLeaves = new Counter(0);
+		tree.postorderTraversal(v -> {
+			if (v.isLeaf())
+				recLeaves.increment();
+		});
+		var leaves = tree.nodeStream().filter(v -> v.getOutDegree() == 0).count();
+		if (recLeaves.get() != leaves)
+			throw new IOException("leaves != recLeaves");
+	}
+
 
 	/**
 	 * data point to report
@@ -420,16 +436,5 @@ public class SampleTrees {
 		ClusterPoppingAlgorithm.apply(clusters, result);
 		result.nodeStream().filter(result::hasTaxa).forEach(v -> result.setLabel(v, "t" + result.getTaxon(v)));
 		return result;
-	}
-
-	public static void check(PhyloTree tree) throws IOException {
-		var recLeaves = new Counter(0);
-		tree.postorderTraversal(v -> {
-			if (v.isLeaf())
-				recLeaves.increment();
-		});
-		var leaves = tree.nodeStream().filter(v -> v.getOutDegree() == 0).count();
-		if (recLeaves.get() != leaves)
-			throw new IOException("leaves != recLeaves");
 	}
 }
