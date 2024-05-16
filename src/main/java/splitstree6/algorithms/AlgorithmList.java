@@ -131,8 +131,7 @@ public class AlgorithmList {
 		add(algorithms, names, new PhyloFusion());
 
 		add(algorithms, names, new ALTSNetwork());
-		if (false)
-			add(algorithms, names, new ALTSExternal());
+		add(algorithms, names, new ALTSExternal());
 
 		add(algorithms, names, new AverageConsensus());
 		add(algorithms, names, new BlobTree());
@@ -205,7 +204,7 @@ public class AlgorithmList {
 	}
 
 	private static void add(Collection<Algorithm> algorithms, Collection<String> names, Algorithm algorithm) {
-		if (SplitsTree6.isDesktop() || !(algorithm instanceof IDesktopOnly)) {
+		if (SplitsTree6.isAllowExperimental() || !(algorithm instanceof IExperimental)) {
 			var aname = algorithm.getClass().getSimpleName();
 			if (names == null || names.isEmpty() || names.contains(aname))
 				algorithms.add(algorithm);

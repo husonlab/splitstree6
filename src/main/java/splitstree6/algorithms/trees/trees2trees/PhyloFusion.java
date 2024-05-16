@@ -20,9 +20,7 @@
 package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
@@ -33,6 +31,7 @@ import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.utils.PathMultiplicityDistance;
 import splitstree6.utils.ProgressMover;
 import splitstree6.utils.TreesUtils;
 
@@ -46,8 +45,6 @@ public class PhyloFusion extends Trees2Trees {
 	private final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
 
 	private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
-
-	private final IntegerProperty optionMaxSearchSeconds = new SimpleIntegerProperty(this, "optionMaxSearchSeconds", 10);
 
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
@@ -67,7 +64,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName(), optionMaxSearchSeconds.getName(), optionNormalizeEdgeWeights.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName()); //, optionCalculateWeights.getName());
 	}
 
 	@Override
@@ -76,7 +73,6 @@ public class PhyloFusion extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
-			case "optionMaxSearchSeconds" -> "Maximum number of seconds to spend in heuristic search";
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
@@ -105,7 +101,7 @@ public class PhyloFusion extends Trees2Trees {
 			if (inputTrees.size() <= 1) {
 				result = inputTrees;
 			} else {
-				result = PhyloFusionAlgorithm.apply(inputTrees, progress);
+				result = PhyloFusionAlgorithm.apply(30000L, inputTrees, progress);
 			}
 
 			for (var network : result) {
@@ -125,10 +121,18 @@ public class PhyloFusion extends Trees2Trees {
 				network.setName("N" + (++count));
 				TreesUtils.addLabels(network, taxaBlock::getLabel);
 				outputBlock.getTrees().add(network);
-				if (network.nodeStream().anyMatch(v -> v.getInDegree() > 1)) {
+				if (!outputBlock.isReticulated() && network.nodeStream().anyMatch(v -> v.getInDegree() > 1)) {
 					outputBlock.setReticulated(true);
 				}
 				NetworkUtils.check(network);
+				if (true) {
+					for (var t = 1; t <= treesBlock.getNTrees(); t++) {
+						var tree = treesBlock.getTree(t);
+						if (!PathMultiplicityDistance.contains(taxaBlock.getTaxaSet(), network, tree)) {
+							System.err.println("Internal error: Network does not appear to contain tree: " + t);
+						}
+					}
+				}
 				if (false) { // this takes too long when number of reticulations is large
 					var networkClusters = TreesUtils.collectAllSoftwiredClusters(network);
 					for (var t = 1; t <= treesBlock.getNTrees(); t++) {
@@ -187,15 +191,4 @@ public class PhyloFusion extends Trees2Trees {
 		this.optionCalculateWeights.set(optionCalculateWeights);
 	}
 
-	public int getOptionMaxSearchSeconds() {
-		return optionMaxSearchSeconds.get();
-	}
-
-	public IntegerProperty optionMaxSearchSecondsProperty() {
-		return optionMaxSearchSeconds;
-	}
-
-	public void setOptionMaxSearchSeconds(int optionMaxSearchSeconds) {
-		this.optionMaxSearchSeconds.set(Math.max(0, optionMaxSearchSeconds));
-	}
 }

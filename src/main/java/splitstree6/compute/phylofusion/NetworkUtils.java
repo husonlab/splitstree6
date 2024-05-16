@@ -69,7 +69,8 @@ public class NetworkUtils {
 				}
 			}, ProgramExecutorService.getNumberOfCoresToUse());
 
-				var allTaxa = BitSetUtils.asBitSet(network.getTaxa());
+			var hasUndefinedWeights = 0;
+			var allTaxa = BitSetUtils.asBitSet(network.getTaxa());
 				for (var e : network.edges()) {
 					var values = edgeWeightsMap.get(e);
 					if (values != null) {
@@ -78,11 +79,17 @@ public class NetworkUtils {
 					} else {
 						network.setWeight(e, 0.0001);
 						if (edgeClustersMap.get(e) == null || !edgeClustersMap.get(e).contains(allTaxa)) {
-							System.err.println("Undefined weight, network edge " + e);
-							System.err.println("Associated clusters: " + StringUtils.toString(edgeClustersMap.get(e), ";"));
+							if (false) {
+								System.err.println("Undefined weight, network edge " + e);
+								System.err.println("Associated clusters: " + StringUtils.toString(edgeClustersMap.get(e), ";"));
+							}
+							hasUndefinedWeights++;
 						}
 					}
 				}
+
+			if (hasUndefinedWeights > 0)
+				System.err.println("Warning: some edge weights are not correctly set");
 			return true;
 		} catch (CanceledException ex) {
 			System.err.println("Set network edge lengths: timed out");

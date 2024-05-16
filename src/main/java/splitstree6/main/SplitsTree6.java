@@ -54,6 +54,8 @@ public class SplitsTree6 extends Application {
 
 	private static boolean desktop = true;
 
+	private static boolean allowExperimental = false;
+
 	private static boolean showSplash;
 
 	/**
@@ -122,6 +124,8 @@ public class SplitsTree6 extends Application {
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-t", "threads", "Maximum number of threads to use in a parallel algorithm (0=all available)", 0));
 		ProgramProperties.setConfirmQuit(options.getOption("-q", "confirmQuit", "Confirm quit on exit", ProgramProperties.isConfirmQuit()));
 
+		allowExperimental = options.getOption("-x", "experimental", "Enable experimental code", false);
+
 		options.done();
 		System.err.println("Java version: " + System.getProperty("java.version"));
 
@@ -177,9 +181,12 @@ public class SplitsTree6 extends Application {
 		return desktop;
 	}
 
-
 	public static void setDesktop(boolean desktop) {
 		SplitsTree6.desktop = desktop;
+	}
+
+	public static boolean isAllowExperimental() {
+		return allowExperimental;
 	}
 }
 

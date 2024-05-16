@@ -31,7 +31,7 @@ import jloda.util.FileUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.IDesktopOnly;
+import splitstree6.algorithms.IExperimental;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
  * this runs the ALTSExternal algorithm externally
  * Daniel Huson, 7.2023
  */
-public class ALTSExternal extends Trees2Trees implements IDesktopOnly {
+public class ALTSExternal extends Trees2Trees implements IExperimental {
 	private final StringProperty optionALTSExecutableFile = new SimpleStringProperty(this, "optionALTSExecutableFile", "");
 
 	{

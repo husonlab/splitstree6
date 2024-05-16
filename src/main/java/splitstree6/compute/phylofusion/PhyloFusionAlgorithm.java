@@ -48,7 +48,7 @@ public class PhyloFusionAlgorithm {
 	 * @return the computed networks
 	 * @throws IOException user canceled
 	 */
-	public static List<PhyloTree> apply(Collection<PhyloTree> inputTrees, ProgressListener progress) throws IOException {
+	public static List<PhyloTree> apply(long maxSearchMilliseconds, Collection<PhyloTree> inputTrees, ProgressListener progress) throws IOException {
 		var taxa = union(inputTrees.stream().map(PhyloGraph::getTaxa).toList());
 
 		var trees = new ArrayList<PhyloTree>();
@@ -63,7 +63,7 @@ public class PhyloFusionAlgorithm {
 			trees.add(tree);
 		}
 
-		var rankings = computeTaxonRankings(progress, taxa, trees, 10000);
+		var rankings = computeTaxonRankings(progress, taxa, trees, maxSearchMilliseconds);
 
 		var bestHybridizationNumber = new Single<>(Integer.MAX_VALUE);
 		var best = new ArrayList<Pair<int[], Map<Integer, HyperSequence>>>();
@@ -112,16 +112,21 @@ public class PhyloFusionAlgorithm {
 		var globalScore = new Single<>(Integer.MAX_VALUE);
 		var stopTime = System.currentTimeMillis() + milliseconds;
 
-		var numberOfRandomOrderings = taxa.cardinality() * taxa.cardinality();
+		var numberOfRandomOrderings = Math.min(1000, taxa.cardinality() * taxa.cardinality());
+
+		if (false)
+			System.err.println("numberOfRandomOrderings: " + numberOfRandomOrderings);
 
 		try (var monitor = new ProgressPercentage()) {
 			ExecuteInParallel.apply(numberOfRandomOrderings, randomTaxonOrderings(taxa, numberOfRandomOrderings),
 					list -> {
-						computeTaxonRankingsRec(progress, 0, new int[taxa.cardinality()], taxa, list, trees, globalScore, rankings);
-						if (globalScore.get() <= 1)
-							monitor.setUserCancelled(true);
-						if (System.currentTimeMillis() > stopTime)
-							monitor.setUserCancelled(true);
+						if (!monitor.isUserCancelled()) {
+							computeTaxonRankingsRec(progress, 0, new int[taxa.cardinality()], taxa, list, trees, globalScore, rankings);
+							if (globalScore.get() <= 1)
+								monitor.setUserCancelled(true);
+							if (System.currentTimeMillis() > stopTime)
+								monitor.setUserCancelled(true);
+						}
 					},
 					ProgramExecutorService.getNumberOfCoresToUse(), monitor);
 		} catch (Exception ignored) {
@@ -269,22 +274,28 @@ public class PhyloFusionAlgorithm {
 			}
 		}
 
-		// any reticulate edge that connects a reticulation to its LSA can be removed.
 
-		try (NodeArray<Node> reticulationLSAMap = network.newNodeArray()) {
-			LSAUtils.computeLSAChildrenMap(network, reticulationLSAMap);
-			var toDelete = new ArrayList<Edge>();
-			for (var v : reticulationLSAMap.keySet()) {
-				var lsa = reticulationLSAMap.get(v);
-				for (var e : v.inEdges()) {
-					if (e.getSource() == lsa)
-						toDelete.add(e);
+		if (false) { // this heuristic does not work and should not be used
+			/*
+			bad example:
+				(((a,((b,c),d)),e),f);
+				(((a,d,c,e),b),f);
+			 */
+			try (NodeArray<Node> reticulationLSAMap = network.newNodeArray()) {
+				LSAUtils.computeLSAChildrenMap(network, reticulationLSAMap);
+				var toDelete = new ArrayList<Edge>();
+				for (var v : reticulationLSAMap.keySet()) {
+					var lsa = reticulationLSAMap.get(v);
+					for (var e : v.inEdges()) {
+						if (e.getSource() == lsa)
+							toDelete.add(e);
+					}
 				}
+				for (var e : toDelete) {
+					network.deleteEdge(e);
+				}
+				network.clearLsaChildrenMap();
 			}
-			for (var e : toDelete) {
-				network.deleteEdge(e);
-			}
-			network.clearLsaChildrenMap();
 		}
 
 		for (var v : network.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
@@ -296,7 +307,7 @@ public class PhyloFusionAlgorithm {
 	}
 
 	/**
-	 * for each taxon, extract all hypersequences
+	 * for each taxon, extract all hyper sequences
 	 *
 	 * @param taxa      all taxa
 	 * @param taxonRank the taxon ranking
