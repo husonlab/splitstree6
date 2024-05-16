@@ -4,18 +4,6 @@
 
 SplitsTree App (version 6.3.13, built 22 Apr 2024)
 
----
-author:
-
-- Daniel H. Huson and David Bryant
-  bibliography:
-- main.bib
-  title: |
-  The SplitsTree App User-Manual\
-  SplitsTree App (version 6.3.13, built 22 Apr 2024)
-
----
-
 ## Introduction
 
 The SplitsTree App is new software for exploring and analyzing
@@ -45,7 +33,7 @@ methods and procedures.
 
 To get started using this program, download the latest installer from
 <https://software-ab.cs.uni-tuebingen.de/download/splitstree6> for
-Linux, Mac OS X or Windows, and install the program on your computer.
+Linux, MacOS X or Windows, and install the program on your computer.
 Versions for iOS and Android are being tested.
 
 Launch the program by double-clicking the program icon or launch it from
@@ -63,7 +51,7 @@ displayed .
 
 Here is a toy example of characters data. You can copy this text from
 the manual and then paste it onto the import data button to obtain the
-network show in the figure.
+network show in the figure (.
 
     6 64
     Taxon1 TAAGTAGATCGGAGTTTTTACTCGTGTGATTTTGGGTATTTTTTATTTAGATTATGAAATTATA
@@ -135,7 +123,7 @@ Document specific toolbar items:
 
 - The *sidebar toggle button* - use this to show or hide the sidebar.
 
-Tab specific toolbar items (that apply only to the currently selected
+Tab specific tool bar items (that apply only to the currently selected
 main tab):
 
 - An *undo button* and *redo button*.
@@ -250,7 +238,7 @@ network), the choices are between rectangular, circular and radial
 cladogram or phylogram. There is a button that toggles addition
 information (such as name of the tree, if any, and number of nodes,
 edges and leaves). In addition, there are buttons for rotating, flipping
-and zooming. On the right side of the toolbar, there is a text input
+and zooming. At the right side of the tool bar, there is a text input
 field for setting the dimensions of a page in the format *rows x cols*.
 
 The side panel contains items for styling the taxon labels and for
@@ -449,7 +437,7 @@ in one of the recognized input formats.
 ## Report tabs
 
 *Report tabs* are used to present the results of analyses such as
-Tajimas D, phylogenetic diversity or Shapely values as a text .
+Tajima' D, phylogenetic diversity or Shapely values as a text .
 
 ![Report tabs are text tabs that are used to provide the result of an
 analysis, here the Shapely values for a set of taxa based on splits.
@@ -475,11 +463,11 @@ lines numbers on and off. There is a format pane that can be used to
 select the desired display format and to specify any options associated
 with the format.
 
-Such a text tab can be opened by selecting a data node item in the sidebar and then pressing the show/edit button at the
-top of the sidebar,
+Such a text tab can be opened by selecting a data node item in the side
+bar and then pressing the show/edit button at the top of the side bar,
 or by double-clicking on the item.
 
-## The sidebar
+## The side bar
 
 The sidebar (figure part b) contains a representation of the workflow as
 a tree at the top, and the algorithms tab pane at the bottom (figure
@@ -515,15 +503,16 @@ program and then compared against a set of GTDB reference genomes
 represented as a phylogenetic outline.
 
 The dialog is opened using the `File->Analyze Draft Genomes...` menu
-item and is set up using three tabs, as shown in the Figure .
+item and is setup using three tabs, as shown in the Figure .
 
-![The first tab is used to specify the input files, the type of input
+![ The first tab is used to specify the input files, the type of input
 (DNA or protein sequences) and whether to use files or FastA records as
 input genomes. Also, specify the output file (and whether to store input
 sequences as sequences or as references to files). The second tab is
 used to edit the labels of genomes. The third tab is used to specify the
 database to compare against (downloaded from the SplitsTree page), the
-distance to search in, and distance within which to include references.](figs/draft-genomes.png)
+distance to search in, and distance within which to include references.
+](figs/draft-genomes.png)
 
 # Building trees and networks
 
@@ -556,9 +545,9 @@ and using the $p$-distance. Switching to the workflow panel displays the
 ![Right hand side of the workflow created when `ungulates.nex` is
 opened.](figs/Ungulate1.png)
 
-In this graph, nodes correspond to algorithms (indicated by an
+In this graph, nodes correspond to algorithms (indicated by a
 ![image](figs/algorithm-icon.png) icon) or data (indicated
-by an ![image](figs/data-icon.png) icon). From the
+by a ![image](figs/data-icon.png) icon). From the
 algorithm nodes you can edit the parameters of the method. Selecting an
 algorithm node and clicking the delete icon (top of pane) removes that
 node and any descendants of that node.
@@ -656,7 +645,7 @@ splits.](figs/rotateButtons.png)
 The traditional approach to displaying split networks marks out the
 splits with a mesh of quadrilaterals and polygons. The outline
 representation [@Bagcietal2021] constructs just the outer perimeter of
-the network. This is sufficient to represent all the split weights,
+the network. This is sufficient to represent all of the split weights,
 and is generally much faster to compute and draw. To switch back and
 forward between the graph mode and the outline mode use the pop-up menu
 at the left of the toolbar .
@@ -664,7 +653,7 @@ at the left of the toolbar .
 ### Split Decomposition
 
 Given a distance matrix, the *Split Decomposition* method
-[@BandeltDress1992] can be selected in the Network menu, or on a distances
+[@BandeltDress1992] can selected in the Network menu, or on a distances
 node in the workflow. *Split Decomposition* is a predecessor of Neighbor
 Net, though the structures of the two methods are quite different. Split
 Decomposition works by inferring a set of splits satisfying a quartet
@@ -680,7 +669,7 @@ far fewer splits than Neighbor Net.
 SplitsTree includes several methods for extracting splits directly from
 character data. These methods do not assume any explicit model for
 sequence evolution. As such they do not correct for hidden mutations.
-However, they can reveal important structure within sequences from
+However they can reveal important structure within sequences from
 closely related organisms, as well as artefacts resulting from data
 handling problems.
 
@@ -692,7 +681,7 @@ defaulting to a count of those characters if weights are not specified.
 The `BinaryToSplits` algorithm is available via the workflow graph or
 workflow hierarchy. The user can specify a weight/count threshold on the
 splits, a cap on the maximum dimension of the split network and the
-option to include all 'trivial' splits separating one taxon from the
+option to include all 'trivial' splits separating one taxa from the
 remainder automatically.
 
 The `DNAtoSplits` method carries out a similar analysis but on
@@ -734,7 +723,7 @@ weight. Sometimes there is a unique minimum spanning tree; other times
 there are multiple.
 
 In this context, the graph contains a node for each input sequence and
-edge between every pair of nodes. The length of each edge is the
+and edge between every pair of nodes. The length of each edge is the
 Hamming distance between the corresponding sequences. Other distance
 measures can be used, but the Hamming distance is appropriate for
 Haplotype Network construction.
@@ -743,8 +732,8 @@ The minimum spanning network is formed from all those edges in the graph
 which appear in every minimum spanning tree .
 
 A minimum spanning network is constructed from a characters block by
-first determining Hamming distances (right-click on the characters block
-and select `Add Algorithm -> Hamming distance`). Then right-click on the
+first determining Hamming distances (right click on the characters block
+and select `Add Algorithm -> Hamming distance`). Then right click on the
 distance block produced and add the `Min Spanning Network` algorithm.
 
 ### Median Joining network
@@ -825,7 +814,7 @@ phylogenetics .
 
 Assume that you have a collection of phylogenetic trees for which you
 would like to explore the use of rooted phylogenetic networks to
-represent them. To obtain a useful network, you must set up a pipeline
+represent them. To obtained a useful network, you must setup a pipeline
 consisting of several steps . In this analysis, incorrect edges are
 particularly harmful because they generate unnecessary reticulations and
 so it is important that the input trees have confidence values (such as
@@ -834,8 +823,10 @@ low-confidence can be ignored.
 
 ![For a set of 48 genes in waterlilies [@Gruenstaeudl2019], on the left
 we see that 10 different gene trees for the NADH dehydrogenase-like
-complex have bee selected. On the right we see the resulting rooted network, computed using the
-PhyloFusion algorithm.](figs/phylofusion-full.png)
+complex have bee selected and the confidence threshold has been set to
+
+70. On the right we see a hybridization network computed using the
+    PhyloFusion algorithm.](figs/phylofusion-full.png)
 
 - First, use the *Reroot or Reorder* algorithm to ensure that all
   trees are correctly rooted (using either midpoint- or outgroup
@@ -1313,7 +1304,7 @@ blocks [@Maddisonetal1997].
 ## Taxa block
 
 This block maintains the list of all taxa in the analysis. There is a
-fixed number (nTax) of taxa and each has an id 1 to nTax and a unique
+fixed number (nTax) of taxa and each has an id 1..nTax and an unique
 label. Optionally, an info string can be provided for each taxon. Also,
 a display label may be provided for each taxon. This can include certain
 HTML tags that are used to render the label.
@@ -2114,7 +2105,7 @@ Reference: [@Volkmannetal2014]
 
 #### Autumn Algorithm
 
-The *Autumn* algorithm takes a Trees block as input and
+The *Autumn Algorithm* algorithm takes a Trees block as input and
 produces a Trees block as output. It computes all minimum hybridization
 networks using the Autumn algorithm The algorithm has the following
 options:
@@ -2132,12 +2123,11 @@ Reference: [@HusonLinz2018]
 
 The *Phylo Fusion* algorithm takes a Trees block as input and produces a
 Trees block as output. It combines multiple rooted phylogenetic trees
-into a rooted netwok using the phylo-fusion algorithm. The algorithm has
-the following options:
-
-`MinConfidence =  <Double>` - minimum input tree-edge confidence
+into a rooted netwok. The algorithm has the following options:
 
 `MutualRefinement =  <Boolean>` - mutually refine input trees
+
+`NormalizeEdgeWeights =  <Boolean>` - normalize input edge weights
 
 References: [@Zhangetal2023; @Zhangetal2024]
 
@@ -2675,7 +2665,7 @@ algorithms.
 ## Input and working nodes
 
 The graph is displayed the workflow tab and is also presented in the
-sidebar . While the casual user will use menu items to set up and change
+sidebar . While the casual user will use menu items to setup and change
 the graph (without being aware of the graph), a user more familiar with
 the program will use controls in the workflow tab and sidebar to
 explicitly add, delete, duplicate or modify nodes and edges in the
@@ -2805,7 +2795,7 @@ loaded using the `File->Replace Data...` menu item.
 To run an analysis on multiple datasets, the SplitsTree packages comes
 with a commandline tool called *run-workflow*, located in the `tools`
 directory. The basic idea is as follows. First, use SplitsTree to
-interactively set up the desired analysis. Then save export the workflow
+interactively setup the desired analysis. Then save export the workflow
 to a file. Then use the `run-workflow` program to apply the workflow to
 multiple datasets.
 
@@ -2859,7 +2849,7 @@ Here is a summary of the most important options:
   created and written to that directory. If you specify one file, then
   all output is written to that file. You can also specify one output
   file per input file. Use the keyword `stdout` to have all output
-  written to the console. If output files end on `.gz` then they will
+  written to the console. If output files end on `.gz` then the will
   be written in gzip format.
 
 - Use the `-n` option to specify a specific data node to be saved to
@@ -2878,7 +2868,7 @@ In SplitsTree, each taxon is represented by a unique label. These labels
 are specified in the input taxa block. In addition to these labels, the
 taxon block may also contain a set of "display labels", one for each
 taxon. If provided, the display labels are used in drawings of trees and
-networks. Display labels can be styled using a set HTML tags. There are
+networks. Display labels can by styled using a set HTML tags. There are
 several ways to do this:
 
 - Use the side panel (on the right) to choose a font, font size, text
@@ -3072,7 +3062,9 @@ Hybridization Networks for Realistic Phylogenetic Trees.” *IEEE/ACM
 Transactions on Computational Biology and Bioinformatics* 15: 398–420.
 
 Huson, DH, and R. Rupp. 2008. “Summarizing Multiple Gene Trees Using
-Cluster Networks.” In *Algorithms in Bioinformatics. WABI 2008*. Vol. 5251. Lecture Notes in Computer Science.
+Cluster Networks.” In *Algorithms in Bioinformatics. WABI 2008*. Vol.
+
+5251. Lecture Notes in Computer Science.
 
 Huson, DH, R. Rupp, and C. Scornavacca. 2012. *Phylogenetic Networks*.
 Cambridge.
