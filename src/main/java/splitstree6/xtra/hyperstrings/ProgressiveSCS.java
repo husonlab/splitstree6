@@ -94,8 +94,9 @@ public class ProgressiveSCS {
 	public static void main(String[] args) {
 		var sequences = new ArrayList<HyperSequence>();
 
-		sequences.add(HyperSequence.parse("11 : 9 : 8 : 4 : 1"));
-		sequences.add(HyperSequence.parse("12 : 1 2 : 11 4 6 9 5 : 8"));
+		sequences.add(HyperSequence.parse("1"));
+		sequences.add(HyperSequence.parse("1 2"));
+		sequences.add(HyperSequence.parse("2"));
 		//sequences.add(HyperSequence.parse("1 : 2: 3 4 : 5 : 6 7"));
 		//sequences.add(HyperSequence.parse("1 2 : 3 4 : 5 : 6:  7"));
 		//sequences.add(HyperSequence.parse("1 : 2: 3 : 4 : 5 : 6 : 7"));

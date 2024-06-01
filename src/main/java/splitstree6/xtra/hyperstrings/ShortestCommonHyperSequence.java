@@ -33,6 +33,7 @@ public class ShortestCommonHyperSequence {
 
 		var matrix = new int[m + 1][n + 1];
 
+		//initialize matrix
 		for (var i = 0; i <= m; i++) {
 			matrix[i][0] = i;
 		}
@@ -48,6 +49,7 @@ public class ShortestCommonHyperSequence {
 				matrix[i][j] = value;
 			}
 		}
+
 
 		var aTrace = new ArrayList<Integer>();
 		var bTrace = new ArrayList<Integer>();
@@ -77,6 +79,7 @@ public class ShortestCommonHyperSequence {
 			}
 			CollectionUtils.reverseInPlace(aTrace);
 			CollectionUtils.reverseInPlace(bTrace);
+
 		}
 
 
@@ -111,6 +114,7 @@ public class ShortestCommonHyperSequence {
 			System.err.println();
 		}
 
+
 		var sequence = new HyperSequence();
 		for (var p = 0; p < aTrace.size(); p++) {
 			var set = new BitSet();
@@ -128,14 +132,15 @@ public class ShortestCommonHyperSequence {
 
 
 	public static void main(String[] args) {
-		var a = HyperSequence.parse("1 : 2 : 3 4 5 : 6 : 7");
-		var b = HyperSequence.parse("1 2 : 3 : 4 5 :  7");
+		var a = HyperSequence.parse("2 : 1 : 5 : 6");
+		var b = HyperSequence.parse("4 : 1 :5 : 2 : 6");
 
 		System.err.println("Input:");
 		System.err.println("a= " + a);
 		System.err.println("b= " + b);
 
 		var aligned = align(a, b);
-		System.err.println("SCS= " + aligned);
+		System.err.println("Result:");
+		System.err.println(aligned);
 	}
 }

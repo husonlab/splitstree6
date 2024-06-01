@@ -20,6 +20,7 @@
 package splitstree6.xtra.alts;
 
 import jloda.fx.util.ArgsOptions;
+import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
@@ -70,13 +71,35 @@ public class AltsNonBinary {
 		var networks = apply(inputTreesBlock.getTrees(), progress);
 		var end = Instant.now();
 		System.err.println("Time taken: " + Duration.between(start, end).toSeconds() + " seconds");
-		System.err.println(networks.size() + " different networks found.");
+
+		LinkedList<Integer> order = new LinkedList<>();
+		order.add(3);
+		order.add(2);
+		order.add(1);
+		order.add(4);
+		order.add(5);
+		order.add(6);
+
+		HashMap<String, Integer> labelTaxonIdMap = new HashMap<>();
+		labelTaxonIdMap.put("a", 1);
+		labelTaxonIdMap.put("b", 2);
+		labelTaxonIdMap.put("c", 3);
+		labelTaxonIdMap.put("d", 4);
+		labelTaxonIdMap.put("e", 5);
+		labelTaxonIdMap.put("f", 6);
+
+
+		/*NewickTreeProcessor processor = new NewickTreeProcessor(labelTaxonIdMap, order);
+		for (var tree : inputTreesBlock.getTrees()){
+			for (var node : tree.leaves()){
+				System.err.println(node.getLabel() + " " + processor.findPathFromLeafToRoot(node));
+			}
+			System.err.println("-------");
+		}*/
 
 		for (var network : networks)
 			System.err.println(network.toBracketString(false));
-
 	}
-
 	/**
 	 *
 	 * @param trees
@@ -138,178 +161,14 @@ public class AltsNonBinary {
 		return order;
 	}
 
-	/**
-	 *
-	 * @param tree
-	 * @param order
-	 * @param labelTaxonIdMap
-	 * @return
-	 */
-	public static String internalNodeLabeller(PhyloTree tree, LinkedList<Integer> order, HashMap<String, Integer> labelTaxonIdMap) {
-		Deque<Integer> stack = new ArrayDeque<>();
-		StringBuilder labelledNewick = new StringBuilder();
-
-		String newick = tree.toBracketString(false);
-		for (int i = 0; i < newick.length(); i++) {
-			char ch = newick.charAt(i);
-			labelledNewick.append(ch);
-			if (ch == '(') {
-				stack.push(i);
-			} else if (ch == ')') {
-				if (!stack.isEmpty()) {
-					int startIndex = stack.pop();
-					String contents = newick.substring(startIndex + 1, i);
-					//System.err.println("content: " + contents);
-					LinkedList<Integer> processedContentSmallestIds = processBrackets(contents, order, labelTaxonIdMap);
-					//System.err.println("processed ids: " + processedContentSmallestIds);
-					String toBeAdded = "";
-					LinkedList<Integer> toBeAddedIds = removeSmallestBasedOnOrder(processedContentSmallestIds, order);
-
-					for (var id : toBeAddedIds){
-						toBeAdded = toBeAdded + "\""+id+"\"" + " ";
-					}
-					toBeAdded = toBeAdded.substring(0, toBeAdded.length()-1);
-					labelledNewick.append(toBeAdded);
-				}
-			}
-		}
-		//System.err.println(labelledNewick);
-		return labelledNewick.toString();
-	}
-	public static LinkedList<Integer> processBrackets(String content, LinkedList<Integer> order, HashMap<String, Integer> labelTaxonIdMap) {
-		LinkedList<Integer> ids = new LinkedList<>();
-		StringBuilder buffer = new StringBuilder();
-		Stack<Integer> bracketPositions = new Stack<>();
-
-		for (int i = 0; i < content.length(); i++) {
-			char ch = content.charAt(i);
-			if (ch == '(') {
-				bracketPositions.push(i);
-				if (buffer.length() > 0) {
-					// Process buffer content before bracket as outside element
-					ids.add(findSmallestElementId(buffer.toString(), order, labelTaxonIdMap));
-					buffer = new StringBuilder(); // Reset buffer
-				}
-			} else if (ch == ')' && !bracketPositions.isEmpty()) {
-				int startIndex = bracketPositions.pop();
-				// Process content within brackets
-				if (bracketPositions.isEmpty()) {
-					String innerContent = content.substring(startIndex + 1, i);
-					ids.add(findSmallestElementId(innerContent, order, labelTaxonIdMap));
-				}
-			} else if (bracketPositions.isEmpty()) {
-				// Accumulate characters outside of brackets
-				if (ch != ',') buffer.append(ch);
-				else if (buffer.length() > 0) {
-					// Process buffer content as outside element
-					ids.add(findSmallestElementId(buffer.toString(), order, labelTaxonIdMap));
-					buffer = new StringBuilder(); // Reset buffer
-				}
-			}
-		}
-
-		// Process any remaining content outside of brackets
-		if (buffer.length() > 0) {
-			ids.add(findSmallestElementId(buffer.toString(), order, labelTaxonIdMap));
-		}
-
-		return ids.stream()
-				.distinct() // Remove duplicates
-				.collect(Collectors.toCollection(LinkedList::new));
-	}
-	private static Integer findSmallestElementId(String str, LinkedList<Integer> order, HashMap<String, Integer> labelTaxonIdMap) {
-		String[] splitStr = str.split(",");
-		Integer smallestTaxonId = null;
-		int smallestOrderIndex = Integer.MAX_VALUE;
-
-		for (String label : splitStr) {
-			label = label.replaceAll("[()]", "").trim(); // Clean the label
-			Integer taxonId = labelTaxonIdMap.get(label);
-			if (taxonId != null) {
-				int orderIndex = order.indexOf(taxonId);
-				if (orderIndex != -1 && orderIndex < smallestOrderIndex) {
-					smallestTaxonId = taxonId;
-					smallestOrderIndex = orderIndex;
-				}
-			}
-		}
-		return smallestTaxonId;
-	}
-	private static LinkedList<Integer> removeSmallestBasedOnOrder(LinkedList<Integer> processedIds, LinkedList<Integer> order) {
-		if (processedIds == null || processedIds.isEmpty() || processedIds.size() == 1 || order == null || order.isEmpty()) {
-			return processedIds;
-		}
-		Integer smallestElement = null;
-		int smallestIndexInOrder = Integer.MAX_VALUE;
-		// Find the smallest element based on the order
-		for (Integer element : processedIds) {
-			int indexInOrder = order.indexOf(element);
-			if (indexInOrder != -1 && indexInOrder < smallestIndexInOrder) {
-				smallestElement = element;
-				smallestIndexInOrder = indexInOrder;
-			}
-		}
-		// Remove the smallest element from processedIds
-		if (smallestElement != null) {
-			processedIds.remove(smallestElement);
-		}
-		return processedIds;
-	}
-
-
-	/**
-	 *
-	 * @param leafNode
-	 * @param labelTaxonIdMap
-	 * @return
-	 */
-	public static HyperSequence path(Node leafNode, HashMap<String, Integer> labelTaxonIdMap) {
-		StringBuilder pathBuilder = new StringBuilder();
-		Node currentNode = leafNode;
-		// Get the taxon ID for the leaf node's label from the map
-		String leafId = String.valueOf(labelTaxonIdMap.get(leafNode.getLabel()));
-		boolean isFirstLabel = true; // To manage the " : " separator placement
-
-		while (currentNode.getParent() != null) {
-			Node parentNode = currentNode.getParent();
-			String cleanLabel = parentNode.getLabel().replaceAll("\"", "");
-			List<String> checkParent = List.of(cleanLabel.split(" "));
-
-			// Check if the parent label contains the leaf node's ID
-			if (checkParent.contains(leafId)) {
-				// Stop adding any further as we encountered the leaf node's ID
-				break;
-			}
-
-			// Insert the label at the start, prepended by " : " if not the first label
-			if (!isFirstLabel) {
-				pathBuilder.insert(0, " : ");
-			}
-			pathBuilder.insert(0, cleanLabel);
-			isFirstLabel = false; // Any further labels are not the first
-			currentNode = parentNode;
-		}
-
-		//System.err.println(leafNode.getLabel() + " " + pathBuilder.toString());
-		return HyperSequence.parse(pathBuilder.toString());
-	}
-
-	/**
-	 *
-	 * @param trees
-	 * @param order
-	 * @param labelTaxonIdMap
-	 * @return
-	 * @throws IOException
-	 */
 	private static HybridizationResult calculateHybridization(Collection<PhyloTree> trees, LinkedList<Integer> order,
 															  HashMap<String, Integer> labelTaxonIdMap) throws IOException {
 
 		Map<Integer, ArrayList<HyperSequence>> leafNodeHyperStringMap = new HashMap<>();
+		NewickTreeProcessor processor = new NewickTreeProcessor(labelTaxonIdMap, order);
 		for (var tree : trees) {
-			PhyloTree labelledTree = NewickIO.valueOf(internalNodeLabeller(tree, order, labelTaxonIdMap));
-			for (Node node : labelledTree.leaves()) {
-				HyperSequence path = path(node, labelTaxonIdMap);
+			for (Node node : tree.leaves()) {
+				HyperSequence path = processor.findPathFromLeafToRoot(node);
 				leafNodeHyperStringMap.computeIfAbsent(labelTaxonIdMap.get(node.getLabel()), k -> new ArrayList<>()).add(path);
 			}
 		}
@@ -321,8 +180,9 @@ public class AltsNonBinary {
 				sequences.add(hyperStrings);
 			}
 			alignments.put(entries.getKey(), ProgressiveSCS.apply(sequences));
+
 		}
-		//System.err.println(alignments);
+		//System.err.println("order: " + order + " alignments: " + alignments);
 
 		ConcurrentHashMap<String, AtomicInteger> elementCounts = new ConcurrentHashMap<>();
 		// Using parallel stream to count occurrences of each element
@@ -447,6 +307,7 @@ public class AltsNonBinary {
 				Node currentNode = tree.newNode();
 				//currentNode.setLabel(value+"$");
 				tree.newEdge(previousNode, currentNode);
+				Edge edge = tree.newEdge(previousNode, currentNode);
 
 				String[] innerNodeValues = value.trim().split(",");
 				for (var nonBinaryNode : innerNodeValues) {
