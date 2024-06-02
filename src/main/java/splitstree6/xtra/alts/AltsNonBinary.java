@@ -412,7 +412,8 @@ public class AltsNonBinary {
 		for (var result : hybridizationResults){
 			var tree = network(result.getAlignments(), result.getOrder(), labelTaxonIdMap);
 			if (!trees.contains(tree) && isTreeAddedToFinalList(trees,tree)) {
-				System.err.println(result.getHybridizationScore() + " ---> " + result.getOrder());
+				//System.err.println(result.getHybridizationScore());
+				//System.err.println(tree.toBracketString());
 				trees.add(tree);
 			}
 		}
