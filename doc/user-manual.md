@@ -2123,7 +2123,7 @@ Reference: [@HusonLinz2018]
 
 The *Phylo Fusion* algorithm takes a Trees block as input and produces a
 Trees block as output. It combines multiple rooted phylogenetic trees
-into a rooted netwok. The algorithm has the following options:
+into a rooted network. The algorithm has the following options:
 
 `MutualRefinement =  <Boolean>` - mutually refine input trees
 

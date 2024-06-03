@@ -92,9 +92,9 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		var reopenAfterRotateOrFlipBroken = new SimpleBooleanProperty(true);
 
-		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft()));
+		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft10()));
 		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()).or(reopenAfterRotateOrFlipBroken));
-		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
+		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight10()));
 		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty().or(reopenAfterRotateOrFlipBroken));
 		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipHorizontal()));
 		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty().or(reopenAfterRotateOrFlipBroken));

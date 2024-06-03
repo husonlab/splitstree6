@@ -37,6 +37,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -94,14 +95,14 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
-		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft()));
+		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft90().toString()));
 		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
-		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
+		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateRight90().toString()));
 		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
-		controller.getFlipHorizontalButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipHorizontal()));
+		controller.getFlipHorizontalButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipHorizontal().toString()));
 		controller.getFlipHorizontalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
-		controller.getFlipVerticalButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipVertical()));
+		controller.getFlipVerticalButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipVertical().toString()));
 		controller.getFlipVerticalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 
@@ -299,7 +300,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor((1.0 / 1.2) * view.getOptionFontScaleFactor()));
 		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
 
-		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(view.getOptionOrientation()));
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(LayoutOrientation.valueOf(view.getOptionOrientation())));
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
 
 		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());

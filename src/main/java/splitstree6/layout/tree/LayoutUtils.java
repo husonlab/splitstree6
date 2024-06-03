@@ -1,5 +1,5 @@
 /*
- *  LayoutUtils.java Copyright (C) 2024 Daniel H. Huson
+ *  ScaleUtils.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -163,7 +163,8 @@ public class LayoutUtils {
 	/**
 	 * update a change of orientation to a node
 	 */
-	public static void applyOrientation(LayoutOrientation newOrientation, javafx.scene.Node node, boolean keepLabelsUnrotated) {
+	public static void applyOrientation(String newOrientationLabel, javafx.scene.Node node, boolean keepLabelsUnrotated) {
+		var newOrientation = LayoutOrientation.valueOf(newOrientationLabel);
 		if (newOrientation.flip())
 			node.setScaleX(-node.getScaleX());
 		var angle = -newOrientation.angle();

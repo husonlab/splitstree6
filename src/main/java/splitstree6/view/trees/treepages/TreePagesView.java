@@ -33,7 +33,6 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -66,7 +65,7 @@ public class TreePagesView implements IView {
 
 	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreeDiagramType.RectangularPhylogram);
 	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
+	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", "Rotate0Deg");
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
 
@@ -227,15 +226,15 @@ public class TreePagesView implements IView {
 		this.optionAveraging.set(optionAveraging);
 	}
 
-	public LayoutOrientation getOptionOrientation() {
+	public String getOptionOrientation() {
 		return optionOrientation.get();
 	}
 
-	public ObjectProperty<LayoutOrientation> optionOrientationProperty() {
+	public StringProperty optionOrientationProperty() {
 		return optionOrientation;
 	}
 
-	public void setOptionOrientation(LayoutOrientation optionOrientation) {
+	public void setOptionOrientation(String optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
 	}
 

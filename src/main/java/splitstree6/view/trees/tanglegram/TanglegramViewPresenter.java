@@ -55,7 +55,6 @@ import splitstree6.window.MainWindow;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import static splitstree6.layout.tree.LayoutOrientation.*;
 import static splitstree6.layout.tree.TreeDiagramType.*;
 
 /**
@@ -100,14 +99,14 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			Platform.runLater(() -> setLabel(n, view.isOptionShowTreeNames(), view.isOptionShowTreeInfo(), controller.getTree2NameLabel()));
 		});
 
-		var orientation2Property = new SimpleObjectProperty<LayoutOrientation>();
+		var orientation2Property = new SimpleStringProperty();
 		view.optionOrientationProperty().addListener((v, o, n) -> {
-			if (n == Rotate0Deg)
-				orientation2Property.set(FlipRotate0Deg);
+			if (n.equals("Rotate0Deg"))
+				orientation2Property.set("FlipRotate0Deg");
 			else
-				orientation2Property.set(Rotate180Deg);
+				orientation2Property.set("Rotate180Deg");
 		});
-		orientation2Property.set(view.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg);
+		orientation2Property.set(view.getOptionOrientation().equals("Rotate0Deg") ? "FlipRotate0Deg" : "Rotate180Deg");
 
 		ObservableMap<Node, LabeledNodeShape> nodeShapeMap2 = FXCollections.observableHashMap();
 		var tree2Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
@@ -193,7 +192,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			view.optionFontScaleFactorProperty().addListener(e -> connectors.update());
 
 			view.optionOrientationProperty().addListener((v, o, n) -> {
-				LayoutUtils.applyOrientation(controller.getMiddlePane(), n, o, false, new SimpleBooleanProperty(false), connectors::update);
+				LayoutUtils.applyOrientation(controller.getMiddlePane(), LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), false, new SimpleBooleanProperty(false), connectors::update);
 			});
 		}
 
@@ -231,10 +230,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		}
 
 		controller.getFlipButton().setOnAction(e -> {
-			if (view.getOptionOrientation() == Rotate0Deg)
-				view.setOptionOrientation(FlipRotate180Deg);
+			if (view.getOptionOrientation().equals("Rotate0Deg"))
+				view.setOptionOrientation("FlipRotate180Deg");
 			else
-				view.setOptionOrientation(Rotate0Deg);
+				view.setOptionOrientation("Rotate0Deg");
 		});
 		controller.getFlipButton().disableProperty().bind(view.emptyProperty());
 

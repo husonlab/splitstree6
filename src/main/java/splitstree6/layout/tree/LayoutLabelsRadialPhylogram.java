@@ -85,6 +85,6 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 	}
 
 	public void accept(LayoutOrientation layoutOrientation) {
-		Platform.runLater(() -> labelLayout.layoutLabels(layoutOrientation));
+		Platform.runLater(() -> labelLayout.layoutLabels(layoutOrientation.toString()));
 	}
 }

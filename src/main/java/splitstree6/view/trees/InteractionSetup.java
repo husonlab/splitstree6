@@ -20,7 +20,7 @@
 package splitstree6.view.trees;
 
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.collections.SetChangeListener;
@@ -49,7 +49,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.main.SplitsTree6;
 
@@ -72,7 +71,7 @@ public class InteractionSetup {
 	private double mouseDownX;
 	private double mouseDownY;
 
-	public InteractionSetup(Stage stage, Pane pane, TaxaBlock taxaBlock, TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation,
+	public InteractionSetup(Stage stage, Pane pane, TaxaBlock taxaBlock, TreeDiagramType diagram, StringProperty orientation,
 							SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel,
 							ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 
@@ -270,7 +269,7 @@ public class InteractionSetup {
 	}
 
 	private EventHandler<MouseEvent> createMouseDraggedOnTaxonLabelHandler(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
-																		   TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation,
+																		   TreeDiagramType diagram, StringProperty orientation,
 																		   ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
 		return me -> {
 			if (nodeShapeMap.keySet().iterator().next().getOwner() instanceof PhyloGraph graph) {
@@ -286,28 +285,28 @@ public class InteractionSetup {
 
 								if (diagram != TreeDiagramType.RadialPhylogram) {
 									switch (orientation.get()) {
-										case Rotate90Deg -> {
+										case "Rotate90Deg" -> {
 											var tmp = dx;
 											dx = -dy;
 											dy = tmp;
 										}
-										case Rotate180Deg -> {
+										case "Rotate180Deg" -> {
 											dx = -dx;
 											dy = -dy;
 										}
-										case Rotate270Deg -> {
+										case "Rotate270Deg" -> {
 											var tmp = dx;
 											dx = dy;
 											dy = -tmp;
 										}
-										case FlipRotate0Deg -> dx = -dx;
-										case FlipRotate90Deg -> {
+										case "FlipRotate0Deg" -> dx = -dx;
+										case "FlipRotate90Deg" -> {
 											var tmp = dx;
 											dx = dy;
 											dy = tmp;
 										}
-										case FlipRotate180Deg -> dy = -dy;
-										case FlipRotate270Deg -> {
+										case "FlipRotate180Deg" -> dy = -dy;
+										case "FlipRotate270Deg" -> {
 											var tmp = dx;
 											dx = -dy;
 											dy = -tmp;

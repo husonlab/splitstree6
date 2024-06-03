@@ -80,7 +80,7 @@ public class DensiTreeView implements IView {
 
 	private final BooleanProperty optionShowConsensus = new SimpleBooleanProperty(this, "optionShowConsensus", true);
 
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
+	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation");
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0 / 1.2);
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0 / 1.2);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
@@ -98,7 +98,7 @@ public class DensiTreeView implements IView {
 
 	{
 		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
-		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
+		ProgramProperties.track(optionOrientation, LayoutOrientation.Rotate0Deg.toString());
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionRerootAndRescale, false);
 		ProgramProperties.track(optionShowTrees, true);
@@ -110,7 +110,7 @@ public class DensiTreeView implements IView {
 		if (startup) {
 			startup = false;
 			optionDiagram.set(DensiTreeDiagramType.TriangularPhylogram);
-			optionOrientation.set(LayoutOrientation.Rotate0Deg);
+			optionOrientation.set(LayoutOrientation.Rotate0Deg.toString());
 			optionAveraging.set(HeightAndAngles.Averaging.ChildAverage);
 			optionRerootAndRescale.set(false);
 			optionShowTrees.set(true);
@@ -248,15 +248,15 @@ public class DensiTreeView implements IView {
 		return viewTab;
 	}
 
-	public LayoutOrientation getOptionOrientation() {
+	public String getOptionOrientation() {
 		return optionOrientation.get();
 	}
 
-	public ObjectProperty<LayoutOrientation> optionOrientationProperty() {
+	public StringProperty optionOrientationProperty() {
 		return optionOrientation;
 	}
 
-	public void setOptionOrientation(LayoutOrientation optionOrientation) {
+	public void setOptionOrientation(String optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
 	}
 

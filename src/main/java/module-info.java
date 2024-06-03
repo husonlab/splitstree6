@@ -215,4 +215,6 @@ module splitstreesix {
 
 	exports splitstree6.xtra.hyperstrings;
 	opens splitstree6.utils;
+	exports splitstree6;
+	opens splitstree6;
 }

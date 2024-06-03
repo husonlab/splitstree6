@@ -30,8 +30,8 @@ import jloda.util.*;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.trees.trees2trees.ALTSExternal;
 import splitstree6.algorithms.trees.trees2trees.ALTSNetwork;
-import splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm;
 import splitstree6.algorithms.trees.trees2trees.PhyloFusion;
+import splitstree6.algorithms.trees.trees2trees.Trees2Trees;
 import splitstree6.compute.autumn.Cluster;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -85,7 +85,7 @@ public class SampleTrees {
 		var echoInputTree = options.getOption("-e", "echoInput", "Echo the input tree to output", false);
 
 		var replicates = options.getOption("-R", "replicates", "Now replicates per input tree", 1);
-		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
+		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
 		var timeOut = options.getOption("-to", "timeOut", "Algorithm killed 'timed out' after this many milliseconds", 300000);
 
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-th", "threads", "Set number of threads to use", 8));
@@ -296,39 +296,41 @@ public class SampleTrees {
 		if (inputBlock.isReticulated())
 			throw new IOException("Illegal rooted network in input");
 
-		var algorithm = switch (algorithmName.toLowerCase()) {
-			case "phylofusion" -> {
-				var phyloFusion = new PhyloFusion();
-				phyloFusion.setOptionMutualRefinement(true);
-				phyloFusion.setOptionNormalizeEdgeWeights(true);
-				phyloFusion.setOptionCalculateWeights(false);
-				yield phyloFusion;
+		Trees2Trees algorithm;
+		if (algorithmName.toLowerCase().startsWith("phylofusion")) {
+			var phyloFusion = new PhyloFusion();
+			phyloFusion.setOptionMutualRefinement(true);
+			phyloFusion.setOptionNormalizeEdgeWeights(true);
+			phyloFusion.setOptionCalculateWeights(false);
+			if (algorithmName.toLowerCase().endsWith("fast"))
+				phyloFusion.setOptionSearch(PhyloFusion.Search.Fast);
+			else if (algorithmName.toLowerCase().endsWith("medium"))
+				phyloFusion.setOptionSearch(PhyloFusion.Search.Medium);
+			else
+				phyloFusion.setOptionSearch(PhyloFusion.Search.Thorough);
+			algorithm = phyloFusion;
+		} else if (algorithmName.equalsIgnoreCase("altsNetwork")) {
+			var alts = new ALTSNetwork();
+			alts.setOptionMutualRefinement(true);
+			algorithm = alts;
+		} else if (algorithmName.equalsIgnoreCase("altsExternal")) {
+			if (inputBlock.isPartial())
+				throw new IOException("--algorithm ALTSExternal not applicable to trees with missing taxa");
+			for (var tree : inputTrees) {
+				if (tree.nodeStream().anyMatch(v -> v.getOutDegree() > 2))
+					throw new IOException("--algorithm ALTSExternal not applicable to trees with multifurcations");
 			}
-			case "altsnetwork" -> {
-				var alts = new ALTSNetwork();
-				alts.setOptionMutualRefinement(true);
-				yield alts;
-			}
-			case "altsexternal" -> {
-				if (inputBlock.isPartial())
-					throw new IOException("--algorithm ALTSExternal not applicable to trees with missing taxa");
-				for (var tree : inputTrees) {
-					if (tree.nodeStream().anyMatch(v -> v.getOutDegree() > 2))
-						throw new IOException("--algorithm ALTSExternal not applicable to trees with multifurcations");
-				}
-				var alts = new ALTSExternal();
-				alts.setOptionALTSExecutableFile("/Users/huson/cpp/louxin/alts");
-				yield alts;
-			}
-			case "autumn" -> new AutumnAlgorithm();
-			default -> throw new UsageException("Unknown algorithm " + algorithmName);
-		};
+			var alts = new ALTSExternal();
+			alts.setOptionALTSExecutableFile("/Users/huson/cpp/louxin/alts");
+			algorithm = alts;
+		} else throw new UsageException("Unknown algorithm " + algorithmName);
+
 		var outputBlock = new TreesBlock();
 		var time = System.currentTimeMillis();
 		try {
 			algorithm.compute(new ProgressTimeOut(timeOut), taxaBlock, inputBlock, outputBlock);
 		} catch (IOException ex) { // timed out
-			if (ex.getMessage().equals(ProgressTimeOut.MESSAGE)) {
+			if (ProgressTimeOut.MESSAGE.equals(ex.getMessage())) {
 				System.err.println("Timed out: " + replicate);
 				return new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
 						maxProportionContractedInternalEdges, maxProportionMissingTaxa, rSPRs, -1, timeOut / 1000.0);

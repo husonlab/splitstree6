@@ -71,7 +71,7 @@ public class TanglegramView implements IView {
 	private final ObjectProperty<TreeDiagramType> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2", TreeDiagramType.RectangularPhylogram);
 	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging2 = new SimpleObjectProperty<>(this, "optionAveraging2");
 
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
+	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", LayoutOrientation.Rotate0Deg.toString());
 
 	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
 
@@ -236,15 +236,15 @@ public class TanglegramView implements IView {
 		this.optionAveraging1.set(optionAveraging1);
 	}
 
-	public LayoutOrientation getOptionOrientation() {
+	public String getOptionOrientation() {
 		return optionOrientation.get();
 	}
 
-	public ObjectProperty<LayoutOrientation> optionOrientationProperty() {
+	public StringProperty optionOrientationProperty() {
 		return optionOrientation;
 	}
 
-	public void setOptionOrientation(LayoutOrientation optionOrientation) {
+	public void setOptionOrientation(String optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
 	}
 

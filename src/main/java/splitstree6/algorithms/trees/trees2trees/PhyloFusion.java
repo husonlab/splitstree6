@@ -20,11 +20,12 @@
 package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.MutualRefinement;
 import splitstree6.compute.phylofusion.NetworkUtils;
@@ -39,17 +40,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PhyloFusion extends Trees2Trees {
+	public enum Search {Thorough, Medium, Fast}
 	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
 
 	private final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
 
 	private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
 
-	private final BooleanProperty optionFastMode = new SimpleBooleanProperty(this, "optionFastMode", false);
+	private final ObjectProperty<Search> optionSearch = new SimpleObjectProperty<>(this, "optionSearch");
 
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
-		ProgramProperties.track(optionFastMode, false);
+		ProgramProperties.track(optionSearch, Search::valueOf, Search.Thorough);
 	}
 
 	@Override
@@ -61,12 +63,12 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public String getShortDescription() {
-		return "Combines multiple rooted phylogenetic trees into a rooted netwok.";
+		return "Combines multiple rooted phylogenetic trees into a rooted network.";
 	}
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionFastMode.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearch.getName()); //, optionCalculateWeights.getName());
 	}
 
 	@Override
@@ -75,7 +77,8 @@ public class PhyloFusion extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
-			case "optionFastMode" -> "Fast mode: 0.1 seconds per taxon, otherwise: 3 seconds per taxon";
+			case "optionSearch" ->
+					"Fast, Medium or Thorough search: 10, 150 or 300 random orderings per taxon, respectively";
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
@@ -105,8 +108,8 @@ public class PhyloFusion extends Trees2Trees {
 				result = inputTrees;
 			} else {
 				var ntax = taxaBlock.getNtax();
-				var milliseconds = Math.round(1000.0 * ntax * (isOptionFastMode() ? 0.1 : 3.0));
-				result = PhyloFusionAlgorithm.apply(milliseconds, inputTrees, progress);
+				var numberOfRandomOrderings = computeNumberOfRandomOrderings(ntax, getOptionSearch());
+				result = PhyloFusionAlgorithm.apply(numberOfRandomOrderings, inputTrees, progress);
 			}
 
 			for (var network : result) {
@@ -138,20 +141,15 @@ public class PhyloFusion extends Trees2Trees {
 						}
 					}
 				}
-				if (false) { // this takes too long when number of reticulations is large
-					var networkClusters = TreesUtils.collectAllSoftwiredClusters(network);
-					for (var t = 1; t <= treesBlock.getNTrees(); t++) {
-						var tree = treesBlock.getTree(t);
-						if (!networkClusters.containsAll(TreesUtils.collectAllHardwiredClusters(tree))) {
-							System.err.println("ERROR: Network does not contain tree: " + t);
-							for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
-								if (!networkClusters.contains(cluster))
-									System.err.println("ERROR: missing cluster: " + StringUtils.toString(cluster));
-							}
-						}
-					}
-				}
 			}
+	}
+
+	private long computeNumberOfRandomOrderings(int ntax, Search optionSearch) {
+		return switch (optionSearch) {
+			case Fast -> Math.max(100, 10L * ntax);
+			case Medium -> 150L * ntax;
+			case Thorough -> 300L * ntax;
+		};
 	}
 
 	public boolean isOptionMutualRefinement() {
@@ -195,15 +193,15 @@ public class PhyloFusion extends Trees2Trees {
 		this.optionCalculateWeights.set(optionCalculateWeights);
 	}
 
-	public boolean isOptionFastMode() {
-		return optionFastMode.get();
+	public void setOptionSearch(Search optionSearch) {
+		this.optionSearch.set(optionSearch);
 	}
 
-	public BooleanProperty optionFastModeProperty() {
-		return optionFastMode;
+	public Search getOptionSearch() {
+		return optionSearch.get();
 	}
 
-	public void setOptionFastMode(boolean optionFastMode) {
-		this.optionFastMode.set(optionFastMode);
+	public ObjectProperty<Search> optionSearchProperty() {
+		return optionSearch;
 	}
 }
