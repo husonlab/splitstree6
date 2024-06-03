@@ -19,8 +19,6 @@
 
 package splitstree6.view.splits.viewer;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
@@ -34,7 +32,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import javafx.util.Pair;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
@@ -104,8 +101,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final Object sync2 = new Object();
 
-	private final Timeline timeline = new Timeline();
-
 	/**
 	 * the splits view presenter
 	 *
@@ -125,8 +120,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		this.mainWindow = mainWindow;
 		this.view = view;
 		this.controller = view.getController();
-
-		timeline.setCycleCount(Timeline.INDEFINITE);
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
@@ -446,55 +439,48 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.setupSingleBidirectionalBinding(mainController.getShowQRCodeMenuItem().selectedProperty(), view.optionShowQRCodeProperty());
 		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
-		{
-			controller.getRotateRightButton().setOnMousePressed(e -> {
-				timeline.stop();
-				if (view.getSplitSelectionModel().size() == 0) {
-					timeline.getKeyFrames().setAll((new KeyFrame(Duration.millis(100), a -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateRight10().toString()))));
-					timeline.play();
-				} else
-					view.getSplitsFormatter().getPresenter().rotateSplitsRight();
-			});
-			controller.getRotateRightButton().setOnMouseReleased(e -> timeline.stop());
-
-			controller.getRotateLeftButton().setOnMousePressed(e -> {
-				timeline.stop();
-				if (view.getSplitSelectionModel().size() == 0) {
-					timeline.getKeyFrames().setAll((new KeyFrame(Duration.millis(100), a -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft10().toString()))));
-					timeline.play();
-				} else
-					view.getSplitsFormatter().getPresenter().rotateSplitsLeft();
-			});
-			controller.getRotateLeftButton().setOnMouseReleased(e -> timeline.stop());
-		}
-
-		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
-		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
-
 		mainController.getRotateRightMenuItem().setOnAction(e -> {
 			if (view.getSplitSelectionModel().size() == 0)
-				view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateRight10().toString());
+				view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateRight(5).toString());
 			else
 				view.getSplitsFormatter().getPresenter().rotateSplitsRight();
 		});
-		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
+		mainController.getRotateRightMenuItem().disableProperty().bind(splitNetworkPane.changingOrientationProperty());
+
+
 
 		mainController.getRotateLeftMenuItem().setOnAction(e -> {
 			if (view.getSplitSelectionModel().size() == 0)
-				view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft10().toString());
+				view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft(5).toString());
 			else
 				view.getSplitsFormatter().getPresenter().rotateSplitsLeft();
 		});
-		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(splitNetworkPane.changingOrientationProperty());
+
+		controller.getRotateLeftButton().setOnAction(e -> {
+			if (!splitNetworkPane.changingOrientationProperty().get())
+				mainController.getRotateLeftMenuItem().getOnAction().handle(null);
+		});
+		controller.getRotateRightButton().setOnAction(e -> {
+			if (!splitNetworkPane.changingOrientationProperty().get())
+				mainController.getRotateRightMenuItem().getOnAction().handle(null);
+		});
 
 
-		controller.getFlipHorizontalButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipHorizontal().toString()));
-		controller.getFlipHorizontalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		controller.getFlipHorizontalButton().setOnAction(e -> {
+			if (!splitNetworkPane.changingOrientationProperty().get()) {
+				view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipHorizontal().toString());
+			}
+		});
+
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipHorizontalButton().getOnAction());
-		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipHorizontalButton().disableProperty());
+		mainController.getFlipMenuItem().disableProperty().bind(splitNetworkPane.changingOrientationProperty());
 
-		controller.getFlipVerticalButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipVertical().toString()));
-		controller.getFlipVerticalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		controller.getFlipVerticalButton().setOnAction(e -> {
+			if (!splitNetworkPane.changingOrientationProperty().get()) {
+				view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipVertical().toString());
+			}
+		});
 
 		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}

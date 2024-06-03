@@ -108,21 +108,12 @@ public class LayoutOrientation {
 			node.setRotate(alpha);
 	}
 
-
-	public LayoutOrientation getRotateLeft90() {
-		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha + 90));
+	public LayoutOrientation getRotateLeft(int angle) {
+		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha + angle));
 	}
 
-	public LayoutOrientation getRotateLeft10() {
-		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha + 5));
-	}
-
-	public LayoutOrientation getRotateRight90() {
-		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha - 90));
-	}
-
-	public LayoutOrientation getRotateRight10() {
-		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha - 5));
+	public LayoutOrientation getRotateRight(int angle) {
+		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha - angle));
 	}
 
 	public LayoutOrientation getFlipHorizontal() {

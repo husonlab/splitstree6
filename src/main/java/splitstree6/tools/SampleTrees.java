@@ -303,11 +303,11 @@ public class SampleTrees {
 			phyloFusion.setOptionNormalizeEdgeWeights(true);
 			phyloFusion.setOptionCalculateWeights(false);
 			if (algorithmName.toLowerCase().endsWith("fast"))
-				phyloFusion.setOptionSearch(PhyloFusion.Search.Fast);
+				phyloFusion.setOptionSearchHeuristic(PhyloFusion.Search.Fast);
 			else if (algorithmName.toLowerCase().endsWith("medium"))
-				phyloFusion.setOptionSearch(PhyloFusion.Search.Medium);
+				phyloFusion.setOptionSearchHeuristic(PhyloFusion.Search.Medium);
 			else
-				phyloFusion.setOptionSearch(PhyloFusion.Search.Thorough);
+				phyloFusion.setOptionSearchHeuristic(PhyloFusion.Search.Thorough);
 			algorithm = phyloFusion;
 		} else if (algorithmName.equalsIgnoreCase("altsNetwork")) {
 			var alts = new ALTSNetwork();

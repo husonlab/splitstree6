@@ -47,11 +47,11 @@ public class PhyloFusion extends Trees2Trees {
 
 	private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
 
-	private final ObjectProperty<Search> optionSearch = new SimpleObjectProperty<>(this, "optionSearch");
+	private final ObjectProperty<Search> optionSearchHeuristic = new SimpleObjectProperty<>(this, "optionSearchHeuristic");
 
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
-		ProgramProperties.track(optionSearch, Search::valueOf, Search.Thorough);
+		ProgramProperties.track(optionSearchHeuristic, Search::valueOf, Search.Thorough);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearch.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName()); //, optionCalculateWeights.getName());
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class PhyloFusion extends Trees2Trees {
 				result = inputTrees;
 			} else {
 				var ntax = taxaBlock.getNtax();
-				var numberOfRandomOrderings = computeNumberOfRandomOrderings(ntax, getOptionSearch());
+				var numberOfRandomOrderings = computeNumberOfRandomOrderings(ntax, getOptionSearchHeuristic());
 				result = PhyloFusionAlgorithm.apply(numberOfRandomOrderings, inputTrees, progress);
 			}
 
@@ -193,15 +193,15 @@ public class PhyloFusion extends Trees2Trees {
 		this.optionCalculateWeights.set(optionCalculateWeights);
 	}
 
-	public void setOptionSearch(Search optionSearch) {
-		this.optionSearch.set(optionSearch);
+	public void setOptionSearchHeuristic(Search optionSearchHeuristic) {
+		this.optionSearchHeuristic.set(optionSearchHeuristic);
 	}
 
-	public Search getOptionSearch() {
-		return optionSearch.get();
+	public Search getOptionSearchHeuristic() {
+		return optionSearchHeuristic.get();
 	}
 
-	public ObjectProperty<Search> optionSearchProperty() {
-		return optionSearch;
+	public ObjectProperty<Search> optionSearchHeuristicProperty() {
+		return optionSearchHeuristic;
 	}
 }
