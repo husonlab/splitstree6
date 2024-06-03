@@ -330,7 +330,7 @@ public class SampleTrees {
 		try {
 			algorithm.compute(new ProgressTimeOut(timeOut), taxaBlock, inputBlock, outputBlock);
 		} catch (IOException ex) { // timed out
-			if (ex.getMessage().equals(ProgressTimeOut.MESSAGE)) {
+			if (ProgressTimeOut.MESSAGE.equals(ex.getMessage())) {
 				System.err.println("Timed out: " + replicate);
 				return new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
 						maxProportionContractedInternalEdges, maxProportionMissingTaxa, rSPRs, -1, timeOut / 1000.0);

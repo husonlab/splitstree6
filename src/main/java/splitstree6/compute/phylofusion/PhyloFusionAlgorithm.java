@@ -29,6 +29,7 @@ import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.utils.PathMultiplicityDistance;
+import splitstree6.utils.ProgressTimeOut;
 import splitstree6.xtra.hyperstrings.HyperSequence;
 import splitstree6.xtra.hyperstrings.ProgressiveSCS;
 
@@ -130,42 +131,40 @@ public class PhyloFusionAlgorithm {
 
 		try {
 			var globalScore = new Single<>(Integer.MAX_VALUE);
-			var total = new LongAdder();
 
 			progress.setSubtask("Searching");
 			progress.setMaximum(numberOfRandomOrderings);
 			progress.setProgress(0);
 
-			var queue = new LinkedBlockingQueue<ArrayList<Integer>>(nThreads);
+			var queue = new LinkedBlockingQueue<ArrayList<Integer>>(2 * nThreads);
 			var sentinel = new ArrayList<Integer>();
 
 			var countdownLatch = new CountDownLatch(nThreads);
 
+			var total = new LongAdder();
+
+			var mainThread = Thread.currentThread();
+
 			for (var t = 0; t < nThreads; t++) {
-				var first = (t == 0);
 				executor.submit(() -> {
 					try {
 						var silent = new ProgressSilent();
 						while (true) {
 							var ordering = queue.take();
-							if (ordering == sentinel)
+							if (ordering == sentinel) {
 								break;
+							}
 							try {
 								computeTaxonRankingsRec(silent, 0, new int[taxa.cardinality()], taxa, ordering, trees, globalScore, rankings);
-								if (total.longValue() >= numberOfRandomOrderings)
-									break;
-								else
-									total.increment();
 							} catch (CanceledException ignored) {
 							}
-							if (first)
-								progress.setProgress(total.longValue());
-							else
-								progress.checkForCancel();
+							progress.checkForCancel();
 						}
-					} catch (InterruptedException | CanceledException ignored) {
+					} catch (InterruptedException ignored) {
+					} catch (CanceledException ignored) {
+						executor.shutdownNow();
+						mainThread.interrupt();
 					} finally {
-						queue.clear();
 						countdownLatch.countDown();
 					}
 				});
@@ -174,6 +173,8 @@ public class PhyloFusionAlgorithm {
 			var randomOrderSupplier = randomTaxonOrderingsSupplier(taxa);
 			do {
 				queue.put(randomOrderSupplier.get());
+				total.increment();
+				progress.incrementProgress();
 			}
 			while (total.longValue() < numberOfRandomOrderings);
 
@@ -184,7 +185,7 @@ public class PhyloFusionAlgorithm {
 			countdownLatch.await();
 
 		} catch (InterruptedException e) {
-			throw new CanceledException();
+			throw new CanceledException(ProgressTimeOut.MESSAGE);
 		} finally {
 			executor.shutdownNow();
 		}
