@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Supplier;
 
 /**
@@ -52,7 +53,7 @@ public class PhyloFusionAlgorithm {
 	 * @return the computed networks
 	 * @throws IOException user canceled
 	 */
-	public static List<PhyloTree> apply(long maxSearchMilliseconds, Collection<PhyloTree> inputTrees, ProgressListener progress) throws IOException {
+	public static List<PhyloTree> apply(long numberOfRandomOrderings, Collection<PhyloTree> inputTrees, ProgressListener progress) throws IOException {
 		var taxa = union(inputTrees.stream().map(PhyloGraph::getTaxa).toList());
 
 		var trees = new ArrayList<PhyloTree>();
@@ -67,7 +68,7 @@ public class PhyloFusionAlgorithm {
 			trees.add(tree);
 		}
 
-		var rankings = computeTaxonRankings(progress, taxa, trees, maxSearchMilliseconds);
+		var rankings = computeTaxonRankings(progress, taxa, trees, numberOfRandomOrderings);
 
 		var bestHybridizationNumber = new Single<>(Integer.MAX_VALUE);
 		var best = new ArrayList<Pair<int[], Map<Integer, HyperSequence>>>();
@@ -117,22 +118,22 @@ public class PhyloFusionAlgorithm {
 	 * compute taxon orderings to consider, using greedy heuristic
 	 *
 	 * @param trees              input trees
-	 * @param milliseconds time allowed for trying different orders
 	 * @return taxon rankings
 	 */
-	private static Collection<? extends int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, long milliseconds) throws CanceledException {
+	private static Collection<? extends int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, long numberOfRandomOrderings) throws CanceledException {
 
 		var rankings = new ArrayList<int[]>();
 
 		var nThreads = ProgramExecutorService.getNumberOfCoresToUse();
 		var executor = Executors.newFixedThreadPool(nThreads);
+
+
 		try {
 			var globalScore = new Single<>(Integer.MAX_VALUE);
+			var total = new LongAdder();
 
-			progress.setSubtask("Searching (%ds)".formatted(milliseconds / 1000));
-			var start = System.currentTimeMillis();
-			var stop = start + milliseconds;
-			progress.setMaximum(milliseconds);
+			progress.setSubtask("Searching");
+			progress.setMaximum(numberOfRandomOrderings);
 			progress.setProgress(0);
 
 			var queue = new LinkedBlockingQueue<ArrayList<Integer>>(nThreads);
@@ -151,15 +152,20 @@ public class PhyloFusionAlgorithm {
 								break;
 							try {
 								computeTaxonRankingsRec(silent, 0, new int[taxa.cardinality()], taxa, ordering, trees, globalScore, rankings);
+								if (total.longValue() >= numberOfRandomOrderings)
+									break;
+								else
+									total.increment();
 							} catch (CanceledException ignored) {
 							}
 							if (first)
-								progress.setProgress(System.currentTimeMillis() - start);
+								progress.setProgress(total.longValue());
 							else
 								progress.checkForCancel();
 						}
 					} catch (InterruptedException | CanceledException ignored) {
 					} finally {
+						queue.clear();
 						countdownLatch.countDown();
 					}
 				});
@@ -169,7 +175,7 @@ public class PhyloFusionAlgorithm {
 			do {
 				queue.put(randomOrderSupplier.get());
 			}
-			while (System.currentTimeMillis() < stop);
+			while (total.longValue() < numberOfRandomOrderings);
 
 			for (var t = 0; t < nThreads; t++) {
 				queue.put(sentinel);
