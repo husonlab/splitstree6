@@ -145,7 +145,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	private long computeNumberOfRandomOrderings(int ntax, Search optionSearch) {
 		return switch (optionSearch) {
-			case Fast -> 10L * ntax;
+			case Fast -> Math.max(100, 10L * ntax);
 			case Medium -> 100L * ntax;
 			case Thorough -> 250L * ntax;
 		};
