@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 public class SplitNetworkPane extends StackPane {
 	private final Group group = new Group();
 	private final ChangeListener<Number> fontScaleChangeListener;
-	private final ChangeListener<LayoutOrientation> orientChangeListener;
+	private final ChangeListener<String> orientChangeListener;
 	private final InvalidationListener layoutLabelsListener;
 	private final InvalidationListener redrawListener;
 
@@ -73,7 +73,7 @@ public class SplitNetworkPane extends StackPane {
 	public SplitNetworkPane(MainWindow mainWindow, ReadOnlyObjectProperty<TaxaBlock> taxaBlock, ReadOnlyObjectProperty<SplitsBlock> splitsBlock,
 							SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
 							ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight, ReadOnlyObjectProperty<SplitsDiagramType> diagram,
-							ReadOnlyObjectProperty<LayoutOrientation> orientation,
+							ReadOnlyStringProperty orientation,
 							ReadOnlyObjectProperty<SplitsRooting> rooting, ReadOnlyDoubleProperty rootAngle, ReadOnlyDoubleProperty labelScaleFactor,
 							ReadOnlyObjectProperty<LabelSplitsBy> labelSplitBy, DoubleProperty unitLength,
 							ObservableMap<Integer, RichTextLabel> taxonLabelMap,
@@ -97,7 +97,7 @@ public class SplitNetworkPane extends StackPane {
 
 		orientChangeListener = (v, o, n) -> {
 			var shapes = nodeLabeledShapeMap.values().stream().filter(LabeledNodeShape::hasShape).collect(Collectors.toList());
-			splitstree6.layout.LayoutUtils.applyOrientation(shapes, o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or), changingOrientation);
+			LayoutOrientation.applyOrientation(shapes, o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or.toString()), changingOrientation);
 		};
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
@@ -157,7 +157,7 @@ public class SplitNetworkPane extends StackPane {
 		this.runAfterUpdate = runAfterUpdate;
 	}
 
-	public void layoutLabels(LayoutOrientation orientation) {
+	public void layoutLabels(String orientation) {
 		splitNetworkLayout.getLabelLayout().layoutLabels(orientation);
 	}
 
@@ -169,9 +169,10 @@ public class SplitNetworkPane extends StackPane {
 		return changingOrientation;
 	}
 
-	private void applyOrientation(LayoutOrientation orientation) {
+	private void applyOrientation(String orientationLabel) {
 		if (!isChangingOrientation()) {
 			changingOrientation.set(true);
+			var orientation = LayoutOrientation.valueOf(orientationLabel);
 			BasicFX.preorderTraversal(getChildren().get(0), n -> {
 				if ("graph-node".equals(n.getId())) {
 					var point = new Point2D(n.getTranslateX(), n.getTranslateY());
@@ -184,7 +185,7 @@ public class SplitNetworkPane extends StackPane {
 				}
 			});
 			ProgramExecutorService.submit(100, () -> Platform.runLater(() -> {
-				layoutLabels(orientation);
+				layoutLabels(orientationLabel);
 				changingOrientation.set(false);
 			}));
 		}

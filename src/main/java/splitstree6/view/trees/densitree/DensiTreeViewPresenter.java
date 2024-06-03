@@ -39,6 +39,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.qr.QRViewUtils;
 import splitstree6.qr.TreeNewickQR;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -48,9 +49,6 @@ import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
-
-import static splitstree6.layout.tree.LayoutOrientation.FlipRotate180Deg;
-import static splitstree6.layout.tree.LayoutOrientation.Rotate0Deg;
 
 public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
@@ -144,7 +142,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 			var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
 			drawer.apply(targetBounds.get(),
 					trees, controller.getCenterPane(), view.getOptionDiagram(), view.getOptionAveraging(),
-					view.getOptionOrientation() != Rotate0Deg,
+					view.getOptionOrientation().startsWith("Flip"),
 					view.isOptionJitter(), view.isOptionRerootAndRescale(),
 					view.getOptionColorIncompatibleEdges(),
 					view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
@@ -196,10 +194,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		view.optionAveragingProperty().addListener(invalidationListener);
 
 		controller.getFlipButton().setOnAction(e -> {
-			if (view.getOptionOrientation() == Rotate0Deg)
-				view.setOptionOrientation(FlipRotate180Deg);
-			else
-				view.setOptionOrientation(Rotate0Deg);
+			view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipVertical().toString());
 		});
 		controller.getFlipButton().disableProperty().bind(view.emptyProperty());
 		view.optionOrientationProperty().addListener(invalidationListener);

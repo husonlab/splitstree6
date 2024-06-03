@@ -96,8 +96,8 @@ public class NetworkPane extends StackPane {
 		};
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
-		orientChangeListener = (v, o, n) -> splitstree6.layout.LayoutUtils.applyOrientation(nodeShapeMap.values(), o, n,
-				or -> networkLayout.getLabelLayout().layoutLabels(or), changingOrientation);
+		orientChangeListener = (v, o, n) -> LayoutOrientation.applyOrientation(nodeShapeMap.values(), o.toString(), n.toString(),
+				or -> networkLayout.getLabelLayout().layoutLabels(or.toString()), changingOrientation);
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
 		layoutLabelsListener = e -> layoutLabels(orientation.get());
@@ -215,7 +215,7 @@ public class NetworkPane extends StackPane {
 	}
 
 	public void layoutLabels(LayoutOrientation orientation) {
-		networkLayout.getLabelLayout().layoutLabels(orientation);
+		networkLayout.getLabelLayout().layoutLabels(orientation.toString());
 	}
 
 	private void applyOrientation(LayoutOrientation orientation) {

@@ -48,8 +48,9 @@ import jloda.util.Single;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.LayoutUtils;
+import splitstree6.layout.ScaleUtils;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.qr.QRViewUtils;
@@ -206,14 +207,14 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
-		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft()));
+		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft90().toString()));
 		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
-		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
+		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateRight90().toString()));
 		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
-		controller.getFlipHorizontalButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipHorizontal()));
+		controller.getFlipHorizontalButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipHorizontal().toString()));
 		controller.getFlipHorizontalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
-		controller.getFlipVerticalButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipVertical()));
+		controller.getFlipVerticalButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipVertical().toString()));
 		controller.getFlipVerticalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 		controller.getScaleBar().visibleProperty().bind(toScale.and(showScaleBar));
@@ -224,7 +225,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 					controller.getScaleBar().factorXProperty().unbind();
 					changingOrientation.unbind();
 				} else {
-					controller.getScaleBar().factorXProperty().bind(view.getOptionOrientation().isWidthHeightSwitched() ? treePane.get().scaleYProperty() : treePane.get().scaleXProperty());
+					controller.getScaleBar().factorXProperty().bind(LayoutOrientation.valueOf(view.getOptionOrientation()).isWidthHeightSwitched() ? treePane.get().scaleYProperty() : treePane.get().scaleXProperty());
 					changingOrientation.bind(treePane.get().changingOrientationProperty());
 				}
 			};
@@ -516,7 +517,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 	public void updateLabelLayout() {
 		if (treePane.get() != null)
-			Platform.runLater(() -> treePane.get().updateLabelLayout(view.getOptionOrientation()));
+			Platform.runLater(() -> treePane.get().updateLabelLayout(LayoutOrientation.valueOf(view.getOptionOrientation())));
 	}
 
 	public LongProperty updateCounterProperty() {
@@ -536,8 +537,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 					var factor = n.doubleValue() / oldZoomX.get();
 					if (factor > 0 && factor != 1.0) {
 						undoManager.add("Zoom horizontally",
-								() -> LayoutUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / factor, 1.0),
-								() -> LayoutUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), factor, 1.0));
+								() -> ScaleUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / factor, 1.0),
+								() -> ScaleUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), factor, 1.0));
 						oldZoomX.set(null);
 					}
 				});
@@ -556,8 +557,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 					var factor = n.doubleValue() / oldZoomY.get();
 					if (factor > 0 && factor != 1.0) {
 						undoManager.add("Zoom vertically",
-								() -> LayoutUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0, 1.0 / factor),
-								() -> LayoutUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0, factor));
+								() -> ScaleUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0, 1.0 / factor),
+								() -> ScaleUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0, factor));
 						oldZoomY.set(null);
 					}
 				});

@@ -59,7 +59,7 @@ public class RadialLabelLayout {
 	 * layout the labels
 	 */
 	public void layoutLabels() {
-		layoutLabels(LayoutOrientation.Rotate0Deg);
+		layoutLabels("Rotate0Deg");
 	}
 
 	private int deferredCounter = 0;
@@ -67,14 +67,15 @@ public class RadialLabelLayout {
 	/**
 	 * layout the labels after graph has been transformed to a specific orientation
 	 *
-	 * @param orientation layout orientation
+	 * @param orientationLabel layout orientation
 	 */
-	public void layoutLabels(LayoutOrientation orientation) {
+	public void layoutLabels(String orientationLabel) {
 		if (!items.isEmpty()) {
+			var orientation = LayoutOrientation.valueOf(orientationLabel);
 			if (deferredCounter < items.size() && items.stream().anyMatch(item -> item.width() == 0 || item.height() == 0)) {
 				//System.err.println("not ready");
 				deferredCounter++;
-				Platform.runLater(() -> layoutLabels(orientation));
+				Platform.runLater(() -> layoutLabels(orientationLabel));
 			} else {
 				deferredCounter = 0;
 				this.orientation = orientation;

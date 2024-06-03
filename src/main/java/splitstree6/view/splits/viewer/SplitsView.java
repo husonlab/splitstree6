@@ -43,7 +43,6 @@ import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.selecttraits.SelectTraits;
@@ -77,7 +76,7 @@ public class SplitsView implements IView {
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 
 	private final ObjectProperty<SplitsDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", SplitsDiagramType.Splits);
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
+	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", "Rotate0Deg");
 
 	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting", SplitsRooting.None);
 	private final DoubleProperty optionRootAngle = new SimpleDoubleProperty(this, "optionRootAngle");
@@ -278,15 +277,15 @@ public class SplitsView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public LayoutOrientation getOptionOrientation() {
+	public String getOptionOrientation() {
 		return optionOrientation.get();
 	}
 
-	public ObjectProperty<LayoutOrientation> optionOrientationProperty() {
+	public StringProperty optionOrientationProperty() {
 		return optionOrientation;
 	}
 
-	public void setOptionOrientation(LayoutOrientation optionOrientation) {
+	public void setOptionOrientation(String optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
 	}
 

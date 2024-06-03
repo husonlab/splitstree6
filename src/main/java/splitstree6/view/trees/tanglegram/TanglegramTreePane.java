@@ -34,7 +34,10 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.tree.*;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LabeledNodeShape;
+import splitstree6.layout.tree.PaneLabel;
+import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.treepages.TreePane;
 
@@ -52,7 +55,7 @@ public class TanglegramTreePane extends Group {
 
 	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
-							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LabelEdgesBy> labelByEdges, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
+							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LabelEdgesBy> labelByEdges, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, StringProperty optionOrientation,
 							  ReadOnlyDoubleProperty fontScaleFactor, ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->

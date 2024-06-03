@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.layout.tree;
+package splitstree6;
 
 import javafx.animation.ParallelTransition;
 import javafx.animation.Transition;
@@ -41,10 +41,6 @@ import java.util.regex.Pattern;
  * Daniel Huson,12.2021
  */
 public class LayoutOrientation {
-	public static final String Rotate0DegString = "Rotate0Deg";
-
-	public static final LayoutOrientation Rotate0Deg = new LayoutOrientation(false, 0);
-
 	private boolean flip;
 
 	private double alpha;
@@ -114,7 +110,7 @@ public class LayoutOrientation {
 	}
 
 	public LayoutOrientation getRotateLeft10() {
-		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha + 5));
+		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha + 10));
 	}
 
 	public LayoutOrientation getRotateRight90() {
@@ -122,7 +118,7 @@ public class LayoutOrientation {
 	}
 
 	public LayoutOrientation getRotateRight10() {
-		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha - 5));
+		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha - 10));
 	}
 
 	public LayoutOrientation getFlipHorizontal() {
@@ -133,13 +129,10 @@ public class LayoutOrientation {
 		return new LayoutOrientation(!flip, GeometryUtilsFX.modulo360(180 - alpha));
 	}
 
-	public static void applyOrientation(Collection<? extends Node> shapes, String oldOrientationLabel, String newOrientationLabel,
+	public static void applyOrientation(Collection<? extends Node> shapes, LayoutOrientation oldOrientation, LayoutOrientation newOrientation,
 										Consumer<LayoutOrientation> orientationConsumer,
 										BooleanProperty changingOrientation) {
 		if (!changingOrientation.get()) {
-			var oldOrientation = LayoutOrientation.valueOf(oldOrientationLabel);
-			var newOrientation = LayoutOrientation.valueOf(newOrientationLabel);
-
 			changingOrientation.set(true);
 
 			var transitions = new ArrayList<Transition>();
@@ -165,7 +158,7 @@ public class LayoutOrientation {
 				if (oldOrientation.flip() != newOrientation.flip() || arc > 10)
 					translate.setDuration(Duration.seconds(1.0));
 				else
-					translate.setDuration(Duration.millis(1));
+					translate.setDuration(Duration.millis(100));
 
 				translate.setToX(point.getX());
 				translate.setToY(point.getY());
@@ -181,11 +174,6 @@ public class LayoutOrientation {
 		}
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof LayoutOrientation other && flip == other.flip && alpha == other.alpha;
-	}
-
 	public String toString() {
 		if (!flip)
 			return "Rotate%.0fDeg".formatted(alpha);
@@ -193,16 +181,11 @@ public class LayoutOrientation {
 			return "FlipRotate%.0fDeg".formatted(alpha);
 	}
 
-	public static LayoutOrientation valueOf(String string) {
-		var item = new LayoutOrientation();
-		if (string != null) {
-			var matcher = Pattern.compile("\\d+").matcher(string);
-			if (matcher.find())
-				item.alpha = NumberUtils.parseDouble(matcher.group());
-			else
-				item.alpha = 0.0;
-			item.flip = string.startsWith("Flip");
-		}
-		return item;
+	public void setFromString(String string) {
+		var matcher = Pattern.compile("\\d+").matcher(string);
+		if (matcher.find())
+			alpha = NumberUtils.parseDouble(matcher.group());
+		else alpha = 0.0;
+		flip = string.startsWith("Flip");
 	}
 }

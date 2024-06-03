@@ -51,6 +51,8 @@ import splitstree6.view.trees.InteractionSetup;
 import java.util.OptionalDouble;
 import java.util.function.Consumer;
 
+import static splitstree6.layout.tree.LayoutOrientation.Rotate0Deg;
+
 /**
  * display an individual phylogenetic tree
  * Daniel Huson, 11.2021
@@ -81,7 +83,7 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
+					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, HeightAndAngles.Averaging averaging, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<PaneLabel> showTreeLabels, DoubleProperty unitLengthX,
 					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 
@@ -95,12 +97,12 @@ public class TreePane extends StackPane {
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
-		interactionSetup = new InteractionSetup(stage, this, taxaBlock, diagram, orientation, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
+		interactionSetup = new InteractionSetup(stage, this, taxaBlock, diagram, orientationLabel, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
 
 		fontScaleChangeListener = (v, o, n) -> {
 			if (result != null) {
 				LayoutUtils.applyLabelScaleFactor(result.taxonLabels(), n.doubleValue() / o.doubleValue());
-				updateLabelLayout(orientation.get());
+				updateLabelLayout(LayoutOrientation.valueOf(orientationLabel.get()));
 			}
 		};
 		fontScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
@@ -109,19 +111,19 @@ public class TreePane extends StackPane {
 		service = new AService<>();
 		service.setExecutor(ProgramExecutorService.getInstance());
 
-		orientation.addListener((v, o, n) -> {
+		orientationLabel.addListener((v, o, n) -> {
 			if (diagram == TreeDiagramType.RadialPhylogram) {
 				var shapes = BasicFX.getAllRecursively(pane, a -> "graph-node".equals(a.getId()));
-				splitstree6.layout.LayoutUtils.applyOrientation(shapes, o, n, orientationConsumer, changingOrientation);
+				LayoutOrientation.applyOrientation(shapes, o, n, orientationConsumer, changingOrientation);
 			} else
-				LayoutUtils.applyOrientation(pane, n, o, false, changingOrientation);
+				LayoutUtils.applyOrientation(pane, LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), false, changingOrientation);
 		});
 
 		service.setCallable(() -> {
 			edgeSelectionModel.clearSelection();
 			double width;
 			double height;
-			if (orientation.get().isWidthHeightSwitched()) {
+			if (LayoutOrientation.valueOf(orientationLabel.get()).isWidthHeightSwitched()) {
 				height = getPrefWidth();
 				width = getPrefHeight() - 12;
 			} else {
@@ -180,12 +182,13 @@ public class TreePane extends StackPane {
 
 			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
 			Platform.runLater(() -> {
-				if (diagram == TreeDiagramType.RadialPhylogram && orientation.get() != LayoutOrientation.Rotate0Deg) {
+				var orientation = LayoutOrientation.valueOf(orientationLabel.get());
+				if (diagram == TreeDiagramType.RadialPhylogram && !orientation.equals(Rotate0Deg)) {
 					var shapes = BasicFX.getAllRecursively(pane, Group.class);
-					splitstree6.layout.LayoutUtils.applyOrientation(shapes, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer, changingOrientation);
+					LayoutOrientation.applyOrientation(shapes, "Rotate0Deg", orientationLabel.get(), orientationConsumer, changingOrientation);
 				} else {
-					LayoutUtils.applyOrientation(orientation.get(), pane, false);
-					updateLabelLayout(orientation.get());
+					LayoutUtils.applyOrientation(orientationLabel.get(), pane, false);
+					updateLabelLayout(orientation);
 				}
 			});
 
