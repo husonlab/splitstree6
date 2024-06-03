@@ -25,6 +25,7 @@ import jloda.util.StringUtils;
 import java.util.*;
 
 public record HyperSequence(ArrayList<BitSet> array) {
+
 	/**
 	 * default constructor
 	 */

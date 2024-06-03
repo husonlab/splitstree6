@@ -23,17 +23,17 @@ import jloda.util.BitSetUtils;
 import jloda.util.CollectionUtils;
 import jloda.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.BitSet;
+import java.util.*;
 
 public class ShortestCommonHyperSequence {
 	public static HyperSequence align(HyperSequence a, HyperSequence b) {
+		expandSubSequences(a,b);
+
 		var m = a.size();
 		var n = b.size();
 
 		var matrix = new int[m + 1][n + 1];
 
-		//initialize matrix
 		for (var i = 0; i <= m; i++) {
 			matrix[i][0] = i;
 		}
@@ -49,7 +49,6 @@ public class ShortestCommonHyperSequence {
 				matrix[i][j] = value;
 			}
 		}
-
 
 		var aTrace = new ArrayList<Integer>();
 		var bTrace = new ArrayList<Integer>();
@@ -79,7 +78,6 @@ public class ShortestCommonHyperSequence {
 			}
 			CollectionUtils.reverseInPlace(aTrace);
 			CollectionUtils.reverseInPlace(bTrace);
-
 		}
 
 
@@ -114,7 +112,6 @@ public class ShortestCommonHyperSequence {
 			System.err.println();
 		}
 
-
 		var sequence = new HyperSequence();
 		for (var p = 0; p < aTrace.size(); p++) {
 			var set = new BitSet();
@@ -130,17 +127,71 @@ public class ShortestCommonHyperSequence {
 		return sequence;
 	}
 
+	private static void expandSubSequence(HyperSequence a, HyperSequence b) {
+		for (int p = 0; p < b.size(); p++) {
+			if (b.get(p).cardinality() > 1) {
+				TreeSet<Integer> sortedIndexes = new TreeSet<>();
+				boolean allFound = true;
 
+				for (int i = b.get(p).nextSetBit(0); i >= 0; i = b.get(p).nextSetBit(i + 1)) {
+					BitSet temp = new BitSet();
+					temp.set(i);
+					if (a.array().contains(temp)) {
+						sortedIndexes.add(a.array().indexOf(temp));
+					} else {
+						allFound = false;
+						break;
+					}
+				}
+				if (allFound) {
+					if(areConsecutive(sortedIndexes)) {
+						b.array().remove(p);
+						for (int i : sortedIndexes.descendingSet()) {
+							b.array().add(p, a.get(i));
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	public static boolean areConsecutive(Set<Integer> sortedIndexes) {
+		if (sortedIndexes.size() < 2) {
+			return true;  // Less than 2 elements are always consecutive
+		}
+
+		Iterator<Integer> iterator = sortedIndexes.iterator();
+		int previous = iterator.next();
+		while (iterator.hasNext()) {
+			int current = iterator.next();
+			if (current != previous + 1) {
+				return false;
+			}
+			previous = current;
+		}
+
+		return true;
+	}
+	public static void expandSubSequences(HyperSequence a, HyperSequence b) {
+		expandSubSequence(a, b);
+		expandSubSequence(b, a);
+	}
 	public static void main(String[] args) {
-		var a = HyperSequence.parse("2 : 1 : 5 : 6");
-		var b = HyperSequence.parse("4 : 1 :5 : 2 : 6");
+		var a = HyperSequence.parse("2:4:1:5:6");
+		var b = HyperSequence.parse("1 5 4: 2 : 6");
 
 		System.err.println("Input:");
 		System.err.println("a= " + a);
 		System.err.println("b= " + b);
 
+		expandSubSequences(b,a);
+
+		System.err.println("a= " + a);
+		System.err.println("b= " + b);
+
 		var aligned = align(a, b);
-		System.err.println("Result:");
-		System.err.println(aligned);
+		System.err.println("SCS= " + aligned);
+
 	}
 }
