@@ -63,7 +63,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public String getShortDescription() {
-		return "Combines multiple rooted phylogenetic trees into a rooted netwok.";
+		return "Combines multiple rooted phylogenetic trees into a rooted network.";
 	}
 
 	@Override
@@ -77,7 +77,8 @@ public class PhyloFusion extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
-			case "optionSearch" -> "Fast, Medium or Thorough search: 10, 100, 250 random orderings per taxon";
+			case "optionSearch" ->
+					"Fast, Medium or Thorough search: 10, 150 or 300 random orderings per taxon, respectively";
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
@@ -146,8 +147,8 @@ public class PhyloFusion extends Trees2Trees {
 	private long computeNumberOfRandomOrderings(int ntax, Search optionSearch) {
 		return switch (optionSearch) {
 			case Fast -> Math.max(100, 10L * ntax);
-			case Medium -> 100L * ntax;
-			case Thorough -> 250L * ntax;
+			case Medium -> 150L * ntax;
+			case Thorough -> 300L * ntax;
 		};
 	}
 
