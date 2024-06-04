@@ -67,6 +67,12 @@
                             <Tooltip text="Zoom in"/>
                         </tooltip>
                     </Button>
+                    <Button fx:id="setScaleRatioButton" contentDisplay="CENTER" maxHeight="20.0" mnemonicParsing="false"
+                            text="Unit Length">
+                        <tooltip>
+                            <Tooltip text="Set the scale ratio"/>
+                        </tooltip>
+                    </Button>
                 </ToolBar>
             </VBox>
         </top>

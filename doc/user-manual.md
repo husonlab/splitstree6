@@ -316,8 +316,10 @@ unrooted or rooted, using either *mid-point rooting* or *outgroup
 rooting*. The latter requires that some taxa have been selected; these
 are treated as the outgroup.
 
-In addition, there are buttons for rotating, flipping and zooming. The
-rotate buttons act differently depending on whether edges in the network
+In addition, there are buttons for rotating, flipping, zooming
+and for setting the _scale ratio_ to a specific value to ensure
+that different networks are drawn to the same scale.
+The rotate buttons act differently depending on whether edges in the network
 are selected or not. If no edges or nodes are selected, then the entire
 network is rotated. If one or more edges are selected then only the
 edges (corresponding to one or more splits) are rotated.

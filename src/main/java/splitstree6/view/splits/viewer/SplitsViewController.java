@@ -66,6 +66,9 @@ public class SplitsViewController {
 	private Button zoomOutButton;
 
 	@FXML
+	private Button setScaleRatioButton;
+
+	@FXML
 	private ToggleButton showScalarBarFitToggleButton;
 
 	@FXML
@@ -111,6 +114,7 @@ public class SplitsViewController {
 		MaterialIcons.setIcon(flipVerticalButton, "flip", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(zoomInButton, "zoom_in");
 		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
+		MaterialIcons.setIcon(setScaleRatioButton, "more_vert");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 
@@ -189,6 +193,10 @@ public class SplitsViewController {
 
 	public Button getZoomOutButton() {
 		return zoomOutButton;
+	}
+
+	public Button getSetScaleRatioButton() {
+		return setScaleRatioButton;
 	}
 
 	public ZoomableScrollPane getScrollPane() {

@@ -28,9 +28,11 @@ import javafx.collections.*;
 import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.shape.Shape;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import jloda.fx.control.RichTextLabel;
@@ -212,6 +214,32 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getScaleBar().visibleProperty().bind((view.optionDiagramProperty().isEqualTo(SplitsDiagramType.Outline).or(view.optionDiagramProperty().isEqualTo(SplitsDiagramType.Splits)))
 				.and(view.emptyProperty().not()).and(showScaleBar));
 		controller.getScaleBar().factorXProperty().bind(view.optionZoomFactorProperty());
+
+		controller.getSetScaleRatioButton().setOnAction(e -> {
+			var currentValue = 100.0 / (controller.getScaleBar().getUnitLengthX() * view.getOptionZoomFactor());
+			var dialog = new TextInputDialog(StringUtils.removeTrailingZerosAfterDot(currentValue));
+			dialog.setTitle("Set Scale Ratio - SplitsTree App");
+			dialog.setHeaderText("Define the length representation per 100 pixels");
+			dialog.setContentText("Length per 100 pixels:");
+			dialog.initOwner(mainWindow.getStage());
+			dialog.initModality(Modality.APPLICATION_MODAL);
+			dialog.showAndWait().ifPresent(resultString -> {
+				if (NumberUtils.isDouble(resultString)) {
+					var result = NumberUtils.parseDouble(resultString);
+					if (result > 0) {
+						Platform.runLater(() -> {
+							var newValue = 100.0 / (result * controller.getScaleBar().getUnitLengthX());
+							view.setOptionZoomFactor(newValue);
+						});
+					}
+				}
+			});
+		});
+
+		if (false) {
+			BasicFX.reportChanges("unitLengthXProperty", controller.getScaleBar().unitLengthXProperty());
+			BasicFX.reportChanges("optionZoomFactorProperty", view.optionZoomFactorProperty());
+		}
 
 		controller.getFitLabel().visibleProperty().bind(controller.getScaleBar().visibleProperty());
 
