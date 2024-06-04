@@ -26,6 +26,7 @@ import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
 import jloda.util.ProgramExecutorService;
+import jloda.util.StringUtils;
 import jloda.util.UsageException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
@@ -71,35 +72,13 @@ public class AltsNonBinary {
 		var networks = apply(inputTreesBlock.getTrees(), progress);
 		var end = Instant.now();
 		System.err.println("Time taken: " + Duration.between(start, end).toSeconds() + " seconds");
-
-		LinkedList<Integer> order = new LinkedList<>();
-		order.add(3);
-		order.add(2);
-		order.add(1);
-		order.add(4);
-		order.add(5);
-		order.add(6);
-
-		HashMap<String, Integer> labelTaxonIdMap = new HashMap<>();
-		labelTaxonIdMap.put("a", 1);
-		labelTaxonIdMap.put("b", 2);
-		labelTaxonIdMap.put("c", 3);
-		labelTaxonIdMap.put("d", 4);
-		labelTaxonIdMap.put("e", 5);
-		labelTaxonIdMap.put("f", 6);
-
-
-		/*NewickTreeProcessor processor = new NewickTreeProcessor(labelTaxonIdMap, order);
-		for (var tree : inputTreesBlock.getTrees()){
-			for (var node : tree.leaves()){
-				System.err.println(node.getLabel() + " " + processor.findPathFromLeafToRoot(node));
-			}
-			System.err.println("-------");
-		}*/
+		System.err.println("Networks: " + networks.size());
 
 		for (var network : networks)
-			System.err.println(network.toBracketString(false));
+			System.err.println(network.toBracketString());
+
 	}
+
 	/**
 	 *
 	 * @param trees
@@ -110,9 +89,9 @@ public class AltsNonBinary {
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) throws IOException {
 		HashMap<String, Integer> labelTaxonIdMap = new HashMap<>();
 		var initialOrder = getInitialOrder(trees, labelTaxonIdMap);
-		//System.err.println("initial order: " + initialOrder);
+
 		HybridizationContext context = new HybridizationContext();
-		backTrack(trees, initialOrder, labelTaxonIdMap, initialOrder.size()-1, 1000, context);
+		backTrack(trees, initialOrder, labelTaxonIdMap, initialOrder.size()-1, initialOrder.size()*200, context);
 		return resultingNetworks(context.hybridizationResultSet, labelTaxonIdMap, progress);
 	}
 
@@ -279,7 +258,15 @@ public class AltsNonBinary {
 		return n * factorialRecursive(n - 1);
 	}
 
-	public static PhyloTree network(Map<Integer, HyperSequence> taxaSCSmap, LinkedList<Integer> finalOrder, HashMap<String, Integer> labelTaxonIdMap) throws IOException {
+	/**
+	 *
+	 * @param taxaSCSmap
+	 * @param finalOrder
+	 * @param labelTaxonIdMap
+	 * @return
+	 * @throws IOException
+	 */
+	public static PhyloTree networkCreate(Map<Integer, HyperSequence> taxaSCSmap, LinkedList<Integer> finalOrder, HashMap<String, Integer> labelTaxonIdMap) throws IOException {
 		PhyloTree tree = new PhyloTree();
 
 		Map<Integer, HyperSequence> sortedMap = sortKeysByOrder(taxaSCSmap, finalOrder);
@@ -288,35 +275,28 @@ public class AltsNonBinary {
 		List<Pair<Node, Integer>> connectionsToMake = new ArrayList<>();
 
 		for (Map.Entry<Integer, HyperSequence> nodes : sortedMap.entrySet()) {
-			//create first node in chain
+			//create the first node in the chain
 			Node firstNode = tree.newNode();
-			//add key node to the map to draw edges later
 			keyNodesMap.put(nodes.getKey(), firstNode);
 
 			Node previousNode = firstNode;
 
-			//create inner nodes
-			String[] values = nodes.getValue() != null ? nodes.getValue().toString().split(":") : new String[0];
-			for (var value : values) {
-				if (value.isBlank()) {
-					continue;
-				}
-				if (value.contains("-")){
-					value = expandRangeString(value.trim());
-				}
-				Node currentNode = tree.newNode();
-				//currentNode.setLabel(value+"$");
-				tree.newEdge(previousNode, currentNode);
-				Edge edge = tree.newEdge(previousNode, currentNode);
+			//if inner node add nodes and connections
+			if (!nodes.getValue().array().isEmpty()) {
+				for (var inners : nodes.getValue().array()) {
+					Node currentNode = tree.newNode();
 
-				String[] innerNodeValues = value.trim().split(",");
-				for (var nonBinaryNode : innerNodeValues) {
-					// Store the connection to be made later
-					// For a non-binary node, split the label and make more than one connection
-					connectionsToMake.add(new Pair<>(currentNode, Integer.valueOf(nonBinaryNode.trim())));
+					tree.newEdge(previousNode, currentNode);
+
+					//multifurcation connections
+					for (PrimitiveIterator.OfInt it = inners.stream().iterator(); it.hasNext(); ) {
+						var eachInnerNode = it.next();
+						connectionsToMake.add(new Pair<>(currentNode, eachInnerNode));
+					}
+					previousNode = currentNode;
 				}
-				previousNode = currentNode;
 			}
+
 			//add leaf nodes at the end of each chain
 			Node leafNode = tree.newNode();
 			leafNode.setLabel(getLabelByTaxonId(labelTaxonIdMap, nodes.getKey()));
@@ -324,8 +304,6 @@ public class AltsNonBinary {
 			tree.addTaxon(leafNode, nodes.getKey());
 
 		}
-
-
 		// Process stored connections
 		for (Pair<Node, Integer> connection : connectionsToMake) {
 			Node fromNode = connection.getFirst();
@@ -335,8 +313,8 @@ public class AltsNonBinary {
 			}
 		}
 
-		for (var n : tree.nodes()) {
-			if (n.getInDegree() == 0) {
+		for (var n : tree.nodes()){
+			if (n.getInDegree() == 0 ){
 				tree.setRoot(n);
 			}
 		}
@@ -355,6 +333,7 @@ public class AltsNonBinary {
 		String resultingTree = tree.toBracketString(false).replaceAll("##", "#");
 		return NewickIO.valueOf(resultingTree);
 	}
+
 
 	private static Map<Integer, HyperSequence> sortKeysByOrder(Map<Integer, HyperSequence> map, LinkedList<Integer> order) {
 		Map<Integer, HyperSequence> sortedMap = new LinkedHashMap<>();
@@ -375,45 +354,21 @@ public class AltsNonBinary {
 		return null; // Return null if no matching taxon ID is found
 	}
 
-	private static String expandRangeString(String input) {
-		// Split the input string by commas to process each segment individually
-		String[] segments = input.split(",");
-		StringBuilder result = new StringBuilder();
-
-		for (String segment : segments) {
-			if (segment.contains("-")) {
-				// If the segment is a range, split it further by '-'
-				String[] rangeParts = segment.split("-");
-				int start = Integer.parseInt(rangeParts[0]);
-				int end = Integer.parseInt(rangeParts[1]);
-				// Append each number within the range to the result
-				for (int i = start; i <= end; i++) {
-					if (result.length() > 0) {
-						result.append(",");  // Append a comma before adding new numbers if not the first entry
-					}
-					result.append(i);
-				}
-			} else {
-				// If the segment is not a range, simply append it
-				if (result.length() > 0) {
-					result.append(",");  // Append a comma before adding new numbers if not the first entry
-				}
-				result.append(segment);
-			}
-		}
-
-		return result.toString();
-	}
-
-
+	/**
+	 *
+	 * @param hybridizationResults
+	 * @param labelTaxonIdMap
+	 * @param progress
+	 * @return
+	 * @throws IOException
+	 */
 	public static List<PhyloTree> resultingNetworks(Set<HybridizationResult> hybridizationResults,
 													HashMap<String, Integer> labelTaxonIdMap, ProgressListener progress) throws IOException {
 		List<PhyloTree> trees = new ArrayList<>();
 		for (var result : hybridizationResults){
-			var tree = network(result.getAlignments(), result.getOrder(), labelTaxonIdMap);
+			var tree = networkCreate(result.getAlignments(), result.getOrder(), labelTaxonIdMap);
 			if (!trees.contains(tree) && isTreeAddedToFinalList(trees,tree)) {
-				//System.err.println(result.getHybridizationScore());
-				//System.err.println(tree.toBracketString());
+				//System.err.println(result.getHybridizationScore() + " " + tree.toBracketString());
 				trees.add(tree);
 			}
 		}
