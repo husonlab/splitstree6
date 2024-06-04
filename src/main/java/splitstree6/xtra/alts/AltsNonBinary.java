@@ -312,6 +312,12 @@ public class AltsNonBinary {
 			}
 		}
 
+		for (var n : tree.nodes()){
+			if (n.getInDegree() == 0 ){
+				tree.setRoot(n);
+			}
+		}
+
 		for (var n : tree.nodes()) {
 			if (n.getInDegree() == 1 && n.getOutDegree() == 1) {
 				tree.delDivertex(n);
@@ -323,8 +329,9 @@ public class AltsNonBinary {
 				tree.setReticulate(e, true);
 		}
 
-		String resultingTree = tree.toBracketString(false).replaceAll("##", "#");
-		return NewickIO.valueOf(resultingTree);
+		return tree;
+		//String resultingTree = tree.toBracketString(false).replaceAll("##", "#");
+		//return NewickIO.valueOf(resultingTree);
 	}
 
 
@@ -362,7 +369,6 @@ public class AltsNonBinary {
 			var tree = networkCreate(result.getAlignments(), result.getOrder(), labelTaxonIdMap);
 			if (!trees.contains(tree) && isTreeAddedToFinalList(trees,tree)) {
 				//System.err.println(result.getHybridizationScore());
-				//System.err.println(tree.toBracketString());
 				trees.add(tree);
 			}
 		}
