@@ -179,7 +179,7 @@ public class ShortestCommonHyperSequence {
 	}
 	public static void main(String[] args) {
 		var a = HyperSequence.parse("2:4:1:5:6");
-		var b = HyperSequence.parse("1 5 4: 2 : 6");
+		var b = HyperSequence.parse("1 5 3 4: 2 : 6");
 
 		System.err.println("Input:");
 		System.err.println("a= " + a);
