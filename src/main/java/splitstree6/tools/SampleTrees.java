@@ -28,10 +28,7 @@ import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import jloda.util.*;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.trees.trees2trees.ALTSExternal;
-import splitstree6.algorithms.trees.trees2trees.ALTSNetwork;
-import splitstree6.algorithms.trees.trees2trees.PhyloFusion;
-import splitstree6.algorithms.trees.trees2trees.Trees2Trees;
+import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.compute.autumn.Cluster;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -323,6 +320,8 @@ public class SampleTrees {
 			var alts = new ALTSExternal();
 			alts.setOptionALTSExecutableFile("/Users/huson/cpp/louxin/alts");
 			algorithm = alts;
+		} else if (algorithmName.equalsIgnoreCase("autumn")) {
+			algorithm = new AutumnAlgorithm();
 		} else throw new UsageException("Unknown algorithm " + algorithmName);
 
 		var outputBlock = new TreesBlock();
