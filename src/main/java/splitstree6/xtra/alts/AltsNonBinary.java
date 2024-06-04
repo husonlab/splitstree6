@@ -329,9 +329,8 @@ public class AltsNonBinary {
 				tree.setReticulate(e, true);
 		}
 
-		return tree;
-		//String resultingTree = tree.toBracketString(false).replaceAll("##", "#");
-		//return NewickIO.valueOf(resultingTree);
+		String resultingTree = tree.toBracketString(false).replaceAll("##", "#");
+		return NewickIO.valueOf(resultingTree);
 	}
 
 
