@@ -89,8 +89,9 @@ public class AltsNonBinary {
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) throws IOException {
 		HashMap<String, Integer> labelTaxonIdMap = new HashMap<>();
 		var initialOrder = getInitialOrder(trees, labelTaxonIdMap);
+
 		HybridizationContext context = new HybridizationContext();
-		backTrack(trees, initialOrder, labelTaxonIdMap, initialOrder.size()-1, 1000, context);
+		backTrack(trees, initialOrder, labelTaxonIdMap, initialOrder.size()-1, initialOrder.size()*200, context);
 		return resultingNetworks(context.hybridizationResultSet, labelTaxonIdMap, progress);
 	}
 
@@ -367,7 +368,7 @@ public class AltsNonBinary {
 		for (var result : hybridizationResults){
 			var tree = networkCreate(result.getAlignments(), result.getOrder(), labelTaxonIdMap);
 			if (!trees.contains(tree) && isTreeAddedToFinalList(trees,tree)) {
-				//System.err.println(result.getHybridizationScore());
+				//System.err.println(result.getHybridizationScore() + " " + tree.toBracketString());
 				trees.add(tree);
 			}
 		}
