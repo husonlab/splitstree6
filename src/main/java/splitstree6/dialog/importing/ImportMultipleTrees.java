@@ -77,7 +77,7 @@ public class ImportMultipleTrees {
 								w.newLine();
 							}
 						} else
-							throw new IOException("File not in Newick format: " + file);
+							throw new IOException("File not in Newick format: " + file.getName());
 					}
 				}
 				FileLoader.apply(false, mainWindow, tmpFile.getPath(), ex -> {

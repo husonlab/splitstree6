@@ -336,19 +336,15 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 		view.optionAveragingProperty().addListener(updateListener);
 
-		controller.getContractHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor((1.0 / 1.1) * view.getOptionHorizontalZoomFactor()));
+		controller.getContractHorizontallyButton().setOnAction(e -> {
+			view.setOptionHorizontalZoomFactor(view.getOptionHorizontalZoomFactor() / 1.1);
+		});
 		controller.getContractHorizontallyButton().disableProperty().bind(view.emptyProperty().or(lockAspectRatio));
 
-
-		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor(1.1 * view.getOptionHorizontalZoomFactor()));
-		controller.getExpandHorizontallyButton().disableProperty().bind(view.emptyProperty().or(lockAspectRatio).or(view.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));
-
-		controller.getExpandVerticallyButton().setOnAction(e -> {
-			view.setOptionVerticalZoomFactor(1.1 * view.getOptionVerticalZoomFactor());
-			if (lockAspectRatio.get())
-				view.setOptionHorizontalZoomFactor(1.1 * view.getOptionHorizontalZoomFactor());
+		controller.getExpandHorizontallyButton().setOnAction(e -> {
+			view.setOptionHorizontalZoomFactor(view.getOptionHorizontalZoomFactor() * 1.1);
 		});
-		controller.getExpandVerticallyButton().disableProperty().bind(view.emptyProperty().or(view.optionVerticalZoomFactorProperty().greaterThan(8.0 / 1.1)));
+		controller.getExpandHorizontallyButton().disableProperty().bind(view.emptyProperty().or(lockAspectRatio).or(view.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));
 
 		controller.getContractVerticallyButton().setOnAction(e -> {
 			view.setOptionVerticalZoomFactor((1.0 / 1.1) * view.getOptionVerticalZoomFactor());
@@ -356,6 +352,13 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				view.setOptionHorizontalZoomFactor((1.0 / 1.1) * view.getOptionHorizontalZoomFactor());
 		});
 		controller.getContractVerticallyButton().disableProperty().bind(view.emptyProperty());
+
+		controller.getExpandVerticallyButton().setOnAction(e -> {
+			view.setOptionVerticalZoomFactor(1.1 * view.getOptionVerticalZoomFactor());
+			if (lockAspectRatio.get())
+				view.setOptionHorizontalZoomFactor(1.1 * view.getOptionHorizontalZoomFactor());
+		});
+		controller.getExpandVerticallyButton().disableProperty().bind(view.emptyProperty().or(view.optionVerticalZoomFactorProperty().greaterThan(8.0 / 1.1)));
 
 		controller.getExpandCollapseVerticallyButton().setOnAction(e -> {
 			var minLabelHeight = treePane.get().getMinLabelHeight();

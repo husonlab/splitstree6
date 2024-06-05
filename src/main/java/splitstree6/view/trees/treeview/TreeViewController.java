@@ -133,7 +133,7 @@ public class TreeViewController {
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(expandCollapseVerticallyButton, "sync_alt", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(expandCollapseVerticallyButton, "vertical_align_center");
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
 		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
 

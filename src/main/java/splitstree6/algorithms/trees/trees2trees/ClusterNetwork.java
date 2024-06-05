@@ -42,7 +42,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Tree selector
+ * cluster network
  * Daniel Huson, 1/2018
  */
 public class ClusterNetwork extends Trees2Trees {
