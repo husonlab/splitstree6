@@ -82,7 +82,7 @@ public class SampleTrees {
 		var echoInputTree = options.getOption("-e", "echoInput", "Echo the input tree to output", false);
 
 		var replicates = options.getOption("-R", "replicates", "Now replicates per input tree", 1);
-		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "PhyloFusionRec", "PhyloFusionRecMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
+		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", "PhyloFusionOld", "PhyloFusionOldMedium", "PhyloFusionOldFast", ""), "");
 		var timeOut = options.getOption("-to", "timeOut", "Algorithm killed 'timed out' after this many milliseconds", 300000);
 
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-th", "threads", "Set number of threads to use", 8));
@@ -294,17 +294,17 @@ public class SampleTrees {
 			throw new IOException("Illegal rooted network in input");
 
 		Trees2Trees algorithm;
-		if (algorithmName.toLowerCase().startsWith("phylofusionrec")) {
-			var phyloFusion = new PhyloFusionRec();
+		if (algorithmName.toLowerCase().startsWith("phylofusionold")) {
+			var phyloFusion = new PhyloFusionOld();
 			phyloFusion.setOptionMutualRefinement(true);
 			phyloFusion.setOptionNormalizeEdgeWeights(true);
 			phyloFusion.setOptionCalculateWeights(false);
 			if (algorithmName.toLowerCase().endsWith("fast"))
-				phyloFusion.setOptionSearchHeuristic(PhyloFusionRec.Search.Fast);
+				phyloFusion.setOptionSearchHeuristic(PhyloFusionOld.Search.Fast);
 			else if (algorithmName.toLowerCase().endsWith("medium"))
-				phyloFusion.setOptionSearchHeuristic(PhyloFusionRec.Search.Medium);
+				phyloFusion.setOptionSearchHeuristic(PhyloFusionOld.Search.Medium);
 			else
-				phyloFusion.setOptionSearchHeuristic(PhyloFusionRec.Search.Thorough);
+				phyloFusion.setOptionSearchHeuristic(PhyloFusionOld.Search.Thorough);
 			algorithm = phyloFusion;
 		} else if (algorithmName.toLowerCase().startsWith("phylofusion")) {
 			var phyloFusion = new PhyloFusion();

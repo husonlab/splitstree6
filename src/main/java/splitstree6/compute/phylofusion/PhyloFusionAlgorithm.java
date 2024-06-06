@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Supplier;
 
 /**
- * the PhyloFusion algorithm
+ * the PhyloFusionOld algorithm
  * Daniel Huson, 5.2024
  */
 public class PhyloFusionAlgorithm {
