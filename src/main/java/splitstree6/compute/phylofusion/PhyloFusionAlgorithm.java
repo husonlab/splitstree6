@@ -54,7 +54,11 @@ public class PhyloFusionAlgorithm {
 	 * @return the computed networks
 	 * @throws IOException user canceled
 	 */
-	public static List<PhyloTree> apply(long numberOfRandomOrderings, Collection<PhyloTree> inputTrees, ProgressListener progress) throws IOException {
+	public static List<PhyloTree> apply(long numberOfRandomOrderings, List<PhyloTree> inputTrees, ProgressListener progress) throws IOException {
+		if (inputTrees.size() == 1) {
+			return List.of(new PhyloTree(inputTrees.get(0)));
+		}
+
 		var taxa = union(inputTrees.stream().map(PhyloGraph::getTaxa).toList());
 
 		var trees = new ArrayList<PhyloTree>();

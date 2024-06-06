@@ -269,7 +269,7 @@ public class PhyloFusion extends Trees2Trees {
 			}
 	}
 
-	private void copySubTree(Node sourceRoot, Node targetRoot) {
+	private static void copySubTree(Node sourceRoot, Node targetRoot) {
 		var sourceTree = (PhyloTree) sourceRoot.getOwner();
 		var targetTree = (PhyloTree) targetRoot.getOwner();
 		try (NodeArray<Node> old2new = sourceTree.newNodeArray()) {
@@ -292,7 +292,7 @@ public class PhyloFusion extends Trees2Trees {
 		}
 	}
 
-	private long computeNumberOfRandomOrderings(int ntax, Search optionSearch) {
+	private static long computeNumberOfRandomOrderings(int ntax, Search optionSearch) {
 		return switch (optionSearch) {
 			case Fast -> Math.max(100, 10L * ntax);
 			case Medium -> 150L * ntax;
