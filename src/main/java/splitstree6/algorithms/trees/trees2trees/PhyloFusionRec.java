@@ -282,7 +282,8 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 				if (cluster.cardinality() > 0)
 					clusters.add(cluster);
 			}
-			clusterSets.add(clusters);
+			if (!clusters.isEmpty())
+				clusterSets.add(clusters);
 		}
 		var result = new ArrayList<PhyloTree>();
 		for (var clusters : clusterSets) {
@@ -304,7 +305,8 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 				}
 				clusters.add(cluster);
 			}
-			clusterSets.add(clusters);
+			if (!clusters.isEmpty())
+				clusterSets.add(clusters);
 		}
 		var result = new ArrayList<PhyloTree>();
 		for (var clusters : clusterSets) {
