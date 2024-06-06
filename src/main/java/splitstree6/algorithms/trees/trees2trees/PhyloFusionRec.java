@@ -46,6 +46,10 @@ import splitstree6.utils.TreesUtils;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * recursive version of the PhyloFusion algorithm
+ * Daniel Huson, 5.2024
+ */
 public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 	private boolean verbose = false;
 
@@ -59,12 +63,12 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 
 	private final ObjectProperty<Search> optionSearchHeuristic = new SimpleObjectProperty<>(this, "optionSearchHeuristic");
 
-	private final BooleanProperty optionSubtreeReduction = new SimpleBooleanProperty(this, "optionSubtreeReduction");
+	private final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
 
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
 		ProgramProperties.track(optionSearchHeuristic, Search::valueOf, Search.Thorough);
-		ProgramProperties.track(optionSubtreeReduction, true);
+		ProgramProperties.track(optionCladeReduction, true);
 	}
 
 	@Override
@@ -81,7 +85,7 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionSubtreeReduction.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionCladeReduction.getName()); //, optionCalculateWeights.getName());
 	}
 
 	@Override
@@ -95,6 +99,7 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
+			case "optionCladeReduction" -> "allow clade reduction as well as subtree reduction";
 			default -> super.getToolTip(optionName);
 		};
 	}
@@ -151,7 +156,7 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 		}
 		Graph incompatibityGraph;
 		var clusters = new ArrayList<BitSet>();
-		var clusterNodeIGMap = new HashMap<BitSet, Node>();
+		var clusterIGMap = new HashMap<BitSet, Node>();
 		{
 			{
 				var clusterSet = new HashSet<BitSet>();
@@ -164,7 +169,7 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 			}
 			incompatibityGraph = new Graph();
 			for (var cluster : clusters) {
-				clusterNodeIGMap.put(cluster, incompatibityGraph.newNode(cluster));
+				clusterIGMap.put(cluster, incompatibityGraph.newNode(cluster));
 			}
 			var nodes = IteratorUtils.asList(incompatibityGraph.nodes());
 			for (var i = 0; i < nodes.size(); i++) {
@@ -178,13 +183,27 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 		}
 		// find a cluster that is compatible with all, if one exists
 		BitSet separator = null;
-		for (var cluster : clusters) {
+		for (int i = 0; i < clusters.size(); i++) {
+			var cluster = clusters.get(i);
 			if (!cluster.equals(taxa)) {
 				if (cluster.cardinality() == 1) {
 					break;
-				} else if (clusterNodeIGMap.get(cluster).getDegree() == 0) {
-					separator = cluster;
-					break;
+				} else if (clusterIGMap.get(cluster).getDegree() == 0) {
+					var ok = true;
+					if (!isOptionCladeReduction()) {
+						// need to check that set of contained clusters is compatible
+						for (int j = i + 1; j < clusters.size(); j++) {
+							var other = clusters.get(j);
+							if (clusters.contains(other) && clusterIGMap.get(other).getDegree() != 0) {
+								ok = false;
+								break;
+							}
+						}
+					}
+					if (ok) {
+						separator = cluster;
+						break;
+					}
 				}
 			}
 		}
@@ -382,15 +401,15 @@ public class PhyloFusionRec extends Trees2Trees implements IExperimental {
 		return optionSearchHeuristic;
 	}
 
-	public boolean isOptionSubtreeReduction() {
-		return optionSubtreeReduction.get();
+	public boolean isOptionCladeReduction() {
+		return optionCladeReduction.get();
 	}
 
-	public BooleanProperty optionSubtreeReductionProperty() {
-		return optionSubtreeReduction;
+	public BooleanProperty optionCladeReductionProperty() {
+		return optionCladeReduction;
 	}
 
-	public void setOptionSubtreeReduction(boolean optionSubtreeReduction) {
-		this.optionSubtreeReduction.set(optionSubtreeReduction);
+	public void setOptionCladeReduction(boolean optionCladeReduction) {
+		this.optionCladeReduction.set(optionCladeReduction);
 	}
 }
