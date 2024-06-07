@@ -28,10 +28,7 @@ import jloda.util.parse.NexusStreamParser;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
-import splitstree6.data.SourceBlock;
-import splitstree6.data.SplitsTree6Block;
-import splitstree6.data.TraitsBlock;
-import splitstree6.data.ViewBlock;
+import splitstree6.data.*;
 import splitstree6.io.nexus.AlgorithmNexusInput;
 import splitstree6.io.nexus.SplitsTree6NexusInput;
 import splitstree6.io.nexus.TaxaNexusInput;
@@ -139,6 +136,10 @@ public class WorkflowNexusInput {
 				inputTaxaBlock.setTraitsBlock((TraitsBlock) dataInput.parse(np, inputTaxaBlock));
 			}
 
+			if (np.peekMatchBeginBlock("sets")) {
+				inputTaxaBlock.setSetsBlock((SetsBlock) dataInput.parse(np, inputTaxaBlock));
+			}
+
 			var taxaFilter = (new AlgorithmNexusInput()).parse(np);
 			if (!(taxaFilter instanceof TaxaFilter))
 				throw new IOExceptionWithLineNumber("Expected TaxaFilter", np.lineno());
@@ -146,6 +147,9 @@ public class WorkflowNexusInput {
 			workingTaxaBlock.overwriteTaxa(inputTaxaBlock);
 			if (np.peekMatchBeginBlock("traits")) {
 				workingTaxaBlock.setTraitsBlock((TraitsBlock) dataInput.parse(np, workingTaxaBlock));
+			}
+			if (np.peekMatchBeginBlock("sets")) {
+				workingTaxaBlock.setSetsBlock((SetsBlock) dataInput.parse(np, workingTaxaBlock));
 			}
 			var workingTaxaTitle = dataInput.getTitle();
 			var inputDataBlock = dataInput.parse(np, inputTaxaBlock);

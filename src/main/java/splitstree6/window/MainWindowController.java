@@ -249,6 +249,12 @@ public class MainWindowController {
 	private MenuItem traitsMenuItem;
 
 	@FXML
+	private MenuItem addTaxonSetMenuItem;
+
+	@FXML
+	private MenuItem removeTaxonSetMenuItem;
+
+	@FXML
 	private MenuItem worldMapMenuItem;
 
 	@FXML
@@ -864,6 +870,14 @@ public class MainWindowController {
 
 	public MenuItem getTraitsMenuItem() {
 		return traitsMenuItem;
+	}
+
+	public MenuItem getAddTaxonSetMenuItem() {
+		return addTaxonSetMenuItem;
+	}
+
+	public MenuItem getRemoveTaxonSetMenuItem() {
+		return removeTaxonSetMenuItem;
 	}
 
 	public MenuItem getWorldMapMenuItem() {

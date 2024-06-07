@@ -265,6 +265,13 @@
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu fx:id="selectSetsMenu" text="Sets">
+                            <MenuItem fx:id="addTaxonSetMenuItem" text="Add Taxon Set..."
+                                      userData="Create a new taxon set containing the currently selected taxa">
+                            </MenuItem>
+                            <MenuItem fx:id="removeTaxonSetMenuItem" text="Remove Taxon Set..."
+                                      userData="Delete a taxon set">
+                            </MenuItem>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
                         </Menu>
                     </Menu>
                     <Menu fx:id="viewMenu" text="View">

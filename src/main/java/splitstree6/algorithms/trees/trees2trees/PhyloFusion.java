@@ -122,6 +122,7 @@ public class PhyloFusion extends Trees2Trees {
 			inputTrees = treesBlock.getTrees().stream().map(PhyloTree::new).toList();
 		}
 
+
 		var result = computeRec(progress, inputTrees);
 		outputBlock.setPartial(false);
 		outputBlock.setRooted(true);
@@ -145,6 +146,9 @@ public class PhyloFusion extends Trees2Trees {
 						System.err.println("Internal error: Network does not appear to contain tree: " + t);
 					}
 				}
+			}
+			if (count == 1 && isOptionCalculateWeights()) {
+				NetworkUtils.setEdgeWeights(treesBlock.getTrees(), network, isOptionNormalizeEdgeWeights(), 3000);
 			}
 		}
 	}

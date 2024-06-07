@@ -101,7 +101,6 @@ import splitstree6.io.utils.ReaderWriterBase;
 import splitstree6.main.CheckForUpdate;
 import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.IDisplayTab;
-import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
@@ -144,6 +143,12 @@ public class MainWindowPresenter {
 			if (!n) {
 				WorkflowUtils.ensureAlignmentView(mainWindow.getWorkflow());
 				WorkflowUtils.ensureWorldMapView(mainWindow.getWorkflow(), false);
+				TaxonSetSupport.updateSetsMenu(mainWindow, controller.getSelectSetsMenu(),
+						label -> {
+							var t = mainWindow.getWorkingTaxa().indexOf(label);
+							if (t > 0)
+								mainWindow.getTaxonSelectionModel().select(mainWindow.getWorkingTaxa().get(t));
+						});
 			}
 		});
 
@@ -299,24 +304,6 @@ public class MainWindowPresenter {
 				selectedDisplayTab.set(displayTab);
 			}
 		});
-	}
-
-	public static void updateTaxSetSelection(MainWindow mainWindow, List<MenuItem> items) {
-		items.removeAll(items.stream().filter(t -> t.getText() != null && t.getText().startsWith("TaxSet")).toList());
-
-		var taxaBlock = mainWindow.getWorkflow().getInputTaxaBlock();
-		if (taxaBlock != null && taxaBlock.getSetsBlock() != null && !taxaBlock.getSetsBlock().getTaxSets().isEmpty()) {
-			for (var set : taxaBlock.getSetsBlock().getTaxSets()) {
-				var menuItem = new MenuItem("TaxSet " + set.getName());
-				menuItem.setOnAction(e -> {
-					for (var t : BitSetUtils.members(set)) {
-						mainWindow.getTaxonSelectionModel().select(taxaBlock.get(t));
-					}
-				});
-				menuItem.disableProperty().bind(mainWindow.emptyProperty());
-				items.add(menuItem);
-			}
-		}
 	}
 
 	private Consumer<MainWindow> additionalCommonMenuSetup = null;
@@ -547,10 +534,6 @@ public class MainWindowPresenter {
 		});
 		controller.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()).or(mainWindow.emptyProperty()));
 
-		mainWindow.getWorkflow().runningProperty().addListener(e -> updateTaxSetSelection(mainWindow, controller.getSelectSetsMenu().getItems()));
-		updateTaxSetSelection(mainWindow, controller.getSelectSetsMenu().getItems());
-		controller.getSelectSetsMenu().disableProperty().bind(new SimpleBooleanProperty((focusedDisplayTab.get() instanceof DisplayTextTab) || ((focusedDisplayTab.get() instanceof WorkflowTab))));
-
 		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
 		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
 
@@ -598,6 +581,9 @@ public class MainWindowPresenter {
 		controller.getSplitsSliderMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new WeightsSlider()));
 
 		controller.getTraitsMenuItem().setOnAction(null);
+
+		TaxonSetSupport.setupMenuItems(mainWindow);
+		controller.getSelectSetsMenu().setOnShowing(e -> TaxonSetSupport.updateSetsMenu(mainWindow, controller.getSelectSetsMenu()));
 
 		controller.getWorldMapMenuItem().setOnAction(e -> WorkflowUtils.ensureWorldMapView(mainWindow.getWorkflow(), true));
 		controller.getWorldMapMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
@@ -979,7 +965,7 @@ public class MainWindowPresenter {
 
 				try {
 					jloda.fx.util.ProgramProperties.put("InputDir", selectedFile.getParent());
-					mainWindow.setFileName(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".splt6"));
+					mainWindow.setFileName(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".stree6"));
 					WorkflowDataLoader.load(workflow, selectedFile.getPath(), inputFormat);
 					workflow.getInputTaxaFilterNode().restart();
 				} catch (Exception ex) {
@@ -1054,5 +1040,4 @@ public class MainWindowPresenter {
 			}
 		}
 	}
-
 }

@@ -38,8 +38,10 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.window.MainWindow;
-import splitstree6.window.MainWindowPresenter;
+import splitstree6.window.TaxonSetSupport;
 import splitstree6.workflow.AlgorithmNode;
+
+import java.util.HashMap;
 
 /**
  * taxa edit presenter
@@ -56,6 +58,8 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 
 	private boolean inSelection = false;
 
+	private final Menu setsMenu;
+
 	private final InvalidationListener activeChangedListener;
 
 	/**
@@ -66,8 +70,6 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		this.tab = tab;
 		this.taxaFilter = (TaxaFilter) taxaEditorNode.getAlgorithm();
 		this.controller = tab.getTaxaFilterController();
-
-		tab.getController().getMainPane();
 
 		var inputTaxonBlock = mainWindow.getWorkflow().getInputTaxaBlock();
 		var workingTaxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
@@ -211,12 +213,30 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		taxaEditorNode.validProperty().addListener(new WeakInvalidationListener(activeChangedListener));
 		activeChangedListener.invalidated(null);
 
-		var setsMenu = setupEditMenuButton(tab.getController().getMenuButton(), controller.getActiveColumn().getContextMenu(), controller.getDisplayLabelColumn().getContextMenu());
+		setsMenu = setupEditMenuButton(tab.getController().getMenuButton(), controller.getActiveColumn().getContextMenu(), controller.getDisplayLabelColumn().getContextMenu());
 		tab.getController().getMenuButton().setVisible(true);
 		tab.getController().getMenuButton().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 
-		mainWindow.getWorkflow().runningProperty().addListener(e -> MainWindowPresenter.updateTaxSetSelection(mainWindow, setsMenu.getItems()));
+		TaxonSetSupport.updateSetsMenu(mainWindow, setsMenu, label -> {
+			for (var item : tableView.getItems()) {
+				if (item.getName().equals(label))
+					tableView.getSelectionModel().select(item);
+			}
+		});
 
+		mainWindow.getWorkflow().runningProperty().addListener((v, o, n) -> {
+			if (!n) {
+				var nameItemMap = new HashMap<String, TaxaFilterTableItem>();
+				for (var item : tableView.getItems()) {
+					nameItemMap.put(item.getName(), item);
+				}
+				TaxonSetSupport.updateSetsMenu(mainWindow, setsMenu, name -> {
+					var item = nameItemMap.get(name);
+					if (item != null)
+						tableView.getSelectionModel().select(item);
+				});
+			}
+		});
 	}
 
 	public static Menu setupEditMenuButton(MenuButton menuButton, ContextMenu... sourceMenus) {

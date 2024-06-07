@@ -26,10 +26,13 @@ import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
 import splitstree6.io.nexus.workflow.WorkflowNexusOutput;
+import splitstree6.tabs.inputeditor.InputEditorTab;
+import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.window.MainWindow;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static splitstree6.io.nexus.workflow.WorkflowNexusInput.WORKFLOW_FILE_SUFFIX;
 
@@ -69,6 +72,13 @@ public class SaveDialog {
 			ProgramProperties.put("SaveDir", file.getParent());
 
 		try {
+			if (!asWorkflowOnly && mainWindow.getWorkingTaxa() == null && mainWindow.getTabByClass(InputEditorTab.class) instanceof InputEditorTab editor && !editor.isEmpty()) {
+				var text = ((DisplayTextView) editor.getView()).getController().getCodeArea().getText();
+				Files.writeString(file.toPath(), text);
+				System.err.println("Saved editor content to file: " + file.getName());
+				return true;
+			}
+
 			new WorkflowNexusOutput().save(mainWindow.getWorkflow(), file.getPath(), asWorkflowOnly);
 			if (!asWorkflowOnly) {
 				mainWindow.setFileName(file.getPath());

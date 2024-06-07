@@ -2,16 +2,17 @@
 
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=12 nAlgorithms=9;
-PROGRAM version='SplitsTree App (version 6.3.17, built 5 May 2024)';
-WORKFLOW creationDate='1714983323181'; [Mon May 06 10:15:23 CEST 2024]
+PROGRAM version='SplitsTree App (version 6.3.23, built 4 Jun 2024)';
+WORKFLOW creationDate='1717750451167'; [Fri Jun 07 10:54:11 CEST 2024]
 END; [SPLITSTREE6]
 
 [
 Methods:
 Analysis was performed using SplitsTree CE 6.0.0 (Huson and Bryant 2006).
 The original input consisted of 17 taxa and 78 trees.
-A Reroot Or Reorder Trees (default options, except RootBy=MidPoint, OutGroupTaxa=(Ljava.lang.String;@65c0a1d1) was applied so as to be Reroot, or change the order of children, on all trees..
+A Reroot Or Reorder Trees (default options, except RootBy=MidPoint, OutGroupTaxa=(Ljava.lang.String;@5f845e0e) was applied so as to be Reroot, or change the order of children, on all trees..
 The Show Trees method was used (default options) so as to obtain a Tree View visualization.
+A Trees Filter (DisabledTrees=(Ljava.lang.String;@5a30f073) was applied so as to be Allows the user to interactively filter trees..
 A Trees Edges Filter (default options, except MinConfidence=70.0) was applied so as to be Provides several options for filtering trees..
 The Phylo Fusion method (Zhang et al 2023, Zhang et al 2024) was used (default options) so as to obtain one rooted network.
 The Show Trees method was used (View=TreePages) so as to obtain a Tree Pages visualization.
@@ -537,8 +538,10 @@ TITLE 'Phylo Fusion';
 LINK TREES = 'Trees-3';
 NAME 'Phylo Fusion';
 OPTIONS
-	MinConfidence = 0,
-	MutualRefinement = 'true';
+	MutualRefinement = 'true',
+	NormalizeEdgeWeights = 'true',
+	SearchHeuristic = 'Thorough',
+	CladeReduction = 'true';
 END; [ALGORITHM]
 
 BEGIN ALGORITHM;
@@ -611,8 +614,8 @@ OPTIONS
 	Diagram = 'RectangularPhylogram',
 	Averaging = 'ChildAverage',
 	Orientation = 'Rotate0Deg',
-	HorizontalZoomFactor = 0.67836967,
-	VerticalZoomFactor = 0.96098034,
+	HorizontalZoomFactor = 0.59015649,
+	VerticalZoomFactor = 0.8786626,
 	FontScaleFactor = 3.5831808,
 	LabelEdgesBy = 'None',
 	ShowQRCode = 'false';
