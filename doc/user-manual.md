@@ -316,10 +316,8 @@ unrooted or rooted, using either *mid-point rooting* or *outgroup
 rooting*. The latter requires that some taxa have been selected; these
 are treated as the outgroup.
 
-In addition, there are buttons for rotating, flipping, zooming,
-and for setting the _scale ratio_ to a specific value to ensure
-that different networks are drawn to the same scale.
-The rotate buttons act differently depending on whether edges in the network
+In addition, there are buttons for rotating, flipping and zooming. The
+rotate buttons act differently depending on whether edges in the network
 are selected or not. If no edges or nodes are selected, then the entire
 network is rotated. If one or more edges are selected then only the
 edges (corresponding to one or more splits) are rotated.
@@ -541,7 +539,7 @@ side panel (as a hierarchy) or in the workflow panel (as a graph). To
 illustrate, open the example file `ungulates.nex` which can be found in
 the directory `publications/WelkerEtal2015` in the Examples directory.
 By default, the SplitsTree App creates a network by running Neighbor Net
-and using the p-distance. Switching to the workflow panel displays the
+and using the $p$-distance. Switching to the workflow panel displays the
 (linear) workflow for this initial analysis .
 
 ![Right hand side of the workflow created when `ungulates.nex` is
@@ -749,9 +747,9 @@ sequences.
 
 A Median-Joining network is constructed from a characters block via the
 Network menu, or by adding an algorithm to the workflow. The method
-comes with a single option \epsilon that is an integer controlling a
+comes with a single option $\epsilon$ that is an integer controlling a
 threshold determining when two sequences are considered adjacent. In
-[@Bandeltetal1999], \epsilon varies between 0, 1 and 2.
+[@Bandeltetal1999], $\epsilon$ varies between $0$, $1$ and $2$.
 
 ## Rooted phylogenetic networks
 
@@ -784,7 +782,7 @@ biological interpretation.
 
 ![On the left we see 10 different gene trees for the NADH
 dehydrogenase-like complex in waterlilies [@Gruenstaeudl2019] and on the
-right we see a hybridization network with hybridization number h=5,
+right we see a hybridization network with hybridization number $h=5$,
 computed using the PhyloFusion
 algorithm.](figs/phylofusion-ndh-genes.png)
 
@@ -792,8 +790,8 @@ In mathematical phylogenetics, a *hybrization network* is a rooted
 phylogenetic network that contains or displays an input set of rooted
 phylogenetic trees. Usually, the requirement is that such a network
 minimizes the "hybridization number", that is, the number of
-reticulations. (To be precise, a reticulation node of indegree k
-contributes k-1 toward the hybridization number.)
+reticulations. (To be precise, a reticulation node of indegree $k$
+contributes $k-1$ toward the hybridization number.)
 
 SplitsTree currently offers two algorithms for computing such networks
 for real world data. The Autumn algorithm [@HusonLinz2018] takes as
@@ -826,7 +824,6 @@ low-confidence can be ignored.
 ![For a set of 48 genes in waterlilies [@Gruenstaeudl2019], on the left
 we see that 10 different gene trees for the NADH dehydrogenase-like
 complex have bee selected and the confidence threshold has been set to
-
 70. On the right we see a hybridization network computed using the
     PhyloFusion algorithm.](figs/phylofusion-full.png)
 
@@ -918,7 +915,7 @@ example the two trees
 `((a,b),c,d)`   and   `(a,b,(c,d));`
   --------------- ----- ----------------
 
-share a split ab|cd which would appear in their unrooted consensus
+share a split $ab|cd$ which would appear in their unrooted consensus
 tree, but they share no clusters, so their rooted consensus tree would
 be completely unresolved.
 
@@ -934,7 +931,7 @@ tree together with a rendering of all input trees .
 Consensus networks are based on the idea of using split networks to
 represent more splits than can appear in a single tree
 [@Bandelt1995; @Hollandetal2004]. They can be constructed using the menu
-command Network>Consensus network, or by adding an algorithm to a
+command Network$>$Consensus network, or by adding an algorithm to a
 trees block in the workflow. Note that, with the menu command, if there
 is more than one trees block then SplitsTree will ask the user to select
 one.
@@ -949,7 +946,7 @@ displaying splits.
   different trees as estimations of the distances between taxa.
 
 - `TreeSizeWeightedMean` - use the mean of the weights in the input
-  trees after normalizing each of the input trees to total length 1.
+  trees after normalizing each of the input trees to total length $1$.
   This should be used if the different trees are on different scales,
   e.g. because they were computed using different methods.
 
@@ -995,7 +992,7 @@ on the right (rooted by the three taxa at the top of both diagrams).
 ### Confidence networks
 
 The idea behind a *confidence network* is to choose the threshold in a
-consensus network so that at least 95\% of the trees have *all* their
+consensus network so that at least $95\%$ of the trees have *all* their
 splits contained in that network. The method was originally designed as
 a way to create confidence intervals from bootstrap distributions
 [@HusonBryant2006], however the dimensionality of the problem, and
@@ -1005,7 +1002,7 @@ applied to samples from the posterior distribution of trees in a
 Bayesian analysis, in which case the network represents a confidence
 set.
 
-The main option in a confidence network is the level, which is 0.95 by
+The main option in a confidence network is the level, which is $0.95$ by
 default. This is the proportion of input trees which will have their
 splits contained in the network. Decreasing this number produces smaller
 networks.
@@ -1028,9 +1025,9 @@ This menu has the following items:
 
 - Edit Input... - Open the input editor tab
 
-- Save - Save the current document
-
 - Analyze Draft Genomes... - Open the microbial draft genome analyzer
+
+- Save - Save the current document
 
 - Save As... - Save the current document to a chosen file
 
@@ -1229,6 +1226,8 @@ This menu has the following items:
 - Min Spanning Network - Compute a minimum spanning network from
   distances
 
+- World Map - Show the world map tab
+
 - Hybridization Network - Compute a minimum hybridization network for
   two rooted trees using the autumn algorithm
 
@@ -1287,7 +1286,7 @@ This menu has the following items:
 
 - Set Window Size... - Set the window size
 
-- All open windows are listed here.
+- Untitled
 
 ## The Help menu
 
@@ -2131,6 +2130,12 @@ into a rooted network. The algorithm has the following options:
 
 `NormalizeEdgeWeights =  <Boolean>` - normalize input edge weights
 
+`SearchHeuristic = {Thorough | Medium | Fast}` - fast, Medium or
+Thorough search: 10, 150 or 300 random orderings per taxon, respectively
+
+`CladeReduction =  <Boolean>` - allow clade reduction as well as subtree
+reduction
+
 References: [@Zhangetal2023; @Zhangetal2024]
 
 #### Average Consensus
@@ -2727,7 +2732,7 @@ nodes as children and vice versa .
 ![ Here we show the workflow that shows a split network computed from
 characters data. The workflow contains chains of alternating algorithm
 and data nodes. The characters data (working data node) is followed by
-the p-distance calculation, giving rise to a data node containing
+the $p$-distance calculation, giving rise to a data node containing
 distances. The distances are provided to the neighbor-net algorithm,
 giving rise to a set of splits. The splits are passed to the show splits
 node, which computes the visualization, which is represented by the
@@ -3065,7 +3070,6 @@ Transactions on Computational Biology and Bioinformatics* 15: 398–420.
 
 Huson, DH, and R. Rupp. 2008. “Summarizing Multiple Gene Trees Using
 Cluster Networks.” In *Algorithms in Bioinformatics. WABI 2008*. Vol.
-
 5251. Lecture Notes in Computer Science.
 
 Huson, DH, R. Rupp, and C. Scornavacca. 2012. *Phylogenetic Networks*.
