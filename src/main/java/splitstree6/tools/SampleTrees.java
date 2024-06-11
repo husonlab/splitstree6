@@ -74,7 +74,7 @@ public class SampleTrees {
 
 		options.comment("Options");
 		var numberOfTaxaRangeString = options.getOption("-t", "taxa", "Number of taxa to restrict the input tree(s) to (range ok, \"\"=keep original size)", "");
-		var rSPRs = options.getOption("-r", "rSPR", "Number of rSPRs", 1);
+		var requestedSPRs = options.getOption("-r", "rSPR", "Number of rSPRs to add to tree (value < 1 treated as probability)", 1.0);
 		var maxProportionMissingTaxa = options.getOption("-m", "missing", "Proportion of missing taxa", 0.0);
 		var maxProportionContractedInternalEdges = options.getOption("-c", "maxContracted", "Maximum proportion of contracted internal edges", 0.0);
 		var numTrees = options.getOption("-n", "numTrees", "Number of trees to sample", 1);
@@ -96,14 +96,21 @@ public class SampleTrees {
 		if (runAlgorithm.equalsIgnoreCase("autumn") && numTrees != 2)
 			throw new UsageException("--algorithm autumn requires --numTrees 2, not " + numTrees);
 
+		if (requestedSPRs <= 0)
+			throw new UsageException("--rSPR must be greater 0, got: " + requestedSPRs);
+		if (requestedSPRs > 1)
+			requestedSPRs = (int) Math.round(requestedSPRs);
+
 
 		var randomForMissingTaxa = new Random();
 		var randomForContractEdges = new Random();
 		var randomForSPRs = new Random();
+		var randomForApplicationOfSPR = new Random();
 		if (randomSeed != 0) {
 			randomForMissingTaxa.setSeed(randomSeed);
 			randomForContractEdges.setSeed(randomSeed);
 			randomForSPRs.setSeed(randomSeed);
+			randomForApplicationOfSPR.setSeed(randomSeed);
 		}
 
 		try (var r = new BufferedReader(new InputStreamReader(FileUtils.getInputStreamPossiblyZIPorGZIP(inputFile)));
@@ -157,6 +164,7 @@ public class SampleTrees {
 							w.write(inputTree.toBracketString(true) + "[&&NHX:GN=in%s];\n".formatted(countInputTrees));
 						var data = new ArrayList<DataPoint>();
 						for (var replicate = 1; replicate <= replicates; replicate++) {
+							var appliedSPRs = 0;
 							System.err.println("Running replicate " + replicate);
 							var outputTrees = new ArrayList<PhyloTree>();
 							for (var t = 0; t < numTrees; t++) {
@@ -188,8 +196,15 @@ public class SampleTrees {
 									RootedNetworkProperties.contractEdges(tree, new HashSet<>(edges), null);
 									check(tree);
 								}
-								if (rSPRs > 0) {
-									for (var i = 0; i < rSPRs; i++) {
+								if (requestedSPRs > 0) {
+									int numberToApply;
+									if (requestedSPRs >= 1)
+										numberToApply = (int) requestedSPRs;
+									else {
+										numberToApply = randomForApplicationOfSPR.nextDouble() >= requestedSPRs ? 1 : 0;
+									}
+									appliedSPRs += numberToApply;
+									for (var i = 0; i < numberToApply; i++) {
 										var edges = IteratorUtils.asList(tree.edges());
 										edges.removeAll(tree.getRoot().outEdgesStream(false).toList());
 										if (edges.size() < 2)
@@ -244,7 +259,7 @@ public class SampleTrees {
 								}
 							}
 							if (!runAlgorithm.isBlank()) {
-								data.add(runAlgorithm(runAlgorithm, timeOut, replicate, rSPRs, maxProportionContractedInternalEdges, maxProportionMissingTaxa, outputTrees));
+								data.add(runAlgorithm(runAlgorithm, timeOut, replicate, (double) appliedSPRs / numTrees, maxProportionContractedInternalEdges, maxProportionMissingTaxa, outputTrees));
 							}
 						}
 						if (!data.isEmpty()) {
@@ -277,7 +292,7 @@ public class SampleTrees {
 		return list;
 	}
 
-	private DataPoint runAlgorithm(String algorithmName, long timeOut, int replicate, int rSPRs, double maxProportionContractedInternalEdges, double maxProportionMissingTaxa, ArrayList<PhyloTree> inputTrees) throws IOException, UsageException {
+	private DataPoint runAlgorithm(String algorithmName, long timeOut, int replicate, double rSPRs, double maxProportionContractedInternalEdges, double maxProportionMissingTaxa, ArrayList<PhyloTree> inputTrees) throws IOException, UsageException {
 		var taxaBlock = new TaxaBlock();
 		var inputBlock = new TreesBlock();
 		var reader = new NewickReader();
@@ -408,12 +423,12 @@ public class SampleTrees {
 	 * @param timeInSeconds
 	 */
 	public record DataPoint(int replicate, int nTaxa, int nTrees, double maxProportionContractedInternalEdges,
-							double maxProportionMissingTaxa, int nSPRs, int h, double timeInSeconds) {
+							double maxProportionMissingTaxa, double nSPRs, int h, double timeInSeconds) {
 		public String toString() {
-			return "%d\t%d\t%d\t%.1f\t%.1f\t%d\t%d\t%d\t%.1f%n".formatted(
+			return "%d\t%d\t%d\t%.1f\t%.1f\t%s\t%s\t%d\t%.1f%n".formatted(
 					replicate, nTaxa, nTrees,
 					maxProportionContractedInternalEdges, maxProportionMissingTaxa,
-					nSPRs, nTrees * nSPRs, h, timeInSeconds);
+					StringUtils.removeTrailingZerosAfterDot(nSPRs), StringUtils.removeTrailingZerosAfterDot(nTrees * nSPRs), h, timeInSeconds);
 		}
 
 		public static String header() {
@@ -427,12 +442,12 @@ public class SampleTrees {
 			var nTrees = data.stream().mapToInt(DataPoint::nTrees).average().orElse(0.0);
 			var maxProportionContractedInternalEdges = data.stream().mapToDouble(DataPoint::maxProportionContractedInternalEdges).average().orElse(0.0);
 			var maxProportionMissingTaxa = data.stream().mapToDouble(DataPoint::maxProportionMissingTaxa).average().orElse(0.0);
-			var nSPRs = data.stream().mapToInt(DataPoint::nSPRs).average().orElse(0.0);
-			var totalSPRs = data.stream().mapToInt(d -> d.nSPRs() * d.nTrees()).average().orElse(0.0);
+			var nSPRs = data.stream().mapToDouble(DataPoint::nSPRs).average().orElse(0.0);
+			var totalSPRs = data.stream().mapToDouble(d -> d.nSPRs() * d.nTrees()).average().orElse(0.0);
 			var h = data.stream().mapToInt(DataPoint::h).average().orElse(0.0);
 			var time = data.stream().mapToDouble(DataPoint::timeInSeconds).average().orElse(0.0);
 
-			return "av\t%.0f\t%.0f\t%.1f\t%.1f\t%.0f\t%.1f\t%.1f\t%.1f%n".formatted(nTaxa, nTrees, maxProportionContractedInternalEdges, maxProportionMissingTaxa, nSPRs, totalSPRs, h, time);
+			return "av\t%.0f\t%.0f\t%.1f\t%.1f\t%.0f\t%s\t%.1f\t%.1f%n".formatted(nTaxa, nTrees, maxProportionContractedInternalEdges, maxProportionMissingTaxa, nSPRs, StringUtils.removeTrailingZerosAfterDot(totalSPRs), h, time);
 		}
 	}
 

@@ -19,6 +19,8 @@
 
 package splitstree6.tabs.algorithms.treefilter;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -38,6 +40,7 @@ import static splitstree6.tabs.algorithms.taxafilter.TaxaFilterPresenter.setupEd
 import static splitstree6.tabs.algorithms.taxafilter.TaxaFilterPresenter.updateColumnWidths;
 
 public class TreeFilterTabPresenter implements IDisplayTabPresenter {
+	private final InvalidationListener activeChangedListener;
 
 	public TreeFilterTabPresenter(MainWindow mainWindow, TreeFilterTab treeFilterTab, AlgorithmNode<TreesBlock, TreesBlock> treesFilterNode, TreesFilter treesFilter) {
 		var algorithmController = treeFilterTab.getController();
@@ -56,6 +59,19 @@ public class TreeFilterTabPresenter implements IDisplayTabPresenter {
 		controller.getNameColumn().setCellValueFactory(new PropertyValueFactory<>("Name"));
 		tableView.widthProperty().addListener(c -> updateColumnWidths(tableView, controller.getNameColumn()));
 
+		activeChangedListener = e -> {
+			var total = tableView.getItems().size();
+			var active = tableView.getItems().stream().filter(TreeFilterTableItem::isActive).count();
+			var selected = tableView.getSelectionModel().getSelectedItems().size();
+			var label = (selected > 0 ? String.format("Selected: %,d, ", selected) : "");
+			label += String.format("Active: %,d (%,d in use) of: %,d", active,
+					(tableView.getItems().size() - treesFilter.getOptionDisabledTrees().length),
+					total);
+			controller.getInfoLabel().setText(label);
+		};
+		tableView.getSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(activeChangedListener));
+		treesFilter.optionDisabledTreesProperty().addListener(new WeakInvalidationListener(activeChangedListener));
+		treesFilterNode.validProperty().addListener(new WeakInvalidationListener(activeChangedListener));
 
 		Runnable updateTable = () -> {
 			tableView.getItems().clear();
@@ -69,6 +85,7 @@ public class TreeFilterTabPresenter implements IDisplayTabPresenter {
 				for (var t = 1; t <= treesBlock.getNTrees(); t++) {
 					var item = new TreeFilterTableItem(t, treesBlock.getTree(t));
 					item.setActive(!disabled.contains(item.getName()));
+					item.activeProperty().addListener(new WeakInvalidationListener(activeChangedListener));
 					tableView.getItems().add(item);
 				}
 			}
@@ -116,6 +133,8 @@ public class TreeFilterTabPresenter implements IDisplayTabPresenter {
 
 		setupEditMenuButton(controller.getMenuButton(), controller.getActiveColumn().getContextMenu());
 		controller.getMenuButton().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
+
+		activeChangedListener.invalidated(null);
 	}
 
 

@@ -204,7 +204,7 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 
 		activeChangedListener = e -> {
 			var label = (tableView.getSelectionModel().getSelectedItems().size() > 0 ? String.format("Selected: %d, ", tableView.getSelectionModel().getSelectedItems().size()) : "");
-			label += String.format("Active: %d (%d in use), total: %d", (inputTaxonBlock.getNtax() - taxaFilter.getNumberDisabledTaxa()), workingTaxonBlock.getNtax(), inputTaxonBlock.getNtax());
+			label += String.format("Active: %,d (%,d in use), total: %,d", (inputTaxonBlock.getNtax() - taxaFilter.getNumberDisabledTaxa()), workingTaxonBlock.getNtax(), inputTaxonBlock.getNtax());
 			controller.getInfoLabel().setText(label);
 		};
 
@@ -261,6 +261,7 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			}
 		}
 		var menu = new Menu("Select");
+		menu.disableProperty().bind(Bindings.isEmpty(menu.getItems()));
 		menuButton.getItems().addAll(new SeparatorMenuItem(), menu);
 		return menu;
 	}

@@ -147,9 +147,15 @@ public class PhyloFusion extends Trees2Trees {
 					}
 				}
 			}
+			for (var v : network.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
+				network.delDivertex(v);
+			}
+
 			if (count == 1 && isOptionCalculateWeights()) {
 				NetworkUtils.setEdgeWeights(treesBlock.getTrees(), network, isOptionNormalizeEdgeWeights(), 3000);
 			}
+			if (optionSearchHeuristic.get() == Search.Fast)
+				break; // only copy one
 		}
 	}
 
