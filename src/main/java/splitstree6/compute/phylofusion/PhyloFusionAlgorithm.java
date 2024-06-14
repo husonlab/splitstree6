@@ -54,7 +54,7 @@ public class PhyloFusionAlgorithm {
 	 * @return the computed networks
 	 * @throws IOException user canceled
 	 */
-	public static List<PhyloTree> apply(long numberOfRandomOrderings, List<PhyloTree> inputTrees, ProgressListener progress) throws IOException {
+	public static List<PhyloTree> apply(long numberOfRandomOrderings, List<PhyloTree> inputTrees, boolean onlyOneNetwork, ProgressListener progress) throws IOException {
 		if (inputTrees.size() == 1) {
 			return List.of(new PhyloTree(inputTrees.get(0)));
 		}
@@ -104,6 +104,12 @@ public class PhyloFusionAlgorithm {
 			}, ProgramExecutorService.getNumberOfCoresToUse(), new ProgressSilent());
 		} catch (Exception e) {
 			throw new IOException(e);
+		}
+
+		if (onlyOneNetwork && best.size() > 1) {
+			var one = best.get(0);
+			best.clear();
+			best.add(one);
 		}
 
 		progress.setSubtask("creating networks");

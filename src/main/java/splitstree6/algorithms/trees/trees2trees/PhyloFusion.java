@@ -65,10 +65,13 @@ public class PhyloFusion extends Trees2Trees {
 
 	private final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
 
+	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
+
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
 		ProgramProperties.track(optionSearchHeuristic, Search::valueOf, Search.Thorough);
 		ProgramProperties.track(optionCladeReduction, true);
+		ProgramProperties.track(optionOnlyOneNetwork, true);
 	}
 
 	@Override
@@ -85,7 +88,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionCladeReduction.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionCladeReduction.getName()); //, optionCalculateWeights.getName());
 	}
 
 	@Override
@@ -94,6 +97,7 @@ public class PhyloFusion extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
+			case "optionOnlyOneNetwork" -> "Report only one network";
 			case "optionSearchHeuristic" ->
 					"Fast, Medium or Thorough search: 10, 150 or 300 random orderings per taxon, respectively";
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
@@ -122,10 +126,15 @@ public class PhyloFusion extends Trees2Trees {
 			inputTrees = treesBlock.getTrees().stream().map(PhyloTree::new).toList();
 		}
 
-
 		var result = computeRec(progress, inputTrees);
 		outputBlock.setPartial(false);
 		outputBlock.setRooted(true);
+
+		if (isOptionOnlyOneNetwork() && result.size() > 1) {
+			var one = result.get(0);
+			result.clear();
+			result.add(one);
+		}
 
 		var count = 0;
 		for (var network : result) {
@@ -233,11 +242,11 @@ public class PhyloFusion extends Trees2Trees {
 				if (verbose)
 					System.err.println("Running on " + taxa.cardinality() + " taxa");
 				var numberOfRandomOrderings = computeNumberOfRandomOrderings(taxa.cardinality(), getOptionSearchHeuristic());
-				return PhyloFusionAlgorithm.apply(numberOfRandomOrderings, trees, progress);
+				return PhyloFusionAlgorithm.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
 			}
 
 		} else {
-			var rep = 1000 + BitSetUtils.min(separator);
+			var rep = BitSetUtils.min(separator);
 			var networksBelow = computeRec(progress, computeTreesBelow(trees, separator));
 
 			var networksAbove = computeRec(progress, computeTreesAbove(trees, separator, rep));
@@ -283,6 +292,8 @@ public class PhyloFusion extends Trees2Trees {
 						}
 					}
 					result.add(networkMerged);
+					if (isOptionOnlyOneNetwork())
+						break;
 				}
 			}
 			return result;
@@ -427,7 +438,19 @@ public class PhyloFusion extends Trees2Trees {
 		return optionCladeReduction;
 	}
 
-	public void setOptionCladeReduction(boolean optionCladeReduction) {
-		this.optionCladeReduction.set(optionCladeReduction);
+	public void setOptionCladeReduction(boolean cladeReduction) {
+		this.optionCladeReduction.set(cladeReduction);
+	}
+
+	public boolean isOptionOnlyOneNetwork() {
+		return optionOnlyOneNetwork.get();
+	}
+
+	public BooleanProperty optionOnlyOneNetworkProperty() {
+		return optionOnlyOneNetwork;
+	}
+
+	public void setOptionOnlyOneNetwork(boolean onlyOneNetwork) {
+		optionOnlyOneNetwork.set(onlyOneNetwork);
 	}
 }

@@ -44,10 +44,13 @@ public class AutumnAlgorithm extends Trees2Trees {
 	private final IntegerProperty optionFirstTree = new SimpleIntegerProperty(this, "optionFirstTree", 1);
 	private final IntegerProperty optionSecondTree = new SimpleIntegerProperty(this, "optionSecondTree", 2);
 
+	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
+
 	private final BooleanProperty optionRerootToMinimize = new SimpleBooleanProperty(this, "optionRerootToMinimize", false);
+
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionFirstTree.getName(), optionSecondTree.getName(),
+		return List.of(optionFirstTree.getName(), optionSecondTree.getName(), optionOnlyOneNetwork.getName(),
 				optionRerootToMinimize.getName());
 	}
 
@@ -57,6 +60,7 @@ public class AutumnAlgorithm extends Trees2Trees {
 			optionName = "option" + optionName;
 		}
 		return switch (optionName) {
+			case "optionOnlyOneNetwork" -> "Report only one network";
 			case "optionFirstTree" -> "index of the first tree";
 			case "optionSecondTree" -> "index of the second tree";
 			case "optionRerootToMinimize" -> "reroot input trees to minimize hybridization number";
@@ -93,7 +97,7 @@ public class AutumnAlgorithm extends Trees2Trees {
 			secondTree = new PhyloTree(secondTree);
 			RerootByHybridNumber.apply(firstTree, secondTree, progress);
 		}
-		outputData.getTrees().addAll(ComputeHybridizationNetwork.apply(taxaBlock, firstTree, secondTree, progress, hybridNumber));
+		outputData.getTrees().addAll(ComputeHybridizationNetwork.apply(taxaBlock, firstTree, secondTree, progress, hybridNumber, isOptionOnlyOneNetwork()));
 		outputData.setReticulated(hybridNumber.get() > 0);
 		var taxa = BitSetUtils.union(BitSetUtils.asBitSet(firstTree.getTaxa()), BitSetUtils.asBitSet(secondTree.getTaxa()));
 		outputData.setPartial(!taxa.equals(taxaBlock.getTaxaSet()));
@@ -130,5 +134,17 @@ public class AutumnAlgorithm extends Trees2Trees {
 
 	public BooleanProperty optionRerootToMinimizeProperty() {
 		return optionRerootToMinimize;
+	}
+
+	public boolean isOptionOnlyOneNetwork() {
+		return optionOnlyOneNetwork.get();
+	}
+
+	public BooleanProperty optionOnlyOneNetworkProperty() {
+		return optionOnlyOneNetwork;
+	}
+
+	public void setOptionOnlyOneNetwork(boolean optionOnlyOneNetwork) {
+		this.optionOnlyOneNetwork.set(optionOnlyOneNetwork);
 	}
 }

@@ -70,8 +70,15 @@ public class SetsBlock extends DataBlock implements IAdditionalDataBlock {
 
 	@Override
 	public void updateShortDescription() {
-		setShortDescription("%,d taxsets and %,d charsets".formatted(taxSets.size(), charSets.size()));
-
+		var buf = new StringBuilder();
+		if (!taxSets.isEmpty())
+			buf.append("%,d taxsets".formatted(taxSets.size()));
+		if (!charSets.isEmpty()) {
+			if (!buf.isEmpty())
+				buf.append(" and ");
+			buf.append("%,d charsets".formatted(charSets.size()));
+		}
+		setShortDescription(buf.toString());
 	}
 
 	@Override

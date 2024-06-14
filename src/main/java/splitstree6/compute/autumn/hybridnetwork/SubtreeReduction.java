@@ -46,7 +46,7 @@ public class SubtreeReduction {
 	 * @param merge merge merged-subtrees back into trees, for debugging purposes
 	 * @return subtree-reduced trees followed by all reduced subtrees
 	 */
-	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2, Set<String> selectedLabels, boolean merge) throws IOException {
+	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2, Set<String> selectedLabels, boolean merge, boolean oneResultOnly) throws IOException {
 		// create rooted trees with nodes labeled by taxa ids
 		var allTaxa = new TaxaBlock();
 		var roots = PreProcess.apply(tree1, tree2, allTaxa);
@@ -101,8 +101,8 @@ public class SubtreeReduction {
 				mergedSubtrees.add(MergeIsomorphicInducedTrees.apply(pair.getFirst(), pair.getSecond()));
 			}
 			results.addAll(mergedSubtrees);
-			var merged1 = MergeNetworks.apply(List.of(newRoot1), mergedSubtrees);
-			var merged2 = MergeNetworks.apply(List.of(newRoot2), mergedSubtrees);
+			var merged1 = MergeNetworks.apply(List.of(newRoot1), mergedSubtrees, oneResultOnly);
+			var merged2 = MergeNetworks.apply(List.of(newRoot2), mergedSubtrees, oneResultOnly);
 			results.addAll(merged1);
 			results.addAll(merged2);
 		}

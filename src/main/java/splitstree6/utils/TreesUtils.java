@@ -25,6 +25,7 @@ import jloda.graph.NodeArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
+import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CollectionUtils;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * some computations on trees and networks
@@ -146,6 +148,13 @@ public class TreesUtils {
 		}
 
 		return inducedTree;
+	}
+
+	public static PhyloTree computeInducedTree(BitSet taxa, PhyloTree originalTree) {
+		var clusters = TreesUtils.collectAllHardwiredClusters(originalTree).stream().map(c -> BitSetUtils.intersection(c, taxa)).filter(c -> c.cardinality() > 0).collect(Collectors.toSet());
+		var tree = new PhyloTree();
+		ClusterPoppingAlgorithm.apply(clusters, tree);
+		return tree;
 	}
 
 	public static PhyloTree computeTreeFromCompatibleSplits(Function<Integer, String> taxonLabel, List<ASplit> splits) {

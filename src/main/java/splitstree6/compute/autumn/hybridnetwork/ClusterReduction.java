@@ -45,7 +45,7 @@ public class ClusterReduction {
 	 *
 	 * @return subtree-reduced trees followed by all reduced subtrees
 	 */
-	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2, Set<String> selectedLabels, boolean merge) throws IOException {
+	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2, Set<String> selectedLabels, boolean merge, boolean oneResultOnly) throws IOException {
 		// create rooted trees with nodes labeled by taxa ids
 		var allTaxa = new TaxaBlock();
 		var roots = PreProcess.apply(tree1, tree2, allTaxa);
@@ -78,8 +78,8 @@ public class ClusterReduction {
 				var newRoot1 = root1.copySubNetwork();
 				var newRoot2 = root2.copySubNetwork();
 
-				var merged1 = MergeNetworks.apply(List.of(newRoot1), List.of(pair.getFirst()));
-				var merged2 = MergeNetworks.apply(List.of(newRoot2), List.of(pair.getSecond()));
+				var merged1 = MergeNetworks.apply(List.of(newRoot1), List.of(pair.getFirst()), oneResultOnly);
+				var merged2 = MergeNetworks.apply(List.of(newRoot2), List.of(pair.getSecond()), oneResultOnly);
 				results.addAll(merged1);
 				results.addAll(merged2);
 			}

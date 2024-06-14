@@ -41,7 +41,7 @@ public class MergeNetworks {
 	 *
 	 * @return subtree-reduced trees followed by all reduced subtrees
 	 */
-	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2, PhyloTree[] subTrees) throws IOException {
+	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2, PhyloTree[] subTrees, boolean oneResultOnly) throws IOException {
 		// create rooted trees with nodes labeled by taxa ids
 		var allTaxa = new TaxaBlock();
 		var roots = PreProcess.apply(tree1, tree2, allTaxa);
@@ -59,9 +59,9 @@ public class MergeNetworks {
 		}
 
 		// run the algorithm
-		var results = apply(inputTrees, subTreesList);
+		var results = apply(inputTrees, subTreesList, oneResultOnly);
 
-		if (results.size() > 0) {
+		if (!results.isEmpty()) {
 			var list = PostProcess.apply(results.toArray(new Root[0]), allTaxa, true);
 			return list.toArray(new PhyloTree[0]);
 		} else
@@ -74,7 +74,7 @@ public class MergeNetworks {
 	 *
 	 * @return list of merged networks
 	 */
-	static public List<Root> apply(Collection<Root> list1, Collection<Root> list2) throws IOException {
+	static public List<Root> apply(Collection<Root> list1, Collection<Root> list2, boolean oneResultOnly) throws IOException {
 		var result = new LinkedList<Root>();
 
 		for (var root1 : list1) {
@@ -83,7 +83,8 @@ public class MergeNetworks {
 				newRoot1 = merge(newRoot1, root2);
 			}
 			result.add(newRoot1);
-
+			if (oneResultOnly)
+				break;
 		}
 		return result;
 	}

@@ -52,11 +52,11 @@ public class ComputeHybridizationNetwork {
 	 *
 	 * @return reduced trees
 	 */
-	public static PhyloTree[] apply(TaxaBlock taxaBlock, PhyloTree tree1, PhyloTree tree2, ProgressListener progress, Single<Integer> hybridizationNumber) throws IOException {
+	public static PhyloTree[] apply(TaxaBlock taxaBlock, PhyloTree tree1, PhyloTree tree2, ProgressListener progress, Single<Integer> hybridizationNumber, boolean oneResultOnly) throws IOException {
 		var upperBound = ComputeHybridNumber.apply(tree1, tree2, progress);
 
 		var computeHybridizationNetwork = new ComputeHybridizationNetwork();
-		var networks = computeHybridizationNetwork.run(tree1, tree2, upperBound, hybridizationNumber, progress);
+		var networks = computeHybridizationNetwork.run(tree1, tree2, upperBound, hybridizationNumber, progress, oneResultOnly);
 
 		var label2taxonId = new HashMap<String, Integer>();
 		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
@@ -90,7 +90,7 @@ public class ComputeHybridizationNetwork {
 	 *
 	 * @return reduced trees
 	 */
-	private PhyloTree[] run(PhyloTree tree1, PhyloTree tree2, int upperBound, Single<Integer> hybridizationNumber, ProgressListener progress) throws IOException {
+	private PhyloTree[] run(PhyloTree tree1, PhyloTree tree2, int upperBound, Single<Integer> hybridizationNumber, ProgressListener progress, boolean oneResultOnly) throws IOException {
 		this.progress = progress;
 		var startTime = System.currentTimeMillis();
 		verbose = ProgramProperties.get("verbose-HL", false);
@@ -151,7 +151,7 @@ public class ComputeHybridizationNetwork {
 		var result = new TreeSet<>(new NetworkComparator());
 		int h;
 		try (var progressMover = new ProgressMover(progress)) {
-			h = computeRec(root1, root2, false, getAllAliveTaxa(root1, root2), upperBound, result, ">");
+			h = computeRec(root1, root2, false, getAllAliveTaxa(root1, root2), upperBound, result, ">", oneResultOnly);
 			fixOrdering(result);
 		}
 
@@ -213,7 +213,7 @@ public class ComputeHybridizationNetwork {
 	 *
 	 * @return cached networks or newly computed networks
 	 */
-	private int cacheComputeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybrids, int k, Collection<Root> totalResults, String depth) throws IOException {
+	private int cacheComputeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybrids, int k, Collection<Root> totalResults, String depth, boolean oneNetworkOnly) throws IOException {
 		if (true) // use caching
 		{
 			var key = root1.toStringTree() + root2.toStringTree() + (candidateHybrids != null ? StringUtils.toString(candidateHybrids) : "");
@@ -230,7 +230,7 @@ public class ComputeHybridizationNetwork {
 				return cachedResults.getFirst();
 			} else {
 				var newResults = new TreeSet<>(new NetworkComparator());
-				var h = computeRec(root1, root2, isReduced, candidateHybrids, k, newResults, depth);
+				var h = computeRec(root1, root2, isReduced, candidateHybrids, k, newResults, depth, oneNetworkOnly);
 
 				if (h > 0)
 					lookupTable.put(key, new Pair<>(h, newResults));
@@ -238,7 +238,7 @@ public class ComputeHybridizationNetwork {
 				return h;
 			}
 		} else {
-			return computeRec(root1, root2, isReduced, candidateHybrids, k, totalResults, depth);
+			return computeRec(root1, root2, isReduced, candidateHybrids, k, totalResults, depth, oneNetworkOnly);
 		}
 	}
 
@@ -247,7 +247,7 @@ public class ComputeHybridizationNetwork {
 	 *
 	 * @param isReduced @return hybrid number
 	 */
-	private int computeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybridsOriginal, int k, Collection<Root> totalResults, String depth) throws IOException {
+	private int computeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybridsOriginal, int k, Collection<Root> totalResults, String depth, boolean oneResultOnly) throws IOException {
 		if (verbose) {
 			System.err.println(depth + "---------- ComputeRec:");
 			System.err.println(depth + "Tree1: " + root1.toStringFullTreeX());
@@ -304,8 +304,8 @@ public class ComputeHybridizationNetwork {
 
 						var currentResults = new TreeSet<>(new NetworkComparator());
 
-						var h = cacheComputeRec(root1, root2, false, candidateHybrids, k, currentResults, depth + " >");
-						var merged = MergeNetworks.apply(currentResults, subTrees);
+						var h = cacheComputeRec(root1, root2, false, candidateHybrids, k, currentResults, depth + " >", oneResultOnly);
+						var merged = MergeNetworks.apply(currentResults, subTrees, oneResultOnly);
 						if (verbose) {
 							for (var r : merged) {
 								System.err.println(depth + "Result-merged: " + r.toStringNetworkFull());
@@ -327,7 +327,7 @@ public class ComputeHybridizationNetwork {
 
 				if (clusterTrees != null) {
 					var resultBottomPair = new TreeSet<>(new NetworkComparator());
-					var h = cacheComputeRec(clusterTrees.getFirst(), clusterTrees.getSecond(), true, candidateHybridsOriginal, k, resultBottomPair, depth + " >");
+					var h = cacheComputeRec(clusterTrees.getFirst(), clusterTrees.getSecond(), true, candidateHybridsOriginal, k, resultBottomPair, depth + " >", oneResultOnly);
 
 					// for the top pair, we should reconsider the place holder in the top pair as a possible place holder
 					var candidateHybrids = (BitSet) candidateHybridsOriginal.clone();
@@ -335,12 +335,12 @@ public class ComputeHybridizationNetwork {
 					candidateHybrids.set(placeHolderTaxon.get(), true);
 
 					var resultTopPair = new TreeSet<>(new NetworkComparator());
-					h += cacheComputeRec(root1, root2, false, candidateHybrids, k - h, resultTopPair, depth + " >");
+					h += cacheComputeRec(root1, root2, false, candidateHybrids, k - h, resultTopPair, depth + " >", oneResultOnly);
 
 					var currentResults = new TreeSet<>(new NetworkComparator());
 
 					for (var r : resultBottomPair) {
-						currentResults.addAll(MergeNetworks.apply(resultTopPair, List.of(r)));
+						currentResults.addAll(MergeNetworks.apply(resultTopPair, List.of(r), oneResultOnly));
 					}
 					if (verbose) {
 						System.err.println(depth + "Cluster reduction applied::");
@@ -422,7 +422,7 @@ public class ComputeHybridizationNetwork {
 				Collection<Root> currentResults = new TreeSet<>(new NetworkComparator());
 				candidateHybridsOriginal.set(hybridTaxon, false);
 
-				var h = cacheComputeRec(root1x, root2x, false, candidateHybridsOriginal, k - 1, currentResults, depth + " >") + 1;
+				var h = cacheComputeRec(root1x, root2x, false, candidateHybridsOriginal, k - 1, currentResults, depth + " >", oneResultOnly) + 1;
 				candidateHybridsOriginal.set(hybridTaxon, true);
 
 				if (h < k)
