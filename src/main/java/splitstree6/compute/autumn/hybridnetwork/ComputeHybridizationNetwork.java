@@ -119,19 +119,23 @@ public class ComputeHybridizationNetwork {
 		if (root2.getTaxa().cardinality() == onlyTree2.cardinality())
 			throw new IOException("None of the taxa in first tree are contained in second tree");
 
+
 		if (onlyTree1.cardinality() > 0) {
-			System.err.println("Killing all taxa only present in first tree: " + onlyTree1.cardinality());
+			if (verbose)
+				System.err.println("Killing all taxa only present in first tree: " + onlyTree1.cardinality());
 			for (var t : BitSetUtils.members(onlyTree1)) {
 				RemoveTaxon.apply(root1, 1, t);
 			}
 		}
 
 		if (onlyTree2.cardinality() > 0) {
-			System.err.println("Killing all taxa only present in second tree: " + onlyTree2.cardinality());
+			if (verbose)
+				System.err.println("Killing all taxa only present in second tree: " + onlyTree2.cardinality());
 			for (var t : BitSetUtils.members(onlyTree2)) {
 				RemoveTaxon.apply(root2, 2, t);
 			}
 		}
+
 
 		// run the refine algorithm
 		if (verbose)

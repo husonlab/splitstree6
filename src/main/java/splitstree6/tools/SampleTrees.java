@@ -70,9 +70,6 @@ public class SampleTrees {
 	 */
 	private void run(String[] args) throws Exception {
 		final ArgsOptions options = new ArgsOptions(args, this, "Samples related trees and optionally runs a network algorithm");
-		options.setVersion(ProgramProperties.getProgramVersion());
-		options.setLicense("This is free software, licensed under the terms of the GNU General Public License, Version 3.");
-		options.setAuthors("Daniel H. Huson");
 
 		options.comment("Input and output");
 		var inputFile = options.getOptionMandatory("-i", "input", "Input tree file (stdin, *.gz ok)", "");
@@ -80,18 +77,17 @@ public class SampleTrees {
 
 		options.comment("Options");
 		var numberOfTaxaRangeString = options.getOption("-t", "taxa", "Number of taxa to restrict the input tree(s) to (range ok, \"\"=keep original size)", "");
-		var requestedSPRs = options.getOption("-r", "rSPR", "Number of rSPRs to add to tree (value < 1 treated as probability)", 1.0);
-		var maxProportionMissingTaxa = options.getOption("-m", "missing", "Proportion of missing taxa", 0.0);
-		var maxProportionContractedInternalEdges = options.getOption("-c", "maxContracted", "Maximum proportion of contracted internal edges", 0.0);
+		var requestedSPRs = options.getOption("-r", "rSPR", "Number of rSPRs to add to each tree (value < 1: use value*number-of-taxa)", 1.0);
+		var firstTreeNoSPR = options.getOption("-fn", "firstTreeNoSPR", "Do not apply any rSPRs to first tree", false);
+		var missingTaxa = options.getOption("-m", "missing", "Number of missing taxa (value < 1: use value*number-of-taxa)", 0.0);
+		var contractedInternalEdges = options.getOption("-c", "maxContracted", "Number of contracted internal edges  (value < 1: use value*number-of-taxa)", 0.0);
 		var numTrees = options.getOption("-n", "numTrees", "Number of trees to sample", 1);
 		var randomSeed = options.getOption("-s", "seed", "Random generator seed (0:use random seed)", 42);
 		var echoInputTree = options.getOption("-e", "echoInput", "Echo the input tree to output", false);
 
-		var replicates = options.getOption("-R", "replicates", "Now replicates per input tree", 1);
+		var replicates = options.getOption("-R", "replicates", "Number replicates per input tree", 1);
 		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
-		var timeOut = options.getOption("-to", "timeOut", "Algorithm killed 'timed out' after this many milliseconds", 300000);
-
-		var sampleFromTwo = options.getOption("-s2", "sampleFromTwo", "Sample trees from two input trees", false);
+		var timeOut = options.getOption("-to", "timeOut", "Algorithm 'timed out' after this many milliseconds", 300000);
 
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-th", "threads", "Set number of threads to use", 8));
 		options.done();
@@ -99,31 +95,20 @@ public class SampleTrees {
 		FileUtils.checkFileReadableNonEmpty(inputFile);
 		FileUtils.checkAllFilesDifferent(inputFile, outputFile);
 
-		if (sampleFromTwo) {
-			if (requestedSPRs != 0)
-				System.err.println("--sampleFromTwo: option --rSPR ignored");
-			if (maxProportionMissingTaxa != 0)
-				System.err.println("--sampleFromTwo: option --missing ignored");
-			if (numTrees != 0)
-				System.err.println("--sampleFromTwo: option --numTrees ignored");
-			if (maxProportionContractedInternalEdges != 0)
-				System.err.println("--sampleFromTwo: option --maxContracted ignored");
-		} else {
-			if (requestedSPRs <= 0)
-				throw new UsageException("--rSPR must be greater 0, got: " + requestedSPRs);
-			if (requestedSPRs > 1)
-				requestedSPRs = (int) Math.round(requestedSPRs);
-			if (runAlgorithm.equalsIgnoreCase("autumn") && numTrees != 2)
-				throw new UsageException("--algorithm autumn requires --numTrees 2, not " + numTrees);
-		}
-
+		if (requestedSPRs <= 0)
+			throw new UsageException("--rSPR must be greater 0, got: " + requestedSPRs);
+		if (requestedSPRs > 1)
+			requestedSPRs = (int) Math.round(requestedSPRs);
+		if (runAlgorithm.equalsIgnoreCase("autumn") && numTrees != 2)
+			throw new UsageException("--algorithm autumn requires --numTrees 2, not " + numTrees);
 		if (echoInputTree && !runAlgorithm.isBlank())
-			throw new UsageException("--echoInput and --algorithm: must not specify both");
+			throw new UsageException("--echoInput and --algorithm: do not specify both");
 
 		var randomForMissingTaxa = new Random();
 		var randomForContractEdges = new Random();
 		var randomForSPRs = new Random();
 		var randomForApplicationOfSPR = new Random();
+
 		if (randomSeed != 0) {
 			randomForMissingTaxa.setSeed(randomSeed);
 			randomForContractEdges.setSeed(randomSeed);
@@ -138,241 +123,169 @@ public class SampleTrees {
 
 			var taxIdMap = new HashMap<String, Integer>();
 
-			if (sampleFromTwo) {
-				PhyloTree origInputTree1 = null;
-				PhyloTree origInputTree2 = null;
+			while (r.ready()) {
+				var line = r.readLine();
+				if (line.startsWith("(")) {
+					var inputTree0 = NewickIO.valueOf(line);
+					TreesUtils.addAdhocTaxonIds(inputTree0, taxIdMap);
+					var inputTaxa0 = BitSetUtils.asBitSet(inputTree0.getTaxa());
 
-				while (r.ready()) {
-					var line = r.readLine();
+					int[] numberOfTaxaRange;
+					if (numberOfTaxaRangeString.isBlank())
+						numberOfTaxaRange = new int[]{inputTaxa0.cardinality()};
+					else
+						numberOfTaxaRange = BitSetUtils.asList(BitSetUtils.valueOf(numberOfTaxaRangeString)).stream().mapToInt(t -> t).toArray();
 
-					if (line.startsWith("(")) {
-						var tree = NewickIO.valueOf(line);
-						TreesUtils.addAdhocTaxonIds(tree, taxIdMap);
-						if (origInputTree1 == null)
-							origInputTree1 = tree;
-						else if (origInputTree2 == null)
-							origInputTree2 = tree;
-						else {
-							throw new IOException("Too many trees input file");
-						}
-					}
-				}
-				if (origInputTree1 == null || origInputTree2 == null)
-					throw new IOException("Didn't find two trees in input file");
-				var taxaIntersection = BitSetUtils.intersection(BitSetUtils.asBitSet(origInputTree1.getTaxa()), BitSetUtils.asBitSet(origInputTree2.getTaxa()));
-
-
-				int[] numberOfTaxaRange;
-				if (numberOfTaxaRangeString.isBlank())
-					numberOfTaxaRange = new int[]{taxaIntersection.cardinality()};
-				else
-					numberOfTaxaRange = StringUtils.parseArrayOfIntegers(numberOfTaxaRangeString);
-
-				for (var numberOfTaxa : numberOfTaxaRange) {
-					if (numberOfTaxaRange.length > 1)
-						System.err.println("NumberOfTaxa: " + numberOfTaxa);
-					var data = new ArrayList<DataPoint>();
-					for (var replicate = 1; replicate <= replicates; replicate++) {
-						PhyloTree inputTree1;
-						PhyloTree inputTree2;
-
-						if (numberOfTaxa > 0 && numberOfTaxa < taxaIntersection.cardinality()) {
-							var array = BitSetUtils.asList(taxaIntersection).stream().mapToInt(t -> t).toArray();
-							if (replicates > 1)
-								CollectionUtils.randomize(array, randomForMissingTaxa.nextInt());
-							var taxonSubset = new BitSet();
-							for (var i = 0; i < numberOfTaxa; i++) {
-								taxonSubset.set(array[i]);
+					for (var numberOfTaxa : numberOfTaxaRange) {
+						if (numberOfTaxaRange.length > 1 && options.isVerbose())
+							System.err.println("NumberOfTaxa: " + numberOfTaxa);
+						BitSet inputTaxa;
+						PhyloTree inputTree;
+						if (numberOfTaxa > 0 && numberOfTaxa < inputTaxa0.cardinality()) {
+							var array = new int[BitSetUtils.max(inputTaxa0) + 1];
+							var count = 0;
+							inputTaxa = new BitSet();
+							for (var t : BitSetUtils.members(inputTaxa0)) {
+								count++;
+								array[t] = count;
+								inputTaxa.set(count);
+								if (count == numberOfTaxa)
+									break;
 							}
-
-							inputTree1 = TreesUtils.computeInducedTree(taxonSubset, origInputTree1);
-							inputTree1.nodeStream().filter(inputTree1::hasTaxa).forEach(v -> inputTree1.setLabel(v, "t" + inputTree1.getTaxon(v)));
-							inputTree2 = TreesUtils.computeInducedTree(taxonSubset, origInputTree2);
-							inputTree2.nodeStream().filter(inputTree2::hasTaxa).forEach(v -> inputTree2.setLabel(v, "t" + inputTree2.getTaxon(v)));
-
-							assert BitSetUtils.asBitSet(inputTree1.getTaxa()).equals(BitSetUtils.asBitSet(BitSetUtils.range(1, numberOfTaxa + 1)));
-							assert BitSetUtils.asBitSet(inputTree2.getTaxa()).equals(BitSetUtils.asBitSet(BitSetUtils.range(1, numberOfTaxa + 1)));
+							inputTree = TreesUtils.computeInducedTree(array, inputTree0);
+							assert inputTree != null;
+							assert BitSetUtils.asBitSet(inputTree.getTaxa()).equals(BitSetUtils.asBitSet(BitSetUtils.range(1, numberOfTaxa + 1)));
 						} else {
-							inputTree1 = origInputTree1;
-							inputTree2 = origInputTree1;
+							inputTaxa = inputTaxa0;
+							inputTree = inputTree0;
 						}
-						System.err.println("Running replicate " + replicate);
-						var producedTrees = List.of(inputTree1, inputTree2);
 
-						if (!runAlgorithm.isBlank()) {
-							data.add(runAlgorithm(runAlgorithm, timeOut, replicate, 0, maxProportionContractedInternalEdges, maxProportionMissingTaxa, producedTrees));
+						for (var v : inputTree.nodes()) {
+							if (v.getInDegree() == 1 && v.getOutDegree() == 1)
+								inputTree.delDivertex(v);
 						}
-					}
-					if (!data.isEmpty()) {
-						w.write("#Algorithm: " + runAlgorithm + "\n");
-						w.write(DataPoint.header());
-						for (var d : data) {
-							w.write(d.toString());
-						}
-						w.write("\n" + DataPoint.average(data));
-					}
-				}
-			} else { // don't sample from two
+						countInputTrees++;
+						if (echoInputTree)
+							w.write(inputTree.toBracketString(true) + "[&&NHX:GN=in%s];\n".formatted(countInputTrees));
 
-				while (r.ready()) {
-					var line = r.readLine();
-					if (line.startsWith("(")) {
-						var inputTree0 = NewickIO.valueOf(line);
-						TreesUtils.addAdhocTaxonIds(inputTree0, taxIdMap);
-						var inputTaxa0 = BitSetUtils.asBitSet(inputTree0.getTaxa());
-
-						int[] numberOfTaxaRange;
-						if (numberOfTaxaRangeString.isBlank())
-							numberOfTaxaRange = new int[]{inputTaxa0.cardinality()};
-						else
-							numberOfTaxaRange = StringUtils.parseArrayOfIntegers(numberOfTaxaRangeString);
-
-						for (var numberOfTaxa : numberOfTaxaRange) {
-							if (numberOfTaxaRange.length > 1)
-								System.err.println("NumberOfTaxa: " + numberOfTaxa);
-							BitSet inputTaxa;
-							PhyloTree inputTree;
-							if (numberOfTaxa > 0 && numberOfTaxa < inputTaxa0.cardinality()) {
-								var array = new int[BitSetUtils.max(inputTaxa0) + 1];
-								var count = 0;
-								inputTaxa = new BitSet();
-								for (var t : BitSetUtils.members(inputTaxa0)) {
-									count++;
-									array[t] = count;
-									inputTaxa.set(count);
-									if (count == numberOfTaxa)
-										break;
-								}
-								inputTree = TreesUtils.computeInducedTree(array, inputTree0);
-								assert inputTree != null;
-								assert BitSetUtils.asBitSet(inputTree.getTaxa()).equals(BitSetUtils.asBitSet(BitSetUtils.range(1, numberOfTaxa + 1)));
-							} else {
-								inputTaxa = inputTaxa0;
-								inputTree = inputTree0;
-							}
-
-							for (var v : inputTree.nodes()) {
-								if (v.getInDegree() == 1 && v.getOutDegree() == 1)
-									inputTree.delDivertex(v);
-							}
-							countInputTrees++;
-							if (echoInputTree)
-								w.write(inputTree.toBracketString(true) + "[&&NHX:GN=in%s];\n".formatted(countInputTrees));
-
-							var data = new ArrayList<DataPoint>();
-							for (var replicate = 1; replicate <= replicates; replicate++) {
-								var appliedSPRs = 0;
+						var data = new ArrayList<DataPoint>();
+						for (var replicate = 1; replicate <= replicates; replicate++) {
+							var appliedSPRs = 0;
+							if (options.isVerbose())
 								System.err.println("Running replicate " + replicate);
-								var producedTrees = new ArrayList<PhyloTree>();
-								for (var t = 0; t < numTrees; t++) {
-									var tree = new PhyloTree(inputTree);
-									check(tree);
-									if (maxProportionMissingTaxa > 0) {
-										var missing = (int) (maxProportionMissingTaxa * inputTaxa.cardinality());
-										if (missing > 0) {
-											List<Integer> keep = new ArrayList<>(BitSetUtils.asList(inputTaxa));
-											CollectionUtils.randomize(keep, randomForMissingTaxa);
-											keep = keep.subList(0, keep.size() - missing);
-											var newId = 0;
-											var oldNewId = new int[BitSetUtils.max(inputTaxa) + 1];
-											for (var tax : keep) {
-												oldNewId[tax] = ++newId;
-											}
-											tree = TreesUtils.computeInducedTree(oldNewId, tree);
-											if (tree == null)
-												throw new RuntimeException("Tree is null");
-											check(tree);
+							var producedTrees = new ArrayList<PhyloTree>();
+							for (var t = 0; t < numTrees; t++) {
+								var tree = new PhyloTree(inputTree);
+								check(tree);
+								if (missingTaxa > 0) {
+									var missing = (int) Math.round(missingTaxa >= 1 ? missingTaxa : missingTaxa * inputTaxa.cardinality());
+									if (missing > 0) {
+										var keep = CollectionUtils.randomize(BitSetUtils.asList(inputTaxa), randomForMissingTaxa)
+												.subList(0, inputTaxa.cardinality() - missing);
+										var newId = 0;
+										var oldNewId = new int[BitSetUtils.max(inputTaxa) + 1];
+										for (var tax : keep) {
+											oldNewId[tax] = ++newId;
 										}
-									}
-									if (maxProportionContractedInternalEdges > 0) {
-										List<Edge> edges = CollectionUtils.randomize(IteratorUtils.asStream(tree.edges()).filter(e -> !e.getTarget().isLeaf()).toList(), randomForContractEdges);
-										var numContractEdges = (int) Math.ceil(maxProportionContractedInternalEdges * edges.size());
-										if (numContractEdges > 0 && numContractEdges < edges.size()) {
-											edges = edges.subList(edges.size() - numContractEdges, edges.size());
-										}
-										RootedNetworkProperties.contractEdges(tree, new HashSet<>(edges), null);
+										tree = TreesUtils.computeInducedTree(oldNewId, tree);
+										if (tree == null)
+											throw new RuntimeException("Tree is null");
 										check(tree);
 									}
-									if (requestedSPRs > 0) {
-										int numberToApply;
-										if (requestedSPRs >= 1)
-											numberToApply = (int) requestedSPRs;
-										else {
-											numberToApply = randomForApplicationOfSPR.nextDouble() >= requestedSPRs ? 1 : 0;
-										}
-										appliedSPRs += numberToApply;
-										for (var i = 0; i < numberToApply; i++) {
-											var edges = IteratorUtils.asList(tree.edges());
-											edges.removeAll(tree.getRoot().outEdgesStream(false).toList());
-											if (edges.size() < 2)
-												throw new RuntimeException("Too few edges");
-
-											var movingEdge = edges.get(randomForSPRs.nextInt(edges.size()));
-											edges.removeAll(getEdgesBelow(movingEdge));
-
-											var targetEdge = movingEdge;
-											Collection<BitSet> all;
-
-											var count = 0;
-											while (true) {
-												targetEdge = edges.get(randomForSPRs.nextInt(edges.size()));
-												if (!(targetEdge.getSource() == movingEdge.getTarget() || targetEdge.getTarget() == movingEdge.getSource())) {
-													try (EdgeArray<Edge> srcTarMap = tree.newEdgeArray()) {
-														var newTree = new PhyloTree();
-														newTree.copy(tree, null, srcTarMap);
-														var before = TreesUtils.collectAllHardwiredClusters(newTree);
-														applyRootedSPR(srcTarMap.get(targetEdge), srcTarMap.get(movingEdge), newTree);
-														var after = TreesUtils.collectAllHardwiredClusters(newTree);
-														if (!before.equals(after) && tree.isConnected()) {
-															all = CollectionUtils.union(before, after);
-															tree = newTree;
-															break;
-														}
-													}
-												}
-												if (++count > 100)
-													throw new RuntimeException("Too few edges");
-											}
-
-											var compatible = true;
-											allPairsLoop:
-											for (var a : all) {
-												for (var b : all) {
-													if (a != b && Cluster.incompatible(a, b)) {
-														compatible = false;
-														break allPairsLoop;
-													}
-												}
-											}
-											if (compatible)
-												System.err.println("no rSPR");
-											check(tree);
-										}
-										countOutputTrees++;
-										if (runAlgorithm.isBlank())
-											w.write(tree.toBracketString(true) + "[&&NHX:GN=out%s];\n".formatted(countOutputTrees));
-
-										producedTrees.add(tree);
+								}
+								if (contractedInternalEdges > 0) {
+									List<Edge> edges = CollectionUtils.randomize(IteratorUtils.asStream(tree.edges()).filter(e -> !e.getTarget().isLeaf()).toList(), randomForContractEdges);
+									var numContractEdges = (int) Math.round(contractedInternalEdges >= 1 ? contractedInternalEdges : contractedInternalEdges * edges.size());
+									if (numContractEdges > 0 && numContractEdges < edges.size()) {
+										edges = edges.subList(edges.size() - numContractEdges, edges.size());
 									}
+									RootedNetworkProperties.contractEdges(tree, new HashSet<>(edges), null);
+									check(tree);
 								}
-								if (!runAlgorithm.isBlank()) {
-									data.add(runAlgorithm(runAlgorithm, timeOut, replicate, (double) appliedSPRs / numTrees, maxProportionContractedInternalEdges, maxProportionMissingTaxa, producedTrees));
+								if (requestedSPRs > 0) {
+									int numberToApply;
+									if (firstTreeNoSPR && t == 0)
+										numberToApply = 0;
+									else if (requestedSPRs < 1) {
+										numberToApply = (int) Math.ceil(requestedSPRs * numberOfTaxa);
+									} else {
+										numberToApply = (int) requestedSPRs;
+									}
+									appliedSPRs += numberToApply;
+
+									for (var i = 0; i < numberToApply; i++) {
+										var edges = IteratorUtils.asList(tree.edges());
+										edges.removeAll(tree.getRoot().outEdgesStream(false).toList());
+										if (edges.size() < 2)
+											throw new RuntimeException("Too few edges");
+
+										var movingEdge = edges.get(randomForSPRs.nextInt(edges.size()));
+										edges.removeAll(getEdgesBelow(movingEdge));
+
+										var targetEdge = movingEdge;
+										Collection<BitSet> all;
+
+										var count = 0;
+										while (true) {
+											targetEdge = edges.get(randomForSPRs.nextInt(edges.size()));
+											if (!(targetEdge.getSource() == movingEdge.getTarget() || targetEdge.getTarget() == movingEdge.getSource())) {
+												try (EdgeArray<Edge> srcTarMap = tree.newEdgeArray()) {
+													var newTree = new PhyloTree();
+													newTree.copy(tree, null, srcTarMap);
+													var before = TreesUtils.collectAllHardwiredClusters(newTree);
+													applyRootedSPR(srcTarMap.get(targetEdge), srcTarMap.get(movingEdge), newTree);
+													var after = TreesUtils.collectAllHardwiredClusters(newTree);
+													if (!before.equals(after) && tree.isConnected()) {
+														all = CollectionUtils.union(before, after);
+														tree = newTree;
+														break;
+													}
+												}
+											}
+											if (++count > 100)
+												throw new RuntimeException("Too few edges");
+										}
+
+										var compatible = true;
+										allPairsLoop:
+										for (var a : all) {
+											for (var b : all) {
+												if (a != b && Cluster.incompatible(a, b)) {
+													compatible = false;
+													break allPairsLoop;
+												}
+											}
+										}
+										if (compatible)
+											System.err.println("no rSPR");
+										check(tree);
+									}
+									countOutputTrees++;
+									if (runAlgorithm.isBlank())
+										w.write(tree.toBracketString(true) + "[&&NHX:GN=out%s];\n".formatted(countOutputTrees));
+
+									producedTrees.add(tree);
 								}
 							}
-							if (!data.isEmpty()) {
-								w.write("#Algorithm: " + runAlgorithm + "\n");
-								w.write(DataPoint.header());
-								for (var d : data) {
-									w.write(d.toString());
-								}
-								w.write("\n" + DataPoint.average(data));
+							if (!runAlgorithm.isBlank()) {
+								data.add(runAlgorithm(runAlgorithm, numberOfTaxa, timeOut, replicate, requestedSPRs, appliedSPRs, contractedInternalEdges, missingTaxa, producedTrees, options.isVerbose()));
 							}
+						}
+						if (!data.isEmpty()) {
+							w.write(DataPoint.header());
+							for (var d : data) {
+								w.write(d.toString());
+							}
+							w.write("\n" + DataPoint.average(runAlgorithm, data) + "\n");
+							w.flush();
 						}
 					}
 				}
 			}
-			System.err.printf("Input trees:  %,10d%n", countInputTrees);
-			System.err.printf("Output trees:%,11d%n", countOutputTrees);
+			if (options.isVerbose()) {
+				System.err.printf("Input trees:  %,10d%n", countInputTrees);
+				System.err.printf("Output trees:%,11d%n", countOutputTrees);
+			}
 		}
 	}
 
@@ -390,14 +303,15 @@ public class SampleTrees {
 		return list;
 	}
 
-	private DataPoint runAlgorithm(String algorithmName, long timeOut, int replicate, double rSPRs, double maxProportionContractedInternalEdges, double maxProportionMissingTaxa, List<PhyloTree> inputTrees) throws IOException, UsageException {
+	private DataPoint runAlgorithm(String algorithmName, int numberOfTaxa, long timeOut, int replicate, double requestedSPRs, int totalSPRs, double maxProportionContractedInternalEdges, double maxProportionMissingTaxa, List<PhyloTree> inputTrees, boolean verbose) throws IOException, UsageException {
 		var taxaBlock = new TaxaBlock();
 		var inputBlock = new TreesBlock();
-		var reader = new NewickReader();
+		{
+			var reader = new NewickReader();
+			reader.read(new ProgressSilent(), new ListIterator<>(inputTrees.stream().map(t -> t.toBracketString(false) + ";").toList()), taxaBlock, inputBlock);
+		}
 
-		reader.read(new ProgressSilent(), new ListIterator<>(inputTrees.stream().map(t -> t.toBracketString(false) + ";").toList()), taxaBlock, inputBlock);
-
-		if (true) {
+		if (verbose) {
 			System.err.println(replicate + "\t" + taxaBlock.getNtax() + ":");
 			for (var tree : inputBlock.getTrees())
 				System.err.println(tree.toBracketString(false) + ";");
@@ -448,19 +362,19 @@ public class SampleTrees {
 		} catch (IOException ex) { // timed out
 			if (ProgressTimeOut.MESSAGE.equals(ex.getMessage())) {
 				System.err.println("Timed out: " + replicate);
-				return new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
-						maxProportionContractedInternalEdges, maxProportionMissingTaxa, rSPRs, -1, timeOut / 1000.0);
+				return new DataPoint(algorithmName, replicate, taxaBlock.getNtax(), inputTrees.size(),
+						maxProportionContractedInternalEdges, maxProportionMissingTaxa, requestedSPRs, totalSPRs, -1, timeOut / 1000.0);
 			} else throw ex;
 		}
 		time = System.currentTimeMillis() - time;
 
 		var h = outputBlock.getTree(1).nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
 
-		var dataPoint = new DataPoint(replicate, taxaBlock.getNtax(), inputTrees.size(),
-				maxProportionContractedInternalEdges, maxProportionMissingTaxa,
-				rSPRs, h, time / 1000.0);
+		var dataPoint = new DataPoint(algorithmName, replicate, numberOfTaxa, inputTrees.size(),
+				maxProportionContractedInternalEdges, maxProportionMissingTaxa, requestedSPRs, totalSPRs, h, time / 1000.0);
 
-		System.err.print(dataPoint);
+		if (verbose)
+			System.err.print(dataPoint);
 
 		return dataPoint;
 	}
@@ -499,48 +413,6 @@ public class SampleTrees {
 			throw new IOException("leaves != recLeaves");
 	}
 
-
-	/**
-	 * data point to report
-	 *
-	 * @param replicate
-	 * @param nTaxa
-	 * @param nTrees
-	 * @param maxProportionContractedInternalEdges
-	 * @param maxProportionMissingTaxa
-	 * @param nSPRs
-	 * @param h
-	 * @param timeInSeconds
-	 */
-	public record DataPoint(int replicate, int nTaxa, int nTrees, double maxProportionContractedInternalEdges,
-							double maxProportionMissingTaxa, double nSPRs, int h, double timeInSeconds) {
-		public String toString() {
-			return "%d\t%d\t%d\t%.1f\t%.1f\t%s\t%s\t%d\t%.1f%n".formatted(
-					replicate, nTaxa, nTrees,
-					maxProportionContractedInternalEdges, maxProportionMissingTaxa,
-					StringUtils.removeTrailingZerosAfterDot(nSPRs), StringUtils.removeTrailingZerosAfterDot(nTrees * nSPRs), h, timeInSeconds);
-		}
-
-		public static String header() {
-			return "#replicate\tnTaxa\tnTrees\tcontract\tmissing\tnSPR\tTotalSPR\th\tseconds\n";
-
-		}
-
-		public static String average(Collection<DataPoint> data) {
-			data = data.stream().filter(d -> d.h() >= 0).toList();
-			var nTaxa = data.stream().mapToInt(DataPoint::nTaxa).average().orElse(0.0);
-			var nTrees = data.stream().mapToInt(DataPoint::nTrees).average().orElse(0.0);
-			var maxProportionContractedInternalEdges = data.stream().mapToDouble(DataPoint::maxProportionContractedInternalEdges).average().orElse(0.0);
-			var maxProportionMissingTaxa = data.stream().mapToDouble(DataPoint::maxProportionMissingTaxa).average().orElse(0.0);
-			var nSPRs = data.stream().mapToDouble(DataPoint::nSPRs).average().orElse(0.0);
-			var totalSPRs = data.stream().mapToDouble(d -> d.nSPRs() * d.nTrees()).average().orElse(0.0);
-			var h = data.stream().mapToInt(DataPoint::h).average().orElse(0.0);
-			var time = data.stream().mapToDouble(DataPoint::timeInSeconds).average().orElse(0.0);
-
-			return "av\t%.0f\t%.0f\t%.1f\t%.1f\t%.0f\t%s\t%.1f\t%.1f%n".formatted(nTaxa, nTrees, maxProportionContractedInternalEdges, maxProportionMissingTaxa, nSPRs, StringUtils.removeTrailingZerosAfterDot(totalSPRs), h, time);
-		}
-	}
-
 	public static PhyloTree subtree(int nTaxa, PhyloTree tree) {
 		var taxa = BitSetUtils.asBitSet(BitSetUtils.range(1, nTaxa + 1));
 		var clusters = new HashSet<BitSet>();
@@ -554,5 +426,50 @@ public class SampleTrees {
 		ClusterPoppingAlgorithm.apply(clusters, result);
 		result.nodeStream().filter(result::hasTaxa).forEach(v -> result.setLabel(v, "t" + result.getTaxon(v)));
 		return result;
+	}
+
+	/**
+	 * data point to report
+	 *
+	 * @param replicate
+	 * @param nTaxa
+	 * @param nTrees
+	 * @param contractedEdges
+	 * @param missingTaxa
+	 * @param totalSPRs
+	 * @param h
+	 * @param timeInSeconds
+	 */
+	public record DataPoint(String algorithmName, int replicate, int nTaxa, int nTrees,
+							double contractedEdges,
+							double missingTaxa, double requestedSPRs, int totalSPRs, int h,
+							double timeInSeconds) {
+		public String toString() {
+			return "%s\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%d\t%d\t%.1f%n".formatted(algorithmName, replicate, nTaxa, nTrees,
+					StringUtils.removeTrailingZerosAfterDot(contractedEdges), StringUtils.removeTrailingZerosAfterDot(missingTaxa),
+					StringUtils.removeTrailingZerosAfterDot(requestedSPRs), totalSPRs, h, Math.max(totalSPRs, h), timeInSeconds);
+		}
+
+		public static String header() {
+			return "#algorithm\treplicate\ttaxa\ttrees\tcontract\tmissing\tspr\tTotalSPRs\tH\tMAX\tSeconds\n";
+
+		}
+
+		public static String average(String algorithmName, Collection<DataPoint> data) {
+			data = data.stream().filter(d -> d.h() >= 0).toList();
+			var nTaxa = data.stream().mapToInt(DataPoint::nTaxa).average().orElse(0.0);
+			var nTrees = data.stream().mapToInt(DataPoint::nTrees).average().orElse(0.0);
+			var contractedEdges = data.stream().mapToDouble(DataPoint::contractedEdges).average().orElse(0.0);
+			var missingTaxa = data.stream().mapToDouble(DataPoint::missingTaxa).average().orElse(0.0);
+			var nSPR = data.stream().mapToDouble(DataPoint::requestedSPRs).average().orElse(0.0);
+			var totalSPRs = data.stream().mapToDouble(DataPoint::totalSPRs).average().orElse(0.0);
+			var h = data.stream().mapToInt(DataPoint::h).average().orElse(0.0);
+			var max = data.stream().mapToInt(d -> Math.max(d.totalSPRs, d.h)).average().orElse(0.0);
+			var time = data.stream().mapToDouble(DataPoint::timeInSeconds).average().orElse(0.0);
+
+			return "av\t%s\t%.1f\t%.0f\t%s\t%s\t%s\t%s\t%.1f\t%.1f\t%.1f%n".formatted(algorithmName, nTaxa, nTrees,
+					StringUtils.removeTrailingZerosAfterDot(contractedEdges), StringUtils.removeTrailingZerosAfterDot(missingTaxa),
+					StringUtils.removeTrailingZerosAfterDot(nSPR), StringUtils.removeTrailingZerosAfterDot(totalSPRs), h, max, time);
+		}
 	}
 }
