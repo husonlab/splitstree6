@@ -70,6 +70,9 @@ public class SampleTrees {
 	 */
 	private void run(String[] args) throws Exception {
 		final ArgsOptions options = new ArgsOptions(args, this, "Samples related trees and optionally runs a network algorithm");
+		options.setVersion(ProgramProperties.getProgramVersion());
+		options.setLicense("This is free software, licensed under the terms of the GNU General Public License, Version 3.");
+		options.setAuthors("Daniel H. Huson");
 
 		options.comment("Input and output");
 		var inputFile = options.getOptionMandatory("-i", "input", "Input tree file (stdin, *.gz ok)", "");
@@ -87,7 +90,7 @@ public class SampleTrees {
 
 		var replicates = options.getOption("-R", "replicates", "Number replicates per input tree", 1);
 		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
-		var timeOut = options.getOption("-to", "timeOut", "Algorithm 'timed out' after this many milliseconds", 300000);
+		var timeOut = options.getOption("-to", "timeOut", "Abort algorithm after this many milliseconds", 300000);
 
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-th", "threads", "Set number of threads to use", 8));
 		options.done();
