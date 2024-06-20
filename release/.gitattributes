@@ -1,0 +1,7 @@
+*.dmg filter=lfs diff=lfs merge=lfs -text
+*.sh filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
+
+SplitsTree_macos_6_3_26.dmg filter=lfs diff=lfs merge=lfs -text
+SplitsTree_unix_6_3_26.sh filter=lfs diff=lfs merge=lfs -text
+SplitsTree_windows-x64_6_3_26.exe filter=lfs diff=lfs merge=lfs -text
