@@ -47,7 +47,11 @@ public class ExtractOptionsText {
 					if (property.getValue() == null || property.getValue().equals(defaultProperty.getValue())) {
 						hasDefaultOption = true;
 					} else {
-						list.add(optionName + "=" + property.getValue());
+						if (property.getValue().getClass().getSimpleName().equals("String[]")) {
+							var strings = (String[]) property.getValue();
+							list.add(optionName + "='" + StringUtils.toString(strings, "', '") + "'");
+						} else
+							list.add(optionName + "=" + property.getValue());
 					}
 				}
 			}

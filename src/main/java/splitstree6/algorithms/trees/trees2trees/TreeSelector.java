@@ -52,7 +52,7 @@ public class TreeSelector extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getShortDescription() {
-		return "Allows the user to select one from a list of trees.";
+		return "Select a tree to use.";
 	}
 
 	@Override

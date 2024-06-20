@@ -35,7 +35,7 @@ import java.util.*;
 public class LSATree extends Trees2Trees implements IFilter {
 	@Override
 	public String getShortDescription() {
-		return "Extracts the LSA tree from a rooted network.";
+		return "Extract the LSA tree from a rooted network.";
 	}
 
 	@Override

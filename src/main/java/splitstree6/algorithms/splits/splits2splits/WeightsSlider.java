@@ -89,13 +89,13 @@ public class WeightsSlider extends Splits2Splits implements IFilter {
 			child.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), child.getSplits(), child.getCycle()));
 			child.setThreshold(parent.getThreshold());
 
-			if (split2label.size() > 0) {
+			if (!split2label.isEmpty()) {
 				for (var s = 1; s <= child.getNsplits(); s++) {
 					var label = split2label.get(child.get(s));
 					child.getSplitLabels().put(s, label);
 				}
 			}
-			setShortDescription("using " + child.getNsplits() + " of " + parent.getNsplits() + " splits");
+			setShortDescription("Filter splits by weight, using " + child.getNsplits() + " of " + parent.getNsplits() + " splits");
 		} else {
 			child.getSplits().clear();
 			child.getSplits().addAll(splits);

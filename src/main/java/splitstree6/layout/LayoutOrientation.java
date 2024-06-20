@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6;
+package splitstree6.layout;
 
 import javafx.animation.ParallelTransition;
 import javafx.animation.Transition;

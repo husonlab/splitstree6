@@ -22,7 +22,6 @@ package splitstree6.algorithms.taxa.taxa2taxa;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
@@ -40,7 +39,7 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 	public void compute(ProgressListener progress, TaxaBlock ignored, TaxaBlock inputTaxaBlock, TaxaBlock outputTaxaBlock) {
 		if (getNumberDisabledTaxa() == 0) {
 			outputTaxaBlock.copy(inputTaxaBlock);
-			setShortDescription(StringUtils.fromCamelCase(getClass().getSimpleName()));
+			setShortDescription("");
 		} else {
 			outputTaxaBlock.clear();
 
@@ -50,7 +49,7 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 					outputTaxaBlock.add(taxon);
 				}
 			}
-			setShortDescription("using " + outputTaxaBlock.getNtax() + " of " + (inputTaxaBlock.getNtax() + " taxa"));
+			setShortDescription("Filter taxa to use " + outputTaxaBlock.getNtax() + " of " + (inputTaxaBlock.getNtax() + " taxa."));
 		}
 
 		final var parentTraits = inputTaxaBlock.getTraitsBlock();

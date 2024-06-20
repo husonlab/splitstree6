@@ -44,12 +44,12 @@ public class ExtractMethodsText {
 	public static final String InputDataTemplate = "The original input consisted of %s and %s.%n";
 	public static final String RemovedCharactersTemplate = "After removal of %s characters, the input had %s characters.%n";
 
-	public static final String TaxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s.%n";
-	public static final String TaxonFilterTemplate = "After removal of %d taxa, the input consisted of %s and %s.%n";
+	public static final String TaxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s%n";
+	public static final String TaxonFilterTemplate = "After removal of %d taxa, the input consisted of %s and %s%n";
 	public static final String MethodWithOutputTemplate = "The %s method%s was used%s so as to obtain %s%s.%n";
 	public static final String MethodTemplate = "The %s method%s was used%s.%n";
 
-	public static final String FilterTemplate = "A %s%s was applied so as to be %s.%n";
+	public static final String FilterTemplate = "The %s%s was applied so as to %s%n";
 
 	/**
 	 * constructor
@@ -99,9 +99,9 @@ public class ExtractMethodsText {
 			if (workingTaxaBlock != null && workingTaxaBlock.getNtax() < topTaxaBlock.getNtax()) {
 				int removed = (topTaxaBlock.getNtax() - workingTaxaBlock.getNtax());
 				if (removed == 1)
-					buf.append(TaxonFilterTemplateOne.formatted(workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
+					buf.append(TaxonFilterTemplateOne.formatted(workflow.getWorkingTaxaBlock().getShortDescription(), addFullStopIfMissing(workflow.getWorkingDataNode().getDataBlock().getShortDescription())));
 				else
-					buf.append(TaxonFilterTemplate.formatted(removed, workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
+					buf.append(TaxonFilterTemplate.formatted(removed, workflow.getWorkingTaxaBlock().getShortDescription(), addFullStopIfMissing(workflow.getWorkingDataNode().getDataBlock().getShortDescription())));
 			}
 
 			if (workflow.getInputDataBlock() instanceof CharactersBlock inputCharacters) {
@@ -132,7 +132,8 @@ public class ExtractMethodsText {
 											if (filter.isActive()) {
 												var name = StringUtils.fromCamelCase(algorithm.getName());
 												var optionsReport = ExtractOptionsText.apply(algorithm);
-												var line = FilterTemplate.formatted(name, (optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""), algorithm.getShortDescription());
+												var line = FilterTemplate.formatted(name, (!optionsReport.isEmpty() ? " (" + optionsReport + ")" : ""),
+														addFullStopIfMissing(firstLetterToLower(algorithm.getShortDescription())));
 												if (!set.contains(line)) {
 													buf.append(line);
 													set.add(line);
@@ -194,6 +195,21 @@ public class ExtractMethodsText {
 		} catch (Exception ignored) {
 			return "";
 		}
+	}
+
+	private String firstLetterToLower(String string) {
+		string = string.trim();
+		if (string.isEmpty())
+			return string;
+		else
+			return string.substring(0, 1).toLowerCase() + string.substring(1);
+	}
+
+	private String addFullStopIfMissing(String string) {
+		string = string.trim();
+		if (string.endsWith("."))
+			return string;
+		else return string + ".";
 	}
 
 	/**

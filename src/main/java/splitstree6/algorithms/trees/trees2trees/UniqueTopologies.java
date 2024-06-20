@@ -109,7 +109,7 @@ public class UniqueTopologies extends Trees2Trees implements IFilter {
 			}
 			child.getTrees().add(tree);
 		}
-		setShortDescription("Topology filter: %,d -> %,d trees".formatted(parent.getNTrees(), child.getNTrees()));
+		setShortDescription("Filter by unique topology, from %,d to %,d trees".formatted(parent.getNTrees(), child.getNTrees()));
 	}
 
 	@Override

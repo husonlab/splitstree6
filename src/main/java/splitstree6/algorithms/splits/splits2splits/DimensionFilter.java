@@ -60,7 +60,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 
 	@Override
 	public String getShortDescription() {
-		return "Heuristically removes splits that lead to high-dimensional boxes in a split network.";
+		return "Heuristically remove splits that lead to high-dimensional boxes in a split network.";
 	}
 
 	@Override

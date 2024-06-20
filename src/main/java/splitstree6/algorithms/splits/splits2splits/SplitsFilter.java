@@ -62,7 +62,7 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 	}
 
 	public String getShortDescription() {
-		return "Provides several ways of filtering splits.";
+		return "Filter splits.";
 	}
 
 	@Override

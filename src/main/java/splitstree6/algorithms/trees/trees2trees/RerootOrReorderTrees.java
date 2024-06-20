@@ -93,7 +93,7 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getShortDescription() {
-		return "Reroot, or change the order of children, on all trees.";
+		return "Reroot or reorder all trees.";
 	}
 
 	public RerootOrReorderTrees() {

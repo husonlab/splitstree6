@@ -1,5 +1,10 @@
 #nexus [SplitsTree6]
 
+[!
+Gruenstaeudl, M. Why the monophyly of Nymphaeaceae currently remains indeterminate: an assessment based on gene-wise plastid phylogenomics.
+Plant Syst Evol 305, 827–836 (2019). https://doi.org/10.1007/s00606-019-01610-5
+]
+
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=12 nAlgorithms=9;
 PROGRAM version='SplitsTree App (version 6.3.23, built 4 Jun 2024)';

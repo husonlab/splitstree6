@@ -54,7 +54,7 @@ public class TreesFilter extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getShortDescription() {
-		return "Allows the user to interactively filter trees.";
+		return "Filter trees.";
 	}
 
 	@Override

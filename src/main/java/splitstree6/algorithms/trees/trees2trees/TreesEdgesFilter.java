@@ -68,7 +68,7 @@ public class TreesEdgesFilter extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getShortDescription() {
-		return "Provides several options for filtering trees.";
+		return "Filter edges in trees.";
 	}
 
 	@Override
