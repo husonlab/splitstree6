@@ -17,7 +17,7 @@ A key novel feature of the SplitsTree App is that all data, algorithms and param
 
 Any workflow can be saved to a file and then applied to other datasets either using SplitsTree App or using an accompanying command-line workflow runner program.
 
-<img width="800" alt="example" src="artwork/example.png">
+<img width="800" alt="example" src="doc/figs/example.png">
 
 ## History
 Our previous program,  SplitsTree4, was designed for computing phylogenetic trees and networks from distances or aligned sequences. It was written in the early 2000's by Daniel Huson and Dave Bryant and described in [(Huson and Bryant, 2006)](https://academic.oup.com/mbe/article/23/2/254/1118872). While the program is still widely used and cited, it was designed for small datasets and the user interface, implemented using the Java Swing library, now feels minimalistic and dated. Moreover, SplitsTree4 was not designed as an open source program.
