@@ -1,3 +1,0 @@
-150d2ea8be977d59cf8f0218d3e7c661 *SplitsTree_macos_6_3_26.dmg
-8ab9f29089f759c6fee78d95c1da49bb *SplitsTree_unix_6_3_26.sh
-fecb5560ddb77067eecd90559ba41b66 *SplitsTree_windows-x64_6_3_26.exe

@@ -60,7 +60,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			""";
 
 	public static final String DESCRIPTION = """
-			This block maintains a network, such as a haplotype network or just a set of points (for PCoA).
+			Maintain a network, such as a haplotype network or just a set of points (for PCoA).
 			""";
 
 	@Override

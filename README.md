@@ -1,7 +1,5 @@
 # <img width="32" alt="image" src="https://user-images.githubusercontent.com/6740594/210514648-dac226c7-b12b-40f0-b0fa-9803cc2e6916.png"> SplitsTree App
 
-Download latest executables: https://software-ab.cs.uni-tuebingen.de/download/splitstree6/welcome.html (alternative download [here](https://unitc-my.sharepoint.com/:f:/g/personal/iijhu01_cloud_uni-tuebingen_de/ErFbVRLEdw5ElYuu0ldpbskBM9XmXOHdeFadVTlssq1Bzg?e=KDefhC)).
-
 The new SplitsTree App is designed as an open source project that provides a wide range of algorithms and processes for computing and working with both unrooted and rooted phylogenetic trees and networks. Much work has been invested in accommodating much larger datasets (more taxa, longer sequences, more trees, improved algorithms) than its predecessor programs, SplitsTree4 and Dendroscope3, and its user interface is based on the JavaFX library, giving it a modern look and feel.
 
 As this is the sixth major reimplementation of SplitsTree, this is also known as SplitsTree6.

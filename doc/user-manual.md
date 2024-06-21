@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.24, built 7 June 2024)
+SplitsTree App (version 6.3.27, built 20 June 2024)
 
 ## Introduction
 
@@ -1457,7 +1457,7 @@ set of points (for PCoA).
     BEGIN NETWORK;
         [TITLE {title};]
       [LINK {type} = {title};]
-      [DIMENSIONS [NVertices=number-of-nodes] [NEdges=number-of-edges];]
+      [DIMENSIONS [NTAX=number-of-taxa] [NVertices=number-of-nodes] [NEdges=number-of-edges];]
         [TYPE {HaplotypeNetwork|Points|Other};]
       [FORMAT
       ;]
