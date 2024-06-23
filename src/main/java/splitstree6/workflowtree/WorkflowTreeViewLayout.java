@@ -113,23 +113,27 @@ public class WorkflowTreeViewLayout {
 					nodeItemMap.put(dataNode, item);
 					inputTaxaItem.getChildren().add(0, item);
 					treeView.getRoot().setExpanded(true);
+					item.setExpanded(true);
 				} else if (workflow.isWorkingTaxaNode(dataNode)) {
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
 					inputTaxaItem.getChildren().add(item);
 					treeView.getRoot().setExpanded(true);
+					item.setExpanded(true);
 				} else if (workflow.isWorkingDataNode(dataNode)) {
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
 					treeView.getRoot().getChildren().add(item);
 					workingDataItem = item;
 					treeView.getRoot().setExpanded(true);
+					item.setExpanded(true);
 				} else {
 					// if (dataNode.getDataBlock() instanceof ViewBlock) return; // todo: what to do with sink blocks?
 
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
 					dataNode.getParents().addListener(createParentsChangeListener(dataNode));
+					item.setExpanded(true);
 				}
 			} else if (node instanceof AlgorithmNode algorithmNode) {
 				if (workflow.isInputDataLoader(algorithmNode) || workflow.isInputDataFilter(algorithmNode)) {
@@ -142,10 +146,12 @@ public class WorkflowTreeViewLayout {
 						inputTaxaItem.getChildren().add(1, item);
 					else
 						inputTaxaItem.getChildren().add(item);
+					item.setExpanded(true);
 				} else {
 					var item = new WorkflowTreeItem(mainWindow, algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					algorithmNode.getParents().addListener(createParentsChangeListener(algorithmNode));
+					item.setExpanded(true);
 				}
 			}
 		} catch (Exception ex) {
