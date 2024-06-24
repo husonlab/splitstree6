@@ -53,7 +53,7 @@ import java.util.*;
 public class PhyloFusion extends Trees2Trees {
 	private boolean verbose = false;
 
-	public enum Search {Thorough, Medium, Fast}
+	public enum Search {SuperThorough, Thorough, Medium, Fast}
 
 	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
 
@@ -374,6 +374,7 @@ public class PhyloFusion extends Trees2Trees {
 			case Fast -> Math.max(100, 10L * ntax);
 			case Medium -> 150L * ntax;
 			case Thorough -> 300L * ntax;
+			case SuperThorough -> 1000L * ntax;
 		};
 	}
 
