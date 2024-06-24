@@ -80,10 +80,10 @@ public class SampleTrees {
 
 		options.comment("Options");
 		var numberOfTaxaRangeString = options.getOption("-t", "taxa", "Number of taxa to restrict the input tree(s) to (range ok, \"\"=keep original size)", "");
-		var requestedSPRs = options.getOption("-r", "rSPR", "Number of rSPRs to add to each tree (value < 1: use value*number-of-taxa)", 1.0);
+		var requestedSPRs = options.getOption("-r", "rSPR", "Number of rSPRs to add to each tree (value < 1: will use value*number-of-taxa)", 1.0);
 		var firstTreeNoSPR = options.getOption("-fn", "firstTreeNoSPR", "Do not apply any rSPRs to first tree", false);
-		var missingTaxa = options.getOption("-m", "missing", "Number of missing taxa (value < 1: use value*number-of-taxa)", 0.0);
-		var contractedInternalEdges = options.getOption("-c", "maxContracted", "Number of contracted internal edges  (value < 1: use value*number-of-taxa)", 0.0);
+		var missingTaxa = options.getOption("-m", "missing", "Number of missing taxa (value < 1: will use value*number-of-taxa)", 0.0);
+		var contractedInternalEdges = options.getOption("-c", "contracted", "Number of contracted internal edges  (value < 1: will use value*number-of-taxa)", 0.0);
 		var numTrees = options.getOption("-n", "numTrees", "Number of trees to sample", 1);
 		var randomSeed = options.getOption("-s", "seed", "Random generator seed (0:use random seed)", 42);
 		var echoInputTree = options.getOption("-e", "echoInput", "Echo the input tree to output", false);
