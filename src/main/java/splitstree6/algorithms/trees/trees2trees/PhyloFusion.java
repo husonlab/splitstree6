@@ -99,7 +99,7 @@ public class PhyloFusion extends Trees2Trees {
 		return switch (optionName) {
 			case "optionOnlyOneNetwork" -> "Report only one network";
 			case "optionSearchHeuristic" ->
-					"Fast, Medium or Thorough search: 10, 150 or 300 random orderings per taxon, respectively";
+					"Fast, Medium, Thorough or SuperThorough search: 10, 150, 300 or 1000 random orderings per taxon, respectively";
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
