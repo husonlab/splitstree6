@@ -129,7 +129,7 @@ public class Connectors {
 			}
 
 
-			if (nodeShapeMap1.size() > 0 && nodeShapeMap2.size() > 0) {
+			if (!nodeShapeMap1.isEmpty() && !nodeShapeMap2.isEmpty()) {
 				var taxaBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
 				var taxonShapeMap1 = new HashMap<Taxon, javafx.scene.Node>();
 				{

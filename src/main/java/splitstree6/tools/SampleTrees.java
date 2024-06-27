@@ -90,7 +90,7 @@ public class SampleTrees {
 
 		var replicates = options.getOption("-R", "replicates", "Number replicates per input tree", 1);
 		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
-		var timeOut = options.getOption("-to", "timeOut", "Abort algorithm after this many milliseconds", 300000);
+		var timeOut = 1000L * options.getOption("-to", "timeOut", "Abort algorithm after this many seconds", 300);
 
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-th", "threads", "Set number of threads to use", 8));
 		options.done();
@@ -315,7 +315,7 @@ public class SampleTrees {
 		}
 
 		if (verbose) {
-			System.err.println(replicate + "\t" + taxaBlock.getNtax() + ":");
+			System.err.println("Input trees:");
 			for (var tree : inputBlock.getTrees())
 				System.err.println(tree.toBracketString(false) + ";");
 		}
@@ -371,7 +371,13 @@ public class SampleTrees {
 		}
 		time = System.currentTimeMillis() - time;
 
-		var h = outputBlock.getTree(1).nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
+		var network = outputBlock.getTree(1);
+
+		var h = network.nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
+
+		if (verbose) {
+			System.err.println("network: " + network.toBracketString(true) + ";");
+		}
 
 		var dataPoint = new DataPoint(algorithmName, replicate, numberOfTaxa, inputTrees.size(),
 				maxProportionContractedInternalEdges, maxProportionMissingTaxa, requestedSPRs, totalSPRs, h, time / 1000.0);
