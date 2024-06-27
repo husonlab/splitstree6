@@ -149,6 +149,11 @@ public class TanglegramViewController {
 		scrollPane.setFitToWidth(true);
 		scrollPane.setFitToHeight(true);
 
+		leftPane.getStyleClass().add("viewer-background");
+		middlePane.getStyleClass().add("viewer-background");
+		rightPane.getStyleClass().add("viewer-background");
+
+
 		innerAnchorPane.getChildren().add(tree1NameLabel);
 		AnchorPane.setTopAnchor(tree1NameLabel, 5.0);
 		AnchorPane.setLeftAnchor(tree1NameLabel, 10.0);
