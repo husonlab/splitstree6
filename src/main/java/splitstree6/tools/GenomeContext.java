@@ -71,7 +71,8 @@ public class GenomeContext {
 		final var inputFiles = options.getOptionMandatory("-i", "input", "Input query FastA files (directory, stdin, .gz ok)", Collections.emptyList());
 		final var perFastARecord = options.getOption("-p", "perFastaRecord", "Process each FastA record as a separate sequence", false);
 		final var databaseFile = options.getOptionMandatory("-d", "database", "Database file", "");
-		final var fileCacheDirectory = new File(options.getOption("-c", "cache", "File cache directory for storing downloaded genomes", new File(databaseFile).getParent()));
+		var parent = new File(databaseFile).getParent();
+		final var fileCacheDirectory = new File(options.getOption("-c", "cache", "File cache directory for storing downloaded genomes", (parent != null ? parent : ".")));
 		final var outputFile = options.getOption("-o", "output", "Output file (stdout, .gz ok)", "stdout");
 
 		options.comment("Filtering");
