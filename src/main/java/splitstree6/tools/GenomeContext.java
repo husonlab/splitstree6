@@ -21,6 +21,7 @@ package splitstree6.tools;
 
 import jloda.fx.util.ArgsOptions;
 import jloda.kmers.mash.MashDistance;
+import jloda.kmers.mash.MashSketch;
 import jloda.seq.FastAFileIterator;
 import jloda.util.*;
 import jloda.util.progress.ProgressPercentage;
@@ -85,8 +86,10 @@ public class GenomeContext {
 		final var useFastAHeaders = options.getOption("-fh", "useFastaHeader", "Use FastA headers for query sequences", false);
 		final var reportName = options.getOption("-rn", "reportNames", "Report reference names", true);
 		final var reportId = options.getOption("-ri", "reportIds", "Report reference ids", false);
+		final var reportPath = options.getOption("-rp", "reportPath", "Report reference path", false);
 		final var reportFile = options.getOption("-rf", "reportFiles", "Report reference files", false);
-		final var reportDistance = options.getOption("-rd", "reportMashDistances", "Report mash distances", true);
+		final var reportDistance = options.getOption("-rd", "reportDistances", "Report mash distances between query and references", true);
+		final var reportMatrix = options.getOption("-rm", "reportMatrix", "Report matrix of all distances", false);
 		final var reportLCA = options.getOption("-rlca", "reportLCA", "Report LCA of references", true);
 		final var includeStrains = options.getOption("-is", "includeStrains", "Include the genomes of strains for the detected species", false);
 
@@ -113,7 +116,6 @@ public class GenomeContext {
 			if (maxDistance < 1)
 				minSketchIntersection = Math.max(minSketchIntersection, computeMinSketchIntersection(maxDistance, database.getMashK(), database.getMashS()));
 
-
 			try (final ProgressPercentage progress = new ProgressPercentage("Processing input files (" + inputFiles.size() + "):", inputFiles.size())) {
 				for (var fileName : inputFiles) {
 					final List<Pair<String, String>> pairs = new ArrayList<>();
@@ -132,16 +134,16 @@ public class GenomeContext {
 							}
 						}
 					} else { // per file
-						final List<String> sequences = pairs.stream().map(Pair::getSecond).collect(Collectors.toList());
+						final var sequences = pairs.stream().map(Pair::getSecond).toList();
 						final var name = (useFastAHeaders ? pairs.get(0).getFirst() : FileUtils.replaceFileSuffix(FileUtils.getFileNameWithoutPath(fileName), ""));
 						pairs.clear();
 						pairs.add(new Pair<>(name, StringUtils.toString(sequences, "").replaceAll("\\s", "")));
 					}
 
 					for (var pair : pairs) {
-						final Collection<Map.Entry<Integer, Double>> list = database.findSimilar(new ProgressSilent(), minSketchIntersection, includeStrains, Collections.singleton(pair.getSecond().getBytes()), false);
+						final var list = database.findSimilar(new ProgressSilent(), minSketchIntersection, includeStrains, Collections.singleton(pair.getSecond().getBytes()), false);
 
-						final Map<Integer, String> id2name = new HashMap<>();
+						final var id2name = new HashMap<Integer, String>();
 						if (reportName) {
 							id2name.putAll(database.getNames(list.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
 						}
@@ -150,15 +152,15 @@ public class GenomeContext {
 							id2file.putAll(database.getFiles(list.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
 						}
 
-						int count = 0;
-						final Set<Integer> taxa = new HashSet<>();
+						var count = 0;
+						final var taxa = new HashSet<Integer>();
 
 						w.write("Query: " + pair.getFirst() + "\n");
 						w.write("Results: " + Math.min(list.size(), maxCount) + "\n");
 
-						double smallestDistance = 1.0;
+						var smallestDistance = 1.0;
 
-						final StringBuilder buf = new StringBuilder();
+						var buf = new StringBuilder();
 						for (var result : list) {
 							if (++count >= maxCount)
 								break;
@@ -175,6 +177,25 @@ public class GenomeContext {
 							if (reportId) {
 								buf.append("\t").append(result.getKey());
 							}
+							if (reportPath) {
+								buf.append("\t");
+								var path = new ArrayList<String>();
+								var id = result.getKey();
+								while (id != null) {
+									path.add(database.getName(id));
+									id = database.getTaxonomyParent(id);
+								}
+								CollectionUtils.reverseInPlace(path);
+								var first = true;
+								for (var label : path) {
+									if (first)
+										first = false;
+									else
+										buf.append("::");
+									buf.append(label);
+								}
+							}
+
 							if (reportFile) {
 								buf.append("\t").append(id2file.get(result.getKey()));
 							}
@@ -186,13 +207,40 @@ public class GenomeContext {
 						}
 
 						if (reportLCA && !taxa.isEmpty()) {
-							final int lca = computeLCA(database, taxa);
+							var lca = computeLCA(database, taxa);
 							buf.append("LCA: ").append(lca).append(" ").append(database.getNames(Collections.singleton(lca)).get(lca));
 						}
 						if (!buf.isEmpty()) {
 							w.write(buf + "\n");
 						}
 						w.write("\n");
+						if (reportMatrix) {
+							var querySketch = MashSketch.compute(pair.getFirst(), List.of(pair.getSecond().getBytes()), true, database.getMashS(), database.getMashK(), database.getMashSeed(), false, true, progress);
+							var taxIdSketchList = database.getMashSketches(taxa);
+							var all = new ArrayList<Pair<String, MashSketch>>();
+							all.add(new Pair<>(pair.getFirst(), querySketch));
+							for (var entry : taxIdSketchList) {
+								all.add(new Pair<>(id2name.get(entry.getFirst()), entry.getSecond()));
+							}
+							var matrix = new double[all.size()][all.size()];
+							for (var i = 0; i < all.size(); i++) {
+								var iSketch = all.get(i).getSecond();
+								for (var j = i + 1; j < all.size(); j++) {
+									var jSketch = all.get(j).getSecond();
+									matrix[i][j] = matrix[j][i] = MashDistance.compute(iSketch, jSketch);
+								}
+							}
+							w.write("Distance matrix:\n");
+							w.write(matrix.length + "\n");
+							for (int i = 0; i < matrix.length; i++) {
+								w.write(all.get(i).getFirst());
+								double[] array = matrix[i];
+								for (var j = 0; j < matrix.length; j++) {
+									w.write(StringUtils.removeTrailingZerosAfterDot("\t.8f", array[j]));
+								}
+								w.write("\n");
+							}
+						}
 						w.flush();
 					}
 					progress.incrementProgress();
@@ -202,8 +250,8 @@ public class GenomeContext {
 	}
 
 	public static int computeMinSketchIntersection(double maxDistance, int mashK, int mashS) {
-		for (int i = mashS; i > 1; i--) {
-			final double distance = MashDistance.compute((double) (i - 1) / (double) mashS, mashK);
+		for (var i = mashS; i > 1; i--) {
+			var distance = MashDistance.compute((double) (i - 1) / (double) mashS, mashK);
 			if (distance > maxDistance)
 				return i;
 		}
@@ -220,9 +268,9 @@ public class GenomeContext {
 		if (list.isEmpty()) {
 			return 0;
 		} else {
-			int prev = 0;
-			for (int depth = 0; ; depth++) {
-				int current = 0;
+			var prev = 0;
+			for (var depth = 0; ; depth++) {
+				var current = 0;
 				for (var ancestors : list) {
 					if (ancestors.size() <= depth)
 						return prev;
