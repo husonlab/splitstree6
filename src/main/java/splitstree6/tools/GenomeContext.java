@@ -111,7 +111,14 @@ public class GenomeContext {
 		}
 
 		try (Writer w = new OutputStreamWriter(FileUtils.getOutputStreamPossiblyZIPorGZIP(outputFile))) {
-			final AccessReferenceDatabase database = new AccessReferenceDatabase(databaseFile, () -> fileCacheDirectory, 2 * ProgramExecutorService.getNumberOfCoresToUse());
+			final AccessReferenceDatabase database;
+			try {
+				Basic.hideSystemErr();
+				database = new AccessReferenceDatabase(databaseFile, () -> fileCacheDirectory, 2 * ProgramExecutorService.getNumberOfCoresToUse());
+			} finally {
+				Basic.restoreSystemErr();
+			}
+
 			// todo: update minSketchIntersection from maxDistance
 			if (maxDistance < 1)
 				minSketchIntersection = Math.max(minSketchIntersection, computeMinSketchIntersection(maxDistance, database.getMashK(), database.getMashS()));
@@ -162,7 +169,7 @@ public class GenomeContext {
 
 						var buf = new StringBuilder();
 						for (var result : list) {
-							if (++count >= maxCount)
+							if (++count > maxCount)
 								break;
 							if (count == 1)
 								smallestDistance = result.getValue();
@@ -181,7 +188,7 @@ public class GenomeContext {
 								buf.append("\t");
 								var path = new ArrayList<String>();
 								var id = result.getKey();
-								while (id != null) {
+								while (id != null && id != 0) {
 									path.add(database.getName(id));
 									id = database.getTaxonomyParent(id);
 								}
@@ -236,7 +243,7 @@ public class GenomeContext {
 								w.write(all.get(i).getFirst());
 								double[] array = matrix[i];
 								for (var j = 0; j < matrix.length; j++) {
-									w.write(StringUtils.removeTrailingZerosAfterDot("\t.8f", array[j]));
+									w.write(StringUtils.removeTrailingZerosAfterDot("\t%.8f", array[j]));
 								}
 								w.write("\n");
 							}

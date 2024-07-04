@@ -352,7 +352,8 @@ public class AccessReferenceDatabase implements Closeable {
 	}
 
 	public int getTaxonomyParent(int taxid) throws SQLException {
-		return new ArrayList<>(executeQueryInt("SELECT parent_id FROM taxa WHERE taxon_id=" + taxid + ";", 1)).get(0);
+		var result = new ArrayList<>(executeQueryInt("SELECT parent_id FROM taxa WHERE taxon_id=" + taxid + ";", 1));
+		return result.isEmpty() ? 0 : result.get(0);
 	}
 
 	public Map<String, String> getReferenceFile2Name(ObservableList<Integer> taxonIds, ProgressListener progress) throws SQLException, IOException {

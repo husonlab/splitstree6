@@ -372,8 +372,10 @@ public class AnalyzeGenomesPresenter {
 	private static File getReferenceDatabaseFile(AnalyzeGenomesDialog dialog) {
 		final var previous = dialog.getOptionReferenceDatabaseFile();
 		final var fileChooser = new FileChooser();
-		if (previous.length() > 0) {
-			fileChooser.setInitialDirectory((new File(previous)).getParentFile());
+		if (!previous.isEmpty()) {
+			var dir = (new File(previous)).getParentFile();
+			if (dir != null && dir.exists())
+				fileChooser.setInitialDirectory(dir);
 			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(previous));
 		}
 		fileChooser.setTitle("SplitsTree6 References Database");
