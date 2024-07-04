@@ -113,7 +113,7 @@ public class GenomeContext {
 		try (Writer w = new OutputStreamWriter(FileUtils.getOutputStreamPossiblyZIPorGZIP(outputFile))) {
 			final AccessReferenceDatabase database;
 			try {
-				Basic.hideSystemErr();
+				Basic.hideSystemErr(); // suppress SLF4J error message
 				database = new AccessReferenceDatabase(databaseFile, () -> fileCacheDirectory, 2 * ProgramExecutorService.getNumberOfCoresToUse());
 			} finally {
 				Basic.restoreSystemErr();
@@ -150,10 +150,8 @@ public class GenomeContext {
 					for (var pair : pairs) {
 						final var list = database.findSimilar(new ProgressSilent(), minSketchIntersection, includeStrains, Collections.singleton(pair.getSecond().getBytes()), false);
 
-						final var id2name = new HashMap<Integer, String>();
-						if (reportName) {
-							id2name.putAll(database.getNames(list.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
-						}
+						final var id2name = new HashMap<Integer, String>(database.getNames(list.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
+
 						final Map<Integer, String> id2file = new HashMap<>();
 						if (reportFile) {
 							id2file.putAll(database.getFiles(list.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
@@ -212,7 +210,6 @@ public class GenomeContext {
 							if (!buf.isEmpty())
 								buf.append("\n");
 						}
-
 						if (reportLCA && !taxa.isEmpty()) {
 							var lca = computeLCA(database, taxa);
 							buf.append("LCA: ").append(lca).append(" ").append(database.getNames(Collections.singleton(lca)).get(lca));
