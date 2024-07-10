@@ -150,9 +150,9 @@ public class GenomeContext {
 					for (var pair : pairs) {
 						final var list = database.findSimilar(new ProgressSilent(), minSketchIntersection, includeStrains, Collections.singleton(pair.getSecond().getBytes()), false);
 
-						final var id2name = new HashMap<Integer, String>(database.getNames(list.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
+						final var id2name = new HashMap<>(database.getNames(list.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
 
-						final Map<Integer, String> id2file = new HashMap<>();
+						final var id2file = new HashMap<Integer, String>();
 						if (reportFile) {
 							id2file.putAll(database.getFiles(list.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
 						}
