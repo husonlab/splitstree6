@@ -55,7 +55,7 @@ public class AccessReferenceDatabase implements Closeable {
 
 	private Supplier<File> fileCacheDirectory;
 
-	private static final boolean verbose = false;
+	private static final boolean verbose = true;
 
 	private final Set<Integer> unusableTaxa = new TreeSet<>();
 
@@ -446,11 +446,12 @@ public class AccessReferenceDatabase implements Closeable {
 		final var id2distance = new ConcurrentHashMap<Integer, Double>();
 
 		final var exception = new Single<Exception>();
-		final var jobs = new AtomicInteger(1);
+		final var activeJobs = new AtomicInteger(1);
+		final var totalJobs = new AtomicInteger(1);
 
 		final var service = Executors.newFixedThreadPool(ProgramExecutorService.getNumberOfCoresToUse());
 		try {
-			service.submit(createTasksRec(getTaxonomyRoot(), querySketches, kmers, minSharedKMers, id2distance, progress, exception, jobs, service));
+			service.submit(createTasksRec(getTaxonomyRoot(), querySketches, kmers, minSharedKMers, id2distance, progress, exception, activeJobs, totalJobs, service));
 
 			if (exception.get() != null)
 				throw new IOException(exception.get());
@@ -462,6 +463,8 @@ public class AccessReferenceDatabase implements Closeable {
 		} finally {
 			service.shutdown();
 		}
+		if (verbose)
+			System.err.printf("Total jobs: %,d%n", totalJobs.get());
 
 		final ArrayList<Map.Entry<Integer, Double>> result;
 		if (includeStrains) {
@@ -491,7 +494,7 @@ public class AccessReferenceDatabase implements Closeable {
 	 * creates a task to submitted to the service. This task will recursively submit further tasks and will call shutdown() once all tasks have been completed
 	 */
 	private Runnable createTasksRec(int taxonId, Collection<MashSketch> querySketches, Set<String> kmers, int minSharedKMers, ConcurrentHashMap<Integer, Double> id2distance,
-									ProgressListener progress, Single<Exception> exception, AtomicInteger jobCount, ExecutorService service) {
+									ProgressListener progress, Single<Exception> exception, AtomicInteger activeJobs, AtomicInteger totalJobs, ExecutorService service) {
 		return () -> {
 			if (exception.get() == null) {
 				try {
@@ -502,8 +505,8 @@ public class AccessReferenceDatabase implements Closeable {
 						final var bloomFilter = pair.getSecond();
 						if (bloomFilter == null || bloomFilter.cardinality() < database.getMashS() || bloomFilter.countContainedProbably(kmers) >= minSharedKMers) {
 							final var id = pair.getFirst();
-							jobCount.incrementAndGet();
-							service.submit(createTasksRec(id, querySketches, kmers, minSharedKMers, id2distance, progress, exception, jobCount, service));
+							activeJobs.incrementAndGet();
+							service.submit(createTasksRec(id, querySketches, kmers, minSharedKMers, id2distance, progress, exception, activeJobs, totalJobs, service));
 							//System.err.println("Adding bloom filter for " + id);
 						}
 						progress.incrementProgress();
@@ -511,6 +514,7 @@ public class AccessReferenceDatabase implements Closeable {
 					final var mashSketches = database.getMashSketches(ids);
 					for (var pair : mashSketches) {
 						final var mashSketch = pair.getSecond();
+						totalJobs.incrementAndGet();
 						for (var sketch : querySketches) {
 							if (MashDistance.computeIntersection(mashSketch, sketch) >= minSharedKMers) {
 								final var id = pair.getFirst();
@@ -520,7 +524,7 @@ public class AccessReferenceDatabase implements Closeable {
 										id2distance.put(id, distance);
 									}
 								}
-								if (verbose)
+								if (false && verbose)
 									System.err.printf("Found similar: " + id + " " + database.getName(id) + " JI: %f dist: %.8f%n", MashDistance.computeJaccardIndex(mashSketch, sketch), distance);
 							}
 						}
@@ -530,7 +534,7 @@ public class AccessReferenceDatabase implements Closeable {
 					exception.setIfCurrentValueIsNull(ex);
 				}
 			}
-			if (jobCount.decrementAndGet() <= 0)
+			if (activeJobs.decrementAndGet() <= 0)
 				service.shutdown();
 		};
 	}
