@@ -30,6 +30,7 @@ import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
 import splitstree6.compute.autumn.hybridnetwork.ComputeHybridizationNetwork;
 import splitstree6.compute.autumn.hybridnumber.RerootByHybridNumber;
+import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.TreesUtils;
@@ -104,6 +105,13 @@ public class AutumnAlgorithm extends Trees2Trees {
 		}
 		outputData.getTrees().addAll(ComputeHybridizationNetwork.apply(taxaBlock, firstTree, secondTree, progress, hybridNumber, isOptionOnlyOneNetwork()));
 		outputData.setReticulated(hybridNumber.get() > 0);
+
+		if (outputData.getTrees().size() == 1) {
+			NetworkUtils.setEdgeWeights(treesBlock.getTrees(), outputData.getTrees().get(0), true, 3000);
+		}
+
+
+
 		var taxa = BitSetUtils.union(BitSetUtils.asBitSet(firstTree.getTaxa()), BitSetUtils.asBitSet(secondTree.getTaxa()));
 		outputData.setPartial(!taxa.equals(taxaBlock.getTaxaSet()));
 		outputData.setRooted(true);

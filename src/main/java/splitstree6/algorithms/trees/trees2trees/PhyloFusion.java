@@ -32,6 +32,8 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
+import jloda.util.Pair;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.MutualRefinement;
 import splitstree6.compute.phylofusion.NetworkUtils;
@@ -65,6 +67,8 @@ public class PhyloFusion extends Trees2Trees {
 
 	private final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
 
+	private final BooleanProperty optionExperimental = new SimpleBooleanProperty(this, "optionExperimental");
+
 	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
 
 	{
@@ -72,6 +76,7 @@ public class PhyloFusion extends Trees2Trees {
 		ProgramProperties.track(optionSearchHeuristic, Search::valueOf, Search.Thorough);
 		ProgramProperties.track(optionCladeReduction, true);
 		ProgramProperties.track(optionOnlyOneNetwork, true);
+		ProgramProperties.track(optionExperimental, true);
 	}
 
 	@Override
@@ -88,8 +93,9 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionCladeReduction.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionExperimental.getName()); //, optionCladeReduction.getName()); //, optionCalculateWeights.getName());
 	}
+	// cladeReduction is not optional, there is a bug when it is not set ;-(
 
 	@Override
 	public String getToolTip(String optionName) {
@@ -104,6 +110,7 @@ public class PhyloFusion extends Trees2Trees {
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
 			case "optionCladeReduction" -> "allow clade reduction as well as subtree reduction";
+			case "optionExperimental" -> "run latest modifications";
 			default -> super.getToolTip(optionName);
 		};
 	}
@@ -120,13 +127,16 @@ public class PhyloFusion extends Trees2Trees {
 		List<PhyloTree> inputTrees;
 		if (isOptionMutualRefinement()) {
 			inputTrees = MutualRefinement.apply(treesBlock.getTrees(), MutualRefinement.Strategy.All, false);
-			if (false)
+			if (verbose)
 				System.err.println("Refined:\n" + NewickIO.toString(inputTrees, false));
 		} else {
 			inputTrees = treesBlock.getTrees().stream().map(PhyloTree::new).toList();
 		}
 
 		var result = computeRec(progress, inputTrees);
+		var hybridizationNumber = result.get(0).nodeStream().filter(v -> v.getInDegree() > 0).mapToInt(v -> v.getInDegree() - 1).sum();
+		System.err.println("Hybridization number: " + hybridizationNumber);
+
 		outputBlock.setPartial(false);
 		outputBlock.setRooted(true);
 
@@ -160,19 +170,176 @@ public class PhyloFusion extends Trees2Trees {
 				network.delDivertex(v);
 			}
 
-			if (count == 1 && isOptionCalculateWeights()) {
+			if (count <= 10 && isOptionCalculateWeights()) {
 				NetworkUtils.setEdgeWeights(treesBlock.getTrees(), network, isOptionNormalizeEdgeWeights(), 3000);
 			}
+			if (network.getRoot().getOutDegree() == 1)
+				network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
 			if (optionSearchHeuristic.get() == Search.Fast)
 				break; // only copy one
 		}
 	}
 
 	private List<PhyloTree> computeRec(ProgressListener progress, List<PhyloTree> trees) throws IOException {
-		var taxa = new BitSet();
+		if (trees.size() == 1) {
+			if (verbose)
+				System.err.println("Single tree");
+			return List.of(new PhyloTree(trees.get(0)));
+		}
+
+		final var taxa = new BitSet();
 		for (var tree : trees) {
 			taxa.or(BitSetUtils.asBitSet(tree.getTaxa()));
 		}
+		var taxLabelMap = new HashMap<Integer, String>();
+		trees.forEach(tree -> tree.nodeStream().filter(Node::isLeaf).forEach(v -> taxLabelMap.putIfAbsent(tree.getTaxon(v), tree.getLabel(v))));
+
+		if (verbose)
+			System.err.println("computeRec----");
+
+		var repOthersMap = new HashMap<Integer, BitSet>();
+
+		if (isOptionExperimental()) { // find all sets of un-separated taxa and replace each set by a single representative taxon
+			var graph = new Graph();
+			var taxonNodeMap = new TreeMap<Integer, Node>();
+			for (var t : BitSetUtils.members(taxa)) {
+				var v = graph.newNode();
+				taxonNodeMap.put(t, v);
+				v.setInfo(t);
+			}
+
+			for (var tree : trees) {
+				if (verbose)
+					System.err.println("Top Tree: " + tree.toBracketString(false));
+
+				var leaves = tree.nodeStream().filter(Node::isLeaf).toList();
+				for (var la : leaves) {
+					var ta = tree.getTaxon(la);
+					var v = taxonNodeMap.get(ta);
+					for (var lb : leaves) {
+						if (la.getParent() != lb.getParent()) {
+							var tb = tree.getTaxon(lb);
+							var w = taxonNodeMap.get(tb);
+							if (!v.isAdjacent(w)) {
+								graph.newEdge(v, w);
+								if (verbose)
+									System.err.println("Separated: " + taxLabelMap.get(ta) + " " + taxLabelMap.get(tb));
+							}
+						}
+					}
+				}
+			}
+			computeComplement(graph);
+
+			if (verbose) {
+				var nodes = IteratorUtils.asList(graph.nodes());
+				for (var i = 0; i < nodes.size(); i++) {
+					var v = nodes.get(i);
+					var ta = (Integer) v.getInfo();
+					for (var j = i + 1; j < nodes.size(); j++) {
+						var w = nodes.get(j);
+						var tb = (Integer) w.getInfo();
+						if (v.isAdjacent(w)) {
+							System.err.println("Not separated: " + taxLabelMap.get(ta) + " and " + taxLabelMap.get(tb));
+						}
+					}
+				}
+			}
+			var treeTaxaSets = trees.stream().map(tree -> BitSetUtils.asBitSet(tree.getTaxa())).toList();
+
+			try (var visited = graph.newNodeSet()) {
+				for (var v : graph.nodes()) {
+					if (!visited.contains(v)) {
+						var component = new ArrayList<Integer>();
+						var stack = new Stack<Node>();
+						stack.push(v);
+						visited.add(v);
+						while (!stack.isEmpty()) {
+							v = stack.pop();
+							if (!component.contains((Integer) v.getInfo())) {
+								component.add((Integer) v.getInfo());
+							}
+							for (var w : v.adjacentNodes()) {
+								if (!visited.contains(w)) {
+									stack.push(w);
+									visited.add(v);
+								}
+							}
+						}
+
+						{ // representative has to appear in every tree that a node that it is representing appears
+							if (component.size() > 1) {
+								var bestRep = 0;
+								var bestOthers = new BitSet();
+								for (var i = 0; i < component.size(); i++) {
+									var rep = (int) component.get(i);
+									var others = new BitSet();
+									for (var taxon : component) {
+										if (taxon != rep && treeTaxaSets.stream().noneMatch(s -> s.get(taxon) && !s.get(rep))) {
+											others.set(taxon);
+										}
+										if (others.cardinality() > bestOthers.cardinality()) {
+											bestRep = rep;
+											bestOthers = others;
+										}
+									}
+								}
+								if (bestOthers.cardinality() > 0) {
+									repOthersMap.put(bestRep, bestOthers);
+								}
+							}
+						}
+					}
+				}
+			}
+			if (!repOthersMap.isEmpty()) {
+				// make copy of trees:
+				{
+					var tmp = new ArrayList<PhyloTree>();
+					for (var tree : trees) {
+						tmp.add(new PhyloTree(tree));
+					}
+					trees = tmp;
+				}
+
+				if (verbose)
+					System.err.println("Before: " + StringUtils.toString(BitSetUtils.asList(taxa).stream().map(taxLabelMap::get).toList(), " "));
+
+				for (var t : repOthersMap.keySet()) {
+					var bitSet = repOthersMap.get(t);
+					if (verbose)
+						System.err.println("t=" + taxLabelMap.get(t) + " set=" + StringUtils.toString(BitSetUtils.asList(bitSet).stream().map(taxLabelMap::get).toList(), " "));
+
+					for (var tree : trees) {
+						var treeTaxa = BitSetUtils.asBitSet(tree.getTaxa());
+						if (treeTaxa.intersects(bitSet)) {
+							if (verbose)
+								System.err.println("Before: " + tree.toBracketString(false));
+							var parents = new HashSet<Node>();
+							tree.nodeStream().filter(Node::isLeaf).filter(v -> bitSet.get(tree.getTaxon(v)))
+									.forEach(v -> {
+										parents.add(v.getParent());
+										tree.deleteNode(v);
+									});
+							for (var p : parents) {
+								if (p.getInDegree() == 1 && p.getOutDegree() == 1 && p.getParent() != tree.getRoot())
+									tree.delDivertex(p);
+							}
+							if (verbose)
+								System.err.println("After: " + tree.toBracketString(false));
+						}
+					}
+				}
+				if (verbose)
+					System.err.println("After: " + StringUtils.toString(BitSetUtils.asList(taxa).stream().map(taxLabelMap::get).toList(), " "));
+
+			}
+			taxa.clear();
+			for (var tree : trees) {
+				taxa.or(BitSetUtils.asBitSet(tree.getTaxa()));
+			}
+		}
+
 		Graph incompatibityGraph;
 		var clusters = new ArrayList<BitSet>();
 		var clusterIGMap = new HashMap<BitSet, Node>();
@@ -247,9 +414,9 @@ public class PhyloFusion extends Trees2Trees {
 
 		} else {
 			var rep = BitSetUtils.min(separator);
-			var networksBelow = computeRec(progress, computeTreesBelow(trees, separator));
+			var networksBelow = computeRec(progress, computeTreesBelow(trees, taxLabelMap, separator));
 
-			var networksAbove = computeRec(progress, computeTreesAbove(trees, separator, rep));
+			var networksAbove = computeRec(progress, computeTreesAbove(trees, taxLabelMap, separator, rep));
 
 			var result = new ArrayList<PhyloTree>();
 			for (var networkAbove : networksAbove) {
@@ -296,11 +463,46 @@ public class PhyloFusion extends Trees2Trees {
 						break;
 				}
 			}
+			if (!repOthersMap.isEmpty()) { // add all the represented taxa to the networks
+				for (var network : result) {
+					network.nodeStream().filter(Node::isLeaf).filter(v -> repOthersMap.containsKey(network.getTaxon(v)))
+							.forEach(v -> {
+								var p = v.getParent();
+								network.deleteEdge(p.getEdgeTo(v));
+								var q = network.newNode();
+								network.newEdge(p, q);
+								network.newEdge(q, v);
+								for (var t : BitSetUtils.members(repOthersMap.get(network.getTaxon(v)))) {
+									var w = network.newNode();
+									network.addTaxon(w, t);
+									network.setLabel(w, taxLabelMap.get(t));
+									network.newEdge(q, w);
+								}
+							});
+				}
+			}
 			return result;
 		}
 	}
 
-	private List<PhyloTree> computeTreesBelow(List<PhyloTree> trees, BitSet taxa) {
+	public static void computeComplement(Graph graph) {
+		var newPairs = new ArrayList<Pair<Node, Node>>();
+		var nodes = IteratorUtils.asList(graph.nodes());
+		for (var i = 0; i < nodes.size(); i++) {
+			var v = nodes.get(i);
+			for (var j = i + 1; j < nodes.size(); j++) {
+				var w = nodes.get(j);
+				if (!v.isAdjacent(w))
+					newPairs.add(new Pair<>(v, w));
+			}
+		}
+		graph.deleteAllEdges();
+		for (var pair : newPairs) {
+			graph.newEdge(pair.getFirst(), pair.getSecond());
+		}
+	}
+
+	private List<PhyloTree> computeTreesBelow(List<PhyloTree> trees, Map<Integer, String> taxonLabelMap, BitSet taxa) {
 		var clusterSets = new HashSet<HashSet<BitSet>>();
 		for (var tree : trees) {
 			var clusters = new HashSet<BitSet>();
@@ -316,12 +518,13 @@ public class PhyloFusion extends Trees2Trees {
 		for (var clusters : clusterSets) {
 			var tree = new PhyloTree();
 			ClusterPoppingAlgorithm.apply(clusters, tree);
+			tree.nodeStream().filter(Node::isLeaf).forEach(v -> tree.setLabel(v, taxonLabelMap.get(tree.getTaxon(v))));
 			result.add(tree);
 		}
 		return result;
 	}
 
-	private List<PhyloTree> computeTreesAbove(List<PhyloTree> trees, BitSet taxa, int rep) {
+	private List<PhyloTree> computeTreesAbove(List<PhyloTree> trees, Map<Integer, String> taxonLabelMap, BitSet taxa, int rep) {
 		var clusterSets = new HashSet<HashSet<BitSet>>();
 		for (var tree : trees) {
 			var clusters = new HashSet<BitSet>();
@@ -339,6 +542,7 @@ public class PhyloFusion extends Trees2Trees {
 		for (var clusters : clusterSets) {
 			var tree = new PhyloTree();
 			ClusterPoppingAlgorithm.apply(clusters, tree);
+			tree.nodeStream().filter(Node::isLeaf).forEach(v -> tree.setLabel(v, taxonLabelMap.get(tree.getTaxon(v))));
 			result.add(tree);
 		}
 		return result;
@@ -453,5 +657,13 @@ public class PhyloFusion extends Trees2Trees {
 
 	public void setOptionOnlyOneNetwork(boolean onlyOneNetwork) {
 		optionOnlyOneNetwork.set(onlyOneNetwork);
+	}
+
+	public boolean isOptionExperimental() {
+		return optionExperimental.get();
+	}
+
+	public BooleanProperty optionExperimentalProperty() {
+		return optionExperimental;
 	}
 }

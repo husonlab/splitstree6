@@ -19,10 +19,8 @@
 
 package splitstree6.compute.phylofusion;
 
-import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
-import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloGraph;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
@@ -341,30 +339,6 @@ public class PhyloFusionAlgorithm {
 						network.newEdge(v, w);
 					}
 				}
-			}
-		}
-
-
-		if (false) { // this heuristic does not work and should not be used
-			/*
-			bad example:
-				(((a,((b,c),d)),e),f);
-				(((a,d,c,e),b),f);
-			 */
-			try (NodeArray<Node> reticulationLSAMap = network.newNodeArray()) {
-				LSAUtils.computeLSAChildrenMap(network, reticulationLSAMap);
-				var toDelete = new ArrayList<Edge>();
-				for (var v : reticulationLSAMap.keySet()) {
-					var lsa = reticulationLSAMap.get(v);
-					for (var e : v.inEdges()) {
-						if (e.getSource() == lsa)
-							toDelete.add(e);
-					}
-				}
-				for (var e : toDelete) {
-					network.deleteEdge(e);
-				}
-				network.clearLsaChildrenMap();
 			}
 		}
 
