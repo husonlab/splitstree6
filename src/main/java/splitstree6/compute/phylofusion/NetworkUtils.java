@@ -140,7 +140,6 @@ public class NetworkUtils {
 		return set;
 	}
 
-
 	public static boolean check(PhyloTree network) {
 		var ok = true;
 		if (!IsDAG.apply(network)) {

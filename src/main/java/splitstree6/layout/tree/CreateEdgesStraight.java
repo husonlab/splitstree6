@@ -64,6 +64,7 @@ public class CreateEdgesStraight {
 			line.setFill(Color.TRANSPARENT);
 			line.setStrokeLineCap(StrokeLineCap.ROUND);
 			line.setStrokeWidth(1);
+			line.setPickOnBounds(false);
 
 			if (tree.isTreeEdge(e))
 				line.getStyleClass().add("graph-edge");

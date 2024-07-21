@@ -157,6 +157,7 @@ public class Connectors {
 					var shape2 = taxonShapeMap2.get(taxon);
 					if (shape1 != null && shape2 != null) {
 						var line = new Path();
+						line.setPickOnBounds(false);
 						group.getChildren().add(line);
 						taxonConnectorMap.put(taxon, line);
 

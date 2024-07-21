@@ -290,6 +290,8 @@ public class DensiTreeDrawer {
 				case RoundedPhylogram ->
 						new Path(new MoveTo(p.getX(), p.getY()), new QuadCurveTo(p.getX(), q.getY(), q.getX(), q.getY()));
 			};
+			shape.setPickOnBounds(false);
+
 			e.setData(shape);
 			shape.getStyleClass().add("graph-special-edge");
 			shape.setStrokeWidth(1.5);
