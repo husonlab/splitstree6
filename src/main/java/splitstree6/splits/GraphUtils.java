@@ -19,13 +19,17 @@
 
 package splitstree6.splits;
 
+import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
+import jloda.util.IteratorUtils;
+import jloda.util.Pair;
 
+import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
- * some phylograph utilities
+ * some graph utilities
  * Daniel Huson, 2.2019
  */
 public class GraphUtils {
@@ -45,6 +49,28 @@ public class GraphUtils {
 				graph.setLabel(v, taxonLabel.apply(t));
 			else
 				graph.setLabel(v, graph.getLabel(v) + ", " + taxonLabel.apply(t));
+		}
+	}
+
+	/**
+	 * convert the graph into its complement
+	 *
+	 * @param graph the graph
+	 */
+	public static void convertToComplement(Graph graph) {
+		var newPairs = new ArrayList<Pair<Node, Node>>();
+		var nodes = IteratorUtils.asList(graph.nodes());
+		for (var i = 0; i < nodes.size(); i++) {
+			var v = nodes.get(i);
+			for (var j = i + 1; j < nodes.size(); j++) {
+				var w = nodes.get(j);
+				if (!v.isAdjacent(w))
+					newPairs.add(new Pair<>(v, w));
+			}
+		}
+		graph.deleteAllEdges();
+		for (var pair : newPairs) {
+			graph.newEdge(pair.getFirst(), pair.getSecond());
 		}
 	}
 }
