@@ -101,7 +101,7 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			/*
 			case ClosestTree -> {
 				compatibility = Compatibility.compatible;
-				yield ClosestTree.apply(progress, taxaBlock.getNtax(), parent.getSplits(), parent.getCycle());
+				yield ClosestTree.recursion(progress, taxaBlock.getNtax(), parent.getSplits(), parent.getCycle());
 			}
 			 */
 			case GreedyWeaklyCompatible ->

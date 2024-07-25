@@ -39,7 +39,7 @@ public class MutualRefinement {
 	}
 
 	/**
-	 * apply mutual refinement
+	 * recursion mutual refinement
 	 *
 	 * @param trees            input trees
 	 * @param strategy         All: use all clusters, Majority, use clusters found in the majority of trees,

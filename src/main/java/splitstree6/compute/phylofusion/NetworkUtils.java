@@ -150,12 +150,34 @@ public class NetworkUtils {
 		if (roots.size() != 1) {
 			System.err.println("Wrong number of root nodes: " + roots.size());
 			ok = false;
+			for (var v : roots) {
+				var below = new Counter();
+				network.postorderTraversal(v, w -> {
+					if (w.isLeaf())
+						below.increment();
+				});
+				System.err.println("below v=" + v + ": " + below + " leaves");
+			}
 		}
 		if (network.getRoot() == null) {
 			System.err.println("Root node not declared");
+			ok = false;
 
 		} else if (!roots.contains(network.getRoot())) {
 			System.err.println("Network declared root has wrong in-degree: " + network.getRoot().getInDegree());
+			ok = false;
+		}
+
+		{
+			var taxaInNetwork = BitSetUtils.asBitSet(network.getTaxa());
+			var taxaOnLeaves = BitSetUtils.asBitSet(network.nodeStream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray());
+			if (!taxaOnLeaves.equals(taxaInNetwork)) {
+				System.err.println("Taxa in network and on leaves differ");
+				System.err.println("Taxa in network:   " + StringUtils.toString(taxaInNetwork));
+				System.err.println("Taxa in on leaves: " + StringUtils.toString(taxaOnLeaves));
+				ok = false;
+			}
+
 		}
 
 		for (var v : network.nodes()) {
@@ -192,6 +214,8 @@ public class NetworkUtils {
 				ok = false;
 			}
 		}
+		if (!ok)
+			System.err.println("bad: " + network.toBracketString(false));
 		return ok;
 	}
 

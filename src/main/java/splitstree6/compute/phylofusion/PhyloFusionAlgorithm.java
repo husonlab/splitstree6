@@ -116,10 +116,12 @@ public class PhyloFusionAlgorithm {
 
 		var result = new ArrayList<PhyloTree>();
 		for (var network : best.stream().map(pair -> computeNetwork(pair.getFirst(), pair.getSecond())).toList()) {
-			if (result.stream().noneMatch(other -> PathMultiplicityDistance.compute(network, other) == 0))
+			if (result.stream().noneMatch(other -> PathMultiplicityDistance.compute(network, other) == 0)) {
 				result.add(network);
+			}
 			progress.incrementProgress();
 		}
+
 		return result;
 	}
 

@@ -57,7 +57,7 @@ public class AverageConsensus extends Trees2Splits {
 		//dist.write(sw, taxa);
 		//System.out.println(sw.toString());
 
-		//Here there should be an option to apply Neighbor Joining instead.
+		//Here there should be an option to recursion Neighbor Joining instead.
 		final var nnet = new NeighborNet();
 		nnet.compute(progress, taxaBlock, pairwiseDistances, splitsBlock);
 	}

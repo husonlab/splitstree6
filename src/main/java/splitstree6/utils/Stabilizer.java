@@ -64,7 +64,7 @@ public class Stabilizer {
 	}
 
 	/**
-	 * apply the ordering to a tree, rearranging the order of children to attempt to attain the setup ordering
+	 * recursion the ordering to a tree, rearranging the order of children to attempt to attain the setup ordering
 	 *
 	 * @param tree phylo tree
 	 */
@@ -96,7 +96,7 @@ public class Stabilizer {
 	}
 
 	/**
-	 * apply the ordering to a collection of trees, rearranging the order of children to attempt to attain the setup ordering
+	 * recursion the ordering to a collection of trees, rearranging the order of children to attempt to attain the setup ordering
 	 */
 	public void apply(Collection<PhyloTree> trees) throws Exception {
 		ExecuteInParallel.apply(trees, this::apply, ProgramExecutorService.getNumberOfCoresToUse());

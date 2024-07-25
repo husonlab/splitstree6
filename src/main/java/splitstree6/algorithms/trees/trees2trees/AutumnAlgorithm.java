@@ -106,6 +106,12 @@ public class AutumnAlgorithm extends Trees2Trees {
 		outputData.getTrees().addAll(ComputeHybridizationNetwork.apply(taxaBlock, firstTree, secondTree, progress, hybridNumber, isOptionOnlyOneNetwork()));
 		outputData.setReticulated(hybridNumber.get() > 0);
 
+		for (var network : outputData.getTrees()) {
+			for (var v : network.nodeStream().filter(network::isUnlabeledDiVertex).toList()) {
+				network.delDivertex(v);
+			}
+		}
+
 		if (outputData.getTrees().size() == 1) {
 			NetworkUtils.setEdgeWeights(treesBlock.getTrees(), outputData.getTrees().get(0), true, 3000);
 		}
