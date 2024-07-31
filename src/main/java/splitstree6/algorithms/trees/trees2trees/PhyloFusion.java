@@ -54,8 +54,8 @@ import java.util.*;
  * Daniel Huson, 5.2024
  */
 public class PhyloFusion extends Trees2Trees {
-	private boolean verbose = false;
-	private boolean checkAllPartialResults = false;
+	private boolean verbose = false; // for debugging
+	private boolean checkAllPartialResults = false; // for debugging
 
 	public enum Search {
 		SuperThorough, Thorough, Medium, Fast;
@@ -86,7 +86,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	private final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
 
-	private final BooleanProperty optionExperimental = new SimpleBooleanProperty(this, "optionExperimental");
+	private final BooleanProperty optionGroupNonSeparated = new SimpleBooleanProperty(this, "optionGroupNonSeparated");
 
 	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
 
@@ -95,7 +95,7 @@ public class PhyloFusion extends Trees2Trees {
 		ProgramProperties.track(optionSearchHeuristic, Search::valueOf, Search.Thorough);
 		ProgramProperties.track(optionCladeReduction, true);
 		ProgramProperties.track(optionOnlyOneNetwork, true);
-		ProgramProperties.track(optionExperimental, true);
+		ProgramProperties.track(optionGroupNonSeparated, true);
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionExperimental.getName()); //, optionCladeReduction.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionGroupNonSeparated.getName(), optionCladeReduction.getName()); //, optionCalculateWeights.getName());
 	}
 	// cladeReduction is not optional, there is a bug when it is not set ;-(
 
@@ -128,8 +128,9 @@ public class PhyloFusion extends Trees2Trees {
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
-			case "optionCladeReduction" -> "allow clade reduction as well as subtree reduction";
-			case "optionExperimental" -> "run latest modifications";
+			case "optionCladeReduction" -> "improve performance using clade reduction";
+			case "optionGroupNonSeparated" ->
+					"improve performance by grouping taxa that are not separated by an non-trivial edge";
 			default -> super.getToolTip(optionName);
 		};
 	}
@@ -141,7 +142,7 @@ public class PhyloFusion extends Trees2Trees {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
 		progress.setTasks("PhyloFusion", "init");
 
-		TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.25);
+		TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.20);
 
 		List<PhyloTree> inputTrees;
 		if (isOptionMutualRefinement()) {
@@ -208,6 +209,8 @@ public class PhyloFusion extends Trees2Trees {
 	 * @throws IOException something went wrong
 	 */
 	private List<PhyloTree> computeRec(ProgressListener progress, List<PhyloTree> trees) throws IOException {
+		removeDuplicates(trees);
+
 		if (trees.size() == 1) {
 			if (verbose)
 				System.err.println("Single tree");
@@ -228,9 +231,9 @@ public class PhyloFusion extends Trees2Trees {
 		if (verbose)
 			System.err.println("computeRec----");
 
-		var repCoveredMap = new HashMap<Integer, BitSet>();
-		if (isOptionExperimental())
-			repCoveredMap.putAll(removeCoveredTaxa(taxa,trees,taxLabelMap));
+		var repGroupMap = new HashMap<Integer, BitSet>();
+		if (getOptionGroupNonSeparated())
+			repGroupMap.putAll(groupNonSeparatedTaxa(taxa, trees, taxLabelMap));
 
 		Graph incompatibityGraph;
 		var clusters = new ArrayList<BitSet>();
@@ -266,7 +269,7 @@ public class PhyloFusion extends Trees2Trees {
 		if (incompatibityGraph.nodeStream().noneMatch(v -> v.getDegree() > 0)) {
 			var tree = new PhyloTree();
 			ClusterPoppingAlgorithm.apply(clusters, tree);
-			return addCoveredBack(repCoveredMap, taxLabelMap, List.of(tree));
+			return restoreGroupedTaxa(repGroupMap, taxLabelMap, List.of(tree));
 
 		}
 		// find a cluster that is compatible with all, if one exists
@@ -299,7 +302,7 @@ public class PhyloFusion extends Trees2Trees {
 			if (trees.size() == 1) {
 				if (verbose)
 					System.err.println("Single tree");
-				return addCoveredBack(repCoveredMap, taxLabelMap, List.of(new PhyloTree(trees.get(0))));
+				return restoreGroupedTaxa(repGroupMap, taxLabelMap, List.of(new PhyloTree(trees.get(0))));
 			} else {
 				// run the algorithm
 				if (verbose)
@@ -307,7 +310,7 @@ public class PhyloFusion extends Trees2Trees {
 				var numberOfRandomOrderings = getOptionSearchHeuristic().numberOfRandomOrderings(taxa.cardinality());
 				var resultList = PhyloFusionAlgorithm.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
 
-				addCoveredBack(repCoveredMap, taxLabelMap, resultList);
+				restoreGroupedTaxa(repGroupMap, taxLabelMap, resultList);
 
 				if (checkAllPartialResults) {
 					for (var network : resultList) {
@@ -412,7 +415,7 @@ public class PhyloFusion extends Trees2Trees {
 				}
 			}
 
-			addCoveredBack(repCoveredMap, taxLabelMap, resultList);
+			restoreGroupedTaxa(repGroupMap, taxLabelMap, resultList);
 
 			if (checkAllPartialResults) {
 				for (var network : resultList) {
@@ -425,14 +428,34 @@ public class PhyloFusion extends Trees2Trees {
 	}
 
 	/**
-	 * remoce all taxa that are covered by some other taxon
+	 * remove duplicate trees
+	 *
+	 * @param trees trees
+	 */
+	private void removeDuplicates(List<PhyloTree> trees) {
+		var result = new ArrayList<PhyloTree>();
+		var sets = new HashSet<Set<BitSet>>();
+		for (var tree : trees) {
+			var clusters = TreesUtils.collectAllHardwiredClusters(tree);
+			if (sets.add(clusters)) {
+				result.add(tree);
+			}
+		}
+		if (result.size() < trees.size()) {
+			trees.clear();
+			trees.addAll(result);
+		}
+	}
+
+	/**
+	 * remove all taxa that are covered by some other taxon
 	 *
 	 * @param taxa        input taxa
 	 * @param trees       input trees
 	 * @param taxLabelMap tax-label map
 	 * @return representative to covered taxa mapp
 	 */
-	private Map<Integer, BitSet> removeCoveredTaxa(final BitSet taxa, final List<PhyloTree> trees, final Map<Integer, String> taxLabelMap) {
+	private Map<Integer, BitSet> groupNonSeparatedTaxa(final BitSet taxa, final List<PhyloTree> trees, final Map<Integer, String> taxLabelMap) {
 		final var repOthersMap = new HashMap<Integer, BitSet>();
 		var graph = new Graph();
 		var taxonNodeMap = new TreeMap<Integer, Node>();
@@ -466,10 +489,12 @@ public class PhyloFusion extends Trees2Trees {
 		GraphUtils.convertToComplement(graph);
 
 		var treeTaxaSets = trees.stream().map(tree -> BitSetUtils.asBitSet(tree.getTaxa())).toList();
+
 		for (var e : IteratorUtils.asList(graph.edges())) {
 			var s = (Integer) e.getSource().getInfo();
 			var t = (Integer) e.getTarget().getInfo();
-			if (treeTaxaSets.stream().noneMatch(set -> set.get(s) && set.get(t)))
+			if (treeTaxaSets.stream().noneMatch(set -> set.get(s) && set.get(t)) ||
+				treeTaxaSets.stream().filter(set -> set.get(s)).count() == 1 || treeTaxaSets.stream().filter(set -> set.get(t)).count()==1)
 				graph.deleteEdge(e);
 		}
 
@@ -586,24 +611,24 @@ public class PhyloFusion extends Trees2Trees {
 	}
 
 	/**
-	 * add all covered taxa into the networks
+	 * add all group taxa into the networks
 	 *
-	 * @param repCoveredMap map of representatives to covered taxa
+	 * @param repGroupMap map of representatives to grouped taxa
 	 * @param taxLabelMap   taxon to label map
 	 * @param networks      the networks
 	 * @return the networks
 	 */
-	private List<PhyloTree> addCoveredBack(Map<Integer, BitSet> repCoveredMap, Map<Integer, String> taxLabelMap, List<PhyloTree> networks) {
-		if (!repCoveredMap.isEmpty()) { // add all the represented taxa to the networks
+	private List<PhyloTree> restoreGroupedTaxa(Map<Integer, BitSet> repGroupMap, Map<Integer, String> taxLabelMap, List<PhyloTree> networks) {
+		if (!repGroupMap.isEmpty()) {
 			for (var network : networks) {
-				IteratorUtils.asStream(network.nodes()).filter(Node::isLeaf).filter(v -> repCoveredMap.containsKey(network.getTaxon(v)))
+				IteratorUtils.asStream(network.nodes()).filter(Node::isLeaf).filter(v -> repGroupMap.containsKey(network.getTaxon(v)))
 						.forEach(v -> {
 							var p = v.getParent();
 							network.deleteEdge(p.getEdgeTo(v));
 							var q = network.newNode();
 							network.newEdge(p, q);
 							network.newEdge(q, v);
-							for (var t : BitSetUtils.members(repCoveredMap.get(network.getTaxon(v)))) {
+							for (var t : BitSetUtils.members(repGroupMap.get(network.getTaxon(v)))) {
 								var w = network.newNode();
 								network.addTaxon(w, t);
 								network.setLabel(w, taxLabelMap.get(t));
@@ -796,11 +821,11 @@ public class PhyloFusion extends Trees2Trees {
 		optionOnlyOneNetwork.set(onlyOneNetwork);
 	}
 
-	public boolean isOptionExperimental() {
-		return optionExperimental.get();
+	public boolean getOptionGroupNonSeparated() {
+		return optionGroupNonSeparated.get();
 	}
 
-	public BooleanProperty optionExperimentalProperty() {
-		return optionExperimental;
+	public BooleanProperty optionGroupNonSeparatedProperty() {
+		return optionGroupNonSeparated;
 	}
 }
