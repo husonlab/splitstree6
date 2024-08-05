@@ -41,7 +41,7 @@ import java.util.HashMap;
  */
 public class NetworkEdits {
 	/**
-	 * recursion the recorded edits
+	 * apply the recorded edits
 	 *
 	 * @param editsString         string of all edits
 	 * @param labeledNodeShapeMap labeled node shape map

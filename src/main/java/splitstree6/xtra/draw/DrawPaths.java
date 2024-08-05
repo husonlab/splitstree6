@@ -1,5 +1,5 @@
 /*
- *  DrawNetwork.java Copyright (C) 2024 Daniel H. Huson
+ *  DrawPaths.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -39,7 +39,7 @@ import jloda.util.TriConsumer;
 
 import java.util.ArrayList;
 
-public class DrawNetwork extends Application {
+public class DrawPaths extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -48,21 +48,23 @@ public class DrawNetwork extends Application {
 		pane.setPrefWidth(800);
 		pane.setPrefHeight(800);
 
-		var edges = new ArrayList<Path>();
+		var connectors = new ArrayList<Path>();
 
 		var slider = new Slider(0.1, 20, 4);
 		var clearButton = new Button("Clear");
 		clearButton.setOnAction(e -> pane.getChildren().clear());
 
 		setupDraw(pane, (p, s, t) -> {
-			edges.add(p);
-			p.setUserData(edges.size());
+			connectors.add(p);
+			p.setUserData(connectors.size());
 			p.setStroke(Color.BLACK);
 			p.setFill(Color.TRANSPARENT);
 			pane.getChildren().add(p);
+
 			s.setStroke(Color.BLACK);
 			s.setFill(Color.WHITE);
 			pane.getChildren().add(s);
+
 			t.setStroke(Color.BLACK);
 			t.setFill(Color.BLACK);
 			pane.getChildren().add(t);

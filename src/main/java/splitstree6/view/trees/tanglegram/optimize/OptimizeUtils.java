@@ -428,7 +428,7 @@ public class OptimizeUtils {
 			clusters.add(set);
 			return set;
 		}
-		//recursion
+		//apply
 		else {
 			TreeSet<String> set = new TreeSet<>();
 			for (Edge f : v.outEdges()) {

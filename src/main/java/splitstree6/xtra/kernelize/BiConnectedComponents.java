@@ -112,7 +112,7 @@ public class BiConnectedComponents {
 	}
 
 	/**
-	 * recursion the algorithm
+	 * apply the algorithm
 	 *
 	 * @param graph graph
 	 *              todo: this is untested

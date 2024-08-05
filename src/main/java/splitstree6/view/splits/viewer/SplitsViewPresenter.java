@@ -327,8 +327,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			ProgramExecutorService.submit(100, () -> Platform.runLater(() -> splitNetworkPane.layoutLabels(view.getOptionOrientation())));
 		});
 
-		BasicFX.reportChanges(view.optionDiagramProperty());
-
 		splitsBlock.addListener(updateListener);
 		view.optionDiagramProperty().addListener(updateListener);
 		view.optionRootingProperty().addListener(updateListener);

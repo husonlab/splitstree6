@@ -60,7 +60,7 @@ public class SimilaritiesToDistances {
 	;
 
 	/**
-	 * recursion the transformation to a given distances block
+	 * apply the transformation to a given distances block
 	 *
 	 * @param distancesBlock the distances block
 	 */
