@@ -28,7 +28,8 @@ import jloda.util.*;
 import splitstree6.utils.TreesUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Predicate;
 
 public class NetworkUtils {
@@ -41,7 +42,12 @@ public class NetworkUtils {
 	 */
 	public static boolean setEdgeWeights(Collection<PhyloTree> trees, PhyloTree network, boolean normalizeEdgeWeights, long milliseconds) {
 		try (var edgeClustersMap = collectAllSoftwiredClusters(network, milliseconds)) {
-			var edgeWeightsMap = new ConcurrentHashMap<Edge, Collection<Double>>();
+			var edgeWeightsMap = new HashMap<Edge, Collection<Double>>();
+			var edgeSupportMap = new HashMap<Edge, LongAdder>();
+			for (var e : edgeClustersMap.keySet()) {
+				edgeWeightsMap.put(e, new ConcurrentLinkedQueue<>());
+				edgeSupportMap.put(e, new LongAdder());
+			}
 
 			ExecuteInParallel.apply(trees, tree -> {
 				var treeLength = tree.edgeStream().mapToDouble(tree::getWeight).sum();
@@ -53,6 +59,7 @@ public class NetworkUtils {
 							clusterWeightMap.put(nodeClusterMap.get(v), tree.getWeight(e));
 						}
 					}
+					var seen = new HashSet<BitSet>();
 					for (var entry : edgeClustersMap.entrySet()) {
 						var e = entry.getKey();
 						var clusters = entry.getValue();
@@ -62,7 +69,12 @@ public class NetworkUtils {
 								if (normalizeEdgeWeights && treeLength > 0) {
 									weight /= treeLength;
 								}
-								edgeWeightsMap.computeIfAbsent(e, k -> new HashSet<>()).add(weight);
+								edgeWeightsMap.get(e).add(weight);
+								if (!seen.contains(cluster)) {
+									if (false)
+										edgeSupportMap.get(e).increment();
+									seen.add(cluster);
+								}
 							}
 						}
 					}
@@ -85,6 +97,10 @@ public class NetworkUtils {
 							}
 							hasUndefinedWeights++;
 						}
+					}
+					var support = edgeSupportMap.get(e);
+					if (support != null && support.intValue() > 0) {
+						network.setConfidence(e, support.intValue());
 					}
 				}
 

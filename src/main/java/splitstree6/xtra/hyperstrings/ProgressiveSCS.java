@@ -45,9 +45,8 @@ public class ProgressiveSCS {
 		else if (sequences.size() == 2) {
 			return ShortestCommonHyperSequence.align(sequences.get(0), sequences.get(1));
 		} else if (sequences.size() == 3) {
-			var one = ShortestCommonMultiHyperSequence.align(sequences.get(0).expand(), sequences.get(1).expand());
-			var all = ShortestCommonMultiHyperSequence.align(one, sequences.get(2).expand());
-			return all.flatten();
+			var one = ShortestCommonHyperSequence.align(sequences.get(0), sequences.get(1));
+			return ShortestCommonHyperSequence.align(one, sequences.get(2));
 		}
 		// setup distances for UPGMA
 		var taxa = new TaxaBlock();
@@ -72,18 +71,18 @@ public class ProgressiveSCS {
 		try {
 			var tree = UPGMA.computeUPGMATree(new ProgressSilent(), taxa, distancesBlock);
 			// progressive alignment up tree:
-			try (NodeArray<MultiHyperSequence> mhs = tree.newNodeArray()) {
+			try (NodeArray<HyperSequence> mhs = tree.newNodeArray()) {
 				tree.postorderTraversal(u -> {
 					if (u.isLeaf()) {
 						var sequence = sequences.get(tree.getTaxon(u) - 1);
-						mhs.put(u, sequence.expand());
+						mhs.put(u, sequence);
 					} else {
 						var v = u.getFirstOutEdge().getTarget();
 						var w = u.getLastOutEdge().getTarget();
-						mhs.put(u, ShortestCommonMultiHyperSequence.align(mhs.get(v), mhs.get(w)));
+						mhs.put(u, ShortestCommonHyperSequence.align(mhs.get(v), mhs.get(w)));
 					}
 				});
-				return mhs.get(tree.getRoot()).flatten();
+				return mhs.get(tree.getRoot());
 			}
 		} catch (CanceledException ignored) {
 			// can't happen

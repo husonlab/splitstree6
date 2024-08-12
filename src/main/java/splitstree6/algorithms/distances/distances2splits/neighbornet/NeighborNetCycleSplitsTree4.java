@@ -29,6 +29,7 @@ import java.util.Stack;
 public class NeighborNetCycleSplitsTree4 {
 	/**
 	 * Run the neighbor net algorithm to compute the circular ordering of the taxa
+	 * @return cycle 1-based
 	 */
 	public static int[] compute(int nTax, double[][] dist) {
 		//Special cases. When nTax<=3, the default circular ordering will work.

@@ -22,7 +22,8 @@ package splitstree6.xtra.hyperstrings;
 import jloda.util.BitSetUtils;
 import jloda.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
 
 public record HyperSequence(ArrayList<BitSet> array) {
 
@@ -80,18 +81,7 @@ public record HyperSequence(ArrayList<BitSet> array) {
 		return array.size();
 	}
 
-	/**
-	 * expands a hyper sequence into a multi-hyper sequence
-	 *
-	 * @return multi-hyper sequence
-	 */
-	public MultiHyperSequence expand() {
-		var components = new ArrayList<Set<BitSet>>();
-		for (var set : array()) {
-			var container = new TreeSet<BitSet>(Comparator.comparing(StringUtils::toString));
-			container.add(set);
-			components.add(container);
-		}
-		return new MultiHyperSequence(components);
+	public void removeEmptyElements() {
+		array.removeAll(array.stream().filter(BitSet::isEmpty).toList());
 	}
 }

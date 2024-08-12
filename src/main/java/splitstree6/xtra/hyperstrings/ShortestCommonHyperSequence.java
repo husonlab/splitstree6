@@ -19,114 +19,277 @@
 
 package splitstree6.xtra.hyperstrings;
 
-import jloda.util.BitSetUtils;
-import jloda.util.CollectionUtils;
-import jloda.util.StringUtils;
+import jloda.util.*;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public class ShortestCommonHyperSequence {
+	private static final byte TRACEBACK_INSERT_A = 1;
+	private static final byte TRACEBACK_INSERT_B = 2;
+	private static final byte TRACEBACK_MATCH = 4;
+
 	public static HyperSequence align(HyperSequence a, HyperSequence b) {
-		expandSubSequences(a,b);
+		// System.err.println("Aligning "+a+" vs "+b);
 
 		var m = a.size();
 		var n = b.size();
 
 		var matrix = new int[m + 1][n + 1];
+		var traceback = new byte[m + 1][n + 1]; // |: 1, \ : 2 - : 4
 
-		for (var i = 0; i <= m; i++) {
+		for (var i = 1; i <= m; i++) {
 			matrix[i][0] = i;
+			traceback[i][0] = TRACEBACK_INSERT_A;
 		}
-		for (var j = 0; j <= n; j++) {
+		for (var j = 1; j <= n; j++) {
 			matrix[0][j] = j;
+			traceback[0][j] = TRACEBACK_INSERT_B;
 		}
 
 		for (var i = 1; i <= m; i++) {
+			var i1 = i - 1;
 			for (var j = 1; j <= n; j++) {
-				var value = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1);
-				if (BitSetUtils.contains(a.get(i - 1), b.get(j - 1)) || BitSetUtils.contains(b.get(j - 1), a.get(i - 1)))
-					value = Math.min(value, matrix[i - 1][j - 1]);
-				matrix[i][j] = value;
-			}
-		}
+				var j1 = j - 1;
 
-		var aTrace = new ArrayList<Integer>();
-		var bTrace = new ArrayList<Integer>();
-		// compute the trace:
-		{
-			var i = m;
-			var j = n;
-			// trace back
-			var value = matrix[i][j];
-			while (i > 0 || j > 0) {
-				if (i > 0 && value == matrix[i - 1][j] + 1) {
-					aTrace.add(i - 1);
-					bTrace.add(-1);
-					value = matrix[i - 1][j];
-					i--;
-				} else if (j > 0 && value == matrix[i][j - 1] + 1) {
-					aTrace.add(-1);
-					bTrace.add(j - 1);
-					value = matrix[i][j - 1];
-					j--;
+				var insertionInA = matrix[i1][j] + 1;
+				var insertionInB = matrix[i][j1] + 1;
+
+				if (BitSetUtils.contains(a.get(i1), b.get(j1)) || BitSetUtils.contains(b.get(j1), a.get(i1))) {
+					var match = matrix[i1][j1];
+					var best = NumberUtils.min(insertionInA, insertionInB, match);
+					if (insertionInA == best)
+						traceback[i][j] |= TRACEBACK_INSERT_A;
+					if (insertionInB == best)
+						traceback[i][j] |= TRACEBACK_INSERT_B;
+					if (match == best)
+						traceback[i][j] |= TRACEBACK_MATCH;
+					matrix[i][j] = best;
 				} else {
-					aTrace.add(i - 1);
-					bTrace.add(j - 1);
-					i--;
-					j--;
+					var best = Math.min(insertionInA, insertionInB);
+					if (insertionInA == best)
+						traceback[i][j] |= TRACEBACK_INSERT_A;
+					if (insertionInB == best)
+						traceback[i][j] |= TRACEBACK_INSERT_B;
+					matrix[i][j] = best;
 				}
 			}
-			CollectionUtils.reverseInPlace(aTrace);
-			CollectionUtils.reverseInPlace(bTrace);
 		}
 
+		if (false) {
+			System.err.println("Matrix:");
+			System.err.print("     ");
+			for (var j = 0; j <= n; j++) {
+				System.err.printf(" %02d  ", j);
+			}
+			System.err.println();
 
-		if (false) { // write out the trace:
-			var bufA = new StringBuilder();
-			var bufB = new StringBuilder();
+			for (var i = 0; i <= m; i++) {
+				System.err.printf("%03d:", i);
 
-			for (var p = 0; p < aTrace.size(); p++) {
-				String wordA;
-				String wordB;
-				if (aTrace.get(p) == -1) {
-					wordB = StringUtils.toString(b.get(bTrace.get(p)));
-					wordA = " ".repeat(wordB.length());
-				} else if (bTrace.get(p) == -1) {
-					wordA = StringUtils.toString(a.get(aTrace.get(p)));
-					wordB = " ".repeat(wordA.length());
-				} else {
-					wordA = StringUtils.toString(a.get(aTrace.get(p)));
-					wordB = StringUtils.toString(b.get(bTrace.get(p)));
-					if (wordA.length() < wordB.length()) {
-						wordA += " ".repeat(wordB.length() - wordA.length());
-					} else if (wordB.length() < wordA.length()) {
-						wordB += " ".repeat(wordA.length() - wordB.length());
+				for (var j = 0; j <= n; j++) {
+					var value = matrix[i][j];
+					System.err.printf(" %2dt%d", value, (traceback[i][j]));
+				}
+				System.err.println();
+			}
+		}
+
+		if (true) {
+			var best = new Single<>(Integer.MAX_VALUE);
+			var result = new Single<HyperSequence>();
+			var seen = new HashSet<Pair<ArrayList<Integer>, ArrayList<Integer>>>();
+
+			traceback(m, n, matrix, traceback, 100, (aTrace, bTrace) -> {
+				var pair = new Pair<>(aTrace, bTrace);
+				if (!seen.add(pair))
+					return;
+
+				aTrace = CollectionUtils.reverse(aTrace);
+				bTrace = CollectionUtils.reverse(bTrace);
+				var hyperSequence = new HyperSequence();
+				for (var p = 0; p < aTrace.size(); p++) {
+					var set = new BitSet();
+					if (aTrace.get(p) != -1) {
+						set.or(a.get(aTrace.get(p)));
+					}
+					if (bTrace.get(p) != -1) {
+						set.or(b.get(bTrace.get(p)));
+					}
+					hyperSequence.add(set);
+				}
+
+				// System.err.println("Got: " + hyperSequence);
+
+				var simplified = new HyperSequence();
+				var count = 0;
+				for (var i = 0; i + 1 < hyperSequence.size(); i++) {
+					var set = BitSetUtils.minus(hyperSequence.get(i), hyperSequence.get(i + 1));
+					if (set.cardinality() > 0) {
+						count += set.cardinality();
+						simplified.add(set);
 					}
 				}
-				bufA.append(wordA).append(" : ");
-				bufB.append(wordB).append(" : ");
-			}
-			System.err.println("\nAlignment:");
-			System.err.println(bufA);
-			System.err.println(bufB);
-			System.err.println();
-		}
+				{
+					var last = hyperSequence.get(hyperSequence.size() - 1);
+					count += last.cardinality();
+					simplified.add(last);
+				}
 
-		var sequence = new HyperSequence();
-		for (var p = 0; p < aTrace.size(); p++) {
-			var set = new BitSet();
-			if (aTrace.get(p) != -1) {
-				set.or(a.get(aTrace.get(p)));
-			}
-			if (bTrace.get(p) != -1) {
-				set.or(b.get(bTrace.get(p)));
-			}
-			sequence.add(set);
-		}
+				// System.err.println("Sim: " + simplified);
 
-		return sequence;
+				if (count < best.get()) {
+					best.set(count);
+					result.set(simplified);
+				}
+			});
+
+			//System.err.println("Done "+a+" vs "+b+": "+result.get());
+
+			return result.get();
+		} else {
+			var aTrace = new ArrayList<Integer>();
+			var bTrace = new ArrayList<Integer>();
+			// compute the trace:
+			{
+				var i = m;
+				var j = n;
+				// trace back
+				var value = matrix[m][n];
+				while (i > 0 || j > 0) {
+					if (i > 0 && value == matrix[i - 1][j] + 1) {
+						aTrace.add(i - 1);
+						bTrace.add(-1);
+						value = matrix[i - 1][j];
+						i--;
+					} else if (j > 0 && value == matrix[i][j - 1] + 1) {
+						aTrace.add(-1);
+						bTrace.add(j - 1);
+						value = matrix[i][j - 1];
+						j--;
+					} else {
+						aTrace.add(i - 1);
+						bTrace.add(j - 1);
+						i--;
+						j--;
+					}
+				}
+				CollectionUtils.reverseInPlace(aTrace);
+				CollectionUtils.reverseInPlace(bTrace);
+			}
+
+			if (false) { // write out the trace:
+				reportTrace(a, b, aTrace, bTrace);
+			}
+
+			var sequence = new HyperSequence();
+			for (var p = 0; p < aTrace.size(); p++) {
+				var set = new BitSet();
+				if (aTrace.get(p) != -1) {
+					set.or(a.get(aTrace.get(p)));
+				}
+				if (bTrace.get(p) != -1) {
+					set.or(b.get(bTrace.get(p)));
+				}
+				sequence.add(set);
+			}
+
+			return sequence;
+		}
 	}
 
+	/**
+	 * perform trace back
+	 *
+	 * @param m                 starting row
+	 * @param n                 starting column
+	 * @param matrix            DP matrix
+	 * @param maxResults        the maximum number of results to consider
+	 * @param tracebackConsumer consume the resulting traceback
+	 */
+	private static void traceback(int m, int n, int[][] matrix, byte[][] traceback, int maxResults, BiConsumer<ArrayList<Integer>, ArrayList<Integer>> tracebackConsumer) {
+		traceBackRec(m, n, matrix[m][n], matrix, traceback, new ArrayList<>(), new ArrayList<>(), new Counter(maxResults), tracebackConsumer);
+	}
+
+	private static void traceBackRec(final int i, final int j, final int value, int[][] matrix, byte[][] traceback, ArrayList<Integer> aTrace, ArrayList<Integer> bTrace, Counter resultsToConsume, BiConsumer<ArrayList<Integer>, ArrayList<Integer>> tracebackConsumer) {
+		// System.err.println("-------- rec: i "+i+" j "+j);
+
+		if ((traceback[i][j] & TRACEBACK_INSERT_A) != 0) {
+			// System.err.printf(" i: %d -> %d, j: %d%n", i, i-1,j);
+			// System.err.println("value: "+value);
+			// System.err.println("matrix["+i+"-1]["+j+"]="+matrix[i-1][j]+"+1");
+
+			aTrace.add(i - 1);
+			bTrace.add(-1);
+			traceBackRec(i - 1, j, matrix[i - 1][j], matrix, traceback, aTrace, bTrace, resultsToConsume, tracebackConsumer);
+			aTrace.remove(aTrace.size() - 1);
+			bTrace.remove(bTrace.size() - 1);
+			if (resultsToConsume.get() == 0)
+				return;
+		}
+		if ((traceback[i][j] & TRACEBACK_INSERT_B) != 0) {
+			// System.err.printf(" i: %d, j: %d -> %d%n", i, j,j-1);
+			// System.err.println("value: "+value);
+			// System.err.println("matrix["+i+"]["+j+"-1]="+matrix[i][j-1]+"+1");
+
+			aTrace.add(-1);
+			bTrace.add(j - 1);
+			traceBackRec(i, j - 1, matrix[i][j - 1], matrix, traceback, aTrace, bTrace, resultsToConsume, tracebackConsumer);
+			aTrace.remove(aTrace.size() - 1);
+			bTrace.remove(bTrace.size() - 1);
+			if (resultsToConsume.get() == 0)
+				return;
+		}
+		if ((traceback[i][j] & TRACEBACK_MATCH) != 0) {
+			// System.err.printf(" i: %d -> %d, j: %d -> %d%n", i,i-1, j,j-1);
+			// System.err.println("value: "+value);
+			//System.err.println("matrix["+i+"]["+j+"]="+matrix[i][j]);
+			aTrace.add(i - 1);
+			bTrace.add(j - 1);
+			traceBackRec(i - 1, j - 1, matrix[i - 1][j - 1], matrix, traceback, aTrace, bTrace, resultsToConsume, tracebackConsumer);
+			aTrace.remove(aTrace.size() - 1);
+			bTrace.remove(bTrace.size() - 1);
+			if (resultsToConsume.get() == 0)
+				return;
+		}
+		if (i == 0 && j == 0) {
+			tracebackConsumer.accept(aTrace, bTrace);
+			resultsToConsume.decrement();
+		}
+	}
+
+	private static void reportTrace(HyperSequence a, HyperSequence b, ArrayList<Integer> aTrace, ArrayList<Integer> bTrace) {
+		var bufA = new StringBuilder();
+		var bufB = new StringBuilder();
+
+		for (var p = 0; p < aTrace.size(); p++) {
+			String wordA;
+			String wordB;
+			if (aTrace.get(p) == -1) {
+				wordB = StringUtils.toString(b.get(bTrace.get(p)));
+				wordA = " ".repeat(wordB.length());
+			} else if (bTrace.get(p) == -1) {
+				wordA = StringUtils.toString(a.get(aTrace.get(p)));
+				wordB = " ".repeat(wordA.length());
+			} else {
+				wordA = StringUtils.toString(a.get(aTrace.get(p)));
+				wordB = StringUtils.toString(b.get(bTrace.get(p)));
+				if (wordA.length() < wordB.length()) {
+					wordA += " ".repeat(wordB.length() - wordA.length());
+				} else if (wordB.length() < wordA.length()) {
+					wordB += " ".repeat(wordA.length() - wordB.length());
+				}
+			}
+			bufA.append(wordA).append(" : ");
+			bufB.append(wordB).append(" : ");
+		}
+		System.err.println("\nAlignment:");
+		System.err.println(bufA);
+		System.err.println(bufB);
+		System.err.println();
+	}
+
+	@Deprecated
 	private static void expandSubSequence(HyperSequence a, HyperSequence b) {
 		for (int p = 0; p < b.size(); p++) {
 			if (b.get(p).cardinality() > 1) {
@@ -144,7 +307,7 @@ public class ShortestCommonHyperSequence {
 					}
 				}
 				if (allFound) {
-					if(areConsecutive(sortedIndexes)) {
+					if (areConsecutive(sortedIndexes)) {
 						b.array().remove(p);
 						for (int i : sortedIndexes.descendingSet()) {
 							b.array().add(p, a.get(i));
@@ -156,6 +319,7 @@ public class ShortestCommonHyperSequence {
 		}
 	}
 
+	@Deprecated
 	public static boolean areConsecutive(Set<Integer> sortedIndexes) {
 		if (sortedIndexes.size() < 2) {
 			return true;  // Less than 2 elements are always consecutive
@@ -173,21 +337,16 @@ public class ShortestCommonHyperSequence {
 
 		return true;
 	}
-	public static void expandSubSequences(HyperSequence a, HyperSequence b) {
-		expandSubSequence(a, b);
-		expandSubSequence(b, a);
-	}
 
 	public static void main(String[] args) {
-		var a = HyperSequence.parse("2:4:1:5:6");
-		var b = HyperSequence.parse("1 5 3 4: 2 : 6");
+		//var a = HyperSequence.parse("6:3:2:8:4 5:7");
+		// var b = HyperSequence.parse("6:2 4 8:5:7:3");
+
+		var a = HyperSequence.parse("2 3 5 : 4 : 8 : 9");
+		var b = HyperSequence.parse("6 : 2 : 3 : 4 5 : 8");
+
 
 		System.err.println("Input:");
-		System.err.println("a= " + a);
-		System.err.println("b= " + b);
-
-		expandSubSequences(b,a);
-
 		System.err.println("a= " + a);
 		System.err.println("b= " + b);
 

@@ -31,11 +31,14 @@ import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.io.writers.splits.NexusWriter;
 import splitstree6.splits.ASplit;
 import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
@@ -90,6 +93,32 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 					NeighborNetCycleSplitsTree4.compute(distancesBlock.size(), distancesBlock.getDistances());
 			case BryantHuson2023 -> NeighborNetCycle2023.computeOrdering(distancesBlock);
 		};
+
+		if (false) {
+			var newSplits = new SplitsBlock();
+			newSplits.setCycle(cycle);
+			newSplits.setCompatibility(Compatibility.cyclic);
+			for (var p = 2; p < cycle.length; p++) {
+				for (var q = p; q < cycle.length; q++) {
+					var bitsetA = new BitSet();
+					for (var i = p; i <= q; i++) {
+						bitsetA.set(cycle[i]);
+					}
+					newSplits.getSplits().add(new ASplit(bitsetA, taxaBlock.getNtax()));
+				}
+			}
+			{
+				var w = new OutputStreamWriter(System.out);
+				{
+					var writer = new splitstree6.io.writers.taxa.NexusWriter();
+					writer.write(w, taxaBlock, taxaBlock);
+				}
+				{
+					var writer = new NexusWriter();
+					writer.write(w, taxaBlock, newSplits);
+				}
+			}
+		}
 
 		progress.setTasks("NNet", "split weight optimization");
 

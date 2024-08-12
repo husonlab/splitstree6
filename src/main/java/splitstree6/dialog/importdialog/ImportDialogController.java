@@ -156,10 +156,6 @@ public class ImportDialogController {
 		return importButton;
 	}
 
-	public CheckBox getInnerNodesLabelingCheckBox() {
-		return innerNodesLabelingCheckBox;
-	}
-
 	public VBox getMainVBox() {
 		return mainVBox;
 	}

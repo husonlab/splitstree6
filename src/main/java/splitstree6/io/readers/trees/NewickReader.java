@@ -110,8 +110,8 @@ public class NewickReader extends TreesReader {
 						setupEdgeConfidenceFromComments(tree, nodeCommentMap);
 					}
 					//System.err.println(tree.toBracketString(false));
-				} catch (IOException ex) {
-					throw new IOExceptionWithLineNumber(lineno, ex);
+				} catch (Exception ex) {
+					throw new IOExceptionWithLineNumber(lineno, new IOException(ex));
 				}
 
 				if (TreesUtils.hasNumbersOnLeafNodes(tree)) {

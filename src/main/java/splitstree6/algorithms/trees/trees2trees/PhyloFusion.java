@@ -150,7 +150,7 @@ public class PhyloFusion extends Trees2Trees {
 			if (verbose)
 				System.err.println("Refined:\n" + NewickIO.toString(inputTrees, false));
 		} else {
-			inputTrees = treesBlock.getTrees().stream().map(PhyloTree::new).toList();
+			inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
 		}
 
 		var result = computeRec(progress, inputTrees);
@@ -232,8 +232,9 @@ public class PhyloFusion extends Trees2Trees {
 			System.err.println("computeRec----");
 
 		var repGroupMap = new HashMap<Integer, BitSet>();
-		if (getOptionGroupNonSeparated())
+		if (getOptionGroupNonSeparated()) {
 			repGroupMap.putAll(groupNonSeparatedTaxa(taxa, trees, taxLabelMap));
+		}
 
 		Graph incompatibityGraph;
 		var clusters = new ArrayList<BitSet>();
@@ -270,8 +271,8 @@ public class PhyloFusion extends Trees2Trees {
 			var tree = new PhyloTree();
 			ClusterPoppingAlgorithm.apply(clusters, tree);
 			return restoreGroupedTaxa(repGroupMap, taxLabelMap, List.of(tree));
-
 		}
+
 		// find a cluster that is compatible with all, if one exists
 		BitSet separator = null;
 		for (int i = 0; i < clusters.size(); i++) {

@@ -86,7 +86,21 @@ public class PhyloFusionAlgorithm {
 				var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
 				// todo: take different optimal SCS into account
 				for (var t : taxonHyperSequencesMap.keySet()) {
-					taxonHyperSequenceMap.put(t, ProgressiveSCS.apply(new ArrayList<>(taxonHyperSequencesMap.get(t))));
+					var hyperSequence = ProgressiveSCS.apply(new ArrayList<>(taxonHyperSequencesMap.get(t)));
+
+					// simplification
+					if (hyperSequence != null) {
+						var prev = new BitSet();
+						for (var i = 0; i + 1 < hyperSequence.size(); i++) {
+							var item = hyperSequence.get(i);
+							var next = hyperSequence.get(i + 1);
+							prev = BitSetUtils.minus(BitSetUtils.intersection(item, next), prev);
+							item.andNot(prev);
+						}
+						hyperSequence.removeEmptyElements();
+					}
+					taxonHyperSequenceMap.put(t, hyperSequence);
+
 				}
 				var hybridizationNumber = computeHybridizationNumber(taxa.cardinality(), taxonHyperSequenceMap);
 				synchronized (bestHybridizationNumber) {

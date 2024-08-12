@@ -56,6 +56,7 @@ public class PlainTextWriter extends DistancesWriterBase {
 							w.write("\t");
 						w.write(taxa.get(i).getName());
 					}
+					w.write("\n");
 				}
 				for (var i = 1; i <= ntax; i++) {
 					for (var j = 1; j <= ntax; j++) {
