@@ -43,7 +43,8 @@ public class ProgressiveSCS {
 		if (sequences.size() == 1)
 			return sequences.get(0);
 		else if (sequences.size() == 2) {
-			return ShortestCommonHyperSequence.align(sequences.get(0), sequences.get(1));
+			var expanded = ShortestCommonHyperSequence.preProcessExpansion(sequences.get(0), sequences.get(1));
+			return ShortestCommonHyperSequence.align(expanded.getFirst(), expanded.getSecond());
 		} else if (sequences.size() == 3) {
 			var one = ShortestCommonHyperSequence.align(sequences.get(0), sequences.get(1));
 			return ShortestCommonHyperSequence.align(one, sequences.get(2));

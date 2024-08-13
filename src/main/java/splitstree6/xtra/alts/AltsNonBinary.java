@@ -20,13 +20,11 @@
 package splitstree6.xtra.alts;
 
 import jloda.fx.util.ArgsOptions;
-import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
 import jloda.util.ProgramExecutorService;
-import jloda.util.StringUtils;
 import jloda.util.UsageException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
@@ -43,7 +41,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static splitstree6.utils.PathMultiplicityDistance.compute;
@@ -282,8 +279,8 @@ public class AltsNonBinary {
 			Node previousNode = firstNode;
 
 			//if inner node add nodes and connections
-			if (!nodes.getValue().array().isEmpty()) {
-				for (var inners : nodes.getValue().array()) {
+			if (!nodes.getValue().members().isEmpty()) {
+				for (var inners : nodes.getValue().members()) {
 					Node currentNode = tree.newNode();
 
 					tree.newEdge(previousNode, currentNode);

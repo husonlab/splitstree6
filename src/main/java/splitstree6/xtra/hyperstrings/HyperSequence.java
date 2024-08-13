@@ -25,7 +25,7 @@ import jloda.util.StringUtils;
 import java.util.ArrayList;
 import java.util.BitSet;
 
-public record HyperSequence(ArrayList<BitSet> array) {
+public record HyperSequence(ArrayList<BitSet> members) {
 
 	/**
 	 * default constructor
@@ -56,7 +56,7 @@ public record HyperSequence(ArrayList<BitSet> array) {
 	 */
 	public String toString() {
 		var buf = new StringBuilder();
-		for (var set : array) {
+		for (var set : members) {
 			if (!buf.isEmpty())
 				buf.append(" : ");
 			buf.append(StringUtils.toString(set));
@@ -66,22 +66,22 @@ public record HyperSequence(ArrayList<BitSet> array) {
 
 
 	public BitSet get(int i) {
-		return array.get(i);
+		return members.get(i);
 	}
 
 	public void set(int i, BitSet set) {
-		array.set(i, set);
+		members.set(i, set);
 	}
 
 	public void add(BitSet set) {
-		array.add(set);
+		members.add(set);
 	}
 
 	public int size() {
-		return array.size();
+		return members.size();
 	}
 
 	public void removeEmptyElements() {
-		array.removeAll(array.stream().filter(BitSet::isEmpty).toList());
+		members.removeAll(members.stream().filter(BitSet::isEmpty).toList());
 	}
 }

@@ -305,7 +305,7 @@ public class PhyloFusionAlgorithm {
 	private static int computeHybridizationNumber(int nTaxa, HashMap<Integer, HyperSequence> taxonHyperSequenceMap) {
 		var total = 0;
 		for (var hyperSequence : taxonHyperSequenceMap.values()) {
-			for (var component : hyperSequence.array()) {
+			for (var component : hyperSequence.members()) {
 				total += component.cardinality();
 			}
 		}
@@ -335,7 +335,7 @@ public class PhyloFusionAlgorithm {
 				taxonChainMap.put(t, new ArrayList<>());
 				if (taxonHyperSequenceMap.containsKey(t)) {
 					var hyperSequence = taxonHyperSequenceMap.get(t);
-					for (var component : hyperSequence.array()) {
+					for (var component : hyperSequence.members()) {
 						var v = network.newNode();
 						label.put(v, component);
 						network.newEdge(prev, v);

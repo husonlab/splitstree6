@@ -24,11 +24,22 @@ import jloda.util.*;
 import java.util.*;
 import java.util.function.BiConsumer;
 
+/**
+ * determines the shortest common hypersequence using dynamic programming
+ * Daniel Huson, 8.2024
+ */
 public class ShortestCommonHyperSequence {
 	private static final byte TRACEBACK_INSERT_A = 1;
 	private static final byte TRACEBACK_INSERT_B = 2;
 	private static final byte TRACEBACK_MATCH = 4;
 
+	/**
+	 * determines the shortest common hypersequence using dynamic programming
+	 *
+	 * @param a one hypersequence
+	 * @param b the other
+	 * @return super sequence
+	 */
 	public static HyperSequence align(HyperSequence a, HyperSequence b) {
 		// System.err.println("Aligning "+a+" vs "+b);
 
@@ -289,6 +300,40 @@ public class ShortestCommonHyperSequence {
 		System.err.println();
 	}
 
+	public static Pair<HyperSequence, HyperSequence> preProcessExpansion(HyperSequence a, HyperSequence b) {
+		var aExpanded = new HyperSequence();
+		var bExpanded = new HyperSequence();
+
+		for (var i = 0; i < 2; i++) { // i==0: expand a using b, i==1: expand b using a
+			var first = (i == 0 ? a : b);
+			var second = (i == 0 ? b : a);
+			var expanded = (i == 0 ? aExpanded : bExpanded);
+
+			for (var set : first.members()) { // for each member
+				if (set.cardinality() == 1)
+					expanded.add(set); // singleton, no expansion
+				else {
+					var remaining = BitSetUtils.copy(set);
+					for (var other : second.members()) { // loop over all members of other sequence
+						if (set.intersects(other)) {
+							var intersection = BitSetUtils.intersection(set, other);
+							remaining.andNot(intersection);
+							expanded.add(intersection);
+						}
+					}
+					if (remaining.cardinality() > 0) // add the remaining taxa as a single element
+						expanded.add(remaining);
+				}
+			}
+		}
+		return new Pair<>(aExpanded, bExpanded);
+	}
+
+	public static HyperSequence postProcessExpansion(HyperSequence a, HyperSequence b, HyperSequence superseq) {
+		// todo: implement
+		return superseq;
+	}
+
 	@Deprecated
 	private static void expandSubSequence(HyperSequence a, HyperSequence b) {
 		for (int p = 0; p < b.size(); p++) {
@@ -299,8 +344,8 @@ public class ShortestCommonHyperSequence {
 				for (int i = b.get(p).nextSetBit(0); i >= 0; i = b.get(p).nextSetBit(i + 1)) {
 					BitSet temp = new BitSet();
 					temp.set(i);
-					if (a.array().contains(temp)) {
-						sortedIndexes.add(a.array().indexOf(temp));
+					if (a.members().contains(temp)) {
+						sortedIndexes.add(a.members().indexOf(temp));
 					} else {
 						allFound = false;
 						break;
@@ -308,9 +353,9 @@ public class ShortestCommonHyperSequence {
 				}
 				if (allFound) {
 					if (areConsecutive(sortedIndexes)) {
-						b.array().remove(p);
+						b.members().remove(p);
 						for (int i : sortedIndexes.descendingSet()) {
-							b.array().add(p, a.get(i));
+							b.members().add(p, a.get(i));
 						}
 					}
 					break;
