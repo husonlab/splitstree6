@@ -58,7 +58,7 @@ public class PhyloFusion extends Trees2Trees {
 	private boolean checkAllPartialResults = false; // for debugging
 
 	public enum Search {
-		SuperThorough, Thorough, Medium, Fast;
+		Thorough, Medium, Fast;
 
 		/**
 		 * get the number of random orderings for the given search
@@ -68,10 +68,9 @@ public class PhyloFusion extends Trees2Trees {
 		 */
 		public int numberOfRandomOrderings(int ntax) {
 			return switch (this) {
-				case Fast -> Math.max(100, 10 * ntax);
+				case Fast -> 10 * ntax;
 				case Medium -> 150 * ntax;
 				case Thorough -> 300 * ntax;
-				case SuperThorough -> 1000 * ntax;
 			};
 		}
 	}
@@ -142,7 +141,8 @@ public class PhyloFusion extends Trees2Trees {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
 		progress.setTasks("PhyloFusion", "init");
 
-		TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.20);
+		if (false)
+			TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.10);
 
 		List<PhyloTree> inputTrees;
 		if (isOptionMutualRefinement()) {

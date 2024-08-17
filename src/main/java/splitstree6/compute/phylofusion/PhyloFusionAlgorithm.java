@@ -149,9 +149,15 @@ public class PhyloFusionAlgorithm {
 
 		var rankings = new ArrayList<int[]>();
 
+		if (false && taxa.cardinality() < 9) {
+			computeAllRankingsRec(new BitSet(), taxa, new int[taxa.cardinality()], rankings);
+			System.err.printf("Using all %,d taxon rankings for n=%,d%n", rankings.size(), taxa.cardinality());
+			return rankings;
+		}
+
+
 		var nThreads = ProgramExecutorService.getNumberOfCoresToUse();
 		var executor = Executors.newFixedThreadPool(nThreads);
-
 
 		try {
 			var globalScore = new Single<>(Integer.MAX_VALUE);
@@ -216,6 +222,23 @@ public class PhyloFusionAlgorithm {
 		progress.checkForCancel();
 
 		return rankings;
+	}
+
+	private static void computeAllRankingsRec(BitSet used, BitSet taxa, int[] ordering, ArrayList<int[]> rankings) {
+		if (used.cardinality() == taxa.cardinality()) {
+			rankings.add(ranking(ordering));
+		} else {
+			for (var t : BitSetUtils.members(taxa)) {
+				if (!used.get(t)) {
+					ordering[used.cardinality()] = t;
+					used.set(t, true);
+					computeAllRankingsRec(used, taxa, ordering, rankings);
+					used.set(t, false);
+				}
+
+			}
+		}
+
 	}
 
 	/**

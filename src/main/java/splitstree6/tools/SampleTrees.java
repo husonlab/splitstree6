@@ -89,11 +89,15 @@ public class SampleTrees {
 		var echoInputTree = options.getOption("-e", "echoInput", "Echo the input tree to output", false);
 
 		var replicates = options.getOption("-R", "replicates", "Number replicates per input tree", 1);
-		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", ""), "");
+		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", "external"), "");
 		var timeOut = 1000L * options.getOption("-to", "timeOut", "Abort algorithm after this many seconds", 300);
+		var externalName = options.getOption("-xp", "externalPath", "Path to external program", "");
 
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-th", "threads", "Set number of threads to use", 8));
 		options.done();
+
+		if (runAlgorithm.equals("external"))
+			runAlgorithm = externalName;
 
 		FileUtils.checkFileReadableNonEmpty(inputFile);
 		FileUtils.checkAllFilesDifferent(inputFile, outputFile);
@@ -324,7 +328,12 @@ public class SampleTrees {
 			throw new IOException("Illegal rooted network in input");
 
 		Trees2Trees algorithm;
-		if (algorithmName.toLowerCase().startsWith("phylofusion")) {
+
+		if (algorithmName.endsWith(".sh")) {
+			var external = new ExternalTrees2Trees();
+			external.setOptionExecutable(algorithmName);
+			algorithm = external;
+		} else if (algorithmName.toLowerCase().startsWith("phylofusion")) {
 			var phyloFusion = new PhyloFusion();
 			phyloFusion.setOptionMutualRefinement(true);
 			phyloFusion.setOptionNormalizeEdgeWeights(true);

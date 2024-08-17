@@ -134,7 +134,8 @@ public class ShortestCommonHyperSequence {
 
 				var simplified = new HyperSequence();
 				var count = 0;
-				for (var i = 0; i + 1 < hyperSequence.size(); i++) {
+
+				for (var i = 0; i < hyperSequence.size() - 1; i++) {
 					var set = BitSetUtils.minus(hyperSequence.get(i), hyperSequence.get(i + 1));
 					if (set.cardinality() > 0) {
 						count += set.cardinality();
@@ -314,15 +315,18 @@ public class ShortestCommonHyperSequence {
 					expanded.add(set); // singleton, no expansion
 				else {
 					var remaining = BitSetUtils.copy(set);
+					var list = new ArrayList<BitSet>();
 					for (var other : second.members()) { // loop over all members of other sequence
 						if (set.intersects(other)) {
 							var intersection = BitSetUtils.intersection(set, other);
 							remaining.andNot(intersection);
-							expanded.add(intersection);
+							list.add(intersection);
 						}
 					}
-					if (remaining.cardinality() > 0) // add the remaining taxa as a single element
-						expanded.add(remaining);
+					if (remaining.cardinality() > 0) {
+						expanded.add(remaining); //
+					}
+					list.forEach(expanded::add);
 				}
 			}
 		}
