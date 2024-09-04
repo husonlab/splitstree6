@@ -27,12 +27,17 @@ While SplitsTree4 was designed for unrooted phylogenetic trees and networks, ano
 
 ## How to cite
 
-The following paper is under revision:
+If you use SplitsTree App, the please cite this paper:
 
-- Daniel H. Huson and David Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks.
+- Daniel H. Huson and David Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods (2024) [https://doi.org/10.1038/s41592-024-02406-3](https://doi.org/10.1038/s41592-024-02406-3)
 
-For now, please cite: 
-- Daniel H. Huson and David Bryant, Application of Phylogenetic Networks in Evolutionary Studies, Molecular Biology and Evolution, 23(2):254-267 (2006) [https://doi.org/10.1093/molbev/msj030](https://doi.org/10.1093/molbev/msj030).
+Papers associated with older versions of SplitsTree:
+
+- Daniel H. Huson and David Bryant, Application of Phylogenetic Networks in Evolutionary Studies, Molecular Biology and Evolution, 23(2):254-267 (2006)
+  [https://doi.org/10.1093/molbev/msj030](https://doi.org/10.1093/molbev/msj030)
+
+- Daniel H. Huson, SplitsTree: analyzing and visualizing evolutionary data, Bioinformatics, 14(1):68-73 (1998)
+  [https://doi.org/10.1093/bioinformatics/14.1.68](https://doi.org/10.1093/bioinformatics/14.1.68)
 
 
 
