@@ -19,6 +19,7 @@
 
 package splitstree6.io.nexus;
 
+import jloda.fx.util.ColorUtilsFX;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -47,6 +48,7 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 				;]
 				[TRAITLATITUDE  latitude-trait-1  latitude-trait-2 ...  latitude-trait-n;
 				 TRAITLONGITUDE longitude-trait-1 longitude-trait-2 ... longitude-trait-n;]
+				[TRAITCOLOR color-trait-1  color-trait-2 ...  color-trait-n;]
 				 TRAITLABELS label-trait-1 label-trait-2 ... label-trait-n;
 				MATRIX
 					trait data in specified format
@@ -124,6 +126,23 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 			np.matchIgnoreCase("TRAITLONGITUDE");
 			for (var i = 1; i <= ntraits; i++)
 				traitsBlock.setTraitLongitude(i, (float) np.getDouble());
+			np.matchIgnoreCase(";");
+		}
+		if (np.peekMatchIgnoreCase("TRAITCOLOR")) {
+			np.matchIgnoreCase("TRAITCOLOR");
+			for (var i = 1; i <= ntraits; i++) {
+				try {
+					var word = np.getWordRespectCase();
+					if (!word.isBlank()) {
+						if (!ColorUtilsFX.isColor(word))
+							throw new IllegalArgumentException("'" + word + "' is not a valid color specification");
+						traitsBlock.setTraitColorName(i, word);
+					}
+				} catch (IllegalArgumentException e) {
+					System.err.println(e.getMessage());
+					traitsBlock.setTraitColorName(i, null);
+				}
+			}
 			np.matchIgnoreCase(";");
 		}
 

@@ -175,6 +175,7 @@ public class TraitsFormat extends Pane {
 			if (graphOptional.isPresent()) {
 				var traitsBlock = getTraitsBlock();
 
+				legend.getColorMap().clear();
 				legend.getLabels().setAll(traitsBlock.getNumericalTraitLabels());
 				legend.getActive().clear();
 				if (isAllTraitsActive()) {
@@ -187,7 +188,6 @@ public class TraitsFormat extends Pane {
 
 				var maxOverAllNodes = 0.0;
 
-				for (var v : nodeShapeMap.keySet()) {
 					for (var t = 1; t <= workingTaxa.get().getNtax(); t++) {
 						var sum = 0.0;
 						for (var trait = 1; trait <= traitsBlock.getNTraits(); trait++) {
@@ -197,7 +197,6 @@ public class TraitsFormat extends Pane {
 						}
 						maxOverAllNodes = Math.max(maxOverAllNodes, sum);
 					}
-				}
 
 				var graph = graphOptional.get();
 				for (var v : nodeShapeMap.keySet()) {
@@ -225,8 +224,12 @@ public class TraitsFormat extends Pane {
 										}
 										sum += value;
 										chart.getData().add(new Pair<>(traitsBlock.getTraitLabel(traitId), value));
+										if (traitsBlock.isSetTraitColorNames()) {
+											chart.getColorMap().put(label, traitsBlock.getTraitColor(traitId));
+											legend.getColorMap().put(label, traitsBlock.getTraitColor(traitId));
+										}
 									} else
-										chart.getData().add(new Pair<>(traitsBlock.getTraitLabel(traitId), 0.0));
+										chart.getData().add(new Pair<>(label, 0.0));
 								}
 
 								if (sum > 0) {

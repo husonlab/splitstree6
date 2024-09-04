@@ -26,6 +26,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -45,6 +46,7 @@ import java.util.function.BiConsumer;
  */
 public class BasicPieChart extends Pane {
 	private final ObservableList<Pair<String, Double>> data = FXCollections.observableArrayList();
+	private final ObservableMap<String, Color> colorMap = FXCollections.observableHashMap();
 
 	private final StringProperty colorScheme = new SimpleStringProperty(this, "colorScheme", "Twenty");
 
@@ -68,7 +70,6 @@ public class BasicPieChart extends Pane {
 
 		layoutXProperty().bind(radius.multiply(-1));
 		layoutYProperty().bind(radius.multiply(-1));
-
 	}
 
 	private void update() {
@@ -113,7 +114,10 @@ public class BasicPieChart extends Pane {
 				arc.radiusYProperty().bind(radius);
 				arc.setStartAngle(angle);
 				arc.setLength(delta);
-				arc.setFill(colorScheme.get(i % colorScheme.size()));
+				if (colorMap.containsKey(name))
+					arc.setFill(colorMap.get(name));
+				else
+					arc.setFill(colorScheme.get(i % colorScheme.size()));
 				arc.setStrokeWidth(0.25);
 				arc.setStroke(Color.BLACK);
 				arc.setUserData(name);
@@ -134,6 +138,10 @@ public class BasicPieChart extends Pane {
 
 	public ObservableList<Pair<String, Double>> getData() {
 		return data;
+	}
+
+	public ObservableMap<String, Color> getColorMap() {
+		return colorMap;
 	}
 
 	public String getColorScheme() {

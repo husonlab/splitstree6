@@ -316,6 +316,8 @@ public class WorldMapView implements IView {
 		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
 			var value = traitsBlock.getTraitValue(t, traitId);
 			chart.getData().add(new Pair<>(taxaBlock.getLabel(t), value));
+			if (traitsBlock.isSetTraitColorNames())
+				chart.getColorMap().put(traitsBlock.getTraitLabel(traitId), traitsBlock.getTraitColor(traitId));
 			total += value;
 		}
 		if (maxCount > 0)

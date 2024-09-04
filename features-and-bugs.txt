@@ -1,2 +1,12 @@
+Todos September 2024:
+
+- Export trees/networks from Tanglegram observing tanglegram ordering of nodes
+- Export coordinates for trees and networks
+- Radial labels for split networks
+- Added examples for different data blocks to documentation
+- Allow image generation when running a workflow
+- Implement drag nodes in SplitNetwork view
+- Allow users to specify colors used in pie charts
+- Batch modify color of edges
 - allow user to set scale explicitly, e.g. 1 unit = 144pixels.
 - preorder algorithms in pop-up menus

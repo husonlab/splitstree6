@@ -19,6 +19,7 @@
 
 package splitstree6.data;
 
+import javafx.scene.paint.Color;
 import jloda.util.IteratorUtils;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
@@ -38,6 +39,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	private String[] labels = {};
 	private float[] traitLatitude = null;
 	private float[] traitLongitude = null;
+	private String[] traitColorName = null;
 	private TraitsNexusFormat format;
 
 	/**
@@ -62,6 +64,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		matrixOfLabels = null;
 		traitLatitude = null;
 		traitLongitude = null;
+		traitColorName = null;
 	}
 
 	public int addTrait(String traitLabel) {
@@ -96,6 +99,11 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 			var tmp = new float[oldNTraits + 1];
 			System.arraycopy(traitLongitude, 0, tmp, 0, oldNTraits);
 			traitLongitude = tmp;
+		}
+		if (traitColorName != null) {
+			var tmp = new String[oldNTraits + 1];
+			System.arraycopy(traitColorName, 0, tmp, 0, oldNTraits);
+			traitColorName = tmp;
 		}
 		return oldNTraits + 1;
 	}
@@ -166,6 +174,25 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		traitLatitude[traitId - 1] = value;
 	}
 
+	public String getTraitColorName(int traitId) {
+		if (!isSetTraitColorNames())
+			return null;
+		else return traitColorName[traitId - 1];
+	}
+
+	public Color getTraitColor(int traitId) {
+		if (!isSetTraitColorNames() || traitColorName[traitId - 1] == null || traitColorName[traitId - 1].isBlank())
+			return Color.WHITE;
+		else return Color.web(traitColorName[traitId - 1]);
+	}
+
+	public void setTraitColorName(int traitId, String color) {
+		if (!isSetTraitColorNames()) {
+			traitColorName = new String[getNTraits()];
+		}
+		traitColorName[traitId - 1] = color;
+	}
+
 	@Override
 	public int size() {
 		return getNTraits();
@@ -182,6 +209,14 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	public void clearLatitudeLongitude() {
 		traitLatitude = null;
 		traitLongitude = null;
+	}
+
+	public boolean isSetTraitColorNames() {
+		return traitColorName != null;
+	}
+
+	public void clearTraitColor() {
+		traitColorName = null;
 	}
 
 	/**
@@ -237,6 +272,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		labels = Arrays.copyOf(srcTraits.labels, srcTraits.getNTraits());
 		traitLongitude = (srcTraits.traitLongitude == null ? null : Arrays.copyOf(srcTraits.traitLongitude, srcTraits.getNTraits()));
 		traitLatitude = (srcTraits.traitLatitude == null ? null : Arrays.copyOf(srcTraits.traitLatitude, srcTraits.getNTraits()));
+		traitColorName = (srcTraits.traitColorName == null ? null : Arrays.copyOf(srcTraits.traitColorName, srcTraits.getNTraits()));
 		matrix = new double[targetTaxa.size()][srcTraits.getNTraits()];
 		matrixOfLabels = null; // will be set in setTraitValueLabel if required
 		for (var tarId = 1; tarId <= targetTaxa.getNtax(); tarId++) {

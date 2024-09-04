@@ -55,6 +55,7 @@ order of TraitLabels. Separator can be comma, space, or tab.]
   [Optional: if you include TraitLatitude and TraitLongitude they will be used to place trait groups on the map]
   TraitLatitude 53 43.6811 5.4 -25.61 -0;
   TraitLongitude 16.75 87.3311 26.5 134.355 -76;
+  TraitColor darkblue darkgreen darkred orange goldenrod;
   TraitLabels Europe Asia Africa Australia America;
   Matrix
 seq_1 0,0,0,3,3

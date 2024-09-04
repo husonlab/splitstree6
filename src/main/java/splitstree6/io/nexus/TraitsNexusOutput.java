@@ -65,6 +65,19 @@ public class TraitsNexusOutput extends NexusIOBase implements INexusOutput<Trait
 			}
 			w.write(";\n");
 		}
+		if (traitsBlock.isSetTraitColorNames()) {
+			w.write("TRAITCOLOR");
+			for (int i = 1; i <= traitsBlock.getNTraits(); i++) {
+				var name = traitsBlock.getTraitColorName(i);
+				if (name == null)
+					w.write("''");
+				else if (name.matches("^[a-zA-Z0-9#]+$"))
+					w.write(" " + name);
+				else
+					w.write(" '" + traitsBlock.getTraitColorName(i) + "'");
+			}
+			w.write(";\n");
+		}
 		{
 			w.write("TRAITLABELS\n");
 			for (int i = 1; i <= traitsBlock.getNTraits(); i++) {
