@@ -49,6 +49,8 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 				[TRAITLATITUDE  latitude-trait-1  latitude-trait-2 ...  latitude-trait-n;
 				 TRAITLONGITUDE longitude-trait-1 longitude-trait-2 ... longitude-trait-n;]
 				[TRAITCOLOR color-trait-1  color-trait-2 ...  color-trait-n;]
+				[TAXONCOLOR color-taxon-1  color-taxon-2 ...  color-taxon-ntax;]
+
 				 TRAITLABELS label-trait-1 label-trait-2 ... label-trait-n;
 				MATRIX
 					trait data in specified format
@@ -141,6 +143,23 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 				} catch (IllegalArgumentException e) {
 					System.err.println(e.getMessage());
 					traitsBlock.setTraitColorName(i, null);
+				}
+			}
+			np.matchIgnoreCase(";");
+		}
+		if (np.peekMatchIgnoreCase("TAXONCOLOR")) {
+			np.matchIgnoreCase("TAXONCOLOR");
+			for (var i = 1; i <= ntax; i++) {
+				try {
+					var word = np.getWordRespectCase();
+					if (!word.isBlank()) {
+						if (!ColorUtilsFX.isColor(word))
+							throw new IllegalArgumentException("'" + word + "' is not a valid color specification");
+						traitsBlock.setTaxaColorName(i, word);
+					}
+				} catch (IllegalArgumentException e) {
+					System.err.println(e.getMessage());
+					traitsBlock.setTaxaColorName(i, null);
 				}
 			}
 			np.matchIgnoreCase(";");

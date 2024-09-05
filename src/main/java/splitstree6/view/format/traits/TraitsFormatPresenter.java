@@ -26,14 +26,15 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.util.FuzzyBoolean;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.window.MainWindow;
 
+
 public class TraitsFormatPresenter {
 	private final InvalidationListener traitsBlockListener;
-	private boolean inUpdatingDefaults = false;
 
 	private final ObservableList<CheckMenuItem> traitMenuItems = FXCollections.observableArrayList();
 
@@ -103,5 +104,16 @@ public class TraitsFormatPresenter {
 
 		format.optionMaxCircleRadiusProperty().addListener(e -> format.updateNodes());
 		format.optionTraitLegendProperty().addListener(e -> format.updateNodes());
+
+		format.getLegend().setUpdateColors((name, oldMap, newMap) -> {
+			var traitsBlock = format.getTraitsBlock();
+			undoManager.doAndAdd(UndoableRedoableCommand.create("trait color", () -> {
+				oldMap.forEach(traitsBlock::setTraitColor);
+				format.updateNodes();
+			}, () -> {
+				newMap.forEach(traitsBlock::setTraitColor);
+				format.updateNodes();
+			}));
+		});
 	}
 }

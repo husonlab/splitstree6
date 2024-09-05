@@ -20,6 +20,7 @@
 package splitstree6.data;
 
 import javafx.scene.paint.Color;
+import jloda.fx.util.ColorUtilsFX;
 import jloda.util.IteratorUtils;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
@@ -39,7 +40,8 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	private String[] labels = {};
 	private float[] traitLatitude = null;
 	private float[] traitLongitude = null;
-	private String[] traitColorName = null;
+	private Color[] traitColor = null;
+	private Color[] taxonColor = null;
 	private TraitsNexusFormat format;
 
 	/**
@@ -64,7 +66,8 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		matrixOfLabels = null;
 		traitLatitude = null;
 		traitLongitude = null;
-		traitColorName = null;
+		traitColor = null;
+		taxonColor = null;
 	}
 
 	public int addTrait(String traitLabel) {
@@ -100,10 +103,10 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 			System.arraycopy(traitLongitude, 0, tmp, 0, oldNTraits);
 			traitLongitude = tmp;
 		}
-		if (traitColorName != null) {
-			var tmp = new String[oldNTraits + 1];
-			System.arraycopy(traitColorName, 0, tmp, 0, oldNTraits);
-			traitColorName = tmp;
+		if (traitColor != null) {
+			var tmp = new Color[oldNTraits + 1];
+			System.arraycopy(traitColor, 0, tmp, 0, oldNTraits);
+			traitColor = tmp;
 		}
 		return oldNTraits + 1;
 	}
@@ -175,24 +178,54 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	}
 
 	public String getTraitColorName(int traitId) {
-		if (!isSetTraitColorNames())
+		if (!isSetTraitColors() || traitColor[traitId - 1] == null)
 			return null;
-		else return traitColorName[traitId - 1];
+		else
+			return ColorUtilsFX.getName(traitColor[traitId - 1]).replace("0x", "#");
 	}
 
 	public Color getTraitColor(int traitId) {
-		if (!isSetTraitColorNames() || traitColorName[traitId - 1] == null || traitColorName[traitId - 1].isBlank())
-			return Color.WHITE;
-		else return Color.web(traitColorName[traitId - 1]);
+		if (!isSetTraitColors())
+			return null;
+		else
+			return traitColor[traitId - 1];
 	}
 
 	public void setTraitColorName(int traitId, String color) {
-		if (!isSetTraitColorNames()) {
-			traitColorName = new String[getNTraits()];
+		if (!isSetTraitColors()) {
+			traitColor = new Color[getNTraits()];
 		}
-		traitColorName[traitId - 1] = color;
+		traitColor[traitId - 1] = color == null ? null : Color.web(color);
 	}
 
+	public void setTraitColor(String traitName, Color color) {
+		var id = getTraitId(traitName);
+		if (id != -1)
+			setTraitColorName(id, ColorUtilsFX.toStringCSS(color));
+	}
+
+	public String getTaxaColorName(int taxId) {
+		if (!isSetTaxonColors() || taxonColor[taxId - 1] == null)
+			return null;
+		else return ColorUtilsFX.getName(taxonColor[taxId - 1]).replace("0x", "#");
+	}
+
+	public Color getTaxaColor(int taxId) {
+		if (!isSetTaxonColors())
+			return null;
+		else return taxonColor[taxId - 1];
+	}
+
+	public void setTaxaColorName(int taxId, String color) {
+		setTaxaColor(taxId, (color == null ? null : Color.web(color)));
+	}
+
+	public void setTaxaColor(int taxonId, Color color) {
+		if (!isSetTaxonColors()) {
+			taxonColor = new Color[matrix.length];
+		}
+		taxonColor[taxonId - 1] = color;
+	}
 	@Override
 	public int size() {
 		return getNTraits();
@@ -211,12 +244,20 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		traitLongitude = null;
 	}
 
-	public boolean isSetTraitColorNames() {
-		return traitColorName != null;
+	public boolean isSetTraitColors() {
+		return traitColor != null;
 	}
 
-	public void clearTraitColor() {
-		traitColorName = null;
+	public void clearTraitColors() {
+		traitColor = null;
+	}
+
+	public boolean isSetTaxonColors() {
+		return taxonColor != null;
+	}
+
+	public void clearTaxonColors() {
+		taxonColor = null;
 	}
 
 	/**
@@ -272,7 +313,8 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		labels = Arrays.copyOf(srcTraits.labels, srcTraits.getNTraits());
 		traitLongitude = (srcTraits.traitLongitude == null ? null : Arrays.copyOf(srcTraits.traitLongitude, srcTraits.getNTraits()));
 		traitLatitude = (srcTraits.traitLatitude == null ? null : Arrays.copyOf(srcTraits.traitLatitude, srcTraits.getNTraits()));
-		traitColorName = (srcTraits.traitColorName == null ? null : Arrays.copyOf(srcTraits.traitColorName, srcTraits.getNTraits()));
+		traitColor = (srcTraits.traitColor == null ? null : Arrays.copyOf(srcTraits.traitColor, srcTraits.getNTraits()));
+		taxonColor = (srcTraits.taxonColor == null ? null : Arrays.copyOf(srcTraits.taxonColor, srcTraits.taxonColor.length));
 		matrix = new double[targetTaxa.size()][srcTraits.getNTraits()];
 		matrixOfLabels = null; // will be set in setTraitValueLabel if required
 		for (var tarId = 1; tarId <= targetTaxa.getNtax(); tarId++) {

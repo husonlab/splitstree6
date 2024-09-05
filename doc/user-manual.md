@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.27, built 20 June 2024)
+SplitsTree App (version 6.3.36, built 5 Sep 2024)
 
 ## Introduction
 
@@ -13,12 +13,18 @@ for computing distances, phylogenetic trees, split networks, haplotype
 networks, rooted phylogenetic networks, tanglegrams, consensus trees and
 consensus networks.
 
-This new software is designed to accommodate the increasing scale and
-intricacy of modern data sets. It extends, integrates and supersedes our
-earlier applications SplitsTree4 [@HusonBryant2006] for unrooted
-phylogenetic trees and networks, Dendroscope3 [@HusonScornavacca2012]
-for rooted trees and networks, and PopArt [@LeighBryant2015] for
-haplotype analysis.
+This new software [@HusonBryant2024] is designed to accommodate the
+increasing scale and intricacy of modern data sets. It extends,
+integrates and supersedes our earlier applications SplitsTree4
+[@HusonBryant2006] for unrooted phylogenetic trees and networks,
+Dendroscope3 [@HusonScornavacca2012] for rooted trees and networks, and
+PopArt [@LeighBryant2015] for haplotype analysis.
+
+If you use this program, the please cite:
+
+Daniel H. Huson and David Bryant. The SplitsTree App: interactive
+analysis and visualization using phylogenetic trees and networks. Nature
+Methods (2024) <https://doi.org/10.1038/s41592-024-02406-3>.
 
 ![ Example of SplitsTree analysis of primate
 mtDNA.](figs/opening-example.png)
@@ -33,7 +39,7 @@ methods and procedures.
 
 To get started using this program, download the latest installer from
 <https://software-ab.cs.uni-tuebingen.de/download/splitstree6> for
-Linux, MacOS X or Windows, and install the program on your computer.
+Linux, Mac OS X or Windows, and install the program on your computer.
 Versions for iOS and Android are being tested.
 
 Launch the program by double-clicking the program icon or launch it from
@@ -51,7 +57,7 @@ displayed .
 
 Here is a toy example of characters data. You can copy this text from
 the manual and then paste it onto the import data button to obtain the
-network show in the figure (.
+network show in the figure .
 
     6 64
     Taxon1 TAAGTAGATCGGAGTTTTTACTCGTGTGATTTTGGGTATTTTTTATTTAGATTATGAAATTATA
@@ -105,7 +111,7 @@ There are three *document-specific toolbar items* on the left side of
 the main toolbar and several *tab-specific toolbar items* ones on the
 right .
 
-![The main tool bar has three document-specific items on the left: Files
+![The main toolbar has three document-specific items on the left: Files
 menu button, import data button and sidebar toggle button. It has
 several tab-specific ones on the right: Undo and redo, font resizing,
 select all/none, find/replace and
@@ -123,7 +129,7 @@ Document specific toolbar items:
 
 - The *sidebar toggle button* - use this to show or hide the sidebar.
 
-Tab specific tool bar items (that apply only to the currently selected
+Tab specific toolbar items (that apply only to the currently selected
 main tab):
 
 - An *undo button* and *redo button*.
@@ -238,7 +244,7 @@ network), the choices are between rectangular, circular and radial
 cladogram or phylogram. There is a button that toggles addition
 information (such as name of the tree, if any, and number of nodes,
 edges and leaves). In addition, there are buttons for rotating, flipping
-and zooming. At the right side of the tool bar, there is a text input
+and zooming. At the right side of the toolbar, there is a text input
 field for setting the dimensions of a page in the format *rows x cols*.
 
 The side panel contains items for styling the taxon labels and for
@@ -316,11 +322,13 @@ unrooted or rooted, using either *mid-point rooting* or *outgroup
 rooting*. The latter requires that some taxa have been selected; these
 are treated as the outgroup.
 
-In addition, there are buttons for rotating, flipping and zooming. The
-rotate buttons act differently depending on whether edges in the network
-are selected or not. If no edges or nodes are selected, then the entire
-network is rotated. If one or more edges are selected then only the
-edges (corresponding to one or more splits) are rotated.
+In addition, there are buttons for rotating, flipping, zooming and for
+setting the *scale ratio* to a specific value to ensure that different
+networks are drawn to the same scale. The rotate buttons act differently
+depending on whether edges in the network are selected or not. If no
+edges or nodes are selected, then the entire network is rotated. If one
+or more edges are selected then only the edges (corresponding to one or
+more splits) are rotated.
 
 The side panel contains items for styling the taxon labels and for
 adding marks to the taxa. The line width can be set here. In addition,
@@ -343,17 +351,21 @@ In addition, there are buttons for rotating, flipping and zooming.
 
 The side panel contains items for styling the taxon labels and for
 adding marks to the taxa. The line width can be set here. In addition,
-there are items to determine which traits are to be shown in pie charats
-and whether to a legend. Also, there is a menu button for determining
-how to represent character-state changes along an edge. The choices are
-has hatches (short marks), labels, compact labels and counts.
+there are items to determine which traits are to be shown in pie charts
+and whether to a legend. To change the colors used in pie charts, press
+on the items in the legend. These are then stored in the traits block in
+the `TRAITCOLOR` entry. Also, there is a menu button for determining how
+to represent character-state changes along an edge. The choices are has
+hatches (short marks), labels, compact labels and counts.
 
 ## World map tab
 
 The *World Map tab* shows a map of the world and places any traits data
-that comes with latitude and longitude assignments on the map . The
-world tab has a toolbar and side panel, the latter is hidden by default,
-but can be opened using the toggle button at the top right of the tab.
+that comes with latitude and longitude assignments on the map . To
+change the colors used in pie charts, press on the items in the legend.
+They are stored in the traits block in the `TAXONCOLOR` entry. The world
+tab has a toolbar and side panel, the latter is hidden by default, but
+can be opened using the toggle button at the top right of the tab.
 
 This tab appears when the input data contains a traits block that has
 latitude and longitude specifications .
@@ -463,11 +475,11 @@ lines numbers on and off. There is a format pane that can be used to
 select the desired display format and to specify any options associated
 with the format.
 
-Such a text tab can be opened by selecting a data node item in the side
-bar and then pressing the show/edit button at the top of the side bar,
-or by double-clicking on the item.
+Such a text tab can be opened by selecting a data node item in the
+sidebar and then pressing the show/edit button at the top of the
+sidebar, or by double-clicking on the item.
 
-## The side bar
+## The sidebar
 
 The sidebar (figure part b) contains a representation of the workflow as
 a tree at the top, and the algorithms tab pane at the bottom (figure
@@ -503,7 +515,7 @@ program and then compared against a set of GTDB reference genomes
 represented as a phylogenetic outline.
 
 The dialog is opened using the `File->Analyze Draft Genomes...` menu
-item and is setup using three tabs, as shown in the Figure .
+item and is set up using three tabs, as shown in the Figure .
 
 ![ The first tab is used to specify the input files, the type of input
 (DNA or protein sequences) and whether to use files or FastA records as
@@ -547,9 +559,9 @@ opened.](figs/Ungulate1.png)
 
 In this graph, nodes correspond to algorithms (indicated by a
 ![image](figs/algorithm-icon.png) icon) or data (indicated
-by a ![image](figs/data-icon.png) icon). From the
+by an ![image](figs/data-icon.png) icon). From the
 algorithm nodes you can edit the parameters of the method. Selecting an
-algorithm node and clicking the delete icon (top of pane) removes that
+algorithm node and clicking the delete button (top of pane) removes that
 node and any descendants of that node.
 
 ![Attaching a BioNJ algorithm to an existing Distances
@@ -592,7 +604,7 @@ SplitsTree implements four standard tree construction methods:
 
 Each of these can be called from the `Trees` menu, or added as an
 algorithm in the workflow. There are several options for displaying
-trees, available by clicking on one of the two icons on the
+trees, available by clicking on one of the two buttons on the
 right-hand-side of the tree window:
 
 ![image](figs/treeButtons.png)
@@ -629,14 +641,14 @@ the same set of splits can be represented in several different ways.
 ### Manipulating split networks
 
 To rotate or flip the entire network, use the toolbar revealed by
-pressing the preferences icon in the top right of the split network
+pressing the preferences button at the top right of the split network
 panel, making sure that none of the nodes or edges in the network are
 selected .
 
 Click on an edge in the split network to select that split. The edges
 associated to that split can be rotated using the rotate buttons in the
 toolbar or the arrows in the side panel which appears when you click the
-icon on the right .
+button on the right .
 
 ![If one or more splits are selected, then highlighted buttons can be
 used to change the angles of the selected
@@ -645,31 +657,31 @@ splits.](figs/rotateButtons.png)
 The traditional approach to displaying split networks marks out the
 splits with a mesh of quadrilaterals and polygons. The outline
 representation [@Bagcietal2021] constructs just the outer perimeter of
-the network. This is sufficient to represent all of the split weights,
-and is generally much faster to compute and draw. To switch back and
-forward between the graph mode and the outline mode use the pop-up menu
-at the left of the toolbar .
+the network. This is sufficient to represent all the split weights, and
+is generally much faster to compute and draw. To switch back and forward
+between the graph mode and the outline mode use the pop-up menu at the
+left of the toolbar .
 
 ### Split Decomposition
 
 Given a distance matrix, the *Split Decomposition* method
-[@BandeltDress1992] can selected in the Network menu, or on a distances
-node in the workflow. *Split Decomposition* is a predecessor of Neighbor
-Net, though the structures of the two methods are quite different. Split
-Decomposition works by inferring a set of splits satisfying a quartet
-condition in the distance matrix. Split Decomposition produces a set of
-weakly compatible splits and, as such, can produce more complex split
-networks than those produced by Neighbor Net. The resulting split
-network will not necessarily be planar. In practice, the conservative
-nature of the selection criteria means that Split Decomposition produces
-far fewer splits than Neighbor Net.
+[@BandeltDress1992] can be selected in the Network menu, or on a
+distances node in the workflow. *Split Decomposition* is a predecessor
+of Neighbor Net, though the structures of the two methods are quite
+different. Split Decomposition works by inferring a set of splits
+satisfying a quartet condition in the distance matrix. Split
+Decomposition produces a set of weakly compatible splits and, as such,
+can produce more complex split networks than those produced by Neighbor
+Net. The resulting split network will not necessarily be planar. In
+practice, the conservative nature of the selection criteria means that
+Split Decomposition produces far fewer splits than Neighbor Net.
 
 ### Splits in characters
 
 SplitsTree includes several methods for extracting splits directly from
 character data. These methods do not assume any explicit model for
 sequence evolution. As such they do not correct for hidden mutations.
-However they can reveal important structure within sequences from
+However, they can reveal important structure within sequences from
 closely related organisms, as well as artefacts resulting from data
 handling problems.
 
@@ -681,7 +693,7 @@ defaulting to a count of those characters if weights are not specified.
 The `BinaryToSplits` algorithm is available via the workflow graph or
 workflow hierarchy. The user can specify a weight/count threshold on the
 splits, a cap on the maximum dimension of the split network and the
-option to include all 'trivial' splits separating one taxa from the
+option to include all 'trivial' splits separating one taxon from the
 remainder automatically.
 
 The `DNAtoSplits` method carries out a similar analysis but on
@@ -713,7 +725,7 @@ methods, MinSpanningNetwork [@ExcoffierSmouse1994] and MedianJoining
 [@Bandeltetal1999]. Haplotype networks are drawn as graphs with each
 edge labelled by marks indicating the number of mutations/differences
 along that edge. This can be modified using the side panel which appears
-when clicking the preferences icon in the top right of the network
+when clicking the preferences button at the top right of the network
 panel.
 
 ### Minimum spanning network
@@ -723,17 +735,17 @@ weight. Sometimes there is a unique minimum spanning tree; other times
 there are multiple.
 
 In this context, the graph contains a node for each input sequence and
-and edge between every pair of nodes. The length of each edge is the
-Hamming distance between the corresponding sequences. Other distance
-measures can be used, but the Hamming distance is appropriate for
-Haplotype Network construction.
+edge between every pair of nodes. The length of each edge is the Hamming
+distance between the corresponding sequences. Other distance measures
+can be used, but the Hamming distance is appropriate for Haplotype
+Network construction.
 
 The minimum spanning network is formed from all those edges in the graph
 which appear in every minimum spanning tree .
 
 A minimum spanning network is constructed from a characters block by
-first determining Hamming distances (right click on the characters block
-and select `Add Algorithm -> Hamming distance`). Then right click on the
+first determining Hamming distances (right-click on the characters block
+and select `Add Algorithm -> Hamming distance`). Then right-click on the
 distance block produced and add the `Min Spanning Network` algorithm.
 
 ### Median Joining network
@@ -780,10 +792,10 @@ biological interpretation.
 
 ### Hybridization networks
 
-![On the left we see 10 different gene trees for the NADH
+![On the left we show 10 different gene trees for the NADH
 dehydrogenase-like complex in waterlilies [@Gruenstaeudl2019] and on the
-right we see a hybridization network with hybridization number $h=5$,
-computed using the PhyloFusion
+right we show a network that contains all 10 trees, with hybridization
+number $h=5$, computed using the PhyloFusion
 algorithm.](figs/phylofusion-ndh-genes.png)
 
 In mathematical phylogenetics, a *hybrization network* is a rooted
@@ -814,7 +826,7 @@ phylogenetics .
 
 Assume that you have a collection of phylogenetic trees for which you
 would like to explore the use of rooted phylogenetic networks to
-represent them. To obtained a useful network, you must setup a pipeline
+represent them. To obtain a useful network, you must setup a pipeline
 consisting of several steps . In this analysis, incorrect edges are
 particularly harmful because they generate unnecessary reticulations and
 so it is important that the input trees have confidence values (such as
@@ -823,9 +835,9 @@ low-confidence can be ignored.
 
 ![For a set of 48 genes in waterlilies [@Gruenstaeudl2019], on the left
 we see that 10 different gene trees for the NADH dehydrogenase-like
-complex have bee selected and the confidence threshold has been set to
-70. On the right we see a hybridization network computed using the
-    PhyloFusion algorithm.](figs/phylofusion-full.png)
+complex have bee selected. On the right we see a hybridization network
+computed using the PhyloFusion
+algorithm.](figs/phylofusion-full.png)
 
 - First, use the *Reroot or Reorder* algorithm to ensure that all
   trees are correctly rooted (using either midpoint- or outgroup
@@ -1340,6 +1352,9 @@ either be a number or a string.
       ;]
       [TRAITLATITUDE  latitude-trait-1  latitude-trait-2 ...  latitude-trait-n;
        TRAITLONGITUDE longitude-trait-1 longitude-trait-2 ... longitude-trait-n;]
+      [TRAITCOLOR color-trait-1  color-trait-2 ...  color-trait-n;]
+      [TAXONCOLOR color-taxon-1  color-taxon-2 ...  color-taxon-ntax;]
+
        TRAITLABELS label-trait-1 label-trait-2 ... label-trait-n;
       MATRIX
         trait data in specified format
@@ -1379,7 +1394,7 @@ both characters and their states can have labels.
 
 ## Distances block
 
-This block maintains a distance matrix of size nTax times nTax.
+This block maintains a editDistance matrix of size nTax times nTax.
 
     BEGIN DISTANCES;
       [TITLE {title};]
@@ -1391,7 +1406,7 @@ This block maintains a distance matrix of size nTax times nTax.
         [LABELS={LEFT|NO}]
       ;]
       MATRIX
-        distance data in specified format
+    editDistance data in specified format
       ;
     END;
 
@@ -1451,13 +1466,13 @@ purposes.
 
 ## Network block
 
-This block maintains a network, such as a haplotype network or just a
-set of points (for PCoA).
+Maintain a network, such as a haplotype network or just a set of points
+(for PCoA).
 
     BEGIN NETWORK;
         [TITLE {title};]
       [LINK {type} = {title};]
-      [DIMENSIONS [NTAX=number-of-taxa] [NVertices=number-of-nodes] [NEdges=number-of-edges];]
+      [DIMENSIONS [NVertices=number-of-nodes] [NEdges=number-of-edges];]
         [TYPE {HaplotypeNetwork|Points|Other};]
       [FORMAT
       ;]
@@ -2672,7 +2687,7 @@ algorithms.
 ## Input and working nodes
 
 The graph is displayed the workflow tab and is also presented in the
-sidebar . While the casual user will use menu items to setup and change
+sidebar . While the casual user will use menu items to set up and change
 the graph (without being aware of the graph), a user more familiar with
 the program will use controls in the workflow tab and sidebar to
 explicitly add, delete, duplicate or modify nodes and edges in the
@@ -2802,7 +2817,7 @@ loaded using the `File->Replace Data...` menu item.
 To run an analysis on multiple datasets, the SplitsTree packages comes
 with a commandline tool called *run-workflow*, located in the `tools`
 directory. The basic idea is as follows. First, use SplitsTree to
-interactively setup the desired analysis. Then save export the workflow
+interactively set up the desired analysis. Then save export the workflow
 to a file. Then use the `run-workflow` program to apply the workflow to
 multiple datasets.
 
@@ -2856,7 +2871,7 @@ Here is a summary of the most important options:
   created and written to that directory. If you specify one file, then
   all output is written to that file. You can also specify one output
   file per input file. Use the keyword `stdout` to have all output
-  written to the console. If output files end on `.gz` then the will
+  written to the console. If output files end on `.gz` then they will
   be written in gzip format.
 
 - Use the `-n` option to specify a specific data node to be saved to
@@ -2875,7 +2890,7 @@ In SplitsTree, each taxon is represented by a unique label. These labels
 are specified in the input taxa block. In addition to these labels, the
 taxon block may also contain a set of "display labels", one for each
 taxon. If provided, the display labels are used in drawings of trees and
-networks. Display labels can by styled using a set HTML tags. There are
+networks. Display labels can be styled using a set HTML tags. There are
 several ways to do this:
 
 - Use the side panel (on the right) to choose a font, font size, text
@@ -3053,6 +3068,11 @@ and Evolution* 21 (7): 1459–61.
 Hoppe, A., S. Tuerpitz, and MA Steel. 2019. “Species Notions That
 Combine Phylogenetic Trees and Phenotypic Partitions.” *Journal of
 Mathematical Biology* 78: 117–34.
+
+Huson, Daniel H., and David Bryant. 2024. “The SplitsTree App:
+Interactive Analysis and Visualization Using Phylogenetic Trees and
+Networks.” *Nature Methods*.
+<https://doi.org/10.1038/s41592-024-02406-3>.
 
 Huson, DH, and D Bryant. 2006. “Application of Phylogenetic Networks in
 Evolutionary Studies.” *Molecular Biology and Evolution* 23 (2): 254–67.

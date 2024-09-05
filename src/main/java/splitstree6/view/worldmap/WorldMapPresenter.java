@@ -20,6 +20,8 @@
 package splitstree6.view.worldmap;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -31,6 +33,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.undo.UndoableRedoableCommand;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.utils.worldmap.WorldMap;
 import splitstree6.view.utils.ExportUtils;
@@ -47,6 +50,8 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 
 	private final WorldMapController controller;
+
+	private final InvalidationListener traitsBlockListener;
 
 	public WorldMapPresenter(MainWindow mainWindow, WorldMapView view) {
 		this.mainWindow = mainWindow;
@@ -140,6 +145,38 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		controller.getGridCheckMenuItem().selectedProperty().bindBidirectional(view.optionShowGridProperty());
 		controller.getTwoCopiesToggleButton().selectedProperty().bindBidirectional(view.optionTwoCopiesProperty());
 		controller.getShowDataButton().selectedProperty().bindBidirectional(view.optionShowDataProperty());
+
+		view.getLegend().setUpdateColors((name, oldMap, newMap) -> {
+			var traitsBlock = view.getTraitsBlock();
+			view.getUndoManager().doAndAdd(UndoableRedoableCommand.create("taxon color", () -> {
+				oldMap.forEach((label, color) -> {
+					traitsBlock.setTaxaColor(mainWindow.getWorkingTaxa().indexOf(label), color);
+				});
+				view.getLegend().getColorMap().putAll(oldMap);
+				view.updateNodes();
+			}, () -> {
+				newMap.forEach((label, color) -> {
+					traitsBlock.setTaxaColor(mainWindow.getWorkingTaxa().indexOf(label), color);
+				});
+				view.getLegend().getColorMap().putAll(newMap);
+				view.updateNodes();
+			}));
+		});
+
+		traitsBlockListener = e -> {
+			var traitsBlock = view.getTraitsBlock();
+			if (traitsBlock != null) {
+				var taxaBlock = mainWindow.getWorkingTaxa();
+				if (traitsBlock.isSetTaxonColors()) {
+					for (var t = 1; t <= taxaBlock.getNtax(); t++) {
+						view.getLegend().getColorMap().put(taxaBlock.getLabel(t), traitsBlock.getTaxaColor(t));
+					}
+				}
+			}
+		};
+		view.traitsBlockProperty().addListener(new WeakInvalidationListener(traitsBlockListener));
+		traitsBlockListener.invalidated(null);
+
 
 		Platform.runLater(this::setupMenuItems);
 	}

@@ -24,12 +24,14 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import javafx.util.Pair;
+import jloda.fx.control.Legend;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.*;
@@ -73,8 +75,9 @@ public class WorldMapView implements IView {
 	private final ObjectProperty<TaxaBlock> workingTaxa = new SimpleObjectProperty<>();
 	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>();
 
-	private final StringProperty colorSchemeName = new SimpleStringProperty(this, "colorSchemeName");
 	private final InvalidationListener validListener;
+
+	private final Legend legend;
 
 	private final InvalidationListener selectionListener;
 
@@ -98,6 +101,16 @@ public class WorldMapView implements IView {
 		this.mainWindow = mainWindow;
 		this.name.set(name);
 		viewTab.setGraphic(MaterialIcons.graphic(MaterialIcons.map));
+
+		var formatter = new LocationsFormat(mainWindow, undoManager);
+		legend = formatter.getLegend();
+		legend.maxCircleRadiusProperty().bindBidirectional(optionMaxCircleRadius);
+		legend.setMaxCircleRadius(optionMaxCircleRadius.get());
+		legend.maxCircleRadiusProperty().addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
+		legend.setEditable(true);
+		legend.getStyleClass().add("viewer-background");
+		legend.setPadding(new Insets(3, 3, 3, 3));
+
 		var loader = new ExtendedFXMLLoader<WorldMapController>(WorldMapController.class);
 		controller = loader.getController();
 
@@ -105,18 +118,13 @@ public class WorldMapView implements IView {
 		empty.bind(Bindings.isEmpty(presenter.getWorldMap1().getUserItems().getChildren()));
 		viewTab.emptyProperty().bind(empty);
 
-		var formatter = new LocationsFormat(mainWindow, undoManager);
 		controller.getFormatVBox().getChildren().addAll(formatter);
 		controller.getFormatVBox().setDisable(false);
-		formatter.getLegend().maxCircleRadiusProperty().bindBidirectional(optionMaxCircleRadius);
-		formatter.getLegend().setMaxCircleRadius(optionMaxCircleRadius.get());
-		formatter.getLegend().maxCircleRadiusProperty().addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
 
-		Platform.runLater(() -> formatter.getLegend().setMaxCircleRadius(optionMaxCircleRadius.get()));
+		Platform.runLater(() -> legend.setMaxCircleRadius(optionMaxCircleRadius.get()));
 
-		colorSchemeName.bindBidirectional(formatter.getLegend().colorSchemeNameProperty());
 
-		formatter.getLegend().setClickOnLabel((e, label) -> {
+		legend.setClickOnLabel((e, label) -> {
 			if (label == null || !e.isShiftDown() || !SplitsTree6.isDesktop())
 				mainWindow.getTaxonSelectionModel().clearSelection();
 			var taxon = mainWindow.getWorkingTaxa().get(label);
@@ -125,22 +133,23 @@ public class WorldMapView implements IView {
 		});
 
 		traitsBlock.addListener(e -> {
-			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, controller, colorSchemeName.get(), formatter.getLegend().getMaxCircleRadius());
-			formatter.getLegend().setMaxCount(maxCount);
+			legend.getLabels().setAll(workingTaxa.get().getLabels());
+			updateNodes();
+			Platform.runLater(() -> controller.getZoomToFitButton().getOnAction().handle(null));
 		});
 
-		AnchorPane.setLeftAnchor(formatter.getLegend(), 5.0);
-		AnchorPane.setTopAnchor(formatter.getLegend(), 30.0);
-		DraggableLabel.makeDraggable(formatter.getLegend());
-		controller.getInnerAnchorPane().getChildren().add(formatter.getLegend());
+		AnchorPane.setLeftAnchor(legend, 5.0);
+		AnchorPane.setTopAnchor(legend, 30.0);
+		DraggableLabel.makeDraggable(legend);
+		controller.getInnerAnchorPane().getChildren().add(legend);
 
 		validListener = e -> {
 			if (mainWindow.getWorkflow().isValid()) {
 				workingTaxa.set(mainWindow.getWorkflow().getWorkingTaxaBlock());
 				if (workingTaxa.get() != null) {
 					traitsBlock.set(workingTaxa.get().getTraitsBlock());
-					formatter.getLegend().getLabels().setAll(workingTaxa.get().getLabels());
-					formatter.getLegend().getActive().addAll(workingTaxa.get().getLabels());
+					legend.getLabels().setAll(workingTaxa.get().getLabels());
+					legend.getActive().addAll(workingTaxa.get().getLabels());
 				} else {
 					traitsBlock.set(null);
 				}
@@ -285,7 +294,10 @@ public class WorldMapView implements IView {
 		}
 	}
 
-	private double updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, WorldMapController controller, String colorSchemeName, double maxRadius) {
+	public void updateNodes() {
+		var taxaBlock = workingTaxa.get();
+		var traitsBlock = getTraitsBlock();
+		var maxRadius = legend.getMaxCircleRadius();
 		if (taxaBlock != null && traitsBlock != null) {
 			var maxCount = computeMaxCount(taxaBlock, traitsBlock);
 			presenter.getWorldMap1().clear();
@@ -295,29 +307,28 @@ public class WorldMapView implements IView {
 				var lat = traitsBlock.getTraitLatitude(traitId);
 				var lon = traitsBlock.getTraitLongitude(traitId);
 				if (lat != 0 || lon != 0) {
-					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxRadius, clickOnLabel), lat, lon);
-					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxRadius, clickOnLabel), lat, lon);
+					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, legend, traitId, maxCount, maxRadius, clickOnLabel), lat, lon);
+					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, legend, traitId, maxCount, maxRadius, clickOnLabel), lat, lon);
 				}
 			}
 
 			presenter.getWorldMap1().expandDataRectangle(0.2);
 			presenter.getWorldMap2().expandDataRectangle(0.2);
 
-			Platform.runLater(() -> controller.getZoomToFitButton().getOnAction().handle(null));
-			return maxCount;
-		} else return 0;
+			legend.setMaxCount(maxCount);
+		} else legend.setMaxCount(0);
 	}
 
-	private static Node setupChart(TaxaBlock taxaBlock, TraitsBlock traitsBlock, String colorSchemeName, int traitId, double maxCount, double maxRadius, BiConsumer<MouseEvent, String> clickOnLabel) {
+	private static Node setupChart(TaxaBlock taxaBlock, TraitsBlock traitsBlock, Legend legend, int traitId, double maxCount, double maxRadius, BiConsumer<MouseEvent, String> clickOnLabel) {
 		var chart = new BasicPieChart(traitsBlock.getTraitLabel(traitId));
 		chart.setClickOnLabel(clickOnLabel);
-		chart.setColorScheme(colorSchemeName);
+		chart.getColorMap().clear();
 		var total = 0.0;
 		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
+			var name = taxaBlock.getLabel(t);
+			chart.getColorMap().put(name, legend.getColorForName(name));
 			var value = traitsBlock.getTraitValue(t, traitId);
-			chart.getData().add(new Pair<>(taxaBlock.getLabel(t), value));
-			if (traitsBlock.isSetTraitColorNames())
-				chart.getColorMap().put(traitsBlock.getTraitLabel(traitId), traitsBlock.getTraitColor(traitId));
+			chart.getData().add(new Pair<>(name, value));
 			total += value;
 		}
 		if (maxCount > 0)
@@ -341,5 +352,17 @@ public class WorldMapView implements IView {
 			max = Math.max(max, count);
 		}
 		return max;
+	}
+
+	public Legend getLegend() {
+		return legend;
+	}
+
+	public TraitsBlock getTraitsBlock() {
+		return traitsBlock.get();
+	}
+
+	public ObjectProperty<TraitsBlock> traitsBlockProperty() {
+		return traitsBlock;
 	}
 }

@@ -93,6 +93,7 @@ public class TraitsFormat extends Pane {
 		legend = new Legend(FXCollections.observableArrayList(), "Twenty", Orientation.VERTICAL);
 		legend.setScalingType(Legend.ScalingType.sqrt);
 		legend.maxCircleRadiusProperty().bindBidirectional(optionMaxCircleRadiusProperty());
+		legend.setEditable(true);
 
 		legend.getStyleClass().add("viewer-background");
 		legend.setPadding(new Insets(3, 3, 3, 3));
@@ -169,102 +170,111 @@ public class TraitsFormat extends Pane {
 		this.nodeShapeMap = nodeShapeMap;
 	}
 
+	private boolean inUpdateNodes = false;
+
 	public void updateNodes() {
-		if (traitsBlock.get() != null && nodeShapeMap != null && traitsBlock.get().getNumberNumericalTraits() > 0) {
-			var graphOptional = nodeShapeMap.keySet().stream().filter(v -> v.getOwner() != null).map(v -> (PhyloGraph) v.getOwner()).findAny();
-			if (graphOptional.isPresent()) {
-				var traitsBlock = getTraitsBlock();
+		if (!inUpdateNodes) {
+			inUpdateNodes = true;
+			try {
+				if (traitsBlock.get() != null && nodeShapeMap != null && traitsBlock.get().getNumberNumericalTraits() > 0) {
+					var graphOptional = nodeShapeMap.keySet().stream().filter(v -> v.getOwner() != null).map(v -> (PhyloGraph) v.getOwner()).findAny();
+					if (graphOptional.isPresent()) {
+						var traitsBlock = getTraitsBlock();
 
-				legend.getColorMap().clear();
-				legend.getLabels().setAll(traitsBlock.getNumericalTraitLabels());
-				legend.getActive().clear();
-				if (isAllTraitsActive()) {
-					legend.getActive().addAll(traitsBlock.getNumericalTraitLabels());
-				} else {
-					for (var active : getOptionActiveTraits()) {
-						legend.getActive().add(active);
-					}
-				}
-
-				var maxOverAllNodes = 0.0;
-
-					for (var t = 1; t <= workingTaxa.get().getNtax(); t++) {
-						var sum = 0.0;
-						for (var trait = 1; trait <= traitsBlock.getNTraits(); trait++) {
-							if (traitsBlock.isNumerical(trait) && isTraitActive(traitsBlock.getTraitLabel(trait))) {
-								sum += traitsBlock.getTraitValue(t, trait);
+						legend.getColorMap().clear();
+						legend.getLabels().setAll(traitsBlock.getNumericalTraitLabels());
+						legend.getActive().clear();
+						if (isAllTraitsActive()) {
+							legend.getActive().addAll(traitsBlock.getNumericalTraitLabels());
+						} else {
+							for (var active : getOptionActiveTraits()) {
+								legend.getActive().add(active);
 							}
 						}
-						maxOverAllNodes = Math.max(maxOverAllNodes, sum);
-					}
 
-				var graph = graphOptional.get();
-				for (var v : nodeShapeMap.keySet()) {
-					var nodeShape = nodeShapeMap.get(v);
-					if (nodeShape != null) {
-						nodeShape.getChildren().removeAll(BasicFX.getAllRecursively(nodeShape, BasicPieChart.class));
-						var updated = false;
+						var maxOverAllNodes = 0.0;
 
-						if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1) {
-							var taxonId = graph.getTaxon(v);
-
-							{
-								var chart = new BasicPieChart(workingTaxa.get().getLabel(taxonId));
-								chart.setColorScheme(legend.getColorSchemeName());
-
-								var tooltipBuf = new StringBuilder();
-
-								var sum = 0.0;
-								for (var traitId : traitsBlock.numericalTraits()) {
-									var label = traitsBlock.getTraitLabel(traitId);
-									if (!isNoneTraitsActive() && isTraitActive(label)) {
-										var value = traitsBlock.getTraitValue(taxonId, traitId);
-										if (value > 0) {
-											tooltipBuf.append(String.format("%s: %,.2f%n", label, value));
-										}
-										sum += value;
-										chart.getData().add(new Pair<>(traitsBlock.getTraitLabel(traitId), value));
-										if (traitsBlock.isSetTraitColorNames()) {
-											chart.getColorMap().put(label, traitsBlock.getTraitColor(traitId));
-											legend.getColorMap().put(label, traitsBlock.getTraitColor(traitId));
-										}
-									} else
-										chart.getData().add(new Pair<>(label, 0.0));
+						for (var t = 1; t <= workingTaxa.get().getNtax(); t++) {
+							var sum = 0.0;
+							for (var trait = 1; trait <= traitsBlock.getNTraits(); trait++) {
+								if (traitsBlock.isNumerical(trait) && isTraitActive(traitsBlock.getTraitLabel(trait))) {
+									sum += traitsBlock.getTraitValue(t, trait);
 								}
+							}
+							maxOverAllNodes = Math.max(maxOverAllNodes, sum);
+						}
 
-								if (sum > 0) {
-									var pieSize = (Math.sqrt(sum) / Math.sqrt(maxOverAllNodes)) * getOptionMaxCircleRadius();
-									chart.setRadius(pieSize);
-									updated = true;
+						var graph = graphOptional.get();
+						for (var v : nodeShapeMap.keySet()) {
+							var nodeShape = nodeShapeMap.get(v);
+							if (nodeShape != null) {
+								nodeShape.getChildren().removeAll(BasicFX.getAllRecursively(nodeShape, BasicPieChart.class));
+								var updated = false;
 
+								if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1) {
+									var taxonId = graph.getTaxon(v);
+
+									{
+										var chart = new BasicPieChart(workingTaxa.get().getLabel(taxonId));
+										chart.setColorScheme(legend.getColorSchemeName());
+
+										var tooltipBuf = new StringBuilder();
+
+										var sum = 0.0;
+										for (var traitId : traitsBlock.numericalTraits()) {
+											var label = traitsBlock.getTraitLabel(traitId);
+											if (!isNoneTraitsActive() && isTraitActive(label)) {
+												var value = traitsBlock.getTraitValue(taxonId, traitId);
+												if (value > 0) {
+													tooltipBuf.append(String.format("%s: %,.2f%n", label, value));
+												}
+												sum += value;
+												chart.getData().add(new Pair<>(traitsBlock.getTraitLabel(traitId), value));
+												if (traitsBlock.isSetTraitColors()) {
+													chart.getColorMap().put(label, traitsBlock.getTraitColor(traitId));
+													legend.getColorMap().put(label, traitsBlock.getTraitColor(traitId));
+												}
+											} else
+												chart.getData().add(new Pair<>(label, 0.0));
+										}
+
+										if (sum > 0) {
+											var pieSize = (Math.sqrt(sum) / Math.sqrt(maxOverAllNodes)) * getOptionMaxCircleRadius();
+											chart.setRadius(pieSize);
+											updated = true;
+
+											for (var shape : BasicFX.getAllRecursively(nodeShape, Shape.class)) {
+												if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
+													circle.setRadius(pieSize);
+												}
+											}
+											nodeShape.getChildren().add(chart);
+
+											if (!tooltipBuf.isEmpty()) {
+												Tooltip.install(chart, new Tooltip(tooltipBuf.toString()));
+											}
+										}
+									}
+								}
+								if (!updated) {
 									for (var shape : BasicFX.getAllRecursively(nodeShape, Shape.class)) {
 										if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
-											circle.setRadius(pieSize);
+											circle.setRadius(2);
 										}
 									}
-									nodeShape.getChildren().add(chart);
 
-									if (!tooltipBuf.isEmpty()) {
-										Tooltip.install(chart, new Tooltip(tooltipBuf.toString()));
-									}
 								}
 							}
 						}
-						if (!updated) {
-							for (var shape : BasicFX.getAllRecursively(nodeShape, Shape.class)) {
-								if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
-									circle.setRadius(2);
-								}
-							}
-
-						}
+						legend.setMaxCount(maxOverAllNodes);
 					}
 				}
-				legend.setMaxCount(maxOverAllNodes);
+				if (getRunAfterUpdateNodes() != null)
+					getRunAfterUpdateNodes().run();
+			} finally {
+				inUpdateNodes = false;
 			}
 		}
-		if (getRunAfterUpdateNodes() != null)
-			getRunAfterUpdateNodes().run();
 	}
 
 	public Legend getLegend() {
