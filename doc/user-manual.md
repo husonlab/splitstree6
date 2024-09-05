@@ -1866,8 +1866,8 @@ Reference: [@BandeltDress1992]
 #### Characters Filter
 
 The *Characters Filter* algorithm takes a Characters block as input and
-produces a Characters block as output. It provides several ways of
-filtering characters. The algorithm has the following options:
+produces a Characters block as output. It filter characters. The
+algorithm has the following options:
 
 `ExcludeGapSites =  <Boolean>` - exclude all sites that contain a gap
 
@@ -2059,7 +2059,7 @@ Reference: [@Husonetal2012]
 #### Dimension Filter
 
 The *Dimension Filter* algorithm takes a Splits block as input and
-produces a Splits block as output. It heuristically removes splits that
+produces a Splits block as output. It heuristically remove splits that
 lead to high-dimensional boxes in a split network. The algorithm has the
 following options:
 
@@ -2077,8 +2077,8 @@ networks. The algorithm has the following options:
 #### Splits Filter
 
 The *Splits Filter* algorithm takes a Splits block as input and produces
-a Splits block as output. It provides several ways of filtering splits.
-The algorithm has the following options:
+a Splits block as output. It filter splits. The algorithm has the
+following options:
 
 `WeightThreshold =  <Float>` - set minimum split weight threshold
 
@@ -2130,6 +2130,8 @@ options:
 
 `SecondTree =  <Integer>` - index of the second tree
 
+`OnlyOneNetwork =  <Boolean>` - report only one network
+
 `RerootToMinimize =  <Boolean>` - reroot input trees to minimize
 hybridization number
 
@@ -2141,14 +2143,20 @@ The *Phylo Fusion* algorithm takes a Trees block as input and produces a
 Trees block as output. It combines multiple rooted phylogenetic trees
 into a rooted network. The algorithm has the following options:
 
+`OnlyOneNetwork =  <Boolean>` - report only one network
+
 `MutualRefinement =  <Boolean>` - mutually refine input trees
 
 `NormalizeEdgeWeights =  <Boolean>` - normalize input edge weights
 
-`SearchHeuristic = {Thorough | Medium | Fast}` - fast, Medium or
-Thorough search: 10, 150 or 300 random orderings per taxon, respectively
+`SearchHeuristic = {Thorough | Medium | Fast}` - fast, Medium, Thorough
+or SuperThorough search: 10, 150, 300 or 1000 random orderings per
+taxon, respectively
 
-`CladeReduction =  <Boolean>` - allow clade reduction as well as subtree
+`GroupNonSeparated =  <Boolean>` - improve performance by grouping taxa
+that are not separated by an non-trivial edge
+
+`CladeReduction =  <Boolean>` - improve performance using clade
 reduction
 
 References: [@Zhangetal2023; @Zhangetal2024]
@@ -2163,8 +2171,7 @@ Reference: [@LapointeCucumel1997]
 #### Blob Tree
 
 The *Blob Tree* algorithm takes a Trees block as input and produces a
-Trees block as output. It extracts the blob tree from a rooted network
-(by contracting all non-trivial bi-connected components).
+Trees block as output. It extract the blob tree from a rooted network.
 
 Reference: [@Husonetal2012]
 
@@ -2301,7 +2308,7 @@ Reference: [@Whitfieldetal2008]
 #### LSA Tree
 
 The *LSA Tree* algorithm takes a Trees block as input and produces a
-Trees block as output. It extracts the LSA tree from a rooted network.
+Trees block as output. It extract the LSA tree from a rooted network.
 
 Reference: [@Husonetal2012]
 
@@ -2325,8 +2332,8 @@ options:
 #### Reroot Or Reorder Trees
 
 The *Reroot Or Reorder Trees* algorithm takes a Trees block as input and
-produces a Trees block as output. It reroot, or change the order of
-children, on all trees. The algorithm has the following options:
+produces a Trees block as output. It reroot or reorder all trees. The
+algorithm has the following options:
 
 `RootBy = {Off | MidPoint | OutGroup}` - determine how to reroot
 
@@ -2375,13 +2382,13 @@ Reference: [@Husonetal2004]
 #### Trees Filter
 
 The *Trees Filter* algorithm takes a Trees block as input and produces a
-Trees block as output. It allows the user to interactively filter trees.
+Trees block as output. It filter trees.
 
 #### Trees Filter More
 
 The *Trees Filter More* algorithm takes a Trees block as input and
-produces a Trees block as output. It provides several options for
-filtering trees. The algorithm has the following options:
+produces a Trees block as output. It filter trees. The algorithm has the
+following options:
 
 `RequireAllTaxa =  <Boolean>` - keep only trees that have the full set
 of taxa
@@ -2395,8 +2402,8 @@ this total length
 #### Trees Edges Filter
 
 The *Trees Edges Filter* algorithm takes a Trees block as input and
-produces a Trees block as output. It provides several options for
-filtering trees. The algorithm has the following options:
+produces a Trees block as output. It filter edges in trees. The
+algorithm has the following options:
 
 `MinConfidence =  <Double>` - keep only edges that have this minimum
 confidence value
@@ -2411,8 +2418,8 @@ length
 #### Tree Selector
 
 The *Tree Selector* algorithm takes a Trees block as input and produces
-a Trees block as output. It allows the user to select one from a list of
-trees. The algorithm has the following options:
+a Trees block as output. It select a tree to use. The algorithm has the
+following options:
 
 `Which =  <Integer>` - which tree to use
 
