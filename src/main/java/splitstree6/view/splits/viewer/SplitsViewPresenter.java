@@ -465,22 +465,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.setupSingleBidirectionalBinding(mainController.getShowQRCodeMenuItem().selectedProperty(), view.optionShowQRCodeProperty());
 		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
-		mainController.getRotateRightMenuItem().setOnAction(e -> {
-			if (view.getSplitSelectionModel().size() == 0)
-				view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateRight(5).toString());
-			else
-				view.getSplitsFormatter().getPresenter().rotateSplitsRight();
-		});
+		mainController.getRotateRightMenuItem().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateRight(5).toString()));
 		mainController.getRotateRightMenuItem().disableProperty().bind(splitNetworkPane.changingOrientationProperty());
 
-
-
-		mainController.getRotateLeftMenuItem().setOnAction(e -> {
-			if (view.getSplitSelectionModel().size() == 0)
-				view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft(5).toString());
-			else
-				view.getSplitsFormatter().getPresenter().rotateSplitsLeft();
-		});
+		mainController.getRotateLeftMenuItem().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft(5).toString()));
 		mainController.getRotateLeftMenuItem().disableProperty().bind(splitNetworkPane.changingOrientationProperty());
 
 		controller.getRotateLeftButton().setOnAction(e -> {

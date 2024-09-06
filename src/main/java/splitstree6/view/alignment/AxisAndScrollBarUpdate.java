@@ -26,6 +26,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import splitstree6.data.CharactersBlock;
+import splitstree6.main.SplitsTree6;
 
 import java.util.BitSet;
 
@@ -65,7 +66,7 @@ public class AxisAndScrollBarUpdate {
 				if (site >= 1 && site <= nChar) {
 					var bits = new BitSet();
 					bits.or(alignmentView.getSelectedSites());
-					if (event.isShiftDown()) {
+					if (event.isShiftDown() || !SplitsTree6.isDesktop()) {
 						if (bits.cardinality() == 0 || bits.cardinality() == 1 && bits.get(site)) {
 							bits.set(site, !bits.get(site));
 						} else {

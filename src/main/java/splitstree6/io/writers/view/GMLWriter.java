@@ -52,12 +52,13 @@ public class GMLWriter extends ViewWriterBase {
 			if (graph != null) {
 				var nodePointMap = splitsView.getPresenter().getSplitNetworkPane().getSplitNetworkLayout().getNodePointMap();
 				var labelNodes = List.of("label", "x", "y");
-				BiFunction<String, Node, String> labelNodeValue = (label, v) -> switch (label) {
-					case "label" -> taxaBlock.getLabel(graph.getTaxon(v));
-					case "x" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getX());
-					case "y" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getY());
-					default -> null;
-				};
+				BiFunction<String, Node, String> labelNodeValue = (label, v) ->
+						switch (label) {
+							case "label" -> (graph.hasTaxa(v) ? taxaBlock.getLabel(graph.getTaxon(v)) : null);
+							case "x" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getX());
+							case "y" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getY());
+							default -> null;
+						};
 				var labelEdges = List.of("split", "weight");
 				BiFunction<String, Edge, String> labelEdgeValue = (label, e) -> switch (label) {
 					case "split" -> String.valueOf(graph.getSplit(e));
