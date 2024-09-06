@@ -58,7 +58,7 @@ public class RotateSplit {
 		var graphOptional = nodeShapeMap.keySet().stream().map(v -> (PhyloSplitsGraph) v.getOwner()).findAny();
 		if (graphOptional.isPresent()) {
 			var graph = graphOptional.get();
-			if (nodeShapeMap.keySet().size() > 0) {
+			if (!nodeShapeMap.keySet().isEmpty()) {
 				if (angle != 0) {
 					var e = graph.edgeStream().filter(f -> graph.getSplit(f) == split).findAny().orElse(null);
 					if (e != null) {

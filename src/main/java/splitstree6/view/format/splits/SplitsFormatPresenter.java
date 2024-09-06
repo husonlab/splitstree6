@@ -196,14 +196,10 @@ public class SplitsFormatPresenter {
 			}
 		};
 
-		controller.getRotateLeftButton().setOnAction(e -> {
-			rotateSplitsLeft();
-		});
+		controller.getRotateLeftButton().setOnAction(e -> rotateSplitsLeft());
 		controller.getRotateLeftButton().disableProperty().bind(splitSelectionModel.sizeProperty().isEqualTo(0));
 
-		controller.getRotateRightButton().setOnAction(e -> {
-			rotateSplitsRight();
-		});
+		controller.getRotateRightButton().setOnAction(e -> rotateSplitsRight());
 		controller.getRotateRightButton().disableProperty().bind(splitSelectionModel.sizeProperty().isEqualTo(0));
 
 		controller.getOutlineFillColorPicker().valueProperty().bindBidirectional(outlineFill);

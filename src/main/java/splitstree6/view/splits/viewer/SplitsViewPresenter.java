@@ -270,7 +270,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			var taxa = mainWindow.getWorkingTaxa();
 			var splits = splitsBlock.get();
 			mouseInteraction.setup(taxonLabelMap, nodeLabeledShapeMap, splitShapeMap, taxa::get, taxa::indexOf,
-					id -> id >= 1 && id <= splits.getNsplits() ? splits.get(id) : null);
+					id -> id >= 1 && id <= splits.getNsplits() ? splits.get(id) : null, view);
 
 			for (var label : BasicFX.getAllRecursively(splitNetworkPane, RichTextLabel.class)) {
 				label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), view.getUndoManager(), label));

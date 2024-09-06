@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ContextMenuEvent;
@@ -35,14 +36,18 @@ import jloda.fx.graph.GraphTraversals;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.undo.UndoableRedoableCommand;
+import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Node;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.BitSetUtils;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.splits.RotateSplit;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.main.SplitsTree6;
 import splitstree6.splits.ASplit;
+import splitstree6.view.utils.ShapeUtils;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -58,6 +63,7 @@ public class InteractionSetup {
 	private static boolean edgeShapeEntered;
 	private static double mouseDownX;
 	private static double mouseDownY;
+	private static double totalAngle;
 
 	private final Stage stage;
 	private final UndoManager undoManager;
@@ -67,7 +73,11 @@ public class InteractionSetup {
 	private InvalidationListener taxonSelectionInvalidationListener;
 	private InvalidationListener splitSelectionInvalidationListener;
 
-	private boolean inClickOnEdge = false;
+	private static EventHandler<MouseEvent> mousePressedHandler;
+	private static EventHandler<MouseEvent> mouseDraggedHandler;
+	private static EventHandler<MouseEvent> mouseReleasedHandler;
+
+
 
 	/**
 	 * constructor
@@ -91,8 +101,50 @@ public class InteractionSetup {
 	 * setup split network mouse interaction
 	 */
 	public void setup(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapesMap,
-					  Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap, Function<Integer, ASplit> idSplitMap) {
+					  Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap, Function<Integer, ASplit> idSplitMap, SplitsView view) {
 		var graphOptional = nodeShapeMap.keySet().stream().map(v -> (PhyloSplitsGraph) v.getOwner()).findAny();
+
+		mousePressedHandler = e -> {
+			mouseDownX = e.getScreenX();
+			mouseDownY = e.getScreenY();
+			totalAngle = 0.0;
+			e.consume();
+		};
+
+		mouseDraggedHandler = e -> {
+			var oldLocation = new Point2D(mouseDownX, mouseDownY);
+			var newLocation = new Point2D(e.getScreenX(), e.getScreenY());
+			var shapes = new ArrayList<Shape>();
+			splitSelectionModel.getSelectedItems().stream().map(splitShapesMap::get).forEach(shapes::addAll);
+			var center = ShapeUtils.getCenterScreenCoordinates(shapes);
+			if (center.distance(oldLocation) > 5 && center.distance(newLocation) > 5) {
+				var angle = GeometryUtilsFX.computeObservedAngle(center, newLocation, oldLocation);
+				totalAngle += angle;
+				RotateSplit.apply(splitSelectionModel.getSelectedItems(), angle, nodeShapeMap);
+			}
+			mouseDownX = e.getScreenX();
+			mouseDownY = e.getScreenY();
+		};
+
+		mouseReleasedHandler = e -> {
+			if (totalAngle != 0) {
+				var splits = new ArrayList<>(splitSelectionModel.getSelectedItems());
+				var oldEdits = view.getOptionEdits();
+				view.setOptionEdits(SplitNetworkEdits.addAngles(oldEdits, splits, totalAngle));
+				undoManager.add(
+						UndoableRedoableCommand.create("Rotate split",
+								() -> {
+									RotateSplit.apply(splits, -totalAngle, nodeShapeMap);
+									view.setOptionEdits(oldEdits);
+								},
+								() -> {
+									RotateSplit.apply(splits, totalAngle, nodeShapeMap);
+									view.setOptionEdits(SplitNetworkEdits.addAngles(oldEdits, splits, totalAngle));
+								}
+						)
+				);
+			}
+		};
 
 		if (graphOptional.isPresent()) {
 			var graph = graphOptional.get();
@@ -145,6 +197,12 @@ public class InteractionSetup {
 							label.setOnMouseEntered(nodeShape.getOnMouseEntered());
 							label.setOnMouseExited(nodeShape.getOnMouseExited());
 						}
+
+						nodeShape.setOnMousePressed(mousePressedHandler);
+
+						nodeShape.setOnMouseDragged(mouseDraggedHandler);
+
+						nodeShape.setOnMouseReleased(mouseReleasedHandler);
 
 						label.setOnMousePressed(e -> {
 							if (taxonSelectionModel.isSelected(taxon)) {
@@ -199,8 +257,6 @@ public class InteractionSetup {
 
 					shape.setOnMouseClicked(e -> {
 						if (e.isStillSincePress() && idSplitMap.apply(splitId) != null) {
-							try {
-								inClickOnEdge = true;
 								if (e.getClickCount() == 1) {
 									if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
 										splitSelectionModel.clearSelection();
@@ -232,12 +288,13 @@ public class InteractionSetup {
 										}
 									}
 								}
-							} finally {
-								inClickOnEdge = false;
-							}
 							e.consume();
 						}
 					});
+
+					shape.setOnMousePressed(mousePressedHandler);
+					shape.setOnMouseDragged(mouseDraggedHandler);
+					shape.setOnMouseReleased(mouseReleasedHandler);
 				}
 			}
 
@@ -284,5 +341,6 @@ public class InteractionSetup {
 		menu.getItems().add(editLabelMenuItem);
 		menu.show(label, event.getScreenX(), event.getScreenY());
 	}
+
 }
 

@@ -118,6 +118,8 @@ public class SplitNetworkLayout {
 					   ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 					   ObservableList<LoopView> loopViews) throws IOException {
 		labelLayout.clear();
+		splitShapeMap.clear();
+		nodeShapeMap.clear();
 
 		if (splitsBlock0.getNsplits() == 0)
 			return new Group();
