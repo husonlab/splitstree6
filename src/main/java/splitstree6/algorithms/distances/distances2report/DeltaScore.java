@@ -28,7 +28,7 @@ import splitstree6.data.parts.Taxon;
 import java.util.Collection;
 
 /**
- * computes the delta score for a editDistance matrix
+ * computes the delta score for a distance matrix
  * Daniel Huson, 2.2023
  */
 public class DeltaScore extends Distances2ReportBase {
@@ -36,7 +36,7 @@ public class DeltaScore extends Distances2ReportBase {
 	@Override
 	public String getCitation() {
 		return "Holland et al 2002;" +
-			   "BR Holland, KT Huber, AWM Dress and V. Moulton, Delta Plots: A tool for analyzing phylogenetic editDistance data, Molecular Biology and Evolution, 19(12):2051–2059, 2002.";
+			   "BR Holland, KT Huber, AWM Dress and V. Moulton, Delta Plots: A tool for analyzing phylogenetic distance data, Molecular Biology and Evolution, 19(12):2051–2059, 2002.";
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class DeltaScore extends Distances2ReportBase {
 		}
 
 		//   System.out.println("Average delta score for selection = " + Basic.roundSigFig(totalAverage[0], 5) + "\nAverage Q-residual = " + Basic.roundSigFig(totalAverage[1], 5) + "\n");
-		//  System.out.println("Average editDistance = " + (avDistance));
+		//  System.out.println("Average distance = " + (avDistance));
 
 
 		// double[] pvals = computeParametricPval(doc, 100, selectedTaxa, totalAverage);

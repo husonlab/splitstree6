@@ -140,7 +140,7 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 	 */
 	private void computeMinimumSpanningNetwork(Set<String> sequences, double[] weights, int epsilon, PhyloGraph graph, EdgeSet feasibleLinks) {
 		var array = sequences.toArray(new String[0]);
-		// compute a editDistance matrix between all sequences:
+		// compute a distance matrix between all sequences:
 		var matrix = new double[array.length][array.length];
 
 		var value2pairs = new TreeMap<Double, List<Pair<Integer, Integer>>>();
@@ -295,9 +295,9 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 	}
 
 	/**
-	 * compute weighted editDistance between two sequences
+	 * compute weighted distance between two sequences
 	 *
-	 * @return editDistance
+	 * @return distance
 	 */
 	private double computeDistance(String seqA, String seqB, double[] weights) {
 		double cost = 0;

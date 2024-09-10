@@ -70,7 +70,7 @@ public class GTRmodel extends NucleotideModel {
 	}
 
 	@Override
-	/* Exact editDistance - pg 456 in Swofford et al.
+	/* Exact distance - pg 456 in Swofford et al.
 	 * Let Pi denote the diagonal matrix with base frequencies down the
 	 * diagonal. The standard formula is
 	 *

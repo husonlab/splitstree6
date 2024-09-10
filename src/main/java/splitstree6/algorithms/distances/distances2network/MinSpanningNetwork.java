@@ -63,7 +63,7 @@ public class MinSpanningNetwork extends Distances2Network {
 		if (!optionName.startsWith("option"))
 			optionName = "option" + optionName;
 		if (optionName.equals(optionEpsilon.getName())) {
-			return "Weighted genetic editDistance measure. Low: MedianJoining, High: full median network";
+			return "Weighted genetic distance measure. Low: MedianJoining, High: full median network";
 		} else if (optionName.equals(optionMinSpanningTree.getName())) {
 			return "Calculate minimum spanning tree";
 		}

@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Computes the maximum likelihood protein editDistance estimates for a set of characters
+ * Computes the maximum likelihood protein distance estimates for a set of characters
  * <p>
  * Created on Jun 8, 2004
  *
@@ -88,7 +88,7 @@ public class ProteinMLDistance extends Characters2Distances {
 		int npairs = ntax * (ntax - 1) / 2;
 
 		distancesBlock.setNtax(ntax);
-		progress.setTasks("Protein ML editDistance", "Init.");
+		progress.setTasks("Protein ML distance", "Init.");
 		progress.setMaximum(npairs);
 
 		ProteinModel model = selectModel(optionModel.getValue());
@@ -104,7 +104,7 @@ public class ProteinMLDistance extends Characters2Distances {
 				final var seqPair = new PairwiseCompare(charactersBlock, s, t);
 				var dist = -1.0;
 
-				//Maximum likelihood editDistance. Note we want to ignore sites
+				//Maximum likelihood distance. Note we want to ignore sites
 				//with the stop codon.
 				try {
 					dist = seqPair.mlDistance(model);

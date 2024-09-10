@@ -33,7 +33,7 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Implements the NeiLi (1979) editDistance for restriction site data.
+ * Implements the NeiLi (1979) distance for restriction site data.
  *
  * @author David Bryant, 2008?
  */

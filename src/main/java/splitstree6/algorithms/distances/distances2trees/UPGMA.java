@@ -79,7 +79,7 @@ public class UPGMA extends Distances2Trees implements IToSingleTree {
 			sizes[t] = 1;
 		}
 
-		final var d = new double[ntax + 1][ntax + 1];// editDistance matix
+		final var d = new double[ntax + 1][ntax + 1];// distance matix
 
 		//Initialise d
 		//Compute the closest values for each taxa.

@@ -33,19 +33,19 @@ import java.util.*;
 import static splitstree6.utils.TreesUtils.addAdhocTaxonIds;
 
 /**
- * computes the path multiplicity editDistance between two rooted trees or networks
- * Note that two tree-child networks are isomorphic, if and only if their editDistance is 0
+ * computes the path multiplicity distance between two rooted trees or networks
+ * Note that two tree-child networks are isomorphic, if and only if their distance is 0
  * Daniel Huson, 2.2024
  */
 
 public class PathMultiplicityDistance {
 
 	/**
-	 * computes the path multiplicity editDistance between two rooted trees or networks
+	 * computes the path multiplicity distance between two rooted trees or networks
 	 *
 	 * @param tree1 rooted tree or network
 	 * @param tree2 rooted tree or network
-	 * @return editDistance
+	 * @return distance
 	 */
 	public static double compute(PhyloTree tree1, PhyloTree tree2) {
 		return compute(List.of(tree1, tree2))[0][1];
@@ -55,7 +55,7 @@ public class PathMultiplicityDistance {
 	 * computes the matrix of all pairwise path-multiplity distances
 	 *
 	 * @param trees input rooted trees and/or networks
-	 * @return editDistance matrix
+	 * @return distance matrix
 	 */
 	public static double[][] compute(List<PhyloTree> trees) {
 		var taxa = new BitSet();

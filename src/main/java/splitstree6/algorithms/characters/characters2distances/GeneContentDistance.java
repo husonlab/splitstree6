@@ -29,7 +29,7 @@ import splitstree6.data.parts.CharactersType;
 import java.util.BitSet;
 
 /**
- * Gene content editDistance
+ * Gene content distance
  * Daniel Huson, 2004
  */
 
@@ -49,7 +49,7 @@ public class GeneContentDistance extends Characters2Distances {
 		if (!optionName.startsWith("option"))
 			optionName = "option" + optionName;
 		if (optionName.equals("optionMethod"))
-			return "Choose Maximum likelihood editDistance estimation (Huson and Steel 2004, eq. 4), or shared genes editDistance (Snel et al, 1997)";
+			return "Choose Maximum likelihood distance estimation (Huson and Steel 2004, eq. 4), or shared genes distance (Snel et al, 1997)";
 		else
 			return optionName;
 	}
@@ -61,7 +61,7 @@ public class GeneContentDistance extends Characters2Distances {
 	}
 
 	/**
-	 * computes the maximum likelihood estimator editDistance Huson and Steel 2003
+	 * computes the maximum likelihood estimator distance Huson and Steel 2003
 	 */
 	private static void computeMLE(DistancesBlock dist, int ntax, BitSet[] genes) {
 		dist.setNtax(ntax);

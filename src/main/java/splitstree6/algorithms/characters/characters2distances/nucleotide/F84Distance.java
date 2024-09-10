@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Implements the Felsenstein84 DNA editDistance model
+ * Implements the Felsenstein84 DNA distance model
  * David Bryant and Daniel Huson, 2004
  */
 
@@ -54,7 +54,7 @@ public class F84Distance extends Nucleotides2DistancesBase {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 
-		progress.setTasks("Felsenstein 1984 editDistance", "Computing...");
+		progress.setTasks("Felsenstein 1984 distance", "Computing...");
 		progress.setMaximum(taxaBlock.getNtax());
 
 		final F84Model model = new F84Model(getOptionBaseFrequencies(), getOptionTsTvRatio());

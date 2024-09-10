@@ -63,7 +63,7 @@ public class HKY85model extends NucleotideModel {
 	}
 
 	/**
-	 * no exact editDistance associated with this model
+	 * no exact distance associated with this model
 	 */
 	public double exactDistance(double[][] F) {
 		throw new RuntimeException("exactDistance: not implemented");

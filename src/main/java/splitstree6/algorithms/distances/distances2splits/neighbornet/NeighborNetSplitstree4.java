@@ -60,7 +60,7 @@ public class NeighborNetSplitstree4 {
 		int numOuterIterations = 0;
 
 
-		//Copy editDistance array into a 1dim vector
+		//Copy distance array into a 1dim vector
 		double[] d = new double[npairs];
 		convertArray2Vec(distances, d);
 
@@ -91,7 +91,7 @@ public class NeighborNetSplitstree4 {
 
 		Arrays.fill(old_x, 1.0);
 
-		double deltax; // editDistance between current x and previous
+		double deltax; // distance between current x and previous
 
 		/* Initialise active - originally no variables are active (held to 0.0) */
 		boolean[] active = new boolean[npairs];
@@ -328,7 +328,7 @@ public class NeighborNetSplitstree4 {
 	 * the formula of Chepoi and Fichet (this takes O(N^2) time only!).
 	 *
 	 * @param n the number of taxa
-	 * @param d the editDistance matrix
+	 * @param d the distance matrix
 	 * @param x the split weights
 	 */
 	static private void runUnconstrained(int n, double[] d, double[] x) {
@@ -364,7 +364,7 @@ public class NeighborNetSplitstree4 {
 	 * *
 	 *
 	 * @param n number of taxa
-	 * @param d editDistance matrix
+	 * @param d distance matrix
 	 * @param p the result
 	 */
 	static private void calculateAtx(int n, double[] d, double[] p) {
@@ -435,7 +435,7 @@ public class NeighborNetSplitstree4 {
 	static private void calculateAb(int n, double[] b, double[] d) {
 		double d_ij;
 
-		//First the pairs editDistance one apart.
+		//First the pairs distance one apart.
 		int index;
 		int dindex = 0;
 

@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 /**
- * Given a circular ordering and a editDistance matrix,
+ * Given a circular ordering and a distance matrix,
  * computes the unconstrained or constrained least square weighted splits
  * <p/>
  * For all vectors, the canonical ordering of pairs is (0,1),(0,2),...,(0,n-1),(1,2),(1,3),...,(1,n-1), ...,(n-1,n)
@@ -104,7 +104,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	 * That is, it minimizes  0.5*||Ax - d||^2_2  +  \lambda ||x||_1
 	 *
 	 * @param ordering Circular ordering
-	 * @param dist     Input editDistance
+	 * @param dist     Input distance
 	 * @return Splits  splits with the estimated weights.
 	 */
 	public static ArrayList<ASplit> apply(int[] ordering, DistancesBlock dist) {
@@ -119,7 +119,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	 * That is, it minimizes  0.5*||Ax - d||^2_2  +  \lambda ||x||_1
 	 *
 	 * @param ordering Circular ordering
-	 * @param dist     Input editDistance
+	 * @param dist     Input distance
 	 * @param options  parameters for the optimization and model
 	 * @return Splits  splits with the estimated weights.
 	 */
@@ -176,7 +176,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 //            { return computeWeightedSplits(ordering,dist,var,options);}
 
 	/**
-	 * setup working editDistance so that ordering is trivial.
+	 * setup working distance so that ordering is trivial.
 	 * Note the the code assumes that taxa are labeled 0..ntax-1 and
 	 * we do the transition here. It is undone when extracting the splits
 	 *
@@ -221,7 +221,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	 * the formula of Chepoi and Fichet (this takes O(N^2) time only!).
 	 *
 	 * @param n the number of taxa
-	 * @param d the editDistance matrix
+	 * @param d the distance matrix
 	 * @param x the split weights
 	 */
 	static private void runUnconstrainedLS(int n, double[] d, double[] x) {
@@ -325,14 +325,14 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	 * 0.5 * (Ax - d)'W(Ax-d) + \lambda 1'x   s.t. x \geq 0
 	 * <p/>
 	 * Here, A is the design matrix for the set of cyclic splits with ordering 0,1,2,...,n-1
-	 * d is the editDistance vector, with pairs in order (0,1),(0,2),...,(0,n-1),(1,2),(1,3),...,(1,n-1), ...,(n-1,n)
+	 * d is the distance vector, with pairs in order (0,1),(0,2),...,(0,n-1),(1,2),(1,3),...,(1,n-1), ...,(n-1,n)
 	 * W is a vector of variances for d, with pairs in same order as d.
 	 * x is a vector of split weights, with pairs in same order as d. The split (i,j), for i<j, is {i,i+1,...,j-1}| rest
 	 * lambda is the regularisation parameter, given by lambda = max_i (A'Wd)_i   * ( 1 - lambdaFraction)
 	 * Note that lambdaFraction = 1 => lambda = 0, and lambdaFraction = 0 => x = 0.
 	 *
 	 * @param ntax    The number of taxa
-	 * @param d       the editDistance matrix
+	 * @param d       the distance matrix
 	 * @param W       the weight matrix
 	 * @param x       the split weights
 	 * @param options fraction parameter for lambda regularisation
@@ -533,7 +533,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	 * *
 	 *
 	 * @param n number of taxa
-	 * @param d editDistance matrix
+	 * @param d distance matrix
 	 * @param p the result
 	 */
 	static public void calculateAtx(int n, double[] d, double[] p) {
@@ -579,7 +579,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	static public void calculateAb(int n, double[] b, double[] d) {
 		double d_ij;
 
-		//First the pairs editDistance one apart.
+		//First the pairs distance one apart.
 		int index;
 		int dindex = 0;
 

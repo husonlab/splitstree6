@@ -32,6 +32,6 @@ public class PDistance extends HammingDistance {
 
 	@Override
 	public String getShortDescription() {
-		return "Computes the normalized Hamming editDistance.";
+		return "Computes the normalized Hamming distance.";
 	}
 }

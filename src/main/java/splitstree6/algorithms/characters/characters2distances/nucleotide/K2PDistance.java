@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Computes the Kimura two parameter editDistance for a set of characters
+ * Computes the Kimura two parameter distance for a set of characters
  * <p>
  * Created on 12-Jun-2004
  *

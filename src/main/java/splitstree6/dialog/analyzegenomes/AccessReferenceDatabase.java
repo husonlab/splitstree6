@@ -437,7 +437,7 @@ public class AccessReferenceDatabase implements Closeable {
 		}
 
 		final var minSharedKMers = MashDistance.computeMinIntersectionSizeForMaxDistance(maxDistance, getMashK(), getMashS());
-		System.err.printf("Max editDistance = %.3f  => min number of shared k-mers = %d%n", maxDistance, minSharedKMers);
+		System.err.printf("Max distance = %.3f  => min number of shared k-mers = %d%n", maxDistance, minSharedKMers);
 
 		progress.setSubtask("Searching");
 		progress.setMaximum(countBloomFilters());

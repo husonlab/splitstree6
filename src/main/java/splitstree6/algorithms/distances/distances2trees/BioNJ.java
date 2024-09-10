@@ -85,7 +85,7 @@ public class BioNJ extends Distances2Trees implements IToSingleTree {
 		if (nTax <= 1)
 			return tree;
 
-		final var h = new double[nTax + 1][nTax + 1];// editDistance matrix
+		final var h = new double[nTax + 1][nTax + 1];// distance matrix
 
 		final var active = new BitSet();
 
@@ -100,7 +100,7 @@ public class BioNJ extends Distances2Trees implements IToSingleTree {
 
 		for (int i = 1; i <= nTax; i++) {
 			h[i][i] = 0.0;
-			for (int j = 1; j <= nTax; j++) { //fill up the editDistance matix h
+			for (int j = 1; j <= nTax; j++) { //fill up the distance matix h
 				if (i < j)
 					h[i][j] = distances.get(i, j);//
 				else
@@ -162,7 +162,7 @@ public class BioNJ extends Distances2Trees implements IToSingleTree {
 
 			// fusion of h
 			// double h_min = h[i_min][j_min];
-			double var_min = var[i_min][j_min]; //Variance of the editDistance between i_min and j_min
+			double var_min = var[i_min][j_min]; //Variance of the distance between i_min and j_min
 
 			//compute lambda to minimize the variances of the new distances
 			double lambda;

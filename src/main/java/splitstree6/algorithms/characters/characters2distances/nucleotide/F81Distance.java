@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Implements the Felsenstein 1981 DNA editDistance model
+ * Implements the Felsenstein 1981 DNA distance model
  * Dave Bryant, 2004
  */
 
@@ -54,7 +54,7 @@ public class F81Distance extends Nucleotides2DistancesBase {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 
-		progress.setTasks("Felsenstein 1981 editDistance", "Computing...");
+		progress.setTasks("Felsenstein 1981 distance", "Computing...");
 
 		final F81model model = new F81model(getOptionBaseFrequencies());
 

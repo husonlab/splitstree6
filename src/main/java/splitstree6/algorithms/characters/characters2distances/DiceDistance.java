@@ -30,7 +30,7 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Calculates distances using the DiceDistance coefficient editDistance
+ * Calculates distances using the DiceDistance coefficient distance
  * <p>
  * Created on Nov 2007
  *
@@ -45,7 +45,7 @@ public class DiceDistance extends Characters2Distances {
 
 	@Override
 	public String getShortDescription() {
-		return "Computes distances using the DiceDistance coefficient editDistance.";
+		return "Computes distances using the DiceDistance coefficient distance.";
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class DiceDistance extends Characters2Distances {
 		int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);
 
-		progress.setTasks("DiceDistance editDistance", "Init.");
+		progress.setTasks("DiceDistance distance", "Init.");
 		progress.setMaximum(ntax);
 
 		for (var s = 1; s <= ntax; s++) {

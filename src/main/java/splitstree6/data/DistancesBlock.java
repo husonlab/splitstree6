@@ -132,7 +132,7 @@ public class DistancesBlock extends DataBlock {
 
 	@Override
 	public void updateShortDescription() {
-		setShortDescription(String.format("a %,d x %,d editDistance matrix", getNtax(), getNtax()));
+		setShortDescription(String.format("a %,d x %,d distance matrix", getNtax(), getNtax()));
 	}
 
 	@Override

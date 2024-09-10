@@ -1057,7 +1057,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 					nfalseZero++;
 			}
 		}
-		System.err.println("Tested incremental fit on circular editDistance: err = " + diff);
+		System.err.println("Tested incremental fit on circular distance: err = " + diff);
 		if (diff > 0.1)
 			incrementalFitting(x2, d, 1e-10, false);
 		return diff;

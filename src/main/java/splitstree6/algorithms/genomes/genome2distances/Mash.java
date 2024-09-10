@@ -63,7 +63,7 @@ public class Mash extends Genomes2Distances {
 
 	@Override
 	public String getCitation() {
-		return "Ondov et al 2016; BD Ondov, TJ Treangen, P. Melsted, AB Mallonee, NH Bergman, S. Koren & AM Phillippy. Mash: fast genome and metagenome editDistance estimation using MinHash. Genome Biol 17:132, 2016.";
+		return "Ondov et al 2016; BD Ondov, TJ Treangen, P. Melsted, AB Mallonee, NH Bergman, S. Koren & AM Phillippy. Mash: fast genome and metagenome distance estimation using MinHash. Genome Biol 17:132, 2016.";
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class Mash extends Genomes2Distances {
 					countUndefined++;
 			}
 			if (countUndefined > 0)
-				NotificationManager.showWarning(String.format("Failed to estimate editDistance for %d pairs (distances set to 0.75) - increase sketch size or decrease k", countUndefined));
+				NotificationManager.showWarning(String.format("Failed to estimate distance for %d pairs (distances set to 0.75) - increase sketch size or decrease k", countUndefined));
 		} catch (IOException ex) {
 			throw ex;
 		} catch (Exception ex) {

@@ -204,7 +204,7 @@ public class SplitsBlockUtilities {
 	}
 
 	/**
-	 * returns comparison of maximum editDistance between any two taxon on side A and on side B of the given split
+	 * returns comparison of maximum distance between any two taxon on side A and on side B of the given split
 	 *
 	 * @param ntax        number of taxa
 	 * @param splitsBlock splits
@@ -347,7 +347,7 @@ public class SplitsBlockUtilities {
 	 *
 	 * @param ntax   number of taxa
 	 * @param splits with 1-based taxa
-	 * @return editDistance matrix, 0-based
+	 * @return distance matrix, 0-based
 	 */
 	public static DistancesBlock splitsToDistances(int ntax, List<ASplit> splits, boolean useWeights) {
 		var distancesBlock = new DistancesBlock();

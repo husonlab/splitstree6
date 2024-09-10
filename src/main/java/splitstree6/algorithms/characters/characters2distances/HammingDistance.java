@@ -64,7 +64,7 @@ public class HammingDistance extends Characters2Distances {
 
 	@Override
 	public String getShortDescription() {
-		return "Computes the Hamming editDistance, that is the number of differences between sequences";
+		return "Computes the Hamming distance, that is the number of differences between sequences";
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class HammingDistance extends Characters2Distances {
             for (char s2 : ALLSTATES.toCharArray())
                 weights[s1][s2] = stringDiff(AmbiguityCodes.getNucleotides(s1), AmbiguityCodes.getNucleotides(s2));*/
 
-		/*Fill in the editDistance matrix */
+		/*Fill in the distance matrix */
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = s + 1; t <= ntax; t++) {
 

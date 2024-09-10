@@ -217,7 +217,7 @@ public class OptimizeUtils {
 	/**
 	 * initialize new matrix in first call, after that only add distances when called with new split system
 	 *
-	 * @return new editDistance matrix
+	 * @return new distance matrix
 	 */
 	public static double[][] setMatForDiffSys(double[][] D, int ntax, ArrayList<ASplit> splits, boolean firstTree) {
 		if (D == null) {

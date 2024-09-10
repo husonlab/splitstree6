@@ -275,10 +275,10 @@ public class ClusterNetwork extends Trees2Trees {
 	}
 
 	/**
-	 * gets the average editDistance from this node to a leaf.
+	 * gets the average distance from this node to a leaf.
 	 *
 	 * @param v node
-	 * @return average editDistance to a leaf
+	 * @return average distance to a leaf
 	 */
 	public static double computeAverageDistanceToALeaf(PhyloTree tree, Node v) {
 		// assumes that all edges are oriented away from the root

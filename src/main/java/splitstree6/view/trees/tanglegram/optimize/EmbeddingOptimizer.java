@@ -634,7 +634,7 @@ public class EmbeddingOptimizer {
 				distMat = OptimizeUtils.setMatForDiffSys(distMat, taxon2ID.size(), sys, false);
 			} else {
 
-// create a new editDistance matrix and update it for every split system induced by the given networks
+// create a new distance matrix and update it for every split system induced by the given networks
 				for (var tree : trees) {
 					//System.err.println("tree ");
 

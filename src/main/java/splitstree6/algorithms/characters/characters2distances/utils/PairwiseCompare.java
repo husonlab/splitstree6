@@ -204,7 +204,7 @@ public class PairwiseCompare { // todo: add support for character weights
 		} else {
 			F = null;
 			//TODO: This should probably throw an 'undefinedDistance' exception.
-			//System.err.println("Missing editDistance");
+			//System.err.println("Missing distance");
 		}
 		return F;
 	}
@@ -263,12 +263,12 @@ public class PairwiseCompare { // todo: add support for character weights
 	}
 
 	/**
-	 * Max Likelihood Distance - returns maximum likelihood editDistance for a given substitution
+	 * Max Likelihood Distance - returns maximum likelihood distance for a given substitution
 	 * model.
 	 *
 	 * @param model Substitution model in use
-	 * @return editDistance
-	 * @throws SaturatedDistancesException editDistance undefined if saturated (editDistance more than 10 substitutions per site)
+	 * @return distance
+	 * @throws SaturatedDistancesException distance undefined if saturated (distance more than 10 substitutions per site)
 	 */
 	public double mlDistance(SubstitutionModel model) throws SaturatedDistancesException {
 

@@ -52,7 +52,7 @@ import java.util.List;
  * modifications to the F_xy matrix. These might be especially useful in protein log Det, where
  * it can often happen that rows or columns of F_xy are all zero. It seems to me that there are
  * better ways of dealing with that (e.g. using logDet on a subset of states), but that
- * requires a lot of further investigation that, given general problems of editDistance based methods,
+ * requires a lot of further investigation that, given general problems of distance based methods,
  * might not be worth it.
  * <p/>
  * Here is a description of the fudge factor as I've interpreted it from LdDist code:
@@ -127,7 +127,7 @@ public class LogDet extends Characters2Distances {
 			throw new IOException("Proportion invariable sites: illegal value: " + getOptionPropInvariableSites());
 
 		final var ntax = charactersBlock.getNtax();
-		progress.setTasks("logDet editDistance", "Calculating");
+		progress.setTasks("logDet distance", "Calculating");
 		progress.setMaximum(ntax);
 		distancesBlock.setNtax(ntax);
 
