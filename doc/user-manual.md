@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.36, built 5 Sep 2024)
+SplitsTree App (version 6.3.37, built 10 Sep 2024)
 
 ## Introduction
 
@@ -309,6 +309,9 @@ phylogenetic outline [@Bagcietal2021] .
 ![The split-network tab for displaying a collection of splits as a split
 network or phylogenetic outline. ](figs/splits-tab.png)
 
+To reshape the layout of the network by rotating the edges associated
+with one or more selected splits, press-and-drag on the network.
+
 The split-network tab has a toolbar and side panel that are hidden by
 default, but can be opened using two toggle buttons at the top right of
 the tab.
@@ -324,13 +327,10 @@ are treated as the outgroup.
 
 In addition, there are buttons for rotating, flipping, zooming and for
 setting the *scale ratio* to a specific value to ensure that different
-networks are drawn to the same scale. The rotate buttons act differently
-depending on whether edges in the network are selected or not. If no
-edges or nodes are selected, then the entire network is rotated. If one
-or more edges are selected then only the edges (corresponding to one or
-more splits) are rotated.
+networks are drawn to the same scale. Use the rotate buttons to rotate
+the entire network.
 
-The side panel contains items for styling the taxon labels and for
+The right side panel contains items for styling the taxon labels and for
 adding marks to the taxa. The line width can be set here. In addition,
 the line width and color can be set. The color of the inner area of an
 outline can be set. You can request to have the splits labeled by their
@@ -1394,7 +1394,7 @@ both characters and their states can have labels.
 
 ## Distances block
 
-This block maintains a editDistance matrix of size nTax times nTax.
+This block maintains a distance matrix of size nTax times nTax.
 
     BEGIN DISTANCES;
       [TITLE {title};]
@@ -1406,7 +1406,7 @@ This block maintains a editDistance matrix of size nTax times nTax.
         [LABELS={LEFT|NO}]
       ;]
       MATRIX
-    editDistance data in specified format
+    distance data in specified format
       ;
     END;
 
@@ -1589,7 +1589,7 @@ Here we list of all provided algorithms, organized by input data.
 
 The *P Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It computes the normalized Hamming
-editDistance. The algorithm has the following options:
+distance. The algorithm has the following options:
 
 `HandleAmbiguousStates = {Ignore | AverageStates | MatchStates}` -
 choose how to handle ambiguous states (nucleotide data only)
@@ -1599,9 +1599,9 @@ Reference: [@Hamming1950]
 #### Hamming Distance
 
 The *Hamming Distance* algorithm takes a Characters block as input and
-produces a Distances block as output. It computes the Hamming
-editDistance, that is the number of differences between sequences The
-algorithm has the following options:
+produces a Distances block as output. It computes the Hamming distance,
+that is the number of differences between sequences The algorithm has
+the following options:
 
 `HandleAmbiguousStates = {Ignore | AverageStates | MatchStates}` -
 choose how to handle ambiguous states (nucleotide data only)
@@ -1762,7 +1762,7 @@ Reference: [@Swoffordetal1996]
 
 The *Dice Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It computes distances using the
-DiceDistance coefficient editDistance.
+DiceDistance coefficient distance.
 
 Reference: [@Dice1945]
 
@@ -1786,7 +1786,7 @@ Reference: [@HusonSteel2004]
 
 The *Gene Sharing Distance* algorithm takes a Characters block as input
 and produces a Distances block as output. It computes distances using
-the gene-sharing editDistance.
+the gene-sharing distance.
 
 Reference: [@Sneletal1997]
 
@@ -1989,7 +1989,7 @@ The *Min Spanning Network* algorithm takes a Distances block as input
 and produces a Network block as output. It computes a minimum spanning
 network. The algorithm has the following options:
 
-`Epsilon =  <Double>` - weighted genetic editDistance measure. Low:
+`Epsilon =  <Double>` - weighted genetic distance measure. Low:
 MedianJoining, High: full median network
 
 `MinSpanningTree =  <Boolean>` - calculate minimum spanning tree
@@ -3213,4 +3213,3 @@ Lineage Taxon Strings.” *Genome Res*.
 
 Zhang, L., B. Cetinkaya, and DH Huson. 2024. “PhyloFusion- Fast and Easy
 Fusion of Rooted Phylogenetic Trees into a Network.”
-
