@@ -29,6 +29,7 @@ import jloda.graph.Node;
 import jloda.util.IteratorUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 
 public class DrawUtils {
@@ -76,6 +77,16 @@ public class DrawUtils {
 			}
 		}
 		return null;
+	}
+
+	public static Point2D getCoordinates(PathElement pathElement) {
+		if (pathElement instanceof MoveTo moveTo) {
+			return new Point2D(moveTo.getX(), moveTo.getY());
+		} else if (pathElement instanceof LineTo lineTo) {
+			return new Point2D(lineTo.getX(), lineTo.getY());
+		} else {
+			return new Point2D(0, 0);
+		}
 	}
 
 	public static Point2D snapToShape(Point2D point, Shape shape, double tolerance) {
@@ -154,5 +165,28 @@ public class DrawUtils {
 			}
 		}
 		return false;
+	}
+
+	public static Path createPath(Point2D a, Point2D b, int step) {
+		var path = new Path();
+		var start = new MoveTo(a.getX(), a.getY());
+		var end = new LineTo(b.getX(), b.getY());
+		path.getElements().add(start);
+		interpolate(start, end, step);
+		path.getElements().add(end);
+		return path;
+	}
+
+	public static Collection<? extends PathElement> interpolate(PathElement first, PathElement last, double tolerance) {
+		var start = getCoordinates(first);
+		var end = getCoordinates(last);
+		var distance = start.distance(end);
+		var n = Math.floor(distance / tolerance) - 1.0;
+		var result = new ArrayList<PathElement>();
+		for (var i = 0.0; i < n; i++) {
+			result.add(new LineTo((i * start.getX() + (n - i) * end.getX()) / n, (i * start.getY() + (n - i) * end.getY()) / n));
+		}
+		//System.err.println("Added: " + result.size());
+		return result;
 	}
 }

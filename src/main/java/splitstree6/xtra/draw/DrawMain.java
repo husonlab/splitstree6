@@ -20,6 +20,7 @@
 package splitstree6.xtra.draw;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -28,8 +29,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jloda.fx.control.CopyableLabel;
+import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.Icebergs;
 import jloda.graph.algorithms.IsDAG;
+import jloda.util.Basic;
+
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Collections;
 
 public class DrawMain extends Application {
 
@@ -54,8 +61,22 @@ public class DrawMain extends Application {
 		showLabelsButton.selectedProperty().bindBidirectional(drawPane.getNodeLabelsGroup().visibleProperty());
 		var showOthersButton = new ToggleButton("Others");
 		showOthersButton.selectedProperty().bindBidirectional(drawPane.getOtherGroup().visibleProperty());
+
+		var deleteButton = new Button("Delete");
+		deleteButton.setOnAction(unused -> {
+			drawPane.getUndoManager().doAndAdd(new DeleteNodesEdgesCommand(drawPane,
+					drawPane.getNodeSelectionModel().getSelectedItems(),
+					drawPane.getEdgeSelectionModel().getSelectedItems()));
+		});
+		deleteButton.disableProperty().bind(drawPane.getNodeSelectionModel().sizeProperty().isEqualTo(0)
+				.and(drawPane.getEdgeSelectionModel().sizeProperty().isEqualTo(0)));
+
 		var clearButton = new Button("Clear");
-		clearButton.setOnAction(e -> drawPane.clear());
+		clearButton.setOnAction(e -> {
+			drawPane.getUndoManager().doAndAdd(new DeleteNodesEdgesCommand(drawPane, drawPane.getNetwork().getNodesAsList(),
+					Collections.emptyList()));
+		});
+		clearButton.disableProperty().bind(drawPane.getNetworkFX().emptyProperty());
 
 		var undoButton = new Button("Undo");
 		undoButton.disableProperty().bind(drawPane.getUndoManager().undoableProperty().not());
@@ -82,11 +103,18 @@ public class DrawMain extends Application {
 
 		var newickLabel = new CopyableLabel("");
 		var showNewickButton = new Button("Newick");
+		showNewickButton.setOnAction(e -> {
+			newickLabel.setText(drawPane.toBracketString(false));
+			try {
+				InputOutput.save(new OutputStreamWriter(System.err), drawPane);
+			} catch (IOException ex) {
+				Basic.caught(ex);
+			}
+		});
 		showNewickButton.disableProperty().bind(drawPane.validProperty().not());
-		showNewickButton.setOnAction(e -> newickLabel.setText(drawPane.toBracketString(false)));
 
 		var toolBar = new ToolBar(toleranceSlider, showNodesButton, showEdgesButton,
-				labelLeavesButton, showNewickButton, clearButton, new Separator(Orientation.VERTICAL),
+				labelLeavesButton, showNewickButton, deleteButton, clearButton, new Separator(Orientation.VERTICAL),
 				undoButton, redoButton, new Separator(Orientation.VERTICAL),
 				zoomInButton, ZoomOutButton);
 
@@ -106,7 +134,20 @@ public class DrawMain extends Application {
 
 		var root = new BorderPane();
 
-		root.setCenter(drawPane);
+		var scrollPane = new ZoomableScrollPane(drawPane);
+		scrollPane.setFitToWidth(true);
+		scrollPane.setFitToHeight(true);
+		scrollPane.setPannable(true);
+		scrollPane.setLockAspectRatio(true);
+		scrollPane.setRequireShiftOrControlToZoom(true);
+
+		drawPane.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
+				scrollPane.getViewportBounds().getWidth(), scrollPane.viewportBoundsProperty()));
+
+		drawPane.minHeightProperty().bind(Bindings.createDoubleBinding(() ->
+				scrollPane.getViewportBounds().getHeight(), scrollPane.viewportBoundsProperty()));
+
+		root.setCenter(scrollPane);
 
 		var vbox = new VBox(toolBar, newickLabel);
 		vbox.setStyle("-fx-background-color: white;");

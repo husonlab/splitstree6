@@ -19,9 +19,7 @@
 
 package splitstree6.xtra.draw;
 
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 import jloda.fx.undo.UndoableRedoableCommand;
@@ -32,6 +30,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * label all leaves command
+ * Daniel Huson, 8.2024
+ */
 public class LabelLeavesCommand extends UndoableRedoableCommand {
 	private final Runnable redo;
 	private final Runnable undo;
@@ -68,18 +70,9 @@ public class LabelLeavesCommand extends UndoableRedoableCommand {
 						var shape = (Shape) v.getData();
 						var t = (int) count.incrementAndGet();
 						var text = "t" + t;
-						network.setLabel(v, text);
+						var label = drawPane.createLabel(v, text);
 						network.addTaxon(v, t);
-						var label = new Label(text);
-						label.translateXProperty().bind(shape.translateXProperty());
-						label.translateYProperty().bind(shape.translateYProperty());
-
-						label.setLayoutX(10);
-						label.setLayoutY(-5);
-						makeDraggable(v, label, drawPane);
-
 						v.setInfo(label);
-						nodeLabelsGroup.getChildren().add(label);
 					});
 			drawPane.getNetworkFX().incrementLastUpdate();
 		};
@@ -119,53 +112,5 @@ public class LabelLeavesCommand extends UndoableRedoableCommand {
 	@Override
 	public void redo() {
 		redo.run();
-	}
-
-	private static double mouseDownX;
-	private static double mouseDownY;
-	private static double mouseX;
-	private static double mouseY;
-	private static boolean wasDragged;
-
-	public static void makeDraggable(jloda.graph.Node v, javafx.scene.Node label, DrawPane drawPane) {
-		label.setOnMousePressed(e -> {
-			mouseDownX = e.getScreenX();
-			mouseDownY = e.getScreenY();
-			mouseX = e.getScreenX();
-			mouseY = e.getScreenY();
-			wasDragged = false;
-			e.consume();
-
-		});
-		label.setOnMouseDragged(e -> {
-			var previous = drawPane.screenToLocal(mouseX, mouseY);
-			var current = drawPane.screenToLocal(e.getScreenX(), e.getScreenY());
-			var delta = new Point2D(current.getX() - previous.getX(), current.getY() - previous.getY());
-			label.setLayoutX(label.getLayoutX() + delta.getX());
-			label.setLayoutY(label.getLayoutY() + delta.getY());
-			wasDragged = true;
-			mouseX = e.getScreenX();
-			mouseY = e.getScreenY();
-			e.consume();
-		});
-		label.setOnMouseReleased(e -> {
-			if (wasDragged) {
-				drawPane.getUndoManager().add("move label", () -> {
-					var previous = drawPane.screenToLocal(mouseDownX, mouseDownY);
-					var current = drawPane.screenToLocal(e.getScreenX(), e.getScreenY());
-					var delta = new Point2D(current.getX() - previous.getX(), current.getY() - previous.getY());
-
-					label.setLayoutX(label.getLayoutX() - delta.getX());
-					label.setLayoutY(label.getLayoutY() - delta.getY());
-				}, () -> {
-					var previous = drawPane.screenToLocal(mouseDownX, mouseDownY);
-					var current = drawPane.screenToLocal(e.getScreenX(), e.getScreenY());
-					var delta = new Point2D(current.getX() - previous.getX(), current.getY() - previous.getY());
-					label.setLayoutX(label.getLayoutX() + delta.getX());
-					label.setLayoutY(label.getLayoutY() + delta.getY());
-				});
-			}
-			e.consume();
-		});
 	}
 }

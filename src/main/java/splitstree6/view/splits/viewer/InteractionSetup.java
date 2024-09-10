@@ -124,6 +124,7 @@ public class InteractionSetup {
 			}
 			mouseDownX = e.getScreenX();
 			mouseDownY = e.getScreenY();
+			e.consume();
 		};
 
 		mouseReleasedHandler = e -> {
@@ -143,6 +144,8 @@ public class InteractionSetup {
 								}
 						)
 				);
+				if (e.isStillSincePress())
+					e.consume();
 			}
 		};
 

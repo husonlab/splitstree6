@@ -25,12 +25,14 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.graph.GraphFX;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
@@ -44,32 +46,42 @@ import jloda.graph.Node;
 import jloda.graph.algorithms.IsDAG;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
+import splitstree6.main.SplitsTree6;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DrawPane extends Pane {
+	public static final int INTERPOLATE_STEP = 5;
 	private final PhyloTree network;
 	private final GraphFX<PhyloTree> networkFX;
 
 	private final SelectionModel<Node> nodeSelectionModel;
 	private final SelectionModel<Edge> edgeSelectionModel;
 
-	private final Group icebergsGroup = new Group();
+	private final Group edgeIcebergsGroup = new Group();
+	private final Group nodeIcebergsGroup = new Group();
 	private final Group edgesGroup = new Group();
 	private final Group nodesGroup = new Group();
 	private final Group nodeLabelsGroup = new Group();
 	private final Group otherGroup = new Group();
+	private final Group world = new Group();
 
 	private final DoubleProperty tolerance = new SimpleDoubleProperty(this, "tolerance", 5);
 
 	private final BooleanProperty valid = new SimpleBooleanProperty(this, "isValidNetwork", false);
 
-	private final Group world = new Group();
 
 	private final UndoManager undoManager = new UndoManager();
 
+
 	public DrawPane() {
 		Icebergs.setEnabled(true);
+		var shapeIcebergMap = new HashMap<Shape, Shape>();
+
+		nodesGroup.getChildren().addListener(createIcebergListener(shapeIcebergMap, nodeIcebergsGroup));
+		edgesGroup.getChildren().addListener(createIcebergListener(shapeIcebergMap, edgeIcebergsGroup));
 
 		network = new PhyloTree();
 		networkFX = new GraphFX<>(network);
@@ -84,50 +96,55 @@ public class DrawPane extends Pane {
 			edgeSelectionModel.getSelectedItems().removeAll(edgeSelectionModel.getSelectedItems().stream().filter(a -> a.getOwner() == null).toList());
 
 			for (var v : network.nodes()) {
-				var shape = (Shape) v.getData();
-				shape.getStyleClass().add("graph-node");
-				shape.setStrokeWidth(v.getInDegree() == 0 ? 2 : 1);
-				shape.setFill(Color.WHITE);
+				if (v.getData() instanceof Shape shape) {
+					shape.getStyleClass().add("graph-node");
+					shape.setStrokeWidth(v.getInDegree() == 0 ? 2 : 1);
 
-				if (shape instanceof Circle circle)
-					circle.setRadius(v.getInDegree() == 0 || v.getOutDegree() == 0 ? 3 : 1.5);
-
-				shape.setStroke(Color.BLACK);
-
-				SelectionManager.setupNodeSelection(v, shape, nodeSelectionModel, edgeSelectionModel);
+					if (shape instanceof Circle circle)
+						circle.setRadius(v.getInDegree() == 0 || v.getOutDegree() == 0 ? 3 : 1.5);
+					SelectionManager.setupNodeSelection(v, shape, nodeSelectionModel, edgeSelectionModel);
+				}
 			}
 
 			for (var edge : network.edges()) {
-				var path = (Path) edge.getData();
-				SelectionManager.setupEdgeSelection(edge, path, nodeSelectionModel, edgeSelectionModel);
+				if (edge.getData() instanceof Path ePath)
+					SelectionManager.setupEdgeSelection(edge, ePath, nodeSelectionModel, edgeSelectionModel);
 			}
 		});
 
-		nodeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super Node>) e -> {
-			if (e.wasAdded()) {
-				var node = e.getElementAdded();
-				if (node.getOwner() != null)
-					((Shape) node.getData()).setEffect(SelectionEffect.create(Color.GOLD));
-			} else if (e.wasRemoved()) {
-				var node = e.getElementRemoved();
-				if (node.getOwner() != null)
-					((Shape) node.getData()).setEffect(null);
+		nodeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super Node>) a -> {
+			if (a.wasAdded()) {
+				var v = a.getElementAdded();
+				if (v.getOwner() != null) {
+					if (v.getData() instanceof Shape shape) {
+						shape.setEffect(SelectionEffect.create(Color.GOLD));
+					}
+					nodeLabelsGroup.getChildren().stream().filter(label -> label.getUserData() instanceof Integer id && id == v.getId()).forEach(label -> label.setEffect(SelectionEffect.create(Color.GOLD)));
+				}
+			} else if (a.wasRemoved()) {
+				var v = a.getElementRemoved();
+				if (v.getOwner() != null) {
+					if (v.getData() instanceof Shape shape) {
+						shape.setEffect(null);
+					}
+					nodeLabelsGroup.getChildren().stream().filter(label -> label.getUserData() instanceof Integer id && id == v.getId()).forEach(label -> label.setEffect(null));
+				}
 			}
 		});
 
 		edgeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super Edge>) e -> {
 			if (e.wasAdded()) {
 				var edge = e.getElementAdded();
-				if (edge.getOwner() != null)
-					((Path) edge.getData()).setEffect(SelectionEffect.create(Color.GOLD));
+				if (edge.getOwner() != null && edge.getData() instanceof Shape shape)
+					shape.setEffect(SelectionEffect.create(Color.GOLD));
 			} else if (e.wasRemoved()) {
 				var edge = e.getElementRemoved();
-				if (edge.getOwner() != null)
-					((Path) edge.getData()).setEffect(null);
+				if (edge.getOwner() != null && edge.getData() instanceof Shape shape)
+					shape.setEffect(null);
 			}
 		});
 
-		world.getChildren().addAll(icebergsGroup, edgesGroup, nodesGroup, nodeLabelsGroup, otherGroup);
+		world.getChildren().addAll(edgeIcebergsGroup, nodeIcebergsGroup, edgesGroup, nodesGroup, nodeLabelsGroup, otherGroup);
 		getChildren().add(world);
 
 		setupMouseInteraction(this);
@@ -233,7 +250,7 @@ public class DrawPane extends Pane {
 
 			if (path == null) {
 				path = new Path();
-				icebergsGroup.getChildren().add(Icebergs.create(path, true));
+				path.getStyleClass().add("graph-edge");
 
 				previous = snapToExisting(previous, getTolerance());
 				pathStart = previous;
@@ -244,8 +261,12 @@ public class DrawPane extends Pane {
 			//point=snapToExisting(point,pane,path,tolerance.doubleValue());
 
 			if (point.distance(previous) > getTolerance()) {
-				path.getElements().add(new LineTo(point.getX(), point.getY()));
-				if (path.getElements().size() == 2) {
+				var pathStarting = path.getElements().size() == 1;
+				var next = new LineTo(point.getX(), point.getY());
+				var start = path.getElements().get(path.getElements().size() - 1);
+				path.getElements().addAll(DrawUtils.interpolate(start, next, INTERPOLATE_STEP));
+				path.getElements().add(next);
+				if (pathStarting) {
 					// previous = snapToExisting(previous, tolerance.get());
 					// var start = new Circle(previous.getX(), previous.getY(), 3);
 					var end = new Circle(3);
@@ -273,9 +294,19 @@ public class DrawPane extends Pane {
 						}
 					}
 					if (middle != null) {
-						path.getElements().setAll(first, middle, last);
+						var points = new ArrayList<PathElement>();
+						points.add(first);
+						points.addAll(DrawUtils.interpolate(first, middle, INTERPOLATE_STEP));
+						points.add(middle);
+						points.addAll(DrawUtils.interpolate(middle, last, INTERPOLATE_STEP));
+						points.add(last);
+						path.getElements().setAll(points);
 					} else {
-						path.getElements().setAll(first, last);
+						var points = new ArrayList<PathElement>();
+						points.add(first);
+						points.addAll(DrawUtils.interpolate(first, last, INTERPOLATE_STEP));
+						points.add(last);
+						path.getElements().setAll(points);
 					}
 				}
 			}), 1000);
@@ -399,10 +430,6 @@ public class DrawPane extends Pane {
 		return networkFX;
 	}
 
-	public Group getIcebergsGroup() {
-		return icebergsGroup;
-	}
-
 	public Group getEdgesGroup() {
 		return edgesGroup;
 	}
@@ -448,51 +475,105 @@ public class DrawPane extends Pane {
 		return v;
 	}
 
-	public Node createNode(Shape shape, int recycledId) {
+	public Node createNode(Shape shape, RichTextLabel label, int recycledId) {
 		var v = network.newNode(null, recycledId);
 		v.setData(shape);
 		shape.setUserData(v);
 		if (!nodesGroup.getChildren().contains(shape))
 			nodesGroup.getChildren().add(shape);
+		if (label != null && !nodeLabelsGroup.getChildren().contains(label)) {
+			v.setInfo(label);
+			nodeLabelsGroup.getChildren().add(label);
+		}
 		return v;
 	}
 
-	public void deleteNode(Node v) {
-		for (var e : IteratorUtils.asList(v.adjacentEdges())) {
-			deleteEdge(e);
+	public void deleteNode(Node... nodes) {
+		for (var v : nodes) {
+			for (var e : IteratorUtils.asList(v.adjacentEdges())) {
+				deleteEdge(e);
+			}
+			nodeSelectionModel.getSelectedItems().remove(v);
+			var shape = (Shape) v.getData();
+			nodesGroup.getChildren().remove(shape);
+			if (v.getInfo() instanceof javafx.scene.Node label)
+				nodeLabelsGroup.getChildren().remove(label);
+			network.deleteNode(v);
 		}
-		nodeSelectionModel.getSelectedItems().remove(v);
-		var shape = (Shape) v.getData();
-		nodesGroup.getChildren().remove(shape);
-		if (v.getInfo() instanceof javafx.scene.Node label)
-			nodeLabelsGroup.getChildren().remove(label);
-		network.deleteNode(v);
 	}
 
 
 	public Edge createEdge(Node v, Node w, Path path) {
 		var e = network.newEdge(v, w);
+		addPath(e, path);
+		return e;
+	}
+
+	public void addPath(Edge e, Path path) {
 		e.setData(path);
 		path.setUserData(e);
 		if (!edgesGroup.getChildren().contains(path))
 			edgesGroup.getChildren().add(path);
-		return e;
 	}
 
 	public Edge createEdge(Node v, Node w, Path path, int recycledId) {
 		var e = network.newEdge(v, w, null, recycledId);
-		e.setData(path);
-		path.setUserData(e);
-		if (!edgesGroup.getChildren().contains(path))
-			edgesGroup.getChildren().add(path);
+		addPath(e, path);
 		return e;
 	}
 
-	public void deleteEdge(Edge e) {
-		if (e.getOwner() != null) {
-			edgeSelectionModel.getSelectedItems().remove(e);
-			if (e.getData() instanceof Path p)
-				edgesGroup.getChildren().remove(p);
+	public void deleteEdge(Edge... edges) {
+		for (var e : edges) {
+			if (e.getOwner() != null) {
+				edgeSelectionModel.getSelectedItems().remove(e);
+				if (e.getData() instanceof Path p)
+					edgesGroup.getChildren().remove(p);
+			}
 		}
+	}
+
+	public RichTextLabel createLabel(Node v, String text) {
+		var shape = (Shape) v.getData();
+		network.setLabel(v, text);
+		var label = new RichTextLabel(text);
+		label.setUserData(v.getId());
+		label.translateXProperty().bind(shape.translateXProperty());
+		label.translateYProperty().bind(shape.translateYProperty());
+		nodeLabelsGroup.getChildren().add(label);
+
+		label.setOnMouseClicked(e -> {
+			if (!e.isShiftDown() && SplitsTree6.isDesktop()) {
+				getNodeSelectionModel().clearSelection();
+				getEdgeSelectionModel().clearSelection();
+			}
+			getNodeSelectionModel().toggleSelection(v);
+		});
+		label.setLayoutX(10);
+		label.setLayoutY(-5);
+		LabelUtils.makeDraggable(v, label, this);
+		return label;
+	}
+
+	private ListChangeListener<javafx.scene.Node> createIcebergListener(Map<Shape, Shape> shapeIcebergMap, Group icebergsGroup) {
+		return a -> {
+			while (a.next()) {
+				for (var item : a.getAddedSubList()) {
+					if (item instanceof Shape shape) {
+						var iceberg = Icebergs.create(shape, true);
+						icebergsGroup.getChildren().add(iceberg);
+						shapeIcebergMap.put(shape, iceberg);
+					}
+				}
+				for (var item : a.getRemoved()) {
+					if (item instanceof Shape shape) {
+						var iceberg = shapeIcebergMap.get(shape);
+						if (iceberg != null) {
+							icebergsGroup.getChildren().remove(iceberg);
+						}
+					}
+				}
+			}
+		};
+
 	}
 }

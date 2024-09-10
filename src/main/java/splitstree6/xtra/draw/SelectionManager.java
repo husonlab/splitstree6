@@ -42,16 +42,18 @@ public class SelectionManager {
 	}
 
 	public static void setupEdgeSelection(Edge edge, Path path, SelectionModel<Node> nodeSelectionModel, SelectionModel<Edge> edgeSelectionModel) {
-		path.setOnMouseClicked(me -> {
-			if (me.getClickCount() == 1 && me.isStillSincePress()) {
-				if (SplitsTree6.isDesktop() && !me.isShiftDown()) {
-					nodeSelectionModel.clearSelection();
-					edgeSelectionModel.clearSelection();
+		if (path != null) {
+			path.setOnMouseClicked(me -> {
+				if (me.getClickCount() == 1 && me.isStillSincePress()) {
+					if (SplitsTree6.isDesktop() && !me.isShiftDown()) {
+						nodeSelectionModel.clearSelection();
+						edgeSelectionModel.clearSelection();
+					}
+					edgeSelectionModel.toggleSelection(edge);
+					me.consume();
 				}
-				edgeSelectionModel.toggleSelection(edge);
-				me.consume();
-			}
-		});
+			});
+		}
 	}
 
 	public static void setupPaneSelection(Pane pane, SelectionModel<Node> nodeSelectionModel, SelectionModel<Edge> edgeSelectionModel) {
