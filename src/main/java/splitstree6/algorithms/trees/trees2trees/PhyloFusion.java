@@ -129,7 +129,7 @@ public class PhyloFusion extends Trees2Trees {
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
 			case "optionCladeReduction" -> "improve performance using clade reduction";
 			case "optionGroupNonSeparated" ->
-					"improve performance by grouping taxa that are not separated by an non-trivial edge";
+					"improve performance by grouping taxa that are not separated by a non-trivial edge";
 			default -> super.getToolTip(optionName);
 		};
 	}

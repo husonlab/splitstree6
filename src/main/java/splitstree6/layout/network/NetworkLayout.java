@@ -33,6 +33,7 @@ import jloda.graph.fmm.FastMultiLayerMethodLayout;
 import jloda.graph.fmm.FastMultiLayerMethodOptions;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
@@ -125,6 +126,8 @@ public class NetworkLayout {
 					labeledNode.setId("graph-node");
 					labeledNode.setTranslateX(point.getX());
 					labeledNode.setTranslateY(point.getY());
+					networkBlock.getNode2data().get(v).put("x", StringUtils.removeTrailingZerosAfterDot("%.4f", point.getX()));
+					networkBlock.getNode2data().get(v).put("y", StringUtils.removeTrailingZerosAfterDot("%.4f", point.getY()));
 
 					if (graph.hasTaxa(v))
 						labeledNode.setTaxa(BitSetUtils.asBitSet(graph.getTaxa(v)));

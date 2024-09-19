@@ -20,8 +20,8 @@
 package splitstree6.layout.splits;
 
 import javafx.geometry.Point2D;
-import jloda.fx.graph.GraphTraversals;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.graph.GraphTraversals;
 import jloda.graph.Node;
 import jloda.phylo.PhyloSplitsGraph;
 import splitstree6.layout.tree.LabeledNodeShape;

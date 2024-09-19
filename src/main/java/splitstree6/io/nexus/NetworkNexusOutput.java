@@ -84,10 +84,19 @@ public class NetworkNexusOutput extends NexusIOBase implements INexusOutput<Netw
 				w.write(" sid=" + e.getSource().getId());
 				w.write(" tid=" + e.getTarget().getId());
 
-				if (graph.getLabel(e) != null && !graph.getLabel(e).trim().isEmpty()) {
+				if (graph.getLabel(e) != null && !graph.getLabel(e).isBlank()) {
 					w.write(" label='" + graph.getLabel(e).trim() + "'");
 				}
-				for (String key : networkBlock.getEdgeData(e).keySet()) {
+				if (graph.hasEdgeWeights() && !networkBlock.getEdgeData(e).containsKey("weight")) {
+					w.write(" weight='" + graph.getWeight(e) + "'");
+				}
+				if (graph.hasEdgeConfidences() && !networkBlock.getEdgeData(e).containsKey("confidence")) {
+					w.write(" confidence='" + graph.getConfidence(e) + "'");
+				}
+				if (graph.hasEdgeProbabilities() && !networkBlock.getEdgeData(e).containsKey("probability")) {
+					w.write(" probability='" + graph.getProbability(e) + "'");
+				}
+				for (var key : networkBlock.getEdgeData(e).keySet()) {
 					w.write(" " + key + "='" + networkBlock.getEdgeData(e).get(key) + "'");
 				}
 			}

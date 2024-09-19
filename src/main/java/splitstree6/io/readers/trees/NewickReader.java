@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
  * Daniel Huson, Daria Evseeva, 2017
  */
 public class NewickReader extends TreesReader {
-	public static final String[] extensions = {"tree", "tre", "trees", "new", "nwk", "treefile"};
+	public static final String[] extensions = {"tree", "tre", "trees", "new", "newick", "nwk", "treefile"};
 	private final BooleanProperty optionConvertMultiLabeledTree = new SimpleBooleanProperty(false);
 
 	public NewickReader() {

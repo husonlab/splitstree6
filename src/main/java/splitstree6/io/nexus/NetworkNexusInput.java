@@ -22,6 +22,7 @@ package splitstree6.io.nexus;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.NetworkBlock;
@@ -59,9 +60,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			END;
 			""";
 
-	public static final String DESCRIPTION = """
-			Maintain a network, such as a haplotype network or just a set of points (for PCoA).
-			""";
+	public static final String DESCRIPTION = "Maintain a network, such as a haplotype network or just a set of points (for PCoA).\n";
 
 	@Override
 	public String getSyntax() {
@@ -134,7 +133,6 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		}
 
 		final var graph = networkBlock.getGraph();
-
 		final var id2node = new TreeMap<Integer, Node>();
 
 		np.matchAnyTokenIgnoreCase("VERTICES NODES"); // nodes deprecated
@@ -212,10 +210,19 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 					graph.setLabel(e, np.getWordRespectCase());
 				}
 				while (!np.peekMatchAnyTokenIgnoreCase(", ;")) {
-					String key = np.getWordRespectCase();
+					var key = np.getWordRespectCase();
 					np.matchIgnoreCase("=");
-					String value = np.getWordRespectCase();
+					var value = np.getWordRespectCase();
 					networkBlock.getEdgeData(e).put(key, value);
+					if (key.equals("weight") && NumberUtils.isDouble(value)) {
+						networkBlock.getGraph().setWeight(e, Double.parseDouble(value));
+					}
+					if (key.equals("confidence") && NumberUtils.isDouble(value)) {
+						networkBlock.getGraph().setConfidence(e, Double.parseDouble(value));
+					}
+					if (key.equals("probability") && NumberUtils.isDouble(value)) {
+						networkBlock.getGraph().setProbability(e, Double.parseDouble(value));
+					}
 				}
 			}
 		}
