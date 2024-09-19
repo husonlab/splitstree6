@@ -53,7 +53,9 @@ public class ExtractCitations {
 	}
 
 	public static Collection<Pair<String, String>> getSplitsTreeKeysAndPapers() {
-		return List.of(new Pair<>("Huson and Bryant 2006",
-				"D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006."));
+		return List.of(new Pair<>("Huson and Bryant 2024",
+				"D.H. Huson and D. Bryant." +
+				" The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks." +
+				" Nature Method, 2024, https://doi.org/10.1038/s41592-024-02406-3."));
 	}
 }
