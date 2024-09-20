@@ -41,7 +41,6 @@ public class LabeledEdgeShape extends Group {
 
 	public LabeledEdgeShape(RichTextLabel label) {
 		this(label, null);
-
 	}
 
 	public LabeledEdgeShape(RichTextLabel label, Shape shape) {
@@ -58,9 +57,9 @@ public class LabeledEdgeShape extends Group {
 			label.setFontSize(11);
 			label.setId("edge-label");
 			MouseDragToTranslate.setup(label);
+			getChildren().add(label);
 		}
 	}
-
 
 	public void setShape(Shape shape) {
 		setShape(shape, Icebergs.enabled());

@@ -229,6 +229,9 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		np.matchIgnoreCase(";");
 		np.matchEndBlock();
 
+		if (!graph.isConnected())
+			throw new IOException("Network is not connected");
+
 		return taxonNamesFound;
 	}
 
@@ -255,7 +258,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				if (nodeId2TaxonLabel.containsKey(id))
 					throw new IOExceptionWithLineNumber("Repeated id", np.lineno());
 				nodeId2TaxonLabel.put(id, label);
-				if (taxaBlock.getLabels().size() == 0) {
+				if (taxaBlock.getLabels().isEmpty()) {
 					taxonNamesFound.add(label);
 				}
 

@@ -148,4 +148,9 @@ public class ShowNetwork extends Network2View {
 	public void setOptionView(ViewType optionView) {
 		this.optionView.set(optionView);
 	}
+
+	@Override
+	public boolean isApplicable(TaxaBlock taxa, NetworkBlock datablock) {
+		return super.isApplicable(taxa, datablock);
+	}
 }

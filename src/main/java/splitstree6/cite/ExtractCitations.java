@@ -49,13 +49,13 @@ public class ExtractCitations {
 	}
 
 	public static String getSplitsTreeKeysString() {
-		return " (Huson and Bryant 2006)";
+		return " (Huson and Bryant 2024)";
 	}
 
 	public static Collection<Pair<String, String>> getSplitsTreeKeysAndPapers() {
 		return List.of(new Pair<>("Huson and Bryant 2024",
 				"D.H. Huson and D. Bryant." +
 				" The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks." +
-				" Nature Method, 2024, https://doi.org/10.1038/s41592-024-02406-3."));
+				" Nature Methods, 2024."));
 	}
 }

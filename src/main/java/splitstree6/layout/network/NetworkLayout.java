@@ -142,10 +142,11 @@ public class NetworkLayout {
 						labeledNode.setShape(circle, true);
 					}
 
-					if (false)
-					for (var node : labeledNode.getChildren()) {
-						if ("iceberg".equals(node.getId())) {
-							node.setStyle("-fx-stroke: green;");
+					if (false) {
+						for (var node : labeledNode.getChildren()) {
+							if ("iceberg".equals(node.getId())) {
+								node.setStyle("-fx-stroke: green;");
+							}
 						}
 					}
 

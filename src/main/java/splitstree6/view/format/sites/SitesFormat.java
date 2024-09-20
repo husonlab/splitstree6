@@ -112,14 +112,80 @@ public class SitesFormat extends Group {
 		public SitesView(NetworkBlock networkBlock, Edge e, Group edgeGroup, SitesStyle sitesStyle) {
 			var lines = BasicFX.getAllRecursively(edgeGroup, Line.class);
 			for (var line : lines) {
-				if (networkBlock.getEdge2data().get(e) != null && networkBlock.getEdge2data().get(e).containsKey("sites")) {
-					var sites = networkBlock.getEdge2data().get(e).get("sites").trim();
-					if (!sites.isEmpty()) {
-						InvalidationListener invalidationListener = null;
+				var data = networkBlock.getEdge2data().get(e);
+				if (data != null) {
+					InvalidationListener invalidationListener = null;
+					if (data.containsKey("sites")) {
+						var sites = data.get("sites").trim();
+						if (!sites.isEmpty()) {
+							if (sitesStyle == SitesStyle.Counts || sitesStyle == SitesStyle.CompactLabels) {
+								var label = (sitesStyle == SitesStyle.CompactLabels ? sites : String.valueOf(StringUtils.countOccurrences(sites, ',') + 1));
+								var text = new CopyableLabel(label);
 
-						if (sitesStyle == SitesStyle.Counts || sitesStyle == SitesStyle.CompactLabels) {
-							var label = (sitesStyle == SitesStyle.CompactLabels ? sites : String.valueOf(StringUtils.countOccurrences(sites, ',') + 1));
-							var text = new CopyableLabel(label);
+								invalidationListener = a -> {
+									getChildren().clear();
+									var start = new Point2D(line.getStartX(), line.getStartY());
+									var end = new Point2D(line.getEndX(), line.getEndY());
+									var angle = GeometryUtilsFX.computeAngle(end.subtract(start));
+									var point = start.add(end).multiply(0.5);
+									point = GeometryUtilsFX.translateByAngle(point, angle + 270, 5);
+									text.setTranslateX(point.getX());
+									text.setTranslateY(point.getY());
+									DraggableUtils.setupDragMouseLayout(text);
+									getChildren().add(text);
+								};
+							} else if (sitesStyle == SitesStyle.Hatches || sitesStyle == SitesStyle.Labels) {
+								var count = StringUtils.countOccurrences(sites, ',') + 1;
+								var labels = sites.split("\s*,\s*");
+								invalidationListener = a -> {
+									getChildren().clear();
+									var start = new Point2D(line.getStartX(), line.getStartY());
+									var end = new Point2D(line.getEndX(), line.getEndY());
+
+									var gapBetweenHatches = 1.0;
+									if (sitesStyle == SitesStyle.Hatches) {
+										var onScreenDistance = line.localToScreen(start.getX(), start.getY()).distance(line.localToScreen(end.getX(), end.getY()));
+										var onScreenGap = 4.0;
+										if ((count + 1) * onScreenGap > 0.3 * onScreenDistance) {
+											onScreenGap = 0.3 * onScreenDistance / (count + 1);
+										}
+										gapBetweenHatches = (line.screenToLocal(onScreenGap, onScreenGap).subtract(line.screenToLocal(0, 0))).magnitude(); // close enough...
+										var start1 = start.multiply(0.35).add(end.multiply(0.65));
+										var end1 = start.multiply(0.65).add(end.multiply(0.35));
+										start = start1;
+										end = end1;
+									} else {
+										gapBetweenHatches = start.distance(end) / (count + 1);
+									}
+
+									var angle = GeometryUtilsFX.computeAngle(end.subtract(start));
+
+									var point = start;
+									for (var i = 0; i < count; i++) {
+										point = GeometryUtilsFX.translateByAngle(point, angle, gapBetweenHatches);
+										var left = GeometryUtilsFX.translateByAngle(point, angle + 90, 5);
+										var right = GeometryUtilsFX.translateByAngle(point, angle + 270, 5);
+										{
+											var hatch = new Line(left.getX(), left.getY(), right.getX(), right.getY());
+											hatch.setStroke(Color.BLACK);
+											hatch.getStyleClass().add("graph-edge");
+											getChildren().add(hatch);
+										}
+										if (sitesStyle == SitesStyle.Labels) {
+											var text = new CopyableLabel(labels[i]);
+											text.setTranslateX(right.getX());
+											text.setTranslateY(right.getY());
+											DraggableUtils.setupDragMouseLayout(text);
+											getChildren().add(text);
+										}
+									}
+								};
+							}
+						}
+					} else if (networkBlock.getGraph().hasEdgeWeights()) {
+						if (sitesStyle != SitesStyle.None) {
+							var text = StringUtils.removeTrailingZerosAfterDot(networkBlock.getGraph().getWeight(e));
+							var label = new CopyableLabel(text);
 
 							invalidationListener = a -> {
 								getChildren().clear();
@@ -128,67 +194,20 @@ public class SitesFormat extends Group {
 								var angle = GeometryUtilsFX.computeAngle(end.subtract(start));
 								var point = start.add(end).multiply(0.5);
 								point = GeometryUtilsFX.translateByAngle(point, angle + 270, 5);
-								text.setTranslateX(point.getX());
-								text.setTranslateY(point.getY());
-								DraggableUtils.setupDragMouseLayout(text);
-								getChildren().add(text);
+								label.setTranslateX(point.getX());
+								label.setTranslateY(point.getY());
+								DraggableUtils.setupDragMouseLayout(label);
+								getChildren().add(label);
 							};
-						} else if (sitesStyle == SitesStyle.Hatches || sitesStyle == SitesStyle.Labels) {
-							var count = StringUtils.countOccurrences(sites, ',') + 1;
-							var labels = sites.split("\s*,\s*");
-							invalidationListener = a -> {
-								getChildren().clear();
-								var start = new Point2D(line.getStartX(), line.getStartY());
-								var end = new Point2D(line.getEndX(), line.getEndY());
 
-
-								var gapBetweenHatches = 1.0;
-								if (sitesStyle == SitesStyle.Hatches) {
-									var onScreenDistance = line.localToScreen(start.getX(), start.getY()).distance(line.localToScreen(end.getX(), end.getY()));
-									var onScreenGap = 4.0;
-									if ((count + 1) * onScreenGap > 0.3 * onScreenDistance) {
-										onScreenGap = 0.3 * onScreenDistance / (count + 1);
-									}
-									gapBetweenHatches = (line.screenToLocal(onScreenGap, onScreenGap).subtract(line.screenToLocal(0, 0))).magnitude(); // close enough...
-									var start1 = start.multiply(0.35).add(end.multiply(0.65));
-									var end1 = start.multiply(0.65).add(end.multiply(0.35));
-									start = start1;
-									end = end1;
-								} else {
-									gapBetweenHatches = start.distance(end) / (count + 1);
-								}
-
-								var angle = GeometryUtilsFX.computeAngle(end.subtract(start));
-
-
-								var point = start;
-								for (var i = 0; i < count; i++) {
-									point = GeometryUtilsFX.translateByAngle(point, angle, gapBetweenHatches);
-									var left = GeometryUtilsFX.translateByAngle(point, angle + 90, 5);
-									var right = GeometryUtilsFX.translateByAngle(point, angle + 270, 5);
-									{
-										var hatch = new Line(left.getX(), left.getY(), right.getX(), right.getY());
-										hatch.setStroke(Color.BLACK);
-										hatch.getStyleClass().add("graph-edge");
-										getChildren().add(hatch);
-									}
-									if (sitesStyle == SitesStyle.Labels) {
-										var text = new CopyableLabel(labels[i]);
-										text.setTranslateX(right.getX());
-										text.setTranslateY(right.getY());
-										DraggableUtils.setupDragMouseLayout(text);
-										getChildren().add(text);
-									}
-								}
-							};
 						}
-						if (invalidationListener != null) {
-							line.startXProperty().addListener(invalidationListener);
-							line.startYProperty().addListener(invalidationListener);
-							line.endXProperty().addListener(invalidationListener);
-							line.endYProperty().addListener(invalidationListener);
-							invalidationListener.invalidated(null);
-						}
+					}
+					if (invalidationListener != null) {
+						line.startXProperty().addListener(invalidationListener);
+						line.startYProperty().addListener(invalidationListener);
+						line.endXProperty().addListener(invalidationListener);
+						line.endYProperty().addListener(invalidationListener);
+						invalidationListener.invalidated(null);
 					}
 				}
 			}

@@ -148,7 +148,7 @@ public class NexusImporter {
 			}
 
 			if (taxaBlock.getNtax() == 0 || taxaBlock.size() == 0) {
-				if (taxLabels != null && (taxLabels.size() == taxaBlock.getNtax() || taxLabels.size() > 0 && taxaBlock.getNtax() == 0))
+				if (taxLabels != null && (taxLabels.size() == taxaBlock.getNtax() || !taxLabels.isEmpty() && taxaBlock.getNtax() == 0))
 					taxaBlock.addTaxaByNames(taxLabels);
 				else
 					throw new IOException("Can't infer taxon names");
