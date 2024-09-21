@@ -153,21 +153,26 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				var v = graph.newNode();
 				id2node.put(id, v);
 
-				if (np.peekMatchIgnoreCase("label")) {
-					np.matchIgnoreCase("label=");
-					graph.setLabel(v, np.getWordRespectCase());
-					if (taxaBlock.getLabels().isEmpty()) {
-						taxonNamesFound.add(graph.getLabel(v));
-						graph.addTaxon(v, taxonNamesFound.size());
-					} else {
-						graph.addTaxon(v, taxaBlock.indexOf(graph.getLabel(v)));
-					}
-				}
 				while (!np.peekMatchAnyTokenIgnoreCase(", ;")) {
-					String key = np.getWordRespectCase();
+					var key = np.getWordRespectCase();
 					np.matchIgnoreCase("=");
-					String value = np.getWordRespectCase();
+					var value = np.getWordRespectCase();
 					networkBlock.getNodeData(v).put(key, value);
+					if (key.equals("tid") && NumberUtils.isInteger(value) && !taxaBlock.getLabels().isEmpty()) {
+						var taxId = NumberUtils.parseInt(value);
+						if (taxId <= 0 || taxId > taxaBlock.getNtax())
+							throw new IOExceptionWithLineNumber("Invalid tax id: " + taxId, np.lineno());
+						graph.addTaxon(v, taxId);
+						graph.setLabel(v, taxaBlock.getLabel(taxId));
+					} else if (key.equals("label")) {
+						graph.setLabel(v, value);
+						if (taxaBlock.getLabels().isEmpty()) {
+							taxonNamesFound.add(value);
+							graph.addTaxon(v, taxonNamesFound.size());
+						} else {
+							graph.addTaxon(v, taxaBlock.indexOf(value));
+						}
+					}
 				}
 			}
 		}
@@ -215,7 +220,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 					var value = np.getWordRespectCase();
 					networkBlock.getEdgeData(e).put(key, value);
 					if (key.equals("weight") && NumberUtils.isDouble(value)) {
-						networkBlock.getGraph().setWeight(e, Double.parseDouble(value));
+						networkBlock.getGraph().setWeight(e, NumberUtils.parseDouble(value));
 					}
 					if (key.equals("confidence") && NumberUtils.isDouble(value)) {
 						networkBlock.getGraph().setConfidence(e, Double.parseDouble(value));
