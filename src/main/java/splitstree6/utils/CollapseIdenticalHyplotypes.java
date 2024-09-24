@@ -20,20 +20,72 @@
 package splitstree6.utils;
 
 import jloda.fx.window.NotificationManager;
+import jloda.graph.Graph;
+import jloda.graph.algorithms.ConnectedComponents;
 import jloda.util.StringUtils;
 import jloda.util.Triplet;
+import jloda.util.progress.ProgressPercentage;
+import splitstree6.algorithms.characters.characters2distances.HammingDistance;
 import splitstree6.data.CharactersBlock;
+import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 import splitstree6.data.parts.Taxon;
 
+import java.io.IOException;
 import java.util.*;
 
+/**
+ * any two sequences are considered to belong to the same haplotype if they are connected by a chain of sequences
+ * in which any two consecutive sequences have Hamming distance 0
+ * Daniel Huson, updated 9.2024
+ */
 public class CollapseIdenticalHyplotypes {
+	/**
+	 * collapse identical haplotypes
+	 *
+	 * @param inputTaxa       taxa
+	 * @param inputCharacters characters
+	 * @return new taxa block, traits block and characters block
+	 */
 	public static Triplet<TaxaBlock, TraitsBlock, CharactersBlock> apply(TaxaBlock inputTaxa, CharactersBlock inputCharacters) {
 		var taxLabelMap = new TreeMap<Integer, List<String>>();
 		for (var t = 1; t <= inputTaxa.getNtax(); t++) {
 			taxLabelMap.computeIfAbsent(t, k -> new ArrayList<>()).add(inputTaxa.getLabel(t));
+		}
+
+		var distancesBlock = new DistancesBlock();
+		try {
+			(new HammingDistance()).compute(new ProgressPercentage(), inputTaxa, inputCharacters, distancesBlock);
+		} catch (IOException ignored) {
+			// can't happen because progress-percentage can't be canceled
+		}
+
+		var taxonComponentArray = new int[inputTaxa.getNtax() + 1];
+
+		{
+			var graphZeroDistance = new Graph();
+			for (var s = 1; s <= inputTaxa.getNtax(); s++) {
+				graphZeroDistance.newNode(s);
+			}
+			for (var v : graphZeroDistance.nodes()) {
+				var s = (int) v.getInfo();
+				for (var w : graphZeroDistance.nodes(v)) {
+					var t = (int) w.getInfo();
+					if (distancesBlock.get(s, t) == 0) {
+						graphZeroDistance.newEdge(v, w);
+					}
+				}
+			}
+
+			var componentNumber = 0;
+			for (var component : ConnectedComponents.components(graphZeroDistance)) {
+				componentNumber++;
+				for (var v : component) {
+					var t = (int) v.getInfo();
+					taxonComponentArray[t] = componentNumber;
+				}
+			}
 		}
 
 		var inputMatrix = inputCharacters.getMatrix();
@@ -41,7 +93,7 @@ public class CollapseIdenticalHyplotypes {
 		for (var s = 1; s <= inputTaxa.getNtax(); s++) {
 			if (!taxLabelMap.get(s).isEmpty()) {
 				for (var t = s + 1; t <= inputTaxa.getNtax(); t++) {
-					if (identical(inputMatrix[s - 1], inputMatrix[t - 1])) {
+					if (taxonComponentArray[s]==taxonComponentArray[t]) {
 						taxLabelMap.get(s).addAll(taxLabelMap.get(t));
 						taxLabelMap.put(t, new ArrayList<>());
 						countCollapsed++;
@@ -49,6 +101,7 @@ public class CollapseIdenticalHyplotypes {
 				}
 			}
 		}
+
 		var inputTraits = inputTaxa.getTraitsBlock();
 
 		var outputNTax = (int) taxLabelMap.entrySet().stream().filter(e -> !e.getValue().isEmpty()).count();
@@ -71,7 +124,6 @@ public class CollapseIdenticalHyplotypes {
 		var outputMatrix = outputCharacters.getMatrix();
 
 		var outputTraits = new TraitsBlock();
-
 
 		if (inputTraits == null || inputTraits.getNTraits() == 0)
 			outputTraits.setDimensions(outputNTax, outputNTax);
@@ -130,13 +182,5 @@ public class CollapseIdenticalHyplotypes {
 			NotificationManager.showInformation("Unique haplotypes: " + outputTaxa.getNtax());
 			return new Triplet<>(outputTaxa, outputTraits, outputCharacters);
 		}
-	}
-
-	private static boolean identical(char[] a, char[] b) {
-		for (var i = 0; i < a.length; i++) {
-			if (a[i] != b[i])
-				return false;
-		}
-		return true;
 	}
 }
