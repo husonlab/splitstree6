@@ -6,6 +6,8 @@ As this is the sixth major reimplementation of SplitsTree, this is also known as
 
 One main aim of this program is to make it easy to compute both trees and networks, hopefully encouraging researchers to use phylogenetic networks when appropriate. A second aim is to bring together the calculation of both unrooted and rooted trees and networks into one program. Moreover, the program explicitly supports the import and export of data in many different formats, making it easy to use the program in collaboration with other programs.
 
+> We are currently beta testing an iOS version... if you would like to try out SplitsTree on your iPad (or even iPhone ;-)), then please contact Daniel Huson for a link to Apple Testflight.
+
 ## User manual
 
 The user manual for this software is available as an
