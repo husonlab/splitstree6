@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.8" transformSequenceNumber="10">
+<install4j version="10.0.9" transformSequenceNumber="10">
   <directoryPresets config="../tools/mash-sketches" />
-  <application name="SplitsTree App" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTree" publisher="Daniel H. Huson and David Bryant" publisherWeb="http://splitstree.husonlab.org" version="6.0.0" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
+  <application name="SplitsTree App" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTree" publisher="Daniel H. Huson and David Bryant" publisherWeb="http://splitstree.husonlab.org" version="6.0.0" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="17">
     <variables>
       <variable name="renderingVMOption" />
     </variables>
@@ -16,7 +16,7 @@
         <entry>netlib-*</entry>
       </macSearchedJars>
     </codeSigning>
-    <jreBundles jdkProviderId="Liberica" release="22/22+37">
+    <jreBundles jdkProviderId="Liberica" release="23/23+38">
       <modules />
     </jreBundles>
   </application>
@@ -1170,5 +1170,4 @@ return true;</property>
   <buildIds buildAll="false">
     <mediaSet refId="1691242165" />
   </buildIds>
-  <buildOptions disableSigning="true" disableNotarization="true" />
 </install4j>

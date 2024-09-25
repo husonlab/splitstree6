@@ -514,18 +514,18 @@ public class MainWindowController {
 		algorithmTabPane.setAllowUndock(false);
 		mainTabPane.setAllowUndock(false);
 
-		MaterialIcons.setIcon(fileMenuButton, "file_open");
+		MaterialIcons.setIcon(fileMenuButton, MaterialIcons.file_open);
 
-		MaterialIcons.setIcon(undoButton, "undo");
-		MaterialIcons.setIcon(redoButton, "redo");
-		MaterialIcons.setIcon(increaseFontSizeButton, "text_increase");
-		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
-		MaterialIcons.setIcon(selectButton, "select_all");
-		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "view_sidebar", "-fx-rotate: 180;", true);
+		MaterialIcons.setIcon(undoButton, MaterialIcons.undo);
+		MaterialIcons.setIcon(redoButton, MaterialIcons.redo);
+		MaterialIcons.setIcon(increaseFontSizeButton, MaterialIcons.text_increase);
+		MaterialIcons.setIcon(decreaseFontSizeButton, MaterialIcons.text_decrease);
+		MaterialIcons.setIcon(selectButton, MaterialIcons.select_all);
+		MaterialIcons.setIcon(showWorkflowTreeCheckButton, MaterialIcons.view_sidebar, "-fx-rotate: 180;", true);
 		if (SplitsTree6.isDesktop())
-			MaterialIcons.setIcon(importButton, "download");
+			MaterialIcons.setIcon(importButton, MaterialIcons.input);
 		else
-			MaterialIcons.setIcon(importButton, "download", "-fx-padding: 0 5px;", true);
+			MaterialIcons.setIcon(importButton, MaterialIcons.input, "-fx-padding: 0 5px;", true);
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -534,8 +534,8 @@ public class MainWindowController {
 		decreaseFontSizeButton.disableProperty().bind(decreaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
 
 
-		MaterialIcons.setIcon(findButton, "search");
-		MaterialIcons.setIcon(exportButton, "ios_share");
+		MaterialIcons.setIcon(findButton, MaterialIcons.search);
+		MaterialIcons.setIcon(exportButton, MaterialIcons.ios_share);
 
 		algorithmsBorderPane.setCenter(algorithmTabPane);
 		mainBorderPane.setCenter(mainTabPane);
