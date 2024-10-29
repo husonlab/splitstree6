@@ -84,4 +84,14 @@ public record HyperSequence(ArrayList<BitSet> members) {
 	public void removeEmptyElements() {
 		members.removeAll(members.stream().filter(BitSet::isEmpty).toList());
 	}
+
+	public HyperSequence induce(BitSet taxa) {
+		var hypersequence = new HyperSequence();
+		for (var element : members) {
+			var set = BitSetUtils.intersection(element, taxa);
+			if (set.cardinality() > 0 && !hypersequence.members().contains(set))
+				hypersequence.members().add(set);
+		}
+		return hypersequence;
+	}
 }

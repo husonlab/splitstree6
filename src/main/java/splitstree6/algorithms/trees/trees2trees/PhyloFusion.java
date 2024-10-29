@@ -122,8 +122,7 @@ public class PhyloFusion extends Trees2Trees {
 		}
 		return switch (optionName) {
 			case "optionOnlyOneNetwork" -> "Report only one network";
-			case "optionSearchHeuristic" ->
-					"Fast, Medium, Thorough or SuperThorough search: 10, 150, 300 or 1000 random orderings per taxon, respectively";
+			case "optionSearchHeuristic" -> "Fast, Medium, or Thorough search";
 			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
@@ -146,10 +145,13 @@ public class PhyloFusion extends Trees2Trees {
 
 		var inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
 
+		var start = System.currentTimeMillis();
 		var result = computeRec(progress, isOptionMutualRefinement(), inputTrees);
 
 		var hybridizationNumber = result.get(0).nodeStream().filter(v -> v.getInDegree() > 0).mapToInt(v -> v.getInDegree() - 1).sum();
 		System.err.println("Hybridization number: " + hybridizationNumber);
+
+		System.err.println("Time: " + ((System.currentTimeMillis() - start) / 1000) + "s");
 
 		outputBlock.setPartial(false);
 		outputBlock.setRooted(true);
@@ -304,7 +306,7 @@ public class PhyloFusion extends Trees2Trees {
 					System.err.println("Running on " + taxa.cardinality() + " taxa");
 				var numberOfRandomOrderings = getOptionSearchHeuristic().numberOfRandomOrderings(taxa.cardinality());
 
-				var resultList = PhyloFusionAlgorithmOct2024.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
+				var resultList = PhyloFusionAlgorithmOct2024.apply(getOptionSearchHeuristic(), trees, isOptionOnlyOneNetwork(), progress);
 
 				// var resultList = PhyloFusionAlgorithmMay2024.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
 

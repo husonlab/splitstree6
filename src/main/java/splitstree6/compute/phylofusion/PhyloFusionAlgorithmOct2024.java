@@ -25,13 +25,14 @@ import jloda.phylo.PhyloGraph;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.trees.trees2trees.PhyloFusion;
 import splitstree6.utils.PathMultiplicityDistance;
-import splitstree6.utils.TreesUtils;
 import splitstree6.xtra.hyperstrings.HyperSequence;
 import splitstree6.xtra.hyperstrings.ProgressiveSCS;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * the PhyloFusion algorithm
@@ -46,13 +47,10 @@ public class PhyloFusionAlgorithmOct2024 {
 	 * @return the computed networks
 	 * @throws IOException user canceled
 	 */
-	public static List<PhyloTree> apply(long numberOfOrderingsToKeep, List<PhyloTree> inputTrees, boolean onlyOneNetwork, ProgressListener progress) throws IOException {
+	public static List<PhyloTree> apply(PhyloFusion.Search search, List<PhyloTree> inputTrees, boolean onlyOneNetwork, ProgressListener progress) throws IOException {
 		if (inputTrees.size() == 1) {
 			return List.of(new PhyloTree(inputTrees.get(0)));
 		}
-
-		numberOfOrderingsToKeep = 1;
-		System.err.println(PhyloFusionAlgorithmOct2024.class.getSimpleName() + " using t=" + numberOfOrderingsToKeep);
 
 		var taxa = union(inputTrees.stream().map(PhyloGraph::getTaxa).toList());
 
@@ -72,7 +70,7 @@ public class PhyloFusionAlgorithmOct2024 {
 		var best = new ArrayList<Pair<int[], Map<Integer, HyperSequence>>>();
 
 
-		for (var ranking : computeTaxonRankings(progress, taxa, trees, numberOfOrderingsToKeep)) {
+		for (var ranking : computeTaxonRankings(progress, taxa, trees, search)) {
 			var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, ranking, trees);
 			var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
 			// todo: take different optimal SCS into account
@@ -123,70 +121,100 @@ public class PhyloFusionAlgorithmOct2024 {
 		return result;
 	}
 
-	private static List<int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, long numberOfRankingsToKeep) throws CanceledException {
-		final var orderings1 = new ArrayList<int[]>();
-		final var orderings2 = new ArrayList<int[]>();
-
-		var clusters = new HashSet<BitSet>();
-		for (var tree : trees) {
-			clusters.addAll(TreesUtils.collectAllHardwiredClusters(tree));
-		}
-		var taxonCountPairs = new ArrayList<Pair<Integer, Integer>>();
-		for (var t : BitSetUtils.members(taxa)) {
-			taxonCountPairs.add(new Pair<>(t, (int) clusters.stream().filter(c -> c.get(t)).count()));
-		}
-		taxonCountPairs.sort((a, b) -> Integer.compare(a.getSecond(), b.getSecond()));
-
+	private static List<int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, PhyloFusion.Search search) throws CanceledException {
 		final var nTax = taxa.cardinality();
+		final var scoredOrderings1 = new FixedCapacitySortedSet<>(nTax, ScoredOrdering::compare);
+		final var scoredOrderings2 = new FixedCapacitySortedSet<>(nTax, ScoredOrdering::compare);
+
+		var startKeepSize = switch (search) {
+			case Fast -> nTax;
+			case Medium -> Math.max(500, nTax);
+			case Thorough -> Math.max(4000, nTax);
+		};
+		var endKeepSize = switch (search) {
+			case Fast -> 5;
+			case Medium -> Math.min(100, nTax);
+			case Thorough -> Math.min(400, nTax);
+		};
+
+		// seed elements
 		{
-			var ordering = new int[nTax];
-			var pos = 0;
-			for (var pair : taxonCountPairs) {
-				var t = pair.getFirst();
-				ordering[pos++] = t;
+			var array = new int[nTax];
+			var count = 0;
+			for (var t : BitSetUtils.members(taxa)) {
+				array[count++] = t;
 			}
-			orderings1.add(ordering);
+			for (var other = 0; other < nTax; other++) {
+				scoredOrderings1.add(new ScoredOrdering(Integer.MAX_VALUE, 0, other, swapAndCopy(array, 0, other)));
+			}
 		}
 
-		progress.setSubtask("Searching orderings");
+		progress.setTasks("Searching orderings", "taxa=" + nTax + " trees=" + trees.size());
 		progress.setMaximum(nTax);
-		progress.setProgress(0);
-		var bestScore = Integer.MAX_VALUE; // this is global if we evaluate to the end of the sequences
+		progress.setProgress(1);
 
-		for (var pos = 0; pos < nTax - 1; pos++) {
-			if (pos > 0) {
-				orderings1.clear();
-				orderings1.addAll(orderings2);
-				orderings2.clear();
+		for (var pos = 1; pos < nTax; pos++) {
+			if (pos > 1) {
+				scoredOrderings1.clear();
+				scoredOrderings1.addAll(scoredOrderings2);
+				scoredOrderings2.clear();
 				progress.incrementProgress();
+
+				var keep = (int) Math.ceil(((double) (nTax - pos) / nTax) * startKeepSize + ((double) pos / nTax) * endKeepSize);
+				scoredOrderings1.changeCapacity(keep);
+				scoredOrderings2.changeCapacity(keep);
 			}
-			for (var other = pos; other < nTax; other++) {
-				for (var ordering : orderings1) {
-					ordering = swapAndCopy(ordering, pos, other);
-					var score = evaluate(progress, taxa, trees, ordering, pos);
-					// System.err.println("ordering="+StringUtils.toString(ordering," ")+" -> "+score);
-					if (score < bestScore) {
-						orderings2.clear();
-						bestScore = score;
-						System.err.println("Best: " + score);
+
+			var finalPos = pos;
+			try {
+				ExecuteInParallel.apply(scoredOrderings1, order -> {
+					for (var other = finalPos; other < nTax; other++) {
+						var ordering = swapAndCopy(order.ordering, finalPos, other);
+						var score = evaluate(progress, taxa, trees, ordering, finalPos);
+						var scoredOrdering = new ScoredOrdering(score, finalPos, other, ordering);
+						scoredOrderings2.add(scoredOrdering);
 					}
-					if (score == bestScore && orderings2.size() < nTax - pos) {
-						orderings2.add(ordering);
-					}
-				}
+				}, ProgramExecutorService.getNumberOfCoresToUse());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		}
-		return orderings2.stream().map(PhyloFusionAlgorithmOct2024::ranking).toList();
+		return scoredOrderings2.stream().map(ScoredOrdering::ordering).map(PhyloFusionAlgorithmOct2024::ranking).toList();
+	}
+
+	public record ScoredOrdering(int score, int pos, int other, int[] ordering) {
+		public static int compare(ScoredOrdering a, ScoredOrdering b) {
+			int result = Integer.compare(a.score, b.score);
+			if (result != 0) return result;
+			result = Integer.compare(a.pos, b.pos);
+			if (result != 0) return result;
+			result = Integer.compare(a.other, b.other);
+			if (result != 0) return result;
+			return Arrays.compare(a.ordering, b.ordering);
+		}
 	}
 
 	public static int evaluate(ProgressListener progress, BitSet taxa, List<PhyloTree> trees, int[] ordering, int pos) throws CanceledException {
-		var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, ranking(ordering), trees);
-		var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
-		// todo: take different optimal SCS into account
-		for (var t1 : taxonHyperSequencesMap.keySet()) {
-			taxonHyperSequenceMap.put(t1, ProgressiveSCS.apply(new ArrayList<>(taxonHyperSequencesMap.get(t1))));
-		}
-		return computeHybridizationNumber(taxa.cardinality(), taxonHyperSequenceMap);
+		if (true) {
+			var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, ranking(ordering), trees);
+			var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
+			for (var t : taxonHyperSequencesMap.keySet()) {
+				taxonHyperSequenceMap.put(t, ProgressiveSCS.apply(new ArrayList<>(taxonHyperSequencesMap.get(t))));
+			}
+			return computeHybridizationNumber(taxa.cardinality(), taxonHyperSequenceMap);
+		} else {
+			var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, ranking(ordering), trees);
+			var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
+			var activeTaxa = BitSetUtils.asBitSet(Arrays.copyOf(ordering, pos + 1));
+			for (var t : BitSetUtils.members(activeTaxa)) {
+				if (taxonHyperSequencesMap.containsKey(t)) {
+					var sequences = taxonHyperSequencesMap.get(t).stream().map(h -> h.induce(activeTaxa))
+							.distinct().collect(Collectors.toCollection(ArrayList::new));
+					taxonHyperSequenceMap.put(t, ProgressiveSCS.apply(sequences));
+				}
+			}
+			return computeHybridizationNumber(activeTaxa.cardinality(), taxonHyperSequenceMap);
+	}
 	}
 
 	public static int[] swapAndCopy(int[] array, int i, int j) {

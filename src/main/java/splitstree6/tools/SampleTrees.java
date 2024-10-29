@@ -89,7 +89,7 @@ public class SampleTrees {
 		var echoInputTree = options.getOption("-e", "echoInput", "Echo the input tree to output", false);
 
 		var replicates = options.getOption("-R", "replicates", "Number replicates per input tree", 1);
-		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "PhyloFusionMedium", "PhyloFusionFast", "Autumn", "ALTSNetwork", "ALTSExternal", "external"), "");
+		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusionFast", "PhyloFusionMedium", "PhyloFusionThorough", "Autumn", "ALTSNetwork", "ALTSExternal", "external"), "");
 		var timeOut = 1000L * options.getOption("-to", "timeOut", "Abort algorithm after this many seconds", 300);
 		var externalName = options.getOption("-xp", "externalPath", "Path to external program", "");
 

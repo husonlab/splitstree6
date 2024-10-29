@@ -151,10 +151,34 @@ public class TreesUtils {
 	}
 
 	public static PhyloTree computeInducedTree(BitSet taxa, PhyloTree originalTree) {
-		var clusters = TreesUtils.collectAllHardwiredClusters(originalTree).stream().map(c -> BitSetUtils.intersection(c, taxa)).filter(c -> c.cardinality() > 0).collect(Collectors.toSet());
-		var tree = new PhyloTree();
-		ClusterPoppingAlgorithm.apply(clusters, tree);
-		return tree;
+		if (false) {
+			var tree = new PhyloTree(originalTree);
+			try (var keep = tree.newNodeSet()) {
+				tree.postorderTraversal(v -> {
+							for (var t : tree.getTaxa(v)) {
+								if (taxa.get(t)) {
+									keep.add(v);
+									return;
+								}
+							}
+							for (var w : v.children()) {
+								if (keep.contains(w)) {
+									keep.add(v);
+									return;
+								}
+							}
+						}
+				);
+				tree.nodeStream().filter(v -> !keep.contains(v)).toList().forEach(tree::deleteNode);
+				tree.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList().forEach(tree::delDivertex);
+			}
+			return tree;
+		} else {
+			var clusters = TreesUtils.collectAllHardwiredClusters(originalTree).stream().map(c -> BitSetUtils.intersection(c, taxa)).filter(c -> c.cardinality() > 0).collect(Collectors.toSet());
+			var tree = new PhyloTree();
+			ClusterPoppingAlgorithm.apply(clusters, tree);
+			return tree;
+		}
 	}
 
 	public static PhyloTree computeTreeFromCompatibleSplits(Function<Integer, String> taxonLabel, List<ASplit> splits) {

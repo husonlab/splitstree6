@@ -557,15 +557,14 @@ public class MainWindowController {
 				if (mainWindow.getStage() != null) {
 					final String title = mainWindow.getStage().getTitle();
 					if (title != null) {
-						final MenuItem menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
+						final var menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
 						menuItem.setOnAction((e) -> mainWindow.getStage().toFront());
 						menuItem.setAccelerator(new KeyCharacterCombination("" + (++count), KeyCombination.SHORTCUT_DOWN));
-						Platform.runLater(() -> {
-							try {
-								windowMenu.getItems().add(menuItem);
-							} catch (Exception ignored) {
-							}
-						});
+
+						try {
+							windowMenu.getItems().add(menuItem);
+						} catch (IndexOutOfBoundsException ignored) {
+						}
 					}
 				}
 				if (MainWindowManager.getInstance().getAuxiliaryWindows(mainWindow) != null) {
