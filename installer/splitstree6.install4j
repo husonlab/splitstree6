@@ -1170,4 +1170,5 @@ return true;</property>
   <buildIds buildAll="false">
     <mediaSet refId="1691242165" />
   </buildIds>
+  <buildOptions disableSigning="true" disableNotarization="true" />
 </install4j>

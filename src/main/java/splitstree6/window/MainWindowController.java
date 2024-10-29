@@ -19,9 +19,9 @@
 
 package splitstree6.window;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.Property;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -32,6 +32,7 @@ import javafx.stage.Stage;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.Single;
@@ -523,9 +524,9 @@ public class MainWindowController {
 		MaterialIcons.setIcon(selectButton, MaterialIcons.select_all);
 		MaterialIcons.setIcon(showWorkflowTreeCheckButton, MaterialIcons.view_sidebar, "-fx-rotate: 180;", true);
 		if (SplitsTree6.isDesktop())
-			MaterialIcons.setIcon(importButton, MaterialIcons.input);
+			MaterialIcons.setIcon(importButton, MaterialIcons.input, "-fx-translate-y: 2;", true);
 		else
-			MaterialIcons.setIcon(importButton, MaterialIcons.input, "-fx-padding: 0 5px;", true);
+			MaterialIcons.setIcon(importButton, MaterialIcons.input, "-fx-padding: 0 5px;-fx-translate-y: 2;", true);
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -559,7 +560,12 @@ public class MainWindowController {
 						final MenuItem menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
 						menuItem.setOnAction((e) -> mainWindow.getStage().toFront());
 						menuItem.setAccelerator(new KeyCharacterCombination("" + (++count), KeyCombination.SHORTCUT_DOWN));
-						windowMenu.getItems().add(menuItem);
+						Platform.runLater(() -> {
+							try {
+								windowMenu.getItems().add(menuItem);
+							} catch (Exception ignored) {
+							}
+						});
 					}
 				}
 				if (MainWindowManager.getInstance().getAuxiliaryWindows(mainWindow) != null) {
@@ -568,7 +574,12 @@ public class MainWindowController {
 						if (title != null) {
 							final MenuItem menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
 							menuItem.setOnAction((e) -> auxStage.toFront());
-							windowMenu.getItems().add(menuItem);
+							Platform.runLater(() -> {
+								try {
+									windowMenu.getItems().add(menuItem);
+								} catch (Exception ignored) {
+								}
+							});
 						}
 					}
 				}
@@ -583,16 +594,10 @@ public class MainWindowController {
 			rightWidth.set(rightToolBarPane.getWidth());
 		});
 
-		mainTabPane.setOnSwipeLeft(Event::consume);
-		mainTabPane.setOnSwipeRight(Event::consume);
-		mainTabPane.setOnSwipeUp(Event::consume);
-		mainTabPane.setOnSwipeDown(Event::consume);
+		SwipeUtils.setConsumeSwipes(mainTabPane);
 		mainTabPane.setFocusTraversable(false);
 
-		algorithmTabPane.setOnSwipeLeft(Event::consume);
-		algorithmTabPane.setOnSwipeRight(Event::consume);
-		algorithmTabPane.setOnSwipeUp(Event::consume);
-		algorithmTabPane.setOnSwipeDown(Event::consume);
+		SwipeUtils.setConsumeSwipes(algorithmTabPane);
 		algorithmTabPane.setFocusTraversable(false);
 	}
 

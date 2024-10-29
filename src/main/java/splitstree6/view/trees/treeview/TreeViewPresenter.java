@@ -110,11 +110,13 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				tree.set(view.getTrees().get(nTree - 1));
 			else
 				tree.set(null);
+			if (tree.get() != null && tree.get().hasReticulateEdges() && view.getOptionDiagram() == TreeDiagramType.TriangularCladogram)
+				Platform.runLater(() -> view.setOptionDiagram(TreeDiagramType.RectangularCladogram));
 		});
 
 		view.getTrees().addListener((InvalidationListener) e -> {
 			controller.getTreeCBox().getItems().setAll(view.getTrees().stream().map(Graph::getName).collect(Collectors.toList()));
-			if (view.getOptionTree() == 0 && view.getTrees().size() > 0)
+			if (view.getOptionTree() == 0 && !view.getTrees().isEmpty())
 				view.setOptionTree(1);
 			if (view.getOptionTree() >= 1 && view.getOptionTree() <= view.getTrees().size()) {
 				controller.getTreeCBox().setValue(controller.getTreeCBox().getItems().get(view.getOptionTree() - 1));

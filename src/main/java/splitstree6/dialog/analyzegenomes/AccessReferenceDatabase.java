@@ -516,9 +516,11 @@ public class AccessReferenceDatabase implements Closeable {
 						final var mashSketch = pair.getSecond();
 						totalJobs.incrementAndGet();
 						for (var sketch : querySketches) {
-							if (MashDistance.computeIntersection(mashSketch, sketch) >= minSharedKMers) {
+							var intersection = MashDistance.computeIntersection(mashSketch, sketch);
+							if (intersection >= minSharedKMers) {
 								final var id = pair.getFirst();
 								final var distance = MashDistance.compute(mashSketch, sketch);
+								// System.err.println("intersection: "+intersection+" distance: "+distance);
 								synchronized (id2distance) {
 									if (!id2distance.containsKey(id) || id2distance.get(id) > distance) {
 										id2distance.put(id, distance);

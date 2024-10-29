@@ -1,5 +1,5 @@
 /*
- *  PhyloFusionAlgorithm.java Copyright (C) 2024 Daniel H. Huson
+ *  PhyloFusionAlgorithmMay2024.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -25,25 +25,19 @@ import jloda.phylo.PhyloGraph;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import jloda.util.progress.ProgressSilent;
 import splitstree6.utils.PathMultiplicityDistance;
-import splitstree6.utils.ProgressTimeOut;
+import splitstree6.utils.TreesUtils;
 import splitstree6.xtra.hyperstrings.HyperSequence;
 import splitstree6.xtra.hyperstrings.ProgressiveSCS;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.LongAdder;
-import java.util.function.Supplier;
 
 /**
- * the PhyloFusionOld algorithm
+ * the PhyloFusion algorithm
  * Daniel Huson, 5.2024
  */
-public class PhyloFusionAlgorithm {
+public class PhyloFusionAlgorithmOct2024 {
 	/**
 	 * run the algorithm
 	 *
@@ -52,10 +46,13 @@ public class PhyloFusionAlgorithm {
 	 * @return the computed networks
 	 * @throws IOException user canceled
 	 */
-	public static List<PhyloTree> apply(long numberOfRandomOrderings, List<PhyloTree> inputTrees, boolean onlyOneNetwork, ProgressListener progress) throws IOException {
+	public static List<PhyloTree> apply(long numberOfOrderingsToKeep, List<PhyloTree> inputTrees, boolean onlyOneNetwork, ProgressListener progress) throws IOException {
 		if (inputTrees.size() == 1) {
 			return List.of(new PhyloTree(inputTrees.get(0)));
 		}
+
+		numberOfOrderingsToKeep = 1;
+		System.err.println(PhyloFusionAlgorithmOct2024.class.getSimpleName() + " using t=" + numberOfOrderingsToKeep);
 
 		var taxa = union(inputTrees.stream().map(PhyloGraph::getTaxa).toList());
 
@@ -71,51 +68,39 @@ public class PhyloFusionAlgorithm {
 			trees.add(tree);
 		}
 
-		var rankings = computeTaxonRankings(progress, taxa, trees, numberOfRandomOrderings);
-
 		var bestHybridizationNumber = new Single<>(Integer.MAX_VALUE);
 		var best = new ArrayList<Pair<int[], Map<Integer, HyperSequence>>>();
 
-		progress.setSubtask("calculating");
-		progress.setMaximum(rankings.size());
-		progress.setProgress(0);
 
-		try {
-			ExecuteInParallel.apply(rankings, taxonRank -> {
-				var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, taxonRank, trees);
-				var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
-				// todo: take different optimal SCS into account
-				for (var t : taxonHyperSequencesMap.keySet()) {
-					var hyperSequence = ProgressiveSCS.apply(new ArrayList<>(taxonHyperSequencesMap.get(t)));
+		for (var ranking : computeTaxonRankings(progress, taxa, trees, numberOfOrderingsToKeep)) {
+			var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, ranking, trees);
+			var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
+			// todo: take different optimal SCS into account
+			for (var t : taxonHyperSequencesMap.keySet()) {
+				var hyperSequence = ProgressiveSCS.apply(new ArrayList<>(taxonHyperSequencesMap.get(t)));
 
-					// simplification
-					if (hyperSequence != null) {
-						var prev = new BitSet();
-						for (var i = 0; i + 1 < hyperSequence.size(); i++) {
-							var item = hyperSequence.get(i);
-							var next = hyperSequence.get(i + 1);
-							prev = BitSetUtils.minus(BitSetUtils.intersection(item, next), prev);
-							item.andNot(prev);
-						}
-						hyperSequence.removeEmptyElements();
+				// simplification
+				if (hyperSequence != null) {
+					var prev = new BitSet();
+					for (var i = 0; i + 1 < hyperSequence.size(); i++) {
+						var item = hyperSequence.get(i);
+						var next = hyperSequence.get(i + 1);
+						prev = BitSetUtils.minus(BitSetUtils.intersection(item, next), prev);
+						item.andNot(prev);
 					}
-					taxonHyperSequenceMap.put(t, hyperSequence);
-
+					hyperSequence.removeEmptyElements();
 				}
-				var hybridizationNumber = computeHybridizationNumber(taxa.cardinality(), taxonHyperSequenceMap);
-				synchronized (bestHybridizationNumber) {
-					if (hybridizationNumber < bestHybridizationNumber.get()) {
-						bestHybridizationNumber.set(hybridizationNumber);
-						best.clear();
-					}
-					if (hybridizationNumber == bestHybridizationNumber.get()) {
-						best.add(new Pair<>(taxonRank, taxonHyperSequenceMap));
-					}
-					progress.incrementProgress();
-				}
-			}, ProgramExecutorService.getNumberOfCoresToUse(), new ProgressSilent());
-		} catch (Exception e) {
-			throw new IOException(e);
+				taxonHyperSequenceMap.put(t, hyperSequence);
+			}
+
+			var hybridizationNumber = computeHybridizationNumber(taxa.cardinality(), taxonHyperSequenceMap);
+			if (hybridizationNumber < bestHybridizationNumber.get()) {
+				bestHybridizationNumber.set(hybridizationNumber);
+				best.clear();
+			}
+			if (hybridizationNumber == bestHybridizationNumber.get()) {
+				best.add(new Pair<>(ranking, taxonHyperSequenceMap));
+			}
 		}
 
 		if (onlyOneNetwork && best.size() > 1) {
@@ -135,188 +120,83 @@ public class PhyloFusionAlgorithm {
 			}
 			progress.incrementProgress();
 		}
-
 		return result;
 	}
 
-	/**
-	 * compute taxon orderings to consider, using greedy heuristic
-	 *
-	 * @param trees              input trees
-	 * @return taxon rankings
-	 */
-	private static Collection<? extends int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, long numberOfRandomOrderings) throws CanceledException {
+	private static List<int[]> computeTaxonRankings(ProgressListener progress, BitSet taxa, ArrayList<PhyloTree> trees, long numberOfRankingsToKeep) throws CanceledException {
+		final var orderings1 = new ArrayList<int[]>();
+		final var orderings2 = new ArrayList<int[]>();
 
-		var rankings = new ArrayList<int[]>();
+		var clusters = new HashSet<BitSet>();
+		for (var tree : trees) {
+			clusters.addAll(TreesUtils.collectAllHardwiredClusters(tree));
+		}
+		var taxonCountPairs = new ArrayList<Pair<Integer, Integer>>();
+		for (var t : BitSetUtils.members(taxa)) {
+			taxonCountPairs.add(new Pair<>(t, (int) clusters.stream().filter(c -> c.get(t)).count()));
+		}
+		taxonCountPairs.sort((a, b) -> Integer.compare(a.getSecond(), b.getSecond()));
 
-		if (false && taxa.cardinality() < 9) {
-			computeAllRankingsRec(new BitSet(), taxa, new int[taxa.cardinality()], rankings);
-			System.err.printf("Using all %,d taxon rankings for n=%,d%n", rankings.size(), taxa.cardinality());
-			return rankings;
+		final var nTax = taxa.cardinality();
+		{
+			var ordering = new int[nTax];
+			var pos = 0;
+			for (var pair : taxonCountPairs) {
+				var t = pair.getFirst();
+				ordering[pos++] = t;
+			}
+			orderings1.add(ordering);
 		}
 
+		progress.setSubtask("Searching orderings");
+		progress.setMaximum(nTax);
+		progress.setProgress(0);
+		var bestScore = Integer.MAX_VALUE; // this is global if we evaluate to the end of the sequences
 
-		var nThreads = ProgramExecutorService.getNumberOfCoresToUse();
-		var executor = Executors.newFixedThreadPool(nThreads);
-
-		try {
-			var globalScore = new Single<>(Integer.MAX_VALUE);
-
-			progress.setSubtask("Searching");
-			progress.setMaximum(numberOfRandomOrderings);
-			progress.setProgress(0);
-
-			var queue = new LinkedBlockingQueue<ArrayList<Integer>>(2 * nThreads);
-			var sentinel = new ArrayList<Integer>();
-
-			var countdownLatch = new CountDownLatch(nThreads);
-
-			var total = new LongAdder();
-
-			var mainThread = Thread.currentThread();
-
-			for (var t = 0; t < nThreads; t++) {
-				executor.submit(() -> {
-					try {
-						var silent = new ProgressSilent();
-						while (true) {
-							var ordering = queue.take();
-							if (ordering == sentinel) {
-								break;
-							}
-							try {
-								computeTaxonRankingsRec(silent, 0, new int[taxa.cardinality()], taxa, ordering, trees, globalScore, rankings);
-							} catch (CanceledException ignored) {
-							}
-							progress.checkForCancel();
-						}
-					} catch (InterruptedException ignored) {
-					} catch (CanceledException ignored) {
-						executor.shutdownNow();
-						mainThread.interrupt();
-					} finally {
-						countdownLatch.countDown();
-					}
-				});
-			}
-
-			var randomOrderSupplier = randomTaxonOrderingsSupplier(taxa);
-			do {
-				queue.put(randomOrderSupplier.get());
-				total.increment();
+		for (var pos = 0; pos < nTax - 1; pos++) {
+			if (pos > 0) {
+				orderings1.clear();
+				orderings1.addAll(orderings2);
+				orderings2.clear();
 				progress.incrementProgress();
 			}
-			while (total.longValue() < numberOfRandomOrderings);
-
-			for (var t = 0; t < nThreads; t++) {
-				queue.put(sentinel);
-			}
-
-			countdownLatch.await();
-
-		} catch (InterruptedException e) {
-			throw new CanceledException(ProgressTimeOut.MESSAGE);
-		} finally {
-			executor.shutdownNow();
-		}
-		progress.checkForCancel();
-
-		return rankings;
-	}
-
-	private static void computeAllRankingsRec(BitSet used, BitSet taxa, int[] ordering, ArrayList<int[]> rankings) {
-		if (used.cardinality() == taxa.cardinality()) {
-			rankings.add(ranking(ordering));
-		} else {
-			for (var t : BitSetUtils.members(taxa)) {
-				if (!used.get(t)) {
-					ordering[used.cardinality()] = t;
-					used.set(t, true);
-					computeAllRankingsRec(used, taxa, ordering, rankings);
-					used.set(t, false);
-				}
-
-			}
-		}
-
-	}
-
-	/**
-	 * recursively use greedy heuristic to compute best order
-	 *
-	 * @param pos           position in orde
-	 * @param order         current order
-	 * @param remainingTaxa remaining taxa
-	 * @param trees         all trees
-	 * @param globalScore   best hybridization number so far
-	 * @param rankings      best orderings
-	 */
-	private static void computeTaxonRankingsRec(ProgressListener progress, int pos, int[] order, BitSet allTaxa, ArrayList<Integer> remainingTaxa, ArrayList<PhyloTree> trees,
-												Single<Integer> globalScore, ArrayList<int[]> rankings) throws CanceledException {
-		var bestScore = Integer.MAX_VALUE;
-		Integer bestTaxon = 0; // needs to be Integer not int, otherwise wrong entry is removed from remaining taxa
-
-		for (var t : remainingTaxa) {
-			order[pos] = t;
-			// fill up with remaining:
-			var nextPos = pos + 1;
-			for (var s : remainingTaxa) {
-				if (!s.equals(t)) {
-					order[nextPos++] = s;
-				}
-			}
-			if (true) {
-				var seen = new BitSet();
-				for (var taxon : order) {
-					if (seen.get(taxon))
-						System.err.println("ERROR: Already seen: " + taxon);
-					else seen.set(taxon);
-				}
-				if (BitSetUtils.compare(allTaxa, seen) != 0) {
-					System.err.println("ERROR: taxa!=seen: " + SetUtils.symmetricDifference(BitSetUtils.asSet(allTaxa), BitSetUtils.asSet(seen)));
-				}
-			}
-
-			var taxonHyperSequencesMap = computeHyperSequences(progress, allTaxa, ranking(order), trees);
-			var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
-			// todo: take different optimal SCS into account
-			for (var t1 : taxonHyperSequencesMap.keySet()) {
-				taxonHyperSequenceMap.put(t1, ProgressiveSCS.apply(new ArrayList<>(taxonHyperSequencesMap.get(t1))));
-			}
-			var h = computeHybridizationNumber(allTaxa.cardinality(), taxonHyperSequenceMap);
-
-			// compute score
-			if (h < bestScore) {
-				bestTaxon = t;
-				bestScore = h;
-			}
-		}
-
-		remainingTaxa.remove(bestTaxon); // remove best and continue
-
-		order[pos] = bestTaxon;
-		for (var p = pos + 1; p < order.length; p++) {
-			order[p] = 0;
-		}
-
-		if (!remainingTaxa.isEmpty()) {
-			if (bestScore <= globalScore.get()) {
-				computeTaxonRankingsRec(progress, pos + 1, order, allTaxa, remainingTaxa, trees, globalScore, rankings);
-			}
-		} else { // completed ordering,
-			if (bestScore <= globalScore.get()) {
-				var ranking = ranking(order);
-				synchronized (PhyloFusionAlgorithm.class) {
-					if (bestScore < globalScore.get()) {
-						globalScore.set(bestScore);
-						rankings.clear();
+			for (var other = pos; other < nTax; other++) {
+				for (var ordering : orderings1) {
+					ordering = swapAndCopy(ordering, pos, other);
+					var score = evaluate(progress, taxa, trees, ordering, pos);
+					// System.err.println("ordering="+StringUtils.toString(ordering," ")+" -> "+score);
+					if (score < bestScore) {
+						orderings2.clear();
+						bestScore = score;
+						System.err.println("Best: " + score);
 					}
-					if (bestScore == globalScore.get()) {
-						rankings.add(ranking);
+					if (score == bestScore && orderings2.size() < nTax - pos) {
+						orderings2.add(ordering);
 					}
 				}
 			}
 		}
+		return orderings2.stream().map(PhyloFusionAlgorithmOct2024::ranking).toList();
+	}
+
+	public static int evaluate(ProgressListener progress, BitSet taxa, List<PhyloTree> trees, int[] ordering, int pos) throws CanceledException {
+		var taxonHyperSequencesMap = computeHyperSequences(progress, taxa, ranking(ordering), trees);
+		var taxonHyperSequenceMap = new HashMap<Integer, HyperSequence>();
+		// todo: take different optimal SCS into account
+		for (var t1 : taxonHyperSequencesMap.keySet()) {
+			taxonHyperSequenceMap.put(t1, ProgressiveSCS.apply(new ArrayList<>(taxonHyperSequencesMap.get(t1))));
+		}
+		return computeHybridizationNumber(taxa.cardinality(), taxonHyperSequenceMap);
+	}
+
+	public static int[] swapAndCopy(int[] array, int i, int j) {
+		array = Arrays.copyOf(array, array.length);
+		if (i != j) {
+			var tmp = array[i];
+			array[i] = array[j];
+			array[j] = tmp;
+		}
+		return array;
 	}
 
 	/**
@@ -325,7 +205,7 @@ public class PhyloFusionAlgorithm {
 	 * @param taxonHyperSequenceMap taxon-to-hypersequence map
 	 * @return hybridization number
 	 */
-	private static int computeHybridizationNumber(int nTaxa, HashMap<Integer, HyperSequence> taxonHyperSequenceMap) {
+	public static int computeHybridizationNumber(int nTaxa, HashMap<Integer, HyperSequence> taxonHyperSequenceMap) {
 		var total = 0;
 		for (var hyperSequence : taxonHyperSequenceMap.values()) {
 			for (var component : hyperSequence.members()) {
@@ -341,7 +221,7 @@ public class PhyloFusionAlgorithm {
 	 * @param taxonHyperSequenceMap the taxon to hypersequence map
 	 * @return the corresponding network
 	 */
-	private static PhyloTree computeNetwork(int[] taxonRank, Map<Integer, HyperSequence> taxonHyperSequenceMap) {
+	public static PhyloTree computeNetwork(int[] taxonRank, Map<Integer, HyperSequence> taxonHyperSequenceMap) {
 		var ordering = inorder(taxonRank);
 
 		var network = new PhyloTree();
@@ -397,7 +277,7 @@ public class PhyloFusionAlgorithm {
 	 * @param trees     all trees
 	 * @return mapping from taxa to hypersequences
 	 */
-	private static Map<Integer, Set<HyperSequence>> computeHyperSequences(ProgressListener progress, BitSet taxa, int[] taxonRank, List<PhyloTree> trees) throws CanceledException {
+	public static Map<Integer, Set<HyperSequence>> computeHyperSequences(ProgressListener progress, BitSet taxa, int[] taxonRank, List<PhyloTree> trees) throws CanceledException {
 		var taxonHyperSequencesMap = new HashMap<Integer, Set<HyperSequence>>();
 		for (var tree : trees) {
 			var minTaxon = findMin(BitSetUtils.asBitSet(tree.getTaxa()), taxonRank);
@@ -506,7 +386,7 @@ public class PhyloFusionAlgorithm {
 	 * @param taxonRank taxon ranks
 	 * @return taxon of smallest rank
 	 */
-	private static int findMin(BitSet taxa, int[] taxonRank) {
+	public static int findMin(BitSet taxa, int[] taxonRank) {
 		var result = -1;
 		for (var t : BitSetUtils.members(taxa)) {
 			if (result == -1)
@@ -523,7 +403,7 @@ public class PhyloFusionAlgorithm {
 	 * @param taxonRank taxon ranking
 	 * @return ordered taxa
 	 */
-	private static ArrayList<Integer> inorder(int[] taxonRank) {
+	public static ArrayList<Integer> inorder(int[] taxonRank) {
 		var ordering = new int[taxonRank.length];
 		for (var t = 1; t < taxonRank.length; t++) {
 			ordering[taxonRank[t]] = t;
@@ -542,7 +422,7 @@ public class PhyloFusionAlgorithm {
 	 * @param order ordering
 	 * @return ranking
 	 */
-	private static int[] ranking(int[] order) {
+	public static int[] ranking(int[] order) {
 		var taxonRank = new int[Arrays.stream(order).max().orElse(0) + 1];
 		var rank = 0;
 		for (int taxon : order) {
@@ -567,14 +447,4 @@ public class PhyloFusionAlgorithm {
 		}
 		return result;
 	}
-
-	public static Supplier<ArrayList<Integer>> randomTaxonOrderingsSupplier(BitSet taxa) {
-		return new Supplier<ArrayList<Integer>>() {
-			private final Random random = new Random(42L);
-			@Override
-			public ArrayList<Integer> get() {
-				return CollectionUtils.randomize(BitSetUtils.asList(taxa), random.nextLong());
-			}
-		};
-			}
 }

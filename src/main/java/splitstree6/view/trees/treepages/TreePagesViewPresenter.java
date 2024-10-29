@@ -88,6 +88,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 				disabledDiagrams.add(TreeDiagramType.RadialCladogram);
 				disabledDiagrams.add(TreeDiagramType.RadialPhylogram);
 			}
+			if (view.getOptionDiagram() == TreeDiagramType.TriangularCladogram)
+				view.setOptionDiagram(TreeDiagramType.RectangularCladogram);
 		});
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, TreeDiagramType::icon));
@@ -268,6 +270,9 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public void setupMenuItems() {
 		var mainController = mainWindow.getController();
+
+		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
 		mainController.getCopyMenuItem().setOnAction(e -> {
 			var list = new ArrayList<String>();

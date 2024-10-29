@@ -201,7 +201,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			tree1.addListener((v, o, n) -> {
 				disabledDiagrams1.clear();
 				if (tree1.get() != null && tree1.get().isReticulated()) {
-					disabledDiagrams1.add(TreeDiagramType.TriangularCladogram);
+					disabledDiagrams1.add(TriangularCladogram);
+					if (view.getOptionDiagram1() == TriangularCladogram)
+						view.optionDiagram1Property().set(RectangularCladogram);
 				}
 			});
 
@@ -218,6 +220,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				disabledDiagrams2.clear();
 				if (tree2.get() != null && tree2.get().isReticulated()) {
 					disabledDiagrams2.add(TreeDiagramType.TriangularCladogram);
+					if (view.getOptionDiagram2() == TriangularCladogram)
+						view.optionDiagram2Property().set(RectangularCladogram);
 				}
 			});
 

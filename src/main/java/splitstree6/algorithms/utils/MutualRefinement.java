@@ -89,6 +89,7 @@ public class MutualRefinement {
 
 			var treeClusters = new HashSet<BitSet>();
 			var treeClusterWeights = new HashMap<BitSet, Double>();
+
 			{
 				var treeLength = tree.edgeStream().mapToDouble(tree::getWeight).sum();
 				try (var nodeCluster = TreesUtils.extractClusters(tree)) {
@@ -99,11 +100,13 @@ public class MutualRefinement {
 				}
 			}
 
+
 			for (var cluster : allClusters) {
 				if (BitSetUtils.contains(taxa, cluster) && !treeClusters.contains(cluster) && isCompatibleWithAll(cluster, treeClusters)) {
 					treeClusters.add(cluster);
 				}
 			}
+
 			if (!removeDuplicates || !seen.contains(treeClusters)) {
 				var newtree = new PhyloTree();
 				newtree.setName(tree.getName() + "-refined");
@@ -142,6 +145,7 @@ public class MutualRefinement {
 			if (removeDuplicates)
 				seen.add(treeClusters);
 		}
+
 		return result;
 	}
 

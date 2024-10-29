@@ -27,7 +27,6 @@ import jloda.fx.util.ProgramProperties;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
-import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.BitSetUtils;
@@ -36,7 +35,7 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.MutualRefinement;
 import splitstree6.compute.phylofusion.NetworkUtils;
-import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
+import splitstree6.compute.phylofusion.PhyloFusionAlgorithmOct2024;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.splits.GraphUtils;
@@ -47,6 +46,7 @@ import splitstree6.utils.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * recursive version of the PhyloFusion algorithm
@@ -144,16 +144,9 @@ public class PhyloFusion extends Trees2Trees {
 		if (false)
 			TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.10);
 
-		List<PhyloTree> inputTrees;
-		if (isOptionMutualRefinement()) {
-			inputTrees = MutualRefinement.apply(treesBlock.getTrees(), MutualRefinement.Strategy.All, false);
-			if (verbose)
-				System.err.println("Refined:\n" + NewickIO.toString(inputTrees, false));
-		} else {
-			inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
-		}
+		var inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
 
-		var result = computeRec(progress, inputTrees);
+		var result = computeRec(progress, isOptionMutualRefinement(), inputTrees);
 
 		var hybridizationNumber = result.get(0).nodeStream().filter(v -> v.getInDegree() > 0).mapToInt(v -> v.getInDegree() - 1).sum();
 		System.err.println("Hybridization number: " + hybridizationNumber);
@@ -203,13 +196,14 @@ public class PhyloFusion extends Trees2Trees {
 
 	/**
 	 * recursively compute the networks
+	 *
 	 * @param progress progress listener
-	 * @param trees current input trees
+	 * @param trees    current input trees
 	 * @return networks
 	 * @throws IOException something went wrong
 	 */
-	private List<PhyloTree> computeRec(ProgressListener progress, List<PhyloTree> trees) throws IOException {
-		removeDuplicates(trees);
+	private List<PhyloTree> computeRec(ProgressListener progress, boolean mutualRefinement, List<PhyloTree> trees) throws IOException {
+		removeContainedAndRefine(trees, mutualRefinement);
 
 		if (trees.size() == 1) {
 			if (verbose)
@@ -309,7 +303,10 @@ public class PhyloFusion extends Trees2Trees {
 				if (verbose)
 					System.err.println("Running on " + taxa.cardinality() + " taxa");
 				var numberOfRandomOrderings = getOptionSearchHeuristic().numberOfRandomOrderings(taxa.cardinality());
-				var resultList = PhyloFusionAlgorithm.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
+
+				var resultList = PhyloFusionAlgorithmOct2024.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
+
+				// var resultList = PhyloFusionAlgorithmMay2024.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
 
 				restoreGroupedTaxa(repGroupMap, taxLabelMap, resultList);
 
@@ -327,14 +324,14 @@ public class PhyloFusion extends Trees2Trees {
 
 		} else {
 			var rep = BitSetUtils.min(separator);
-			var networksBelow = computeRec(progress, computeTreesBelow(trees, taxLabelMap, separator));
+			var networksBelow = computeRec(progress, isOptionMutualRefinement(), computeTreesBelow(trees, taxLabelMap, separator));
 			if (checkAllPartialResults) {
 				for (var network : networksBelow) {
 					NetworkUtils.check(network);
 				}
 			}
 
-			var networksAbove = computeRec(progress, computeTreesAbove(trees, taxLabelMap, separator, rep));
+			var networksAbove = computeRec(progress, isOptionMutualRefinement(), computeTreesAbove(trees, taxLabelMap, separator, rep));
 
 			if (checkAllPartialResults) {
 				for (var networkA : networksAbove) {
@@ -429,22 +426,55 @@ public class PhyloFusion extends Trees2Trees {
 	}
 
 	/**
-	 * remove duplicate trees
+	 * remove contained trees.
 	 *
 	 * @param trees trees
 	 */
-	private void removeDuplicates(List<PhyloTree> trees) {
-		var result = new ArrayList<PhyloTree>();
-		var sets = new HashSet<Set<BitSet>>();
-		for (var tree : trees) {
-			var clusters = TreesUtils.collectAllHardwiredClusters(tree);
-			if (sets.add(clusters)) {
-				result.add(tree);
-			}
-		}
-		if (result.size() < trees.size()) {
+	private void removeContainedAndRefine(List<PhyloTree> trees, boolean refine) {
+
+		if (true) {
+			var result = MutualRefinement.apply(trees, MutualRefinement.Strategy.All, false);
 			trees.clear();
 			trees.addAll(result);
+		}
+
+		var dataList = new ArrayList<>(trees.stream().map(DataItem::new)
+				.sorted(Comparator.comparingInt(a -> a.taxa().cardinality())).toList());
+		trees.clear();
+
+		var keep = new BitSet();
+
+		for (var i = 0; i < dataList.size(); i++) {
+			var iTaxa = dataList.get(i).taxa();
+			var iClusters = dataList.get(i).clusters();
+
+			var ok = true;
+			for (var j = i + 1; ok && j < dataList.size(); j++) {
+				var jTaxa = dataList.get(j).taxa();
+				var jClusters = dataList.get(j).clusters();
+				if (BitSetUtils.contains(jTaxa, iTaxa)) {
+					if (iTaxa.cardinality() == jTaxa.cardinality()) {
+						if (jClusters.containsAll(iClusters)) {
+							ok = false;
+						}
+					} else { // iTaxa is subset
+						var jInduced = jClusters.stream().map(s -> BitSetUtils.intersection(s, iTaxa)).filter(s -> s.cardinality() > 0).collect(Collectors.toSet());
+						if (jInduced.containsAll(iClusters)) {
+							ok = false;
+						}
+					}
+				}
+			}
+			if (ok)
+				keep.set(i);
+		}
+
+		trees.addAll(BitSetUtils.asList(keep).stream().map(i -> dataList.get(i).tree()).toList());
+	}
+
+	public record DataItem(PhyloTree tree, BitSet taxa, Set<BitSet> clusters) {
+		public DataItem(PhyloTree tree) {
+			this(new PhyloTree(tree), BitSetUtils.asBitSet(tree.getTaxa()), TreesUtils.collectAllHardwiredClusters(tree));
 		}
 	}
 
@@ -495,7 +525,7 @@ public class PhyloFusion extends Trees2Trees {
 			var s = (Integer) e.getSource().getInfo();
 			var t = (Integer) e.getTarget().getInfo();
 			if (treeTaxaSets.stream().noneMatch(set -> set.get(s) && set.get(t)) ||
-				treeTaxaSets.stream().filter(set -> set.get(s)).count() == 1 || treeTaxaSets.stream().filter(set -> set.get(t)).count()==1)
+				treeTaxaSets.stream().filter(set -> set.get(s)).count() == 1 || treeTaxaSets.stream().filter(set -> set.get(t)).count() == 1)
 				graph.deleteEdge(e);
 		}
 
@@ -615,8 +645,8 @@ public class PhyloFusion extends Trees2Trees {
 	 * add all group taxa into the networks
 	 *
 	 * @param repGroupMap map of representatives to grouped taxa
-	 * @param taxLabelMap   taxon to label map
-	 * @param networks      the networks
+	 * @param taxLabelMap taxon to label map
+	 * @param networks    the networks
 	 * @return the networks
 	 */
 	private List<PhyloTree> restoreGroupedTaxa(Map<Integer, BitSet> repGroupMap, Map<Integer, String> taxLabelMap, List<PhyloTree> networks) {
@@ -645,9 +675,10 @@ public class PhyloFusion extends Trees2Trees {
 
 	/**
 	 * compute all trees below a cluster
-	 * @param trees trees
+	 *
+	 * @param trees         trees
 	 * @param taxonLabelMap taxon label map
-	 * @param taxa the taxa
+	 * @param taxa          the taxa
 	 * @return trees below cluster
 	 */
 	private List<PhyloTree> computeTreesBelow(List<PhyloTree> trees, Map<Integer, String> taxonLabelMap, BitSet taxa) {
@@ -674,10 +705,11 @@ public class PhyloFusion extends Trees2Trees {
 
 	/**
 	 * computes all the trees above a cluster
-	 * @param trees the trees
+	 *
+	 * @param trees         the trees
 	 * @param taxonLabelMap taxon-label map
-	 * @param taxa taxa
-	 * @param rep the representative to be used for the cluster
+	 * @param taxa          taxa
+	 * @param rep           the representative to be used for the cluster
 	 * @return trees above the cluster
 	 */
 	private List<PhyloTree> computeTreesAbove(List<PhyloTree> trees, Map<Integer, String> taxonLabelMap, BitSet taxa, int rep) {
@@ -717,6 +749,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	/**
 	 * copy a source network into a target network
+	 *
 	 * @param sourceRoot root of the source network
 	 * @param targetNode the node in the target network where to copy the source root to
 	 */

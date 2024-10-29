@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
@@ -91,7 +92,7 @@ public class DisplayDataPresenter {
 					return;
 				}
 			}
-			if (controller.getFormatCBox().getItems().size() > 0)
+			if (!controller.getFormatCBox().getItems().isEmpty())
 				controller.getFormatCBox().setValue(controller.getFormatCBox().getItems().get(0));
 		};
 		dataNode.dataBlockProperty().addListener(new WeakInvalidationListener(dataBlockChangeListener));
@@ -129,6 +130,7 @@ public class DisplayDataPresenter {
 					displayData.replaceText(w.toString());
 					controller.getTitledPane().setText("Format: " + exporter.get().getName());
 					controller.getTitledPane().setExpanded(false);
+					ProgramProperties.put("ViewFormat" + dataNode.getDataBlock().getBlockName(), exporter.get().getName());
 				} catch (IOException ex) {
 					NotificationManager.showError("Export data failed: " + ex);
 					controller.getTitledPane().setText("Format");
@@ -136,6 +138,11 @@ public class DisplayDataPresenter {
 			}
 		});
 		controller.getApplyButton().disableProperty().bind(displayData.emptyProperty().or(exporter.isNull()));
+
+		var previousFormat = ProgramProperties.get("ViewFormat" + dataNode.getDataBlock().getBlockName(), "");
+		if (!previousFormat.isBlank() && controller.getFormatCBox().getItems().contains(previousFormat)) {
+			controller.getFormatCBox().setValue(previousFormat);
+		}
 	}
 
 	public void setupOptionControls(DisplayDataController controller, DataBlockWriter exporter) {

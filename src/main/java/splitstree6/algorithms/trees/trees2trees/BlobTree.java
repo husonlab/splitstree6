@@ -21,11 +21,13 @@ package splitstree6.algorithms.trees.trees2trees;
 
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
+import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.TreesUtils;
+import splitstree6.xtra.kernelize.BiConnectedComponents2;
 import splitstree6.xtra.kernelize.ClusterIncompatibilityGraph;
 
 import java.util.BitSet;
@@ -82,29 +84,88 @@ public class BlobTree extends Trees2Trees implements IFilter {
 	}
 
 	public static void computeBlobTree(PhyloTree network, PhyloTree tree) {
-		// setup cluster weight map
-		var clusterWeightMap = new HashMap<BitSet, Double>();
-		try (var nodeClusterMap = TreesUtils.extractClusters(network)) {
-			for (var entry : nodeClusterMap.entrySet()) {
-				var v = entry.getKey();
-				var cluster = entry.getValue();
-				if (v.getInDegree() == 1) {
-					clusterWeightMap.put(cluster, network.getWeight(v.getFirstInEdge()));
-				} else {
-					clusterWeightMap.put(cluster, 0.0);
+
+		if (false) {
+			if (true) {
+				try (var unused = tree.copy(network)) {
+					var components = BiConnectedComponents2.apply(tree);
+					for (var component : components) {
+						if (component.size() > 1) {
+							var newNode = tree.newNode();
+							for (var v : component) {
+								var inEdges = IteratorUtils.asList(v.inEdges());
+								var outEdges = IteratorUtils.asList(v.outEdges());
+								for (var e : inEdges) {
+									if (!component.contains(e.getSource())) {
+										var newEdge = tree.newEdge(e.getSource(), newNode);
+										if (tree.hasEdgeWeights()) {
+											tree.setWeight(newEdge, tree.getWeight(e));
+										}
+										if (tree.hasEdgeConfidences()) {
+											tree.setConfidence(newEdge, tree.getConfidence(e));
+										}
+									}
+									tree.deleteEdge(e);
+								}
+								for (var e : outEdges) {
+									if (!component.contains(e.getTarget())) {
+										var newEdge = tree.newEdge(newNode, e.getTarget());
+										if (tree.hasEdgeWeights()) {
+											tree.setWeight(newEdge, tree.getWeight(e));
+										}
+										if (tree.hasEdgeConfidences()) {
+											tree.setConfidence(newEdge, tree.getConfidence(e));
+										}
+									}
+									tree.deleteEdge(e);
+								}
+								tree.deleteNode(v);
+							}
+						}
+					}
+				}
+			} else {
+				try (var unused = tree.copy(network)) {
+					var reticulate = tree.nodeStream().filter(v -> v.getInDegree() >= 2).findAny();
+					if (reticulate.isPresent()) {
+						var v = reticulate.get();
+						var children = IteratorUtils.asList(v.children());
+						var parents = IteratorUtils.asList(v.parents());
+						for (var p : parents) {
+							for (var c : children) {
+								if (!p.isChild(c))
+									tree.newEdge(p, c);
+							}
+						}
+						tree.deleteNode(v);
+					}
 				}
 			}
-		}
-		// determine clusters to keep:
-		var incompatibiltyGraph = ClusterIncompatibilityGraph.apply(List.of(network));
-		var clusters = incompatibiltyGraph.nodeStream().filter(v -> v.getDegree() == 0).map(v -> (BitSet) v.getInfo()).toList();
+		} else {
+			// setup cluster weight map
+			var clusterWeightMap = new HashMap<BitSet, Double>();
+			try (var nodeClusterMap = TreesUtils.extractClusters(network)) {
+				for (var entry : nodeClusterMap.entrySet()) {
+					var v = entry.getKey();
+					var cluster = entry.getValue();
+					if (v.getInDegree() == 1) {
+						clusterWeightMap.put(cluster, network.getWeight(v.getFirstInEdge()));
+					} else {
+						clusterWeightMap.put(cluster, 0.0);
+					}
+				}
+			}
+			// determine clusters to keep:
+			var incompatibiltyGraph = ClusterIncompatibilityGraph.apply(List.of(network));
+			var clusters = incompatibiltyGraph.nodeStream().filter(v -> v.getDegree() == 0).map(v -> (BitSet) v.getInfo()).toList();
 
-		ClusterPoppingAlgorithm.apply(clusters, tree);
-		try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
-			for (var v : nodeClusterMap.keySet()) {
-				if (v.getInDegree() == 0) {
-					var cluster = nodeClusterMap.get(v);
-					tree.setWeight(v.getFirstInEdge(), clusterWeightMap.get(cluster));
+			ClusterPoppingAlgorithm.apply(clusters, tree);
+			try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
+				for (var v : nodeClusterMap.keySet()) {
+					if (v.getInDegree() == 0) {
+						var cluster = nodeClusterMap.get(v);
+						tree.setWeight(v.getFirstInEdge(), clusterWeightMap.get(cluster));
+					}
 				}
 			}
 		}

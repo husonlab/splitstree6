@@ -52,6 +52,7 @@ import splitstree6.algorithms.source.source2genomes.GenomesLoader;
 import splitstree6.algorithms.source.source2network.NetworkLoader;
 import splitstree6.algorithms.source.source2splits.SplitsLoader;
 import splitstree6.algorithms.source.source2trees.TreesLoader;
+import splitstree6.algorithms.splits.splits2report.IncompatibilityScore;
 import splitstree6.algorithms.splits.splits2report.ShapleyValues;
 import splitstree6.algorithms.splits.splits2splits.*;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
@@ -187,6 +188,7 @@ public class AlgorithmList {
 		add(algorithms, names, new EstimateInvariableSites());
 		add(algorithms, names, new PhiTest());
 		add(algorithms, names, new DeltaScore());
+		add(algorithms, names, new IncompatibilityScore());
 		add(algorithms, names, new splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity());
 		add(algorithms, names, new ShapleyValues());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity());

@@ -421,6 +421,8 @@ public class MainWindowPresenter {
 					break;
 			}
 		});
+		controller.getQuitMenuItem().setDisable(false);
+
 
 		controller.getCloseMenuItem().setOnAction(e -> {
 			if (SaveBeforeClosingDialog.apply(mainWindow) != SaveBeforeClosingDialog.Result.cancel) {
