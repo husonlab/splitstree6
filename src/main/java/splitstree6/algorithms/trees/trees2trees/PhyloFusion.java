@@ -151,7 +151,8 @@ public class PhyloFusion extends Trees2Trees {
 		var hybridizationNumber = result.get(0).nodeStream().filter(v -> v.getInDegree() > 0).mapToInt(v -> v.getInDegree() - 1).sum();
 		System.err.println("Hybridization number: " + hybridizationNumber);
 
-		System.err.println("Time: " + ((System.currentTimeMillis() - start) / 1000) + "s");
+		if (false)
+			System.err.println("Time: " + ((System.currentTimeMillis() - start) / 1000) + "s");
 
 		outputBlock.setPartial(false);
 		outputBlock.setRooted(true);
@@ -178,7 +179,7 @@ public class PhyloFusion extends Trees2Trees {
 				for (var t = 1; t <= treesBlock.getNTrees(); t++) {
 					var tree = treesBlock.getTree(t);
 					if (!PathMultiplicityDistance.contains(taxaBlock.getTaxaSet(), network, tree)) {
-						System.err.println("Warning: Network does not appear to contain tree: " + t);
+						System.err.println("Warning: Network might not contain tree: " + t);
 					}
 				}
 			}
@@ -434,7 +435,7 @@ public class PhyloFusion extends Trees2Trees {
 	 */
 	private void removeContainedAndRefine(List<PhyloTree> trees, boolean refine) {
 
-		if (true) {
+		if (refine) {
 			var result = MutualRefinement.apply(trees, MutualRefinement.Strategy.All, false);
 			trees.clear();
 			trees.addAll(result);
@@ -451,6 +452,7 @@ public class PhyloFusion extends Trees2Trees {
 			var iClusters = dataList.get(i).clusters();
 
 			var ok = true;
+			if (false)
 			for (var j = i + 1; ok && j < dataList.size(); j++) {
 				var jTaxa = dataList.get(j).taxa();
 				var jClusters = dataList.get(j).clusters();

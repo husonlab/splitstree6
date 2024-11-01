@@ -64,4 +64,8 @@ public class FixedCapacitySortedSet<E> extends TreeSet<E> {
 		}
 		this.capacity = capacity;
 	}
+
+	public int getCapacity() {
+		return capacity;
+	}
 }

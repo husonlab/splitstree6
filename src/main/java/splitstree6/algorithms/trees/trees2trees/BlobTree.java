@@ -19,20 +19,21 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
+import jloda.graph.Node;
+import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
+import jloda.util.CollectionUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.TreesUtils;
-import splitstree6.xtra.kernelize.BiConnectedComponents2;
+import splitstree6.xtra.kernelize.ArticulationPoints;
 import splitstree6.xtra.kernelize.ClusterIncompatibilityGraph;
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * blob trees
@@ -84,63 +85,53 @@ public class BlobTree extends Trees2Trees implements IFilter {
 	}
 
 	public static void computeBlobTree(PhyloTree network, PhyloTree tree) {
+		if (true) {
+			tree.clear();
+			tree.copy(network).close();
+			var articulate = ArticulationPoints.apply(tree);
 
-		if (false) {
-			if (true) {
-				try (var unused = tree.copy(network)) {
-					var components = BiConnectedComponents2.apply(tree);
-					for (var component : components) {
-						if (component.size() > 1) {
-							var newNode = tree.newNode();
-							for (var v : component) {
-								var inEdges = IteratorUtils.asList(v.inEdges());
-								var outEdges = IteratorUtils.asList(v.outEdges());
-								for (var e : inEdges) {
-									if (!component.contains(e.getSource())) {
-										var newEdge = tree.newEdge(e.getSource(), newNode);
-										if (tree.hasEdgeWeights()) {
-											tree.setWeight(newEdge, tree.getWeight(e));
-										}
-										if (tree.hasEdgeConfidences()) {
-											tree.setConfidence(newEdge, tree.getConfidence(e));
-										}
-									}
-									tree.deleteEdge(e);
-								}
-								for (var e : outEdges) {
-									if (!component.contains(e.getTarget())) {
-										var newEdge = tree.newEdge(newNode, e.getTarget());
-										if (tree.hasEdgeWeights()) {
-											tree.setWeight(newEdge, tree.getWeight(e));
-										}
-										if (tree.hasEdgeConfidences()) {
-											tree.setConfidence(newEdge, tree.getConfidence(e));
-										}
-									}
-									tree.deleteEdge(e);
-								}
-								tree.deleteNode(v);
-							}
-						}
-					}
-				}
-			} else {
-				try (var unused = tree.copy(network)) {
-					var reticulate = tree.nodeStream().filter(v -> v.getInDegree() >= 2).findAny();
-					if (reticulate.isPresent()) {
-						var v = reticulate.get();
-						var children = IteratorUtils.asList(v.children());
-						var parents = IteratorUtils.asList(v.parents());
-						for (var p : parents) {
-							for (var c : children) {
-								if (!p.isChild(c))
-									tree.newEdge(p, c);
-							}
-						}
+			if (false) {
+				// todo: this is not finished
+				var keep = new HashSet<>(articulate);
+				keep.addAll(tree.nodeStream().filter(v -> v.getInDegree() == 0 || v.getOutDegree() == 0 || keep.contains(v)).toList());
+				var toDelete = CollectionUtils.difference(IteratorUtils.asSet(tree.nodes()), keep);
+
+				try (NodeArray<Set<Node>> below = tree.newNodeArray()) {
+
+					for (var v : toDelete) {
 						tree.deleteNode(v);
 					}
+
+				}
+			} else {
+				var toContract = new ArrayList<>(tree.edgeStream().filter(e ->
+						!(articulate.contains(e.getSource())
+						  && (articulate.contains(e.getTarget()) || e.getTarget().isLeaf()))).toList());
+				while (!toContract.isEmpty()) {
+					var vw = toContract.remove(0);
+					var v = vw.getSource();
+					var w = vw.getTarget();
+					for (var wc : w.outEdges()) {
+						var c = wc.getTarget();
+						if (!v.isChild(c)) {
+							var vc = tree.newEdge(v, c);
+							if (tree.hasEdgeWeights()) {
+								tree.setWeight(vc, tree.getWeight(vw));
+							}
+							if (tree.hasEdgeConfidences()) {
+								tree.setConfidence(vc, tree.getConfidence(vw));
+							}
+							if (!(articulate.contains(v) && (articulate.contains(c) || c.isLeaf()))) {
+								toContract.add(vc);
+							}
+						}
+					}
+					toContract.removeAll(IteratorUtils.asList(w.adjacentEdges()));
+					tree.deleteNode(w);
 				}
 			}
+			tree.clearReticulateEdges();
+			System.err.println(tree.toBracketString(false) + ";");
 		} else {
 			// setup cluster weight map
 			var clusterWeightMap = new HashMap<BitSet, Double>();

@@ -279,8 +279,8 @@ public class AltsNonBinary {
 			Node previousNode = firstNode;
 
 			//if inner node add nodes and connections
-			if (!nodes.getValue().members().isEmpty()) {
-				for (var inners : nodes.getValue().members()) {
+			if (!nodes.getValue().elements().isEmpty()) {
+				for (var inners : nodes.getValue().elements()) {
 					Node currentNode = tree.newNode();
 
 					tree.newEdge(previousNode, currentNode);

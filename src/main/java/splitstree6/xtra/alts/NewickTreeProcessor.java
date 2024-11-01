@@ -104,7 +104,7 @@ public class NewickTreeProcessor {
             }
 
             if (addedValues) {
-                if (pathBuilder.length() > 0 && pathBuilder.charAt(pathBuilder.length() - 1) == ' ') {
+                if (!pathBuilder.isEmpty() && pathBuilder.charAt(pathBuilder.length() - 1) == ' ') {
                     pathBuilder.setLength(pathBuilder.length() - 1); // Remove trailing space
                 }
                 //Add colon to separate node
@@ -114,7 +114,7 @@ public class NewickTreeProcessor {
             currentNode = parentNode;
         }
 
-        if (pathBuilder.length() > 0 && pathBuilder.charAt(pathBuilder.length() - 3) == ' ') {
+        if (!pathBuilder.isEmpty() && pathBuilder.charAt(pathBuilder.length() - 3) == ' ') {
             pathBuilder.setLength(pathBuilder.length() - 3); // Remove trailing colon and spaces
         }
 

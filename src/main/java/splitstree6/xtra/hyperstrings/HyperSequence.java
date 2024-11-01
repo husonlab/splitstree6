@@ -25,7 +25,7 @@ import jloda.util.StringUtils;
 import java.util.ArrayList;
 import java.util.BitSet;
 
-public record HyperSequence(ArrayList<BitSet> members) {
+public record HyperSequence(ArrayList<BitSet> elements) {
 
 	/**
 	 * default constructor
@@ -56,7 +56,7 @@ public record HyperSequence(ArrayList<BitSet> members) {
 	 */
 	public String toString() {
 		var buf = new StringBuilder();
-		for (var set : members) {
+		for (var set : elements) {
 			if (!buf.isEmpty())
 				buf.append(" : ");
 			buf.append(StringUtils.toString(set));
@@ -66,31 +66,31 @@ public record HyperSequence(ArrayList<BitSet> members) {
 
 
 	public BitSet get(int i) {
-		return members.get(i);
+		return elements.get(i);
 	}
 
 	public void set(int i, BitSet set) {
-		members.set(i, set);
+		elements.set(i, set);
 	}
 
 	public void add(BitSet set) {
-		members.add(set);
+		elements.add(set);
 	}
 
 	public int size() {
-		return members.size();
+		return elements.size();
 	}
 
 	public void removeEmptyElements() {
-		members.removeAll(members.stream().filter(BitSet::isEmpty).toList());
+		elements.removeAll(elements.stream().filter(BitSet::isEmpty).toList());
 	}
 
 	public HyperSequence induce(BitSet taxa) {
 		var hypersequence = new HyperSequence();
-		for (var element : members) {
+		for (var element : elements) {
 			var set = BitSetUtils.intersection(element, taxa);
-			if (set.cardinality() > 0 && !hypersequence.members().contains(set))
-				hypersequence.members().add(set);
+			if (set.cardinality() > 0 && !hypersequence.elements().contains(set))
+				hypersequence.elements().add(set);
 		}
 		return hypersequence;
 	}

@@ -21,7 +21,9 @@ package splitstree6.xtra.hyperstrings;
 
 import jloda.util.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashSet;
 import java.util.function.BiConsumer;
 
 /**
@@ -310,13 +312,13 @@ public class ShortestCommonHyperSequence {
 			var second = (i == 0 ? b : a);
 			var expanded = (i == 0 ? aExpanded : bExpanded);
 
-			for (var set : first.members()) { // for each member
+			for (var set : first.elements()) { // for each member
 				if (set.cardinality() == 1)
 					expanded.add(set); // singleton, no expansion
 				else {
 					var remaining = BitSetUtils.copy(set);
 					var list = new ArrayList<BitSet>();
-					for (var other : second.members()) { // loop over all members of other sequence
+					for (var other : second.elements()) { // loop over all members of other sequence
 						if (set.intersects(other)) {
 							var intersection = BitSetUtils.intersection(set, other);
 							remaining.andNot(intersection);
@@ -336,55 +338,6 @@ public class ShortestCommonHyperSequence {
 	public static HyperSequence postProcessExpansion(HyperSequence a, HyperSequence b, HyperSequence superseq) {
 		// todo: implement
 		return superseq;
-	}
-
-	@Deprecated
-	private static void expandSubSequence(HyperSequence a, HyperSequence b) {
-		for (int p = 0; p < b.size(); p++) {
-			if (b.get(p).cardinality() > 1) {
-				TreeSet<Integer> sortedIndexes = new TreeSet<>();
-				boolean allFound = true;
-
-				for (int i = b.get(p).nextSetBit(0); i >= 0; i = b.get(p).nextSetBit(i + 1)) {
-					BitSet temp = new BitSet();
-					temp.set(i);
-					if (a.members().contains(temp)) {
-						sortedIndexes.add(a.members().indexOf(temp));
-					} else {
-						allFound = false;
-						break;
-					}
-				}
-				if (allFound) {
-					if (areConsecutive(sortedIndexes)) {
-						b.members().remove(p);
-						for (int i : sortedIndexes.descendingSet()) {
-							b.members().add(p, a.get(i));
-						}
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	@Deprecated
-	public static boolean areConsecutive(Set<Integer> sortedIndexes) {
-		if (sortedIndexes.size() < 2) {
-			return true;  // Less than 2 elements are always consecutive
-		}
-
-		Iterator<Integer> iterator = sortedIndexes.iterator();
-		int previous = iterator.next();
-		while (iterator.hasNext()) {
-			int current = iterator.next();
-			if (current != previous + 1) {
-				return false;
-			}
-			previous = current;
-		}
-
-		return true;
 	}
 
 	public static void main(String[] args) {
