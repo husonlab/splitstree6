@@ -36,31 +36,31 @@ public class ProgressiveSCS {
 	/**
 	 * run the progressive SCS heuristic
 	 *
-	 * @param sequences input hyper sequences
+	 * @param hyperSequences input hyper sequences
 	 * @return shortest common hyper sequence
 	 */
-	public static HyperSequence apply(ArrayList<HyperSequence> sequences) {
-		if (sequences.size() == 1)
-			return sequences.get(0);
-		else if (sequences.size() == 2) {
-			var expanded = ShortestCommonHyperSequence.preProcessExpansion(sequences.get(0), sequences.get(1));
+	public static HyperSequence apply(ArrayList<HyperSequence> hyperSequences) {
+		if (hyperSequences.size() == 1)
+			return hyperSequences.get(0);
+		else if (hyperSequences.size() == 2) {
+			var expanded = ShortestCommonHyperSequence.preProcessExpansion(hyperSequences.get(0), hyperSequences.get(1));
 			return ShortestCommonHyperSequence.align(expanded.getFirst(), expanded.getSecond());
-		} else if (sequences.size() == 3) {
-			var one = ShortestCommonHyperSequence.align(sequences.get(0), sequences.get(1));
-			return ShortestCommonHyperSequence.align(one, sequences.get(2));
+		} else if (hyperSequences.size() == 3) {
+			var one = ShortestCommonHyperSequence.align(hyperSequences.get(0), hyperSequences.get(1));
+			return ShortestCommonHyperSequence.align(one, hyperSequences.get(2));
 		}
 		// setup distances for UPGMA
 		var taxa = new TaxaBlock();
-		for (var t = 0; t < sequences.size(); t++) {
+		for (var t = 0; t < hyperSequences.size(); t++) {
 			taxa.addTaxonByName("s" + t);
 		}
 		var distancesBlock = new DistancesBlock();
 		distancesBlock.setNtax(taxa.getNtax());
 
 		for (var i = 1; i <= taxa.getNtax(); i++) {
-			var si = sequences.get(i - 1);
+			var si = hyperSequences.get(i - 1);
 			for (var j = i + 1; j <= taxa.getNtax(); j++) {
-				var sj = sequences.get(j - 1);
+				var sj = hyperSequences.get(j - 1);
 				var aligned = ShortestCommonHyperSequence.align(si, sj);
 				var minLength = Math.min(si.size(), sj.size());
 				var d = (double) (aligned.size() - minLength) / (double) minLength;
@@ -75,7 +75,7 @@ public class ProgressiveSCS {
 			try (NodeArray<HyperSequence> mhs = tree.newNodeArray()) {
 				tree.postorderTraversal(u -> {
 					if (u.isLeaf()) {
-						var sequence = sequences.get(tree.getTaxon(u) - 1);
+						var sequence = hyperSequences.get(tree.getTaxon(u) - 1);
 						mhs.put(u, sequence);
 					} else {
 						var v = u.getFirstOutEdge().getTarget();

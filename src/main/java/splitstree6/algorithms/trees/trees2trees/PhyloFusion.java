@@ -452,7 +452,6 @@ public class PhyloFusion extends Trees2Trees {
 			var iClusters = dataList.get(i).clusters();
 
 			var ok = true;
-			if (false)
 			for (var j = i + 1; ok && j < dataList.size(); j++) {
 				var jTaxa = dataList.get(j).taxa();
 				var jClusters = dataList.get(j).clusters();
