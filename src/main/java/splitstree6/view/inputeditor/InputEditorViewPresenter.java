@@ -29,6 +29,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.RunAfterAWhile;
+import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
@@ -145,7 +146,7 @@ public class InputEditorViewPresenter {
 		if (previousDir.isDirectory()) {
 			fileChooser.setInitialDirectory(previousDir);
 		}
-		fileChooser.setInitialFileName(mainWindow.getFileName());
+		fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPathOrSuffix(mainWindow.getFileName()));
 		var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
 		if (selectedFile != null) {
 			view.saveToFile(selectedFile);

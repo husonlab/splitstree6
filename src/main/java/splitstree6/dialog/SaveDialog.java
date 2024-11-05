@@ -54,10 +54,10 @@ public class SaveDialog {
 
 		if (!asWorkflowOnly) {
 			fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Files", "*.stree6", "*.nxs", "*.nex"));
-			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".stree6")));
+			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), "")));
 		} else {
 			fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Workflow Files", "*" + WORKFLOW_FILE_SUFFIX));
-			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), WORKFLOW_FILE_SUFFIX)));
+			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), "")));
 		}
 
 		var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());

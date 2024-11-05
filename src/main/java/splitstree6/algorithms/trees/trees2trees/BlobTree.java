@@ -115,7 +115,7 @@ public class BlobTree extends Trees2Trees implements IFilter {
 				var map = new HashMap<Node, Set<Set<Node>>>();
 				for (var component : components) {
 					if (component.size() > 2) {
-						var nodesWithParentsNotInComponent = new ArrayList<Node>();
+						var nodesWithParentsNotInComponent = new HashSet<Node>();
 						for (var v : component) {
 							for (var p : v.parents()) {
 								if (!component.contains(p)) {
@@ -128,13 +128,13 @@ public class BlobTree extends Trees2Trees implements IFilter {
 						}
 						Node topNode;
 						if (!nodesWithParentsNotInComponent.isEmpty())
-							topNode = nodesWithParentsNotInComponent.get(0);
+							topNode = nodesWithParentsNotInComponent.iterator().next();
 						else topNode = tree.getRoot();
 						map.computeIfAbsent(topNode, k -> new HashSet<>()).add(component);
 					}
 				}
 				for (var entry : map.entrySet()) {
-					if (entry.getValue().size() > 1) {
+					if (entry.getValue().size() > 1 || entry.getKey().getInDegree() > 1) {
 						for (var component : entry.getValue()) {
 							var top = entry.getKey();
 							var blobTop = tree.newNode();
@@ -175,9 +175,9 @@ public class BlobTree extends Trees2Trees implements IFilter {
 
 			for (var component : components) {
 				if (component.size() > 2) {
-					var nodesWithParentsInComponent = new ArrayList<Node>();
-					var nodesWithParentsNotInComponent = new ArrayList<Node>();
-					var nodesWithChildrenNotInComponent = new ArrayList<Node>();
+					var nodesWithParentsInComponent = new HashSet<Node>();
+					var nodesWithParentsNotInComponent = new HashSet<Node>();
+					var nodesWithChildrenNotInComponent = new HashSet<Node>();
 
 					for (var v : component) {
 						for (var p : v.parents()) {
@@ -205,7 +205,7 @@ public class BlobTree extends Trees2Trees implements IFilter {
 
 					Node topNode;
 					if (nodesWithParentsNotInComponent.size() == 1) {
-						topNode = nodesWithParentsNotInComponent.get(0);
+						topNode = nodesWithParentsNotInComponent.iterator().next();
 					} else {
 						if (component.contains(tree.getRoot()))
 							topNode = tree.getRoot();

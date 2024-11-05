@@ -357,11 +357,11 @@ public class AnalyzeGenomesPresenter {
 
 	private static File getOutputFile(Stage owner, String defaultName) {
 		final var fileChooser = new FileChooser();
-		if (defaultName.length() > 0) {
+		if (!defaultName.isEmpty()) {
 			final var previousDir = new File(defaultName);
 			if (previousDir.isDirectory())
 				fileChooser.setInitialDirectory(previousDir);
-			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(defaultName));
+			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPathOrSuffix(defaultName));
 		}
 		fileChooser.setTitle("Output File");
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Files", "*.stree6", "*.nxs", "*.nex"));
@@ -376,7 +376,7 @@ public class AnalyzeGenomesPresenter {
 			var dir = (new File(previous)).getParentFile();
 			if (dir != null && dir.exists())
 				fileChooser.setInitialDirectory(dir);
-			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(previous));
+			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPathOrSuffix(previous));
 		}
 		fileChooser.setTitle("SplitsTree6 References Database");
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 References Database", "*.db", "*.st6db"));

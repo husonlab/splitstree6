@@ -53,7 +53,7 @@ public class ImportTreeNames {
 		final var previousFile = new File(ProgramProperties.get("TreeNamesFile", ""));
 		if (previousFile.isFile()) {
 			fileChooser.setInitialDirectory(previousFile.getParentFile());
-			fileChooser.setInitialFileName(previousFile.getName());
+			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPathOrSuffix(previousFile.getName()));
 		}
 		fileChooser.setSelectedExtensionFilter(TextFileFilter.getInstance());
 		fileChooser.getExtensionFilters().addAll(TextFileFilter.getInstance(), new FileChooser.ExtensionFilter("TXT", "*.txt", "*.txt.gz"));

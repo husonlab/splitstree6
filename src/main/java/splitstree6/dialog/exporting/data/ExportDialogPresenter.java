@@ -143,7 +143,7 @@ public class ExportDialogPresenter {
 			fileChooser.setInitialDirectory((new File(mainWindow.getFileName()).getParentFile()));
 
 		fileChooser.getExtensionFilters().addAll(dataBlockWriter.getExtensionFilter());
-		fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), "-" + StringUtils.toLowerCaseWithUnderScores(dataNode.getTitle()) + "." + dataBlockWriter.getFileExtensions().get(0))));
+		fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), "-" + StringUtils.toLowerCaseWithUnderScores(dataNode.getTitle()))));
 
 		return fileChooser.showSaveDialog(mainWindow.getStage());
 	}
