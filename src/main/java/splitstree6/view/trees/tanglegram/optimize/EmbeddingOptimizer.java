@@ -36,22 +36,11 @@ import java.util.*;
  */
 public class EmbeddingOptimizer {
 	public static final boolean DEBUG = false;
-	public static final boolean printILP = false;
 
 	/**
 	 * update the embedding algorithm for a single tree
 	 */
 	public static void apply(PhyloTree tree, ProgressListener progressListener) throws CanceledException {
-		if (printILP) {
-			int tempIndex = 1;
-			for (var v : tree.nodes()) {
-				if (v.getOutDegree() != 0) {
-					tree.setLabel(v, Integer.toString(tempIndex));
-					tempIndex++;
-				}
-			}
-		}
-
 		if (tree.getRoot() == null || tree.getNumberReticulateEdges() == 0) {
 			tree.getLSAChildrenMap().clear();
 			return;
