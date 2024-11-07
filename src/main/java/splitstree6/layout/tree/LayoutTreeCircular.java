@@ -21,11 +21,14 @@ package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 import jloda.util.Single;
+
+import java.util.Map;
 
 /**
  * compute a circular layout
@@ -35,7 +38,7 @@ public class LayoutTreeCircular {
 	/**
 	 * compute layout for a circular cladogram
 	 */
-	public static NodeArray<Point2D> apply(PhyloTree tree, NodeDoubleArray nodeAngleMap, boolean toScale, HeightAndAngles.Averaging averaging) {
+	public static NodeArray<Point2D> apply(PhyloTree tree, Map<Node, Double> nodeAngleMap, boolean toScale, HeightAndAngles.Averaging averaging) {
 
 		// compute radius:
 		try (var nodeRadiusMap = tree.newNodeDoubleArray()) {

@@ -42,6 +42,7 @@ import javafx.stage.Stage;
 import jloda.fx.control.ProgressPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.*;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -561,7 +562,7 @@ public class DensiTreeDrawer {
 					}
 					e.consume();
 				};
-				label.setOnContextMenuRequested(InteractionSetup.createNodeContextMenuHandler(stage, label));
+				label.setOnContextMenuRequested(InteractionSetup.createNodeContextMenuHandler(stage, new UndoManager(), label));
 				label.setOnMouseClicked(mouseClickedHandler);
 
 				if (taxonSelectionModel.isSelected(taxon)) {

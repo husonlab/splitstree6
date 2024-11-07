@@ -31,6 +31,7 @@ import jloda.util.Pair;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * computes the y-coordinates for the rectangular layout
@@ -47,14 +48,14 @@ public class HeightAndAngles {
 	/**
 	 * compute the y-coordinates for the parallel view
 	 */
-	public static void apply(PhyloTree tree, NodeDoubleArray nodeHeightMap, Averaging averaging) {
+	public static void apply(PhyloTree tree, Map<Node, Double> nodeHeightMap, Averaging averaging) {
 		apply(tree, tree.getRoot(), nodeHeightMap, averaging);
 	}
 
 	/**
 	 * compute the y-coordinates for the parallel view
 	 */
-	public static void apply(PhyloTree tree, Node root, NodeDoubleArray nodeHeightMap, Averaging averaging) {
+	public static void apply(PhyloTree tree, Node root, Map<Node, Double> nodeHeightMap, Averaging averaging) {
 		var leafOrder = new LinkedList<Node>();
 		computeYCoordinateOfLeavesRec(tree, root, 0, nodeHeightMap, leafOrder);
 		if (tree.getNumberReticulateEdges() > 0)
@@ -92,7 +93,7 @@ public class HeightAndAngles {
 		});
 	}
 
-	public static void computeAngles(PhyloTree tree, NodeDoubleArray nodeAngleMap, Averaging averaging) {
+	public static void computeAngles(PhyloTree tree, Map<Node, Double> nodeAngleMap, Averaging averaging) {
 		HeightAndAngles.apply(tree, nodeAngleMap, averaging);
 		var max = nodeAngleMap.values().stream().mapToDouble(a -> a).max().orElse(0);
 		var factor = 360.0 / max;
@@ -106,7 +107,7 @@ public class HeightAndAngles {
 	 *
 	 * @return index of last leaf
 	 */
-	private static int computeYCoordinateOfLeavesRec(PhyloTree tree, Node v, int leafNumber, NodeDoubleArray yCoord, List<Node> nodeOrder) {
+	private static int computeYCoordinateOfLeavesRec(PhyloTree tree, Node v, int leafNumber, Map<Node, Double> yCoord, List<Node> nodeOrder) {
 		if (v.isLeaf() || tree.isLsaLeaf(v)) {
 			// String taxonName = tree.getLabel(v);
 			yCoord.put(v, (double) ++leafNumber);
@@ -123,7 +124,7 @@ public class HeightAndAngles {
 	/**
 	 * recursively compute the y coordinate for the internal nodes of a parallel diagram
 	 */
-	private static void computeHeightInternalNodesAsChildAverageRec(PhyloTree tree, Node v, NodeDoubleArray nodeHeightMap) {
+	private static void computeHeightInternalNodesAsChildAverageRec(PhyloTree tree, Node v, Map<Node, Double> nodeHeightMap) {
 		if (v.getOutDegree() > 0) {
 			double first = Double.NEGATIVE_INFINITY;
 			double last = Double.NEGATIVE_INFINITY;
@@ -145,7 +146,7 @@ public class HeightAndAngles {
 	/**
 	 * fix spacing so that space between any two true leaves is 1
 	 */
-	private static void fixSpacing(Collection<Node> leafOrder, NodeDoubleArray yCoord) {
+	private static void fixSpacing(Collection<Node> leafOrder, Map<Node, Double> yCoord) {
 		var nodes = leafOrder.toArray(new Node[0]);
 		double leafPos = 0;
 		for (int lastLeaf = -1; lastLeaf < nodes.length; ) {

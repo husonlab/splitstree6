@@ -1,0 +1,127 @@
+<!--
+  ~ help.html Copyright (C) 2024 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SplitsTree Server - Help</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .command {
+            margin-bottom: 20px;
+        }
+
+        .command h2 {
+            margin-bottom: 5px;
+        }
+
+        .options {
+            margin-left: 20px;
+        }
+
+        .example {
+            background-color: #f8f8f8;
+            border-left: 5px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+<h1>Welcome to the SplitsTree Server</h1>
+<p>Help documentation will be available soon. Below are some available RESTful commands:</p>
+
+<div class="command">
+    <h2>1. <code>help</code></h2>
+    <p>Description: Show this help page.</p>
+</div>
+
+<div class="command">
+    <h2>2. <code>draw</code></h2>
+    <p>Description: Render a tree or network based on the provided options.</p>
+    <div class="options">
+        <h3>Options:</h3>
+        <ul>
+            <li><strong>newick</strong>: A tree or network in Newick format.</li>
+            <li><strong>layout</strong>: The layout of tree or network.
+                <ul>
+                    <li>If the Newick contains a tree, then the possible values are:
+                        radial, phylogram, cladogram, triangular, circular_phylogram and circular_cladogram.
+                    <li> If the Newick contains a rooted network, then the possible values are:
+                        phylogram, cladogram, circular_phylogram and circular_cladogram.
+                    <li> If the Newick contains splits (split-Newick), then the possible values are:
+                        radial and outline.
+                </ul>
+            </li>
+            <li><strong>width</strong>: The width of the rendering in pixels.</li>
+            <li><strong>height</strong>: The height of the rendering in pixels.</li>
+        </ul>
+    </div>
+    Example tree: <br>
+    <div class="examples">
+        <code>ServiceURL/draw?newick=((a,b),c);&amp;layout=cladogram&amp;width=600&amp;height=600</code><br>
+    </div>
+    <br>
+    It is better to apply URL encoding to Newick string. The resulting request is:<br>
+    <div class="examples">
+        <code>ServiceURL/draw?newick=%28%28a%2Cb%29%2Cc%29%3B&amp;layout=cladogram&amp;width=600&amp;height=600</code><br>
+    </div>
+    <br>
+    <br>
+
+    Example rooted network: <br>
+    This is the Newick string for a rooted network: <br>
+    <code>((A,(B,(C)#H1)),((E,D),#H1));</code>
+    <br>
+    To provide this as an argument, all special characters have to be URL encoded. The result looks like this:
+    <br>
+    <div class="examples">
+        <code>ServiceURL/draw?newick=%28%28A%2C%28B%2C%28C%29%23H1%29%29%2C%28%28E%2CD%29%2C%23H1%29%29%3B</code><br>
+    </div>
+    <br>
+    <br>
+
+    Example split network: <br>
+    This is the Newick string for a splits: <br>
+    (A.andrenof:0.01,(A.florea:0.0036,((<2|A.cerana:0.046,<1|A.mellifer:0.033):0.007,(A.dorsata|1:0.01>|2:0.006>:0.049,A.koschev:0.037):0.0032):0.033):0.0007);
+    <br>
+    To provide this as an argument, all special characters have to be URL encoded. The result looks like this:
+    <br>
+    <div class="examples">
+        <code>ServiceURL/draw?layout=outline&newick=%28A.andrenof%3A0.01%2C%28A.florea%3A0.0036%2C%28%28%3C2%7CA.cerana%3A0.046%2C%3C1%7CA.mellifer%3A0.033%29%3A0.007%2C%28A.dorsata%7C1%3A0.01%3E%7C2%3A0.006%3E%3A0.049%2CA.koschev%3A0.037%29%3A0.0032%29%3A0.033%29%3A0.0007%29%3B</code><br>
+    </div>
+    <br>
+    <br>
+
+</div>
+</body>
+</html>

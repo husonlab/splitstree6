@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.9" transformSequenceNumber="10">
-  <directoryPresets config="../tools/mash-sketches" />
+  <directoryPresets config="../tools/webserver" />
   <application name="SplitsTree App" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTree" publisher="Daniel H. Huson and David Bryant" publisherWeb="http://splitstree.husonlab.org" version="6.0.0" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="17">
     <variables>
       <variable name="renderingVMOption" />
@@ -45,6 +45,7 @@
       <fileEntry mountPoint="1691243205" file="../tools/sample-trees" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/bfilter-tool" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/mash-sketches" fileMode="755" overrideFileMode="true" />
+      <fileEntry mountPoint="1691243205" file="../tools/webserver" fileMode="755" overrideFileMode="true" />
       <dirEntry mountPoint="1691243210" file="../target/generated-resources/licenses" subDirectory="licenses" />
       <fileEntry mountPoint="1691243207" file="../target/generated-resources/licenses.xml" />
       <fileEntry mountPoint="1691243207" file="../licenses/JLODA-LICENSE.txt" />
@@ -259,7 +260,7 @@ return console.askOkCancel(message, true);
               </action>
               <action id="1691243206" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
-                  <property name="files" type="array" class="java.io.File" length="6">
+                  <property name="files" type="array" class="java.io.File" length="7">
                     <element index="0">
                       <object class="java.io.File">
                         <string>tools/genome-context</string>
@@ -288,6 +289,11 @@ return console.askOkCancel(message, true);
                     <element index="5">
                       <object class="java.io.File">
                         <string>tools/sample-trees</string>
+                      </object>
+                    </element>
+                    <element index="6">
+                      <object class="java.io.File">
+                        <string>tools/webserver</string>
                       </object>
                     </element>
                   </property>

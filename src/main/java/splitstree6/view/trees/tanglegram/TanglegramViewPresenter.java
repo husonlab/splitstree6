@@ -87,7 +87,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		);
 
 		final ObservableMap<Node, LabeledNodeShape> nodeShapeMap1 = FXCollections.observableHashMap();
-		var tree1Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
+		var tree1Pane = new TanglegramTreePane(mainWindow.getStage(), view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
 				view.optionDiagram1Property(), view.optionLabelEdgesByProperty(), view.optionAveraging1Property(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(),
 				nodeShapeMap1);
 
@@ -109,7 +109,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		orientation2Property.set(view.getOptionOrientation().equals("Rotate0Deg") ? "FlipRotate0Deg" : "Rotate180Deg");
 
 		ObservableMap<Node, LabeledNodeShape> nodeShapeMap2 = FXCollections.observableHashMap();
-		var tree2Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
+		var tree2Pane = new TanglegramTreePane(mainWindow.getStage(), view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
 				view.optionDiagram2Property(), view.optionLabelEdgesByProperty(), view.optionAveraging2Property(), orientation2Property, view.optionFontScaleFactorProperty(),
 				nodeShapeMap2);
 

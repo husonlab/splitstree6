@@ -35,6 +35,7 @@ import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.graph.Edge;
@@ -82,7 +83,7 @@ public class TreePane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
+	public TreePane(Stage stage, UndoManager undoManager, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, HeightAndAngles.Averaging averaging, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<PaneLabel> showTreeLabels, DoubleProperty unitLengthX,
 					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
@@ -97,7 +98,7 @@ public class TreePane extends StackPane {
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
-		interactionSetup = new InteractionSetup(stage, this, taxaBlock, diagram, orientationLabel, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
+		interactionSetup = new InteractionSetup(stage, this, undoManager, taxaBlock, diagram, orientationLabel, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
 
 		fontScaleChangeListener = (v, o, n) -> {
 			if (result != null) {

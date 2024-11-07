@@ -21,6 +21,7 @@ module splitstreesix {
 	requires com.google.zxing;
 	requires org.xerial.sqlitejdbc;
 	requires com.fasterxml.jackson.databind;
+	requires jdk.httpserver;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;
@@ -217,4 +218,8 @@ module splitstreesix {
 	opens splitstree6.utils;
 	opens splitstree6.xtra;
 	opens splitstree6.layout;
+
+	opens splitstree6.tools.server;
+	exports splitstree6.tools.server;
+
 }

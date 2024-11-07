@@ -60,6 +60,7 @@ import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2distances.AverageDistances;
 import splitstree6.algorithms.trees.trees2report.ListOneRSPRTrees;
+import splitstree6.algorithms.trees.trees2report.RobinsonFouldsDistances;
 import splitstree6.algorithms.trees.trees2report.TreeDiversityIndex;
 import splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues;
 import splitstree6.algorithms.trees.trees2splits.*;
@@ -192,6 +193,7 @@ public class AlgorithmList {
 		add(algorithms, names, new splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity());
 		add(algorithms, names, new ShapleyValues());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity());
+		add(algorithms, names, new RobinsonFouldsDistances());
 		add(algorithms, names, new TreeDiversityIndex());
 		add(algorithms, names, new TajimaD());
 		add(algorithms, names, new UnrootedShapleyValues());

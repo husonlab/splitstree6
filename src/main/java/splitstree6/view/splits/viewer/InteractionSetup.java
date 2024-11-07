@@ -24,8 +24,10 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -36,6 +38,7 @@ import jloda.fx.label.EditLabelDialog;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommand;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.GraphTraversals;
@@ -47,6 +50,7 @@ import splitstree6.layout.splits.RotateSplit;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.main.SplitsTree6;
 import splitstree6.splits.ASplit;
+import splitstree6.view.utils.NodeLabelDialog;
 import splitstree6.view.utils.ShapeUtils;
 
 import java.util.ArrayList;
@@ -92,6 +96,11 @@ public class InteractionSetup {
 			if (e.isStillSincePress() && !e.isShiftDown()) {
 				Platform.runLater(splitSelectionModel::clearSelection);
 				Platform.runLater(taxonSelectionModel::clearSelection);
+				for (var textField : BasicFX.getAllRecursively(pane, TextField.class)) {
+					if (textField.getParent() instanceof Group group) {
+						Platform.runLater(() -> group.getChildren().remove(textField));
+					}
+				}
 				e.consume();
 			}
 		});
@@ -333,11 +342,10 @@ public class InteractionSetup {
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
-			var oldText = label.getText();
-			var editLabelDialog = new EditLabelDialog(stage, label);
-			var result = editLabelDialog.showAndWait();
-			if (result.isPresent() && !result.get().equals(oldText)) {
-				undoManager.doAndAdd("Edit Label", () -> label.setText(oldText), () -> label.setText(result.get()));
+			if (SplitsTree6.isDesktop()) {
+				NodeLabelDialog.apply(undoManager, stage, label);
+			} else {
+				NodeLabelDialog.apply(undoManager, label, null);
 			}
 		});
 		var menu = new ContextMenu();

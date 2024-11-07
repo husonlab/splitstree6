@@ -31,6 +31,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.layout.Pane;
+
 import javafx.scene.shape.Shape;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -57,6 +59,7 @@ import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
+import splitstree6.main.SplitsTree6;
 import splitstree6.qr.QRViewUtils;
 import splitstree6.qr.SplitNewickQR;
 import splitstree6.splits.Compatibility;
@@ -65,6 +68,7 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
+import splitstree6.view.utils.NodeLabelDialog;
 import splitstree6.window.MainWindow;
 
 import java.io.IOException;
@@ -502,11 +506,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
-			var oldText = label.getText();
-			var editLabelDialog = new EditLabelDialog(stage, label);
-			var result = editLabelDialog.showAndWait();
-			if (result.isPresent() && !result.get().equals(oldText)) {
-				undoManager.doAndAdd("Edit Label", () -> label.setText(oldText), () -> label.setText(result.get()));
+			if (false && SplitsTree6.isDesktop()) {
+				NodeLabelDialog.apply(undoManager, stage, label);
+			} else {
+				NodeLabelDialog.apply(undoManager, label, null);
 			}
 		});
 		var menu = new ContextMenu();

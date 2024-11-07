@@ -2469,6 +2469,16 @@ applied to
 
 Reference: [@Faith1992]
 
+### Robinson Foulds Distances
+
+The *Robinson Foulds Distances* algorithm takes a Trees block as input and produces a Report block as output.
+It calculates the Robinson-Foulds distance between each pair of trees
+The algorithm has the following options:
+
+`Normalize =  <Boolean>` - normalized distances
+
+Reference: [@RobinsonFoulds1981]
+
 #### Tree Diversity Index
 
 The *Tree Diversity Index* algorithm takes a Trees block as input and

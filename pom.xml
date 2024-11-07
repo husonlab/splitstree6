@@ -108,6 +108,7 @@
             <artifactId>richtextfx</artifactId>
             <version>0.11.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/at.favre.lib/bcrypt -->
         <!--
         <dependency>
                 <groupId>com.github.lejon</groupId>

@@ -24,7 +24,9 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
@@ -53,6 +55,7 @@ import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.splits.algorithms.ConvexHull;
 import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.splits.algorithms.PhylogeneticOutline;
@@ -88,6 +91,16 @@ public class SplitNetworkLayout {
 		labelLayout = new RadialLabelLayout();
 	}
 
+	public Group apply(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splitsBlock, SplitsDiagramType diagramType, double width, double height) throws IOException {
+		ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
+		ObservableMap<Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
+		ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
+		ObservableList<LoopView> loopViews = FXCollections.observableArrayList();
+		return apply(progress, taxaBlock, splitsBlock, diagramType,
+				SplitsRooting.None, 0, new SetSelectionModel<Taxon>(), new SetSelectionModel<Integer>(),
+				new SimpleObjectProperty<>(LabelSplitsBy.None), new SimpleDoubleProperty(), width, height,
+				taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
+	}
 
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0,
 					   DoubleProperty unitLength, double width, double height,
@@ -385,6 +398,7 @@ public class SplitNetworkLayout {
 		line.endYProperty().addListener(listener);
 		listener.invalidated(null);
 	}
+
 
 	private void rotate90(PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap) {
 		for (var v : graph.nodes()) {

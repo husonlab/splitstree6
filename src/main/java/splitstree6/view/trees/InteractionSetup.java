@@ -26,8 +26,10 @@ import javafx.collections.ObservableMap;
 import javafx.collections.SetChangeListener;
 import javafx.collections.WeakSetChangeListener;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -35,9 +37,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
-import jloda.fx.label.EditLabelDialog;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.AService;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Edge;
@@ -51,6 +54,7 @@ import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.main.SplitsTree6;
+import splitstree6.view.utils.NodeLabelDialog;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -63,6 +67,7 @@ import java.util.stream.Collectors;
  * Daniel Huson, 7.2022
  */
 public class InteractionSetup {
+	private final UndoManager undoManager;
 	private final SetChangeListener<Taxon> taxonSelectionChangeListener;
 	private final SetChangeListener<Edge> edgeSelectionChangeListener;
 
@@ -71,15 +76,21 @@ public class InteractionSetup {
 	private double mouseDownX;
 	private double mouseDownY;
 
-	public InteractionSetup(Stage stage, Pane pane, TaxaBlock taxaBlock, TreeDiagramType diagram, StringProperty orientation,
+	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, TaxaBlock taxaBlock, TreeDiagramType diagram, StringProperty orientation,
 							SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel,
 							ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
+		this.undoManager = undoManager;
 
 		pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 			if (e.isStillSincePress()) {
 				if (!e.isShiftDown() && !e.isAltDown()) {
 					Platform.runLater(edgeSelectionModel::clearSelection);
 					Platform.runLater(taxonSelectionModel::clearSelection);
+				}
+				for (var textField : BasicFX.getAllRecursively(pane, TextField.class)) {
+					if (textField.getParent() instanceof Group group) {
+						Platform.runLater(() -> group.getChildren().remove(textField));
+					}
 				}
 				e.consume();
 			}
@@ -157,7 +168,7 @@ public class InteractionSetup {
 					var labeledShape = nodeShapeMap.get(v);
 					if (labeledShape.hasLabel()) {
 						var handler = createMouseClickedOnNodeHandler(taxaBlock, taxonSelectionModel, v);
-						var contextMenuHander = createNodeContextMenuHandler(stage, labeledShape.getLabel());
+						var contextMenuHander = createNodeContextMenuHandler(stage, undoManager, labeledShape.getLabel());
 
 						for (var node : labeledShape.all()) {
 							node.setOnMouseClicked(handler);
@@ -422,13 +433,15 @@ public class InteractionSetup {
 		};
 	}
 
-	public static EventHandler<? super ContextMenuEvent> createNodeContextMenuHandler(Stage stage, RichTextLabel label) {
+	public static EventHandler<? super ContextMenuEvent> createNodeContextMenuHandler(Stage stage, UndoManager undoManager, RichTextLabel label) {
 		return event -> {
 			var editLabelMenuItem = new MenuItem("Edit Label...");
 			editLabelMenuItem.setOnAction(e -> {
-				var editLabelDialog = new EditLabelDialog(stage, label);
-				var result = editLabelDialog.showAndWait();
-				result.ifPresent(label::setText);
+				if (SplitsTree6.isDesktop()) {
+					NodeLabelDialog.apply(undoManager, stage, label);
+				} else {
+					NodeLabelDialog.apply(undoManager, label, null);
+				}
 			});
 			var menu = new ContextMenu();
 			menu.getItems().add(editLabelMenuItem);
