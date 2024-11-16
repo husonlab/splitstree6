@@ -114,11 +114,6 @@ public class HttpServerST {
 		return httpServer;
 	}
 
-
-	public int getReadsPerPage() {
-		return readsPerPage;
-	}
-
 	public String getAbout() {
 		return "Version: " + ProgramProperties.getProgramVersion() + "\n"
 			   + "Hostname: " + getAddress().getHostName() + "\n"

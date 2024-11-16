@@ -144,7 +144,7 @@ public class ShortestCommonHyperSequence {
 						simplified.add(set);
 					}
 				}
-				{
+				if (hyperSequence.size() > 0) {
 					var last = hyperSequence.get(hyperSequence.size() - 1);
 					count += last.cardinality();
 					simplified.add(last);

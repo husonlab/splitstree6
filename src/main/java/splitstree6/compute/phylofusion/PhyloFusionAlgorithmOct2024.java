@@ -137,25 +137,23 @@ public class PhyloFusionAlgorithmOct2024 {
 		final int iterations;
 		final int maxIterationsWithoutImprovement;
 
-		iterations = 1;
-
 		switch (search) {
-			default -> {
+			default /* fast */ -> {
 				startKeepSize = 10;
 				endKeepSize = 10;
-				//iterations = 10;
-				maxIterationsWithoutImprovement = 3;
+				iterations = 10;
+				maxIterationsWithoutImprovement = 2;
 			}
 			case Medium -> {
 				startKeepSize = 300;
 				endKeepSize = 300;
-				//iterations = 10;
+				iterations = 10;
 				maxIterationsWithoutImprovement = 4;
 			}
 			case Thorough -> {
 				startKeepSize = 4000;
 				endKeepSize = Math.min(400, nTax);
-				//iterations = 10;
+				iterations = 10;
 				maxIterationsWithoutImprovement = iterations; // turned off
 			}
 		}
@@ -198,7 +196,7 @@ public class PhyloFusionAlgorithmOct2024 {
 							var scoredOrdering = new ScoredOrdering(score, finalIteration, ordering);
 							scoredOrderings2.add(scoredOrdering);
 						}
-					}, 1); // ProgramExecutorService.getNumberOfCoresToUse());
+					}, ProgramExecutorService.getNumberOfCoresToUse());
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -207,7 +205,7 @@ public class PhyloFusionAlgorithmOct2024 {
 
 			}
 			bestScores[iteration] = scoredOrderings2.first().score;
-			if (iteration > maxIterationsWithoutImprovement && bestScores[iteration] == bestScores[iteration - maxIterationsWithoutImprovement]) {
+			if (iteration >= maxIterationsWithoutImprovement && bestScores[iteration] == bestScores[iteration - maxIterationsWithoutImprovement]) {
 				if (verbose)
 					System.err.println("Break in iteration: " + iteration);
 				break; // haven't seen an improvement in last 3 iterations

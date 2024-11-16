@@ -18,7 +18,6 @@ module splitstreesix {
 	requires org.fxmisc.flowless;
 	requires org.fxmisc.richtext;
 	requires org.fxmisc.undo;
-	requires com.google.zxing;
 	requires org.xerial.sqlitejdbc;
 	requires com.fasterxml.jackson.databind;
 	requires jdk.httpserver;

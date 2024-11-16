@@ -24,7 +24,10 @@ import com.sun.net.httpserver.HttpHandler;
 import jloda.util.Basic;
 import jloda.util.StringUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -61,7 +64,7 @@ public class HttpHandlerST implements HttpHandler {
 		}
 	}
 
-	private String[] getGETParameters(HttpExchange httpExchange) {
+	public static String[] getGETParameters(HttpExchange httpExchange) {
 		final var uri = httpExchange.getRequestURI().toString();
 		final var posQuestionMark = uri.indexOf('?');
 		if (posQuestionMark > 0 && posQuestionMark < uri.length() - 1) {
@@ -74,12 +77,28 @@ public class HttpHandlerST implements HttpHandler {
 		return new String[0];
 	}
 
-	private String[] getPOSTParameters(HttpExchange httpExchange) {
-		return new String[0]; // not implemented
+	public static String[] getPOSTParameters(HttpExchange exchange) throws IOException {
+		if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+			throw new IllegalArgumentException("Request method must be POST");
+		}
+		try (var reader = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8))) {
+			var buf = new StringBuilder();
+			while (reader.ready()) {
+				buf.append(reader.readLine()).append("\n");
+			}
+			if (buf.toString().contains("&")) {
+				return StringUtils.split(buf.toString(), '&');
+			} else
+				return new String[]{buf.toString()};
+		}
 	}
 
 	public void respond(HttpExchange httpExchange, String[] parameters) throws IOException {
 		final var bytes = requestHandler.handle(httpExchange.getHttpContext().getPath(), parameters);
+		httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+		httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+		httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+
 		try (var outputStream = httpExchange.getResponseBody()) {
 			httpExchange.sendResponseHeaders(200, bytes.length);
 			outputStream.write(bytes);
