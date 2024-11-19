@@ -215,7 +215,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
 
 		var qrImageView = new SimpleObjectProperty<ImageView>();
-		QRViewUtils.setup(controller.getAnchorPane(), consensusTree, TreeNewickQR.createFunction(), qrImageView, view.optionShowQRCodeProperty());
+		QRViewUtils.setup(controller.getAnchorPane(), consensusTree, () -> TreeNewickQR.apply(consensusTree.get(), true, false, false, 4296), qrImageView, view.optionShowQRCodeProperty());
 
 	}
 

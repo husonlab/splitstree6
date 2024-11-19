@@ -248,7 +248,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		var data = new SimpleObjectProperty<Pair<TaxaBlock, SplitsBlock>>();
 		data.bind(Bindings.createObjectBinding(() -> new Pair<>(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getSplitsBlock()), mainWindow.workingTaxaProperty(), view.splitsBlockProperty(), updateCounter));
 		var qrImageView = new SimpleObjectProperty<ImageView>();
-		QRViewUtils.setup(controller.getInnerAnchorPane(), data, SplitNewickQR.createFunction(), qrImageView, view.optionShowQRCodeProperty());
+		QRViewUtils.setup(controller.getInnerAnchorPane(), data, () -> SplitNewickQR.apply(data.get().getKey(), data.get().getValue(), true, false, 4296), qrImageView, view.optionShowQRCodeProperty());
 
 		var paneWidth = new SimpleDoubleProperty();
 		var paneHeight = new SimpleDoubleProperty();

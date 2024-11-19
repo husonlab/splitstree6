@@ -432,7 +432,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
 
 		var qrImageView = new SimpleObjectProperty<ImageView>();
-		QRViewUtils.setup(controller.getAnchorPane(), tree, TreeNewickQR.createFunction(), qrImageView, view.optionShowQRCodeProperty());
+		QRViewUtils.setup(controller.getAnchorPane(), tree, () -> TreeNewickQR.apply(tree.get(), true, false, false, 4296), qrImageView, view.optionShowQRCodeProperty());
 
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
