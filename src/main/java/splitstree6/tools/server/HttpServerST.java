@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * HTTP server for megan server
+ * HTTP server for webserver
  * Daniel Huson, 8.2020
  */
 public class HttpServerST {
@@ -61,24 +61,17 @@ public class HttpServerST {
 		httpServer.setExecutor(threadPoolExecutor);
 
 		// general info:
-		createContext(path + "/help", new HttpHandlerST(RequestHandler.getHelp(this)), null); // .setAuthenticator(authenticator);
+		createContext(path + "/help", new HttpHandlerST(RequestHandler.getHelp(this)), null);
 		createContext(path + "/version", new HttpHandlerST(RequestHandler.getVersion()), null);
 		createContext(path + "/about", new HttpHandlerST(RequestHandler.getAbout(this)), null);
 		createContext(path + "/isReadOnly", new HttpHandlerST((c, p) -> "true".getBytes()), null);
 
-		final var authenticator = new BasicAuthenticator("get") {
-			@Override
-			public boolean checkCredentials(String username, String password) {
-				return true;
-			}
-		};
-
-		createContext(path + "/draw", new HttpHandlerST(RequestHandler.draw()), authenticator);
+		createContext(path + "/draw", new HttpHandlerST(RequestHandler.draw()), null);
 
 	}
 
 	private void createContext(String path, HttpHandlerST handler, BasicAuthenticator authenticator) {
-		final HttpContext context = httpServer.createContext(path, handler);
+		var context = httpServer.createContext(path, handler);
 		if (authenticator != null)
 			context.setAuthenticator(authenticator);
 		contexts.add(context);

@@ -27,6 +27,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * webserver parameters
+ * Daniel Huson, 8.2020
+ */
 public class Parameters {
 	public static boolean matchIgnoreCase(String[] parameters, String key, String value) {
 		for (String param : parameters) {

@@ -22,7 +22,6 @@ package splitstree6.tools.server;
 import jloda.util.CollectionUtils;
 import jloda.util.StringUtils;
 
-
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * SplitsTreeServer request handler for data requests
+ * webserver request handler for data requests
  * Daniel Huson, 8.2020
  */
 public interface RequestHandler {

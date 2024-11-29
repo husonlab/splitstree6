@@ -30,8 +30,8 @@ import jloda.util.ProgramExecutorService;
 import jloda.util.UsageException;
 
 /**
- * Megan Server program
- * Daniel Huson, 8.2020
+ * SplitsTreeServer program
+ * Daniel Huson, 11.2024
  */
 public class SplitsTreeServer extends Application {
 	public static final String Version = "SplitsTreeServer0.1";

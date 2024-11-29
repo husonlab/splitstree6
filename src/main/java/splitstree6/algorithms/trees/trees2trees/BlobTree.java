@@ -23,6 +23,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.graph.Edge;
 import jloda.graph.Node;
+import jloda.graph.algorithms.BiconnectedComponents;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.SetUtils;
@@ -32,7 +33,6 @@ import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.TreesUtils;
-import splitstree6.xtra.kernelize.BiconnectedComponents;
 import splitstree6.xtra.kernelize.ClusterIncompatibilityGraph;
 
 import java.util.*;
