@@ -121,7 +121,94 @@
     </div>
     <br>
     <br>
-
 </div>
+
+<div class="command">
+    <h2>3. <code>draw_distances</code></h2>
+    <p>Description: Draw distances as a tree or network based on the provided options.</p>
+    <div class="options">
+        <h3>Options:</h3>
+        <ul>
+            <li><strong>matrix</strong>: The distances in Phylip or Nexus format.</li>
+            <li><strong>algorithm</strong>: The algorithm to compute a tree or network.
+                <ul>
+                    <li> To compute a tree, the possible values are: NJ, BioNJ and UPGMA.
+                    <li> To compute a split network, the possible values are: NNet and SplitDecomposition.
+                </ul>
+            <li><strong>layout</strong>: See the draw command.</li>
+            <li><strong>width</strong>: See the draw command.</li>
+            <li><strong>height</strong>: See the draw command.</li>
+        </ul>
+    </div>
+</div>
+
+Example distances: <br>
+Here is a distance matrix in Phylip-like format:<br><br>
+
+This must be supplied as the value for the key `matrix`, either in the URL of a GET request or in the body of a POST
+request.
+<pre>
+6
+A 0 0.09 0.10 0.10 0.00 0.08
+B 0.09 0 0.09 0.09 0.09 0.10
+C 0.10 0.09 0 0.12 0.11 0.10
+D 0.10 0.09 0.12 0 0.10 0.10
+E 0.00 0.09 0.11 0.10 0 0.08
+F 0.08 0.10 0.10 0.10 0.08 0
+    </pre>
+
+Here is a GET example:
+<div class="examples">
+    <code>ServiceURL/draw_distances?algorithm=NNet;&amp;layout=outline&amp;width=600&amp;height=600&matrix=6%0AA%200%200.09%200.10%200.10%200.00%200.08%0AB%200.09%200%200.09%200.09%200.09%200.10%0AC%200.10%200.09%200%200.12%200.11%200.10%0AD%200.10%200.09%200.12%200%200.10%200.10%0AE%200.00%200.09%200.11%200.10%200%200.08%0AF%200.08%200.10%200.10%200.10%200.08%200
+    </code><br>
+</div>
+<br>
+
+<div class="command">
+    <h2>3. <code>draw_sequences</code></h2>
+    <p>Description: Draw sequences as a tree or network based on the provided options.</p>
+    <div class="options">
+        <h3>Options:</h3>
+        <ul>
+            <li><strong>sequences</strong>: The sequences in FastA, Phylip or Nexus format.</li>
+            <li><strong>transform</strong>: The desired distance calculation. The possible values currently
+                are: hamming and logdet.
+            </li>
+            <li><strong>algorithm</strong>: See the draw_distances command.</li>
+            <li><strong>layout</strong>: See the draw command.</li>
+            <li><strong>width</strong>: See the draw command.</li>
+            <li><strong>height</strong>: See the draw command.</li>
+        </ul>
+    </div>
+</div>
+
+Example sequences: <br>
+Here is are sequences in FastA format: <br><br>
+
+This must be supplied as the value for the key `sequences`, either in the URL of a GET request or in the body of a POST
+request.
+<pre>
+>A
+ATATACGGTTATTAGAAAAATGTGTGTGTGTTTTTTCATGTGG
+>B
+ATATACGGATATTACAAGAATCTATGTCTGCTTTCTCATGTGG
+>C
+ATATACGGATATTATAAGAATGTGTGTGTGTTTTTTCATGTGG
+>D
+ATATACGGATAGTAGTAAAATGTGTGTGTGTTTTTTCATGTGA
+>E
+ATATACGGATAGTAGGAAAATGTGTGTGTGTTTTTTCATGTGC
+>F
+ATATACGGATAGTAGCAAAATGTGTGTGTGTTTTTTCATGTGT
+    </pre>
+
+Here is a GET example:
+
+<div class="examples">
+    <code>ServiceURL/draw_sequences?transform=hamming&algorithm=NNet&layout=outline&amp;width=600&amp;height=600&sequences=%3EA%0AATATACGGTTATTAGAAAAATGTGTGTGTGTTTTTTCATGTGG%0A%3EB%0AATATACGGATATTACAAGAATCTATGTCTGCTTTCTCATGTGG%0A%3EC%0AATATACGGATATTATAAGAATGTGTGTGTGTTTTTTCATGTGG%0A%3ED%0AATATACGGATAGTAGTAAAATGTGTGTGTGTTTTTTCATGTGA%0A%3EE%0AATATACGGATAGTAGGAAAATGTGTGTGTGTTTTTTCATGTGC%0A%3EF%0AATATACGGATAGTAGCAAAATGTGTGTGTGTTTTTTCATGTGT
+</div>
+<br>
+
+
 </body>
 </html>

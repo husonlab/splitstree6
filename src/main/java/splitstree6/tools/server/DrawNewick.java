@@ -20,7 +20,9 @@
 
 package splitstree6.tools.server;
 
+import javafx.geometry.Point2D;
 import jloda.graph.Node;
+import jloda.graph.NodeArray;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.data.SplitsBlock;
@@ -37,6 +39,10 @@ import java.util.Map;
 
 import static jloda.util.FileLineIterator.PREFIX_TO_INDICATE_TO_PARSE_FILENAME_STRING;
 
+/**
+ * handles draw newick requests
+ * Daniel Huson, 11/2024
+ */
 public class DrawNewick {
 	public static String apply(String newick, String layout, double width, double height) throws IOException {
 		if (newick.contains("<") && newick.contains(">")) {
@@ -112,7 +118,7 @@ public class DrawNewick {
 					LayoutTreeCircular.apply(tree, nodeAngleMap, true, HeightAndAngles.Averaging.ChildAverage);
 			default /*"radial"*/ -> LayoutTreeRadial.apply(tree);
 		}) {
-			// todo: scale coordinates to fit into width/height
+			scaleCoordinates(nodePointMap, width, height, (layout.contains("circular") || layout.contains("radial")));
 
 			var buf = new StringBuilder();
 			buf.append("%d\t%d%n".formatted(tree.getNumberOfNodes(), tree.getNumberOfEdges()));
@@ -126,6 +132,26 @@ public class DrawNewick {
 						StringUtils.removeTrailingZerosAfterDot("%.8f", tree.getWeight(e))));
 			}
 			return buf.toString();
+		}
+	}
+
+	private static void scaleCoordinates(NodeArray<Point2D> nodePointMap, double width, double height, boolean maintainAspectRatio) {
+		var minX = nodePointMap.values().stream().mapToDouble(Point2D::getX).min().orElse(0);
+		var maxX = nodePointMap.values().stream().mapToDouble(Point2D::getX).max().orElse(0);
+		var minY = nodePointMap.values().stream().mapToDouble(Point2D::getY).min().orElse(0);
+		var maxY = nodePointMap.values().stream().mapToDouble(Point2D::getY).max().orElse(0);
+
+		var factorX = (maxX - minX > 0 ? width / (maxX - minX) : 1.0);
+		var factorY = (maxY - minY > 0 ? height / (maxY - minY) : 1.0);
+
+		if (maintainAspectRatio) {
+			factorX = factorY = Math.min(factorX, factorY);
+		}
+		var fFactorX = factorX;
+		var fFactorY = factorY;
+
+		for (var v : nodePointMap.keySet()) {
+			nodePointMap.compute(v, (k, p) -> (p != null ? new Point2D((p.getX() - minX) * fFactorX, (p.getY() - minY) * fFactorY) : null));
 		}
 	}
 }

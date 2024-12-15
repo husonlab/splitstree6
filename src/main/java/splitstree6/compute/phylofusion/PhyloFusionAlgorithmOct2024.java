@@ -484,14 +484,14 @@ public class PhyloFusionAlgorithmOct2024 {
 	}
 
 	/**
-	 * this implements refinement rule 1: Consider the HTS L of taxon s in tree 1 has an element E of size >1.
+	 * this implements refinement rule 1: Consider the HTS seq1s of taxon s in tree T1 has an element E of size >1.
 	 * Let z be the largest taxon in E and let R be the set of other elements in E.
-	 * If no elements of R are contained anywhere else in L,
-	 * then look for a later taxon t and tree (tree2!=tree1) such that the HTS M contains the elements of R.
-	 * If found, we remove R from E and insert R at the beginning of M. This corresponds to refining the node corresponding
-	 * to L along the edge toward taxon t.
+	 * If no elements of R are contained anywhere else in seq1s,
+	 * then look for a later taxon t and tree T2 such that the HTS seq2t contains the elements of R.
+	 * If found, we remove R from E and insert R at the beginning of seq1t, the sequence for t in T. This corresponds to refining the node corresponding
+	 * to E along the edge toward taxon t.
 	 *
-	 * @param hyperSequenceTable the (taxon,tree) to hypersequence table
+	 * @param hyperSequenceTable the (taxon,tree) to hyper sequence table
 	 * @param taxonRank          the taxon ranking
 	 */
 	private static void applyRefinementRule1(Table<Integer, Integer, HyperSequence> hyperSequenceTable, int[] taxonRank) {
@@ -500,23 +500,24 @@ public class PhyloFusionAlgorithmOct2024 {
 		for (var i = 0; i < ordering.size() - 1; i++) {
 			var taxonS = ordering.get(i);
 			for (var tree1 : treeOrder) {
-				var seqL = hyperSequenceTable.get(taxonS, tree1);
-				if (seqL != null) {
-					for (var elementE : seqL.elements()) {
+				var seq1s = hyperSequenceTable.get(taxonS, tree1);
+				if (seq1s != null) {
+					for (var elementE : seq1s.elements()) {
 						if (elementE.cardinality() > 1) { // multifurcation
 							var taxonZ = getLargest(taxonRank, elementE);
 							var remainingR = BitSetUtils.minus(elementE, BitSetUtils.asBitSet(taxonZ));
-							if (seqL.elements().stream().filter(e -> e != elementE).noneMatch(e -> e.intersects(remainingR))) {
+							if (seq1s.elements().stream().filter(e -> e != elementE).noneMatch(e -> e.intersects(remainingR))) {
 								loop:
 								for (var j = i + 1; j < ordering.size(); j++) {
 									var taxonT = ordering.get(j);
 									for (var tree2 : treeOrder) {
 										if (!tree2.equals(tree1)) {
-											var seqM = hyperSequenceTable.get(taxonT, tree2);
-											if (seqM != null) {
-												if (BitSetUtils.contains(BitSetUtils.union(seqM.elements()), remainingR)) {
+											var seq2t = hyperSequenceTable.get(taxonT, tree2);
+											if (seq2t != null) {
+												if (BitSetUtils.contains(BitSetUtils.union(seq2t.elements()), remainingR)) {
 													elementE.andNot(remainingR);
-													seqM.elements().add(0, remainingR);
+													var seq1t = hyperSequenceTable.get(taxonT, tree1);
+													seq1t.elements().add(0, remainingR);
 													break loop;
 												}
 											}

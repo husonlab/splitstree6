@@ -67,6 +67,9 @@ public class HttpServerST {
 		createContext(path + "/isReadOnly", new HttpHandlerST((c, p) -> "true".getBytes()), null);
 
 		createContext(path + "/draw", new HttpHandlerST(RequestHandler.draw()), null);
+		createContext(path + "/draw_distances", new HttpHandlerST(RequestHandler.drawDistances()), null);
+		createContext(path + "/draw_sequences", new HttpHandlerST(RequestHandler.drawSequences()), null);
+
 
 	}
 
