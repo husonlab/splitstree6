@@ -91,7 +91,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
-		ProgramProperties.track(optionSearchHeuristic, Search::valueOf, Search.Thorough);
+		ProgramProperties.track(optionSearchHeuristic, Search::valueOf, Search.Fast);
 		ProgramProperties.track(optionCladeReduction, true);
 		ProgramProperties.track(optionOnlyOneNetwork, true);
 		ProgramProperties.track(optionGroupNonSeparated, true);

@@ -26,8 +26,8 @@ import javafx.beans.property.StringProperty;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
+import jloda.util.BitSetUtils;
 import jloda.util.FileUtils;
-import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IExperimental;
@@ -35,6 +35,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
 import java.io.*;
+import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -45,7 +46,6 @@ import java.util.concurrent.Executors;
 public class ExternalTrees2Trees extends Trees2Trees implements IExperimental {
 	private final StringProperty optionExecutable = new SimpleStringProperty(this, "optionExecutable", "");
 	private final BooleanProperty optionWeights = new SimpleBooleanProperty(this, "optionWeights", true);
-
 
 	{
 		ProgramProperties.track(optionExecutable, "");
@@ -58,7 +58,7 @@ public class ExternalTrees2Trees extends Trees2Trees implements IExperimental {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionExecutable.getName());
+		return List.of(optionExecutable.getName(), optionWeights.getName());
 	}
 
 	@Override
@@ -91,10 +91,9 @@ public class ExternalTrees2Trees extends Trees2Trees implements IExperimental {
 		var newickIO = new NewickIO();
 
 		try {
-			var count = 0;
 			try (var w = new BufferedWriter(new FileWriter(inputFile))) {
 				for (var tree0 : treesBlock.getTrees()) {
-					if (IteratorUtils.size(tree0.getTaxa()) == taxaBlock.getNtax() && !treesBlock.isReticulated()) {
+					if (!treesBlock.isReticulated()) {
 						var tree = new PhyloTree(tree0);
 						for (var v : tree.nodes()) {
 							if (tree.getLabel(v) != null) {
@@ -105,7 +104,6 @@ public class ExternalTrees2Trees extends Trees2Trees implements IExperimental {
 							}
 						}
 						w.write(newickIO.toBracketString(tree, false) + ";\n");
-						count++;
 					}
 				}
 			}
@@ -116,6 +114,7 @@ public class ExternalTrees2Trees extends Trees2Trees implements IExperimental {
 
 			var number = 0;
 			try (var r = new BufferedReader(new FileReader(outFile))) {
+				var taxa = new BitSet();
 				while (r.ready()) {
 					var line = r.readLine();
 					var tree = new PhyloTree();
@@ -125,6 +124,12 @@ public class ExternalTrees2Trees extends Trees2Trees implements IExperimental {
 					outputBlock.getTrees().add(tree);
 					if (outputBlock.isReticulated() && tree.isReticulated())
 						outputBlock.setReticulated(true);
+					if (taxa.cardinality() == 0) {
+						taxa.or(BitSetUtils.asBitSet(tree.getTaxa()));
+					} else {
+						if (!outputBlock.isPartial() && !taxa.equals(BitSetUtils.asBitSet(tree.getTaxa())))
+							outputBlock.setPartial(true);
+					}
 				}
 			}
 		} finally {

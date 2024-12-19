@@ -67,8 +67,8 @@ public class LabeledNodeShape extends Group {
 	public void setShape(Shape shape, boolean useIceBerg) {
 		getChildren().clear();
 		if (shape != null) {
-			if (useIceBerg) { // node icebergs seem to get in the way...
-				getChildren().add(Icebergs.create(shape, false));
+			if (false && useIceBerg) { // node icebergs seem to get in the way...
+				getChildren().add(Icebergs.create(shape, true));
 			}
 			getChildren().add(shape);
 		}

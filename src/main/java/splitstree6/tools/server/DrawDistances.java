@@ -84,7 +84,7 @@ public class DrawDistances {
 				var newick = SplitNewick.toString(taxaBlock::getLabel, splitsBlock.getSplits(), true, false) + ";";
 				yield DrawNewick.applySplitNewick(newick, layout, width, height);
 			}
-			case "splitdecompostion" -> {
+			case "splitdecomposition" -> {
 				var splitsBlock = new SplitsBlock();
 				(new SplitDecomposition()).compute(new ProgressSilent(), taxaBlock, distancesBlock, splitsBlock);
 				var newick = SplitNewick.toString(taxaBlock::getLabel, splitsBlock.getSplits(), true, false) + ";";
