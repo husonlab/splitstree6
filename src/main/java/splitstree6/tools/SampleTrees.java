@@ -89,7 +89,7 @@ public class SampleTrees {
 		var echoInputTree = options.getOption("-e", "echoInput", "Echo the input tree to output", false);
 
 		var replicates = options.getOption("-R", "replicates", "Number replicates per input tree", 1);
-		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusionFast", "PhyloFusionMedium", "PhyloFusionThorough", "Autumn", "ALTSNetwork", "ALTSExternal", "external"), "");
+		var runAlgorithm = options.getOption("-a", "algorithm", "Run algorithm and report stats", List.of("PhyloFusion", "Autumn", "ALTSNetwork", "ALTSExternal", "external"), "");
 		var timeOut = 1000L * options.getOption("-to", "timeOut", "Abort algorithm after this many seconds", 300);
 		var externalName = options.getOption("-xp", "externalPath", "Path to external program", "");
 
@@ -333,18 +333,12 @@ public class SampleTrees {
 			var external = new ExternalTrees2Trees();
 			external.setOptionExecutable(algorithmName);
 			algorithm = external;
-		} else if (algorithmName.toLowerCase().startsWith("phylofusion")) {
+		} else if (algorithmName.equalsIgnoreCase("phylofusion")) {
 			var phyloFusion = new PhyloFusion();
 			phyloFusion.setOptionMutualRefinement(true);
 			phyloFusion.setOptionNormalizeEdgeWeights(true);
 			phyloFusion.setOptionCalculateWeights(false);
 			phyloFusion.setOptionOnlyOneNetwork(true);
-			if (algorithmName.toLowerCase().endsWith("fast"))
-				phyloFusion.setOptionSearchHeuristic(PhyloFusion.Search.Fast);
-			else if (algorithmName.toLowerCase().endsWith("medium"))
-				phyloFusion.setOptionSearchHeuristic(PhyloFusion.Search.Medium);
-			else
-				phyloFusion.setOptionSearchHeuristic(PhyloFusion.Search.Thorough);
 			algorithm = phyloFusion;
 		} else if (algorithmName.equalsIgnoreCase("altsNetwork")) {
 			var alts = new ALTSNetwork();

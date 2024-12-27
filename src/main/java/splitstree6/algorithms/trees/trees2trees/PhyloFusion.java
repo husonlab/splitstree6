@@ -20,9 +20,7 @@
 package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import jloda.fx.util.ProgramProperties;
 import jloda.graph.Graph;
 import jloda.graph.Node;
@@ -35,7 +33,7 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.MutualRefinement;
 import splitstree6.compute.phylofusion.NetworkUtils;
-import splitstree6.compute.phylofusion.PhyloFusionAlgorithmOct2024;
+import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.splits.GraphUtils;
@@ -57,31 +55,11 @@ public class PhyloFusion extends Trees2Trees {
 	private boolean verbose = false; // for debugging
 	private boolean checkAllPartialResults = false; // for debugging
 
-	public enum Search {
-		Thorough, Medium, Fast;
-
-		/**
-		 * get the number of random orderings for the given search
-		 *
-		 * @param ntax ntaxa
-		 * @return number of random orderings
-		 */
-		public int numberOfRandomOrderings(int ntax) {
-			return switch (this) {
-				case Fast -> 10 * ntax;
-				case Medium -> 150 * ntax;
-				case Thorough -> 300 * ntax;
-			};
-		}
-	}
-
 	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
 
 	private final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
 
 	private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
-
-	private final ObjectProperty<Search> optionSearchHeuristic = new SimpleObjectProperty<>(this, "optionSearchHeuristic");
 
 	private final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
 
@@ -89,12 +67,18 @@ public class PhyloFusion extends Trees2Trees {
 
 	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
 
+	private final BooleanProperty optionRefinementHeuristic = new SimpleBooleanProperty(this, "optionRefinementHeuristic");
+
+	private final BooleanProperty optionMissingTaxaHeuristic = new SimpleBooleanProperty(this, "optionMissingTaxaHeuristic");
+
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
-		ProgramProperties.track(optionSearchHeuristic, Search::valueOf, Search.Fast);
 		ProgramProperties.track(optionCladeReduction, true);
 		ProgramProperties.track(optionOnlyOneNetwork, true);
 		ProgramProperties.track(optionGroupNonSeparated, true);
+		ProgramProperties.track(optionRefinementHeuristic, true);
+		ProgramProperties.track(optionMissingTaxaHeuristic, true);
+
 	}
 
 	@Override
@@ -111,7 +95,9 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(), optionNormalizeEdgeWeights.getName(), optionSearchHeuristic.getName(), optionGroupNonSeparated.getName(), optionCladeReduction.getName()); //, optionCalculateWeights.getName());
+		return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(),
+				optionRefinementHeuristic.getName(), optionMissingTaxaHeuristic.getName(), optionNormalizeEdgeWeights.getName(),
+				optionGroupNonSeparated.getName(), optionCladeReduction.getName()); //, optionCalculateWeights.getName());
 	}
 	// cladeReduction is not optional, there is a bug when it is not set ;-(
 
@@ -127,6 +113,8 @@ public class PhyloFusion extends Trees2Trees {
 			case "optionMutualRefinement" -> "mutually refine input trees";
 			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
 			case "optionCladeReduction" -> "improve performance using clade reduction";
+			case "optionRefinementHeuristic" -> "apply refinement heuristic to reduce hybridization number";
+			case "optionMissingTaxaHeuristic" -> "apply missing-taxa heuristic to reduce hybridization number";
 			case "optionGroupNonSeparated" ->
 					"improve performance by grouping taxa that are not separated by a non-trivial edge";
 			default -> super.getToolTip(optionName);
@@ -192,8 +180,7 @@ public class PhyloFusion extends Trees2Trees {
 			}
 			if (network.getRoot().getOutDegree() == 1)
 				network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
-			if (optionSearchHeuristic.get() == Search.Fast)
-				break; // only copy one
+			break; // only copy one
 		}
 	}
 
@@ -305,9 +292,8 @@ public class PhyloFusion extends Trees2Trees {
 				// run the algorithm
 				if (verbose)
 					System.err.println("Running on " + taxa.cardinality() + " taxa");
-				var numberOfRandomOrderings = getOptionSearchHeuristic().numberOfRandomOrderings(taxa.cardinality());
-
-				var resultList = PhyloFusionAlgorithmOct2024.apply(getOptionSearchHeuristic(), trees, isOptionOnlyOneNetwork(), progress);
+				var resultList = PhyloFusionAlgorithm.apply(trees, isOptionOnlyOneNetwork(),
+						isOptionRefinementHeuristic(), isOptionMissingTaxaHeuristic(), progress);
 
 				// var resultList = PhyloFusionAlgorithmMay2024.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
 
@@ -822,18 +808,6 @@ public class PhyloFusion extends Trees2Trees {
 		this.optionCalculateWeights.set(optionCalculateWeights);
 	}
 
-	public void setOptionSearchHeuristic(Search optionSearchHeuristic) {
-		this.optionSearchHeuristic.set(optionSearchHeuristic);
-	}
-
-	public Search getOptionSearchHeuristic() {
-		return optionSearchHeuristic.get();
-	}
-
-	public ObjectProperty<Search> optionSearchHeuristicProperty() {
-		return optionSearchHeuristic;
-	}
-
 	public boolean isOptionCladeReduction() {
 		return optionCladeReduction.get();
 	}
@@ -864,5 +838,21 @@ public class PhyloFusion extends Trees2Trees {
 
 	public BooleanProperty optionGroupNonSeparatedProperty() {
 		return optionGroupNonSeparated;
+	}
+
+	public boolean isOptionRefinementHeuristic() {
+		return optionRefinementHeuristic.get();
+	}
+
+	public BooleanProperty optionRefinementHeuristicProperty() {
+		return optionRefinementHeuristic;
+	}
+
+	public boolean isOptionMissingTaxaHeuristic() {
+		return optionMissingTaxaHeuristic.get();
+	}
+
+	public BooleanProperty optionMissingTaxaHeuristicProperty() {
+		return optionMissingTaxaHeuristic;
 	}
 }
