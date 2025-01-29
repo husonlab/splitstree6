@@ -130,11 +130,17 @@
         <h3>Options:</h3>
         <ul>
             <li><strong>matrix</strong>: The distances in Phylip or Nexus format.</li>
+            <li><strong>output</strong>: The requested output.
+                <ul>
+                    <li> The possible values are: Coordinates (default) and Newick.
+                </ul>
+            </li>
             <li><strong>algorithm</strong>: The algorithm to compute a tree or network.
                 <ul>
                     <li> To compute a tree, the possible values are: NJ, BioNJ and UPGMA.
                     <li> To compute a split network, the possible values are: NNet and SplitDecomposition.
                 </ul>
+            </li>
             <li><strong>layout</strong>: See the draw command.</li>
             <li><strong>width</strong>: See the draw command.</li>
             <li><strong>height</strong>: See the draw command.</li>
@@ -171,6 +177,11 @@ Here is a GET example:
         <h3>Options:</h3>
         <ul>
             <li><strong>sequences</strong>: The sequences in FastA, Phylip or Nexus format.</li>
+            <li><strong>output</strong>: The requested output.
+                <ul>
+                    <li> The possible values are: Coordinates (default) and Newick.
+                </ul>
+            </li>
             <li><strong>transform</strong>: The desired distance calculation. The possible values currently
                 are: hamming and logdet.
             </li>
@@ -206,9 +217,41 @@ Here is a GET example:
 
 <div class="examples">
     <code>ServiceURL/draw_sequences?transform=hamming&algorithm=NNet&layout=outline&amp;width=600&amp;height=600&sequences=%3EA%0AATATACGGTTATTAGAAAAATGTGTGTGTGTTTTTTCATGTGG%0A%3EB%0AATATACGGATATTACAAGAATCTATGTCTGCTTTCTCATGTGG%0A%3EC%0AATATACGGATATTATAAGAATGTGTGTGTGTTTTTTCATGTGG%0A%3ED%0AATATACGGATAGTAGTAAAATGTGTGTGTGTTTTTTCATGTGA%0A%3EE%0AATATACGGATAGTAGGAAAATGTGTGTGTGTTTTTTCATGTGC%0A%3EF%0AATATACGGATAGTAGCAAAATGTGTGTGTGTTTTTTCATGTGT
-</div>
-<br>
+    </code>
 
+    <p>
+
+        Here is the expected result (using the default `output=coordinates`):
+    <p>
+    <pre>
+    9	8
+1	0.0	0.0	A
+2	0.0	-65.0
+3	-112.6	-130.0
+4	-168.9	-97.5	D
+5	-168.9	-162.6	E
+6	-112.6	-195.1	F
+7	97.5	-65.0
+8	407.3	-243.8	B
+9	125.7	-48.8	C
+1	1	2	1	6
+2	2	3	2	7
+3	3	4	1	8
+4	3	5	1	5
+5	3	6	1	2
+6	2	7	1.5	1
+7	7	8	5.5	3
+8	7	9	0.5	4
+</pre>
+
+    <p>
+        Here is the expected result (using the default `output=newick`):
+    <pre>
+    (A:0,((D:1,E:1,F:1):2,(B:5.5,C:0.5):1.5));
+</pre>
+
+
+</div>
 
 </body>
 </html>

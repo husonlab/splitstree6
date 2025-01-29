@@ -150,20 +150,20 @@ public class SplitsTree6 extends Application {
 		try {
 			if (showSplash)
 				SplashScreen.showSplash(Duration.ofSeconds(5));
-				stage.setTitle("Untitled - " + ProgramProperties.getProgramName());
-				NotificationManager.setShowNotifications(true);
+			stage.setTitle("Untitled - " + ProgramProperties.getProgramName());
+			NotificationManager.setShowNotifications(true);
 
-				final var mainWindow = new MainWindow();
-				WindowGeometry.setToStage(stage);
-				mainWindow.show(stage, stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-				WindowGeometry.listenToStage(stage);
+			final var mainWindow = new MainWindow();
+			WindowGeometry.setToStage(stage);
+			mainWindow.show(stage, stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+			WindowGeometry.listenToStage(stage);
 
-				MainWindowManager.getInstance().addMainWindow(mainWindow);
+			MainWindowManager.getInstance().addMainWindow(mainWindow);
 
-				if (!inputFiles.isEmpty()) {
-					for (var file : inputFiles)
-						Platform.runLater(() -> FileLoader.apply(false, mainWindow, file, e -> NotificationManager.showError("Open file failed: " + e)));
-				}
+			if (!inputFiles.isEmpty()) {
+				for (var file : inputFiles)
+					Platform.runLater(() -> FileLoader.apply(false, mainWindow, file, e -> NotificationManager.showError("Open file failed: " + e)));
+			}
 
 		} catch (Exception ex) {
 			Basic.caught(ex);

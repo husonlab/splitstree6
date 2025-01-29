@@ -42,8 +42,10 @@ import static jloda.util.FileLineIterator.PREFIX_TO_INDICATE_TO_PARSE_FILENAME_S
  * Daniel Huson, 12/2024
  */
 public class DrawSequences {
-	public static String apply(String sequences, String transform, String algorithm, String layout, double width, double height) throws IOException {
+	public static String apply(String sequences, String output, String transform, String algorithm, String layout, double width, double height) throws IOException {
 		var input = PREFIX_TO_INDICATE_TO_PARSE_FILENAME_STRING + sequences;
+
+		Utilities.checkValue("output", output, List.of("coordinates", "newick"));
 
 		var taxaBlock = new TaxaBlock();
 		var charactersBlock = new CharactersBlock();
@@ -65,7 +67,7 @@ public class DrawSequences {
 				phylipWriter.optionTruncateLabelsProperty().set(false);
 				var matrix = new StringWriter();
 				phylipWriter.write(matrix, taxaBlock, distances);
-				yield DrawDistances.apply(matrix.toString(), algorithm, layout, width, height);
+				yield DrawDistances.apply(matrix.toString(), output, algorithm, layout, width, height);
 			}
 			case "logdet" -> {
 				var distances = new DistancesBlock();
@@ -74,10 +76,9 @@ public class DrawSequences {
 				phylipWriter.optionTruncateLabelsProperty().set(false);
 				var matrix = new StringWriter();
 				phylipWriter.write(matrix, taxaBlock, distances);
-				yield DrawDistances.apply(matrix.toString(), algorithm, layout, width, height);
+				yield DrawDistances.apply(matrix.toString(), output, algorithm, layout, width, height);
 			}
 			default -> throw new IOException("Unsupported transform: " + transform);
-
 		};
 	}
 }

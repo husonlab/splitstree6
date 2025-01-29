@@ -44,8 +44,11 @@ import static jloda.util.FileLineIterator.PREFIX_TO_INDICATE_TO_PARSE_FILENAME_S
  * Daniel Huson, 12/2024
  */
 public class DrawDistances {
-	public static String apply(String matrix, String algorithm, String layout, double width, double height) throws IOException {
+	public static String apply(String matrix, String output, String algorithm, String layout, double width, double height) throws IOException {
 		var input = PREFIX_TO_INDICATE_TO_PARSE_FILENAME_STRING + matrix;
+
+		Utilities.checkValue("output", output, List.of("coordinates", "newick"));
+		Utilities.checkValue("algorithm", output, List.of("nj", "bionj", "upgma", "nnet", "splitdecomposition"));
 
 		var taxaBlock = new TaxaBlock();
 		var distancesBlock = new DistancesBlock();
@@ -64,31 +67,31 @@ public class DrawDistances {
 				var trees = new TreesBlock();
 				(new NeighborJoining()).compute(new ProgressSilent(), taxaBlock, distancesBlock, trees);
 				var newick = trees.getTree(1).toBracketString(true) + ";";
-				yield DrawNewick.applyTreeNewick(newick, layout, width, height);
+				yield (output.equals("newick") ? newick : DrawNewick.applyTreeNewick(newick, layout, width, height));
 			}
 			case "bionj" -> {
 				var trees = new TreesBlock();
 				(new BioNJ()).compute(new ProgressSilent(), taxaBlock, distancesBlock, trees);
 				var newick = trees.getTree(1).toBracketString(true) + ";";
-				yield DrawNewick.applyTreeNewick(newick, layout, width, height);
+				yield (output.equals("newick") ? newick : DrawNewick.applyTreeNewick(newick, layout, width, height));
 			}
 			case "upgma" -> {
 				var trees = new TreesBlock();
 				(new UPGMA()).compute(new ProgressSilent(), taxaBlock, distancesBlock, trees);
 				var newick = trees.getTree(1).toBracketString(true) + ";";
-				yield DrawNewick.applyTreeNewick(newick, layout, width, height);
+				yield (output.equals("newick") ? newick : DrawNewick.applyTreeNewick(newick, layout, width, height));
 			}
 			case "nnet" -> {
 				var splitsBlock = new SplitsBlock();
 				(new NeighborNet()).compute(new ProgressSilent(), taxaBlock, distancesBlock, splitsBlock);
 				var newick = SplitNewick.toString(taxaBlock::getLabel, splitsBlock.getSplits(), true, false) + ";";
-				yield DrawNewick.applySplitNewick(newick, layout, width, height);
+				yield (output.equals("newick") ? newick : DrawNewick.applySplitNewick(newick, layout, width, height));
 			}
 			case "splitdecomposition" -> {
 				var splitsBlock = new SplitsBlock();
 				(new SplitDecomposition()).compute(new ProgressSilent(), taxaBlock, distancesBlock, splitsBlock);
 				var newick = SplitNewick.toString(taxaBlock::getLabel, splitsBlock.getSplits(), true, false) + ";";
-				yield DrawNewick.applySplitNewick(newick, layout, width, height);
+				yield (output.equals("newick") ? newick : DrawNewick.applySplitNewick(newick, layout, width, height));
 			}
 			default -> throw new IOException("Unsupported algorithm: " + algorithm);
 		};

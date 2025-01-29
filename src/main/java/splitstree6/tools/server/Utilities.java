@@ -20,6 +20,9 @@
 package splitstree6.tools.server;
 
 
+import java.io.IOException;
+import java.util.Collection;
+
 /**
  * server utilities
  * Daniel Huson, 8.2020
@@ -35,5 +38,14 @@ public class Utilities {
 
 	public static byte[] getBytesLittleEndian(long a) {
 		return new byte[]{(byte) a, (byte) (a >> 8), (byte) (a >> 16), (byte) (a >> 24), (byte) (a >> 32), (byte) (a >> 40), (byte) (a >> 48), (byte) (a >> 56)};
+	}
+
+	public static void checkValue(String key, String value, Collection<String> legalValues) throws IOException {
+		for (var legalValue : legalValues) {
+			if (!value.equals(legalValue))
+				return;
+		}
+		throw new IOException(key + " illegal value " + value + ", must be one of: " + String.join(", ", legalValues));
+
 	}
 }

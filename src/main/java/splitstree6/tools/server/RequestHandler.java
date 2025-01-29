@@ -84,11 +84,17 @@ public interface RequestHandler {
 	static RequestHandler drawDistances() {
 		return (c, p) -> {
 			try {
-				checkKnownParameters(p, "matrix", "algorithm", "layout", "width", "height");
+				checkKnownParameters(p, "output", "matrix", "algorithm", "layout", "width", "height");
 
 				var matrix = Parameters.getValue(p, "matrix");
 				if (matrix == null) return reportError(c, p, "matrix argument is null");
 				matrix = URLDecoder.decode(matrix, StandardCharsets.UTF_8);
+
+				var output = Parameters.getValue(p, "output");
+				if (output == null)
+					output = "coordinates";
+				else
+					output = output.toLowerCase();
 
 				var algorithm = Parameters.getValue(p, "algorithm");
 				if (algorithm == null)
@@ -104,13 +110,14 @@ public interface RequestHandler {
 				var height = Parameters.getValue(p, "height", 800.0);
 
 				System.err.println("draw_distances request");
+				System.err.println("output=" + output);
 				System.err.println("matrix=\n" + matrix);
 				System.err.println("algorithm=" + algorithm);
 				System.err.println("layout=" + layout);
 				System.err.println("width=" + width);
 				System.err.println("height=" + height);
 
-				return DrawDistances.apply(matrix, algorithm, layout, width, height).getBytes();
+				return DrawDistances.apply(matrix, output, algorithm, layout, width, height).getBytes();
 			} catch (IOException ex) {
 				return reportError(c, p, ex.getMessage());
 			}
@@ -120,7 +127,13 @@ public interface RequestHandler {
 	static RequestHandler drawSequences() {
 		return (c, p) -> {
 			try {
-				checkKnownParameters(p, "sequences", "transform", "algorithm", "layout", "width", "height");
+				checkKnownParameters(p, "output", "sequences", "transform", "algorithm", "layout", "width", "height");
+
+				var output = Parameters.getValue(p, "output");
+				if (output == null)
+					output = "coordinates";
+				else
+					output = output.toLowerCase();
 
 				var sequences = Parameters.getValue(p, "sequences");
 				if (sequences == null) return reportError(c, p, "sequences argument is null");
@@ -145,6 +158,7 @@ public interface RequestHandler {
 				var height = Parameters.getValue(p, "height", 800.0);
 
 				System.err.println("draw_distances request");
+				System.err.println("output=" + output);
 				System.err.println("sequences= (" + StringUtils.getLinesFromString(sequences).size() + " lines)");
 				System.err.println("transform=" + transform);
 				System.err.println("algorithm=" + algorithm);
@@ -152,7 +166,7 @@ public interface RequestHandler {
 				System.err.println("width=" + width);
 				System.err.println("height=" + height);
 
-				return DrawSequences.apply(sequences, transform, algorithm, layout, width, height).getBytes();
+				return DrawSequences.apply(sequences, output, transform, algorithm, layout, width, height).getBytes();
 			} catch (IOException ex) {
 				return reportError(c, p, ex.getMessage());
 			}
