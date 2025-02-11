@@ -2,13 +2,13 @@
 
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=8 nAlgorithms=6;
-PROGRAM version='SplitsTree CE (version 6.1.10-beta, built 5 Sep 2023)';
+PROGRAM version='SplitsTree App (version 6.1.10-beta, built 5 Sep 2023)';
 WORKFLOW creationDate='1694396208431'; [Mon Sep 11 09:36:48 SGT 2023]
 END; [SPLITSTREE6]
 
 [
 Methods:
-Analysis was performed using SplitsTree CE 6.0.0_alpha (Huson and Bryant 2006).
+Analysis was performed using SplitsTree App 6.0.0_alpha (Huson and Bryant 2006).
 The original input consisted of 5 taxa and 3 trees.
 The Show Trees method was used (View=TreePages) so as to obtain a Tree Pages visualization.
 The ALT S Network method (Zhang et al 2023) was used (default options) so as to obtain 2 rooted networks.

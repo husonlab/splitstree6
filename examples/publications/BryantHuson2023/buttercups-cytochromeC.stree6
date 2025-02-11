@@ -8,7 +8,7 @@ END; [SPLITSTREE6]
 
 [
 Methods:
-Analysis was performed using SplitsTree CE 6.0.0 (Huson and Bryant 2006).
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2006).
 The original input consisted of 100 taxa and 100 Protein sequences of length 364.
 The Protein ML Distance method (Swofford et al 1996) was used (default options) so as to obtain a 100 x 100 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004, Bryant & Huson 2023) was used (default options) so as to obtain 266 splits, cyclic.

@@ -18,7 +18,7 @@ This is an example of a Nexus file, modified from a sample file distributed
 with DNASP.
 
 Methods:
-Analysis was performed using SplitsTree CE 6.0.0 (Huson and Bryant 2006).
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2006).
 The original input consisted of 7 taxa and 7 DNA sequences of length 56.
 The Median Joining method (Bandelt et al 1999) was used (default options) so as to obtain 9 nodes and 11 edges.
 

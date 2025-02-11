@@ -18,7 +18,7 @@ Cite: Wolf, Eva and Gaquerel, Emmanuel and Scharmann, Mathias and Yant, Levi and
 Figure 3
 
 Methods:
-Analysis was performed using SplitsTree CE 6.0.0 (Huson and Bryant 2006).
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2006).
 The original input consisted of 63 taxa and a 63 x 63 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004, Bryant & Huson 2023) was used (default options) so as to obtain 156 splits, cyclic.
 The Show Splits method was used (default options) so as to obtain a Split Network visualization.
