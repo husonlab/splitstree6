@@ -374,7 +374,7 @@ public class TreesUtils {
 		var network = NewickIO.valueOf("(((((((((('Lamprologus speciosus',((('Neolamprologus brevis','Hybrid 1.1 Hybrid 2.1 Hybrid 2.2'),('Neolamprologus calliurus')#H2))#H1),('Hybrid 1.2',#H2)),(((((('Altolamprologus calvus',('Altolamprologus sp. shell','Altolamprologus compressiceps')),('Lamprologus cailipterus','Noalamprologus wauthioni','Noalamprologus fascratus')),('Lamprologus ocellatus')#H4),((((((('Lepidiolamprologus sp. meeli-boulengeri',('Lepidiolamprologus attenuatus')#H6),(('Lepidiolamprologus meeli',('Lepidiolamprologus hecqui')#H7),'Lepidiolamprologus boulengeri')),('Lepidiolamprologus profundicola')#H8),('Lepidiolamprologus elongatus')#H9),('Lepidiolamprologus sp. nov.',#H8),#H6,#H7,#H9),'Lamprologus lemainii'))#H5),('Lamprologus meleagris')#H10,(('Neolamprologus leloupi',('Neolamprologus caudopunctatus')#H12))#H11,('Lamprologus lemairii',#H12)))#H3,('Neolamprologus multifasciatus')#H13),(((('Lamprologus signatus','Lamprologus laparogramma'),'Lamprologus kungweensis'),'Lamprologus omatipinnis'))#H14,('Neolamprologus similis')#H15),((('Julidochromis ornatus',('Telmatochromis vittatus')#H17),('Variabilichromis moorii')#H18))#H16),'Neolamprologus wauthioni'),#H10,#H4),'Lamprologus callipterus','Neolamprologus fasciatus',#H11,#H14,#H13,#H3,#H15,#H5),#H1,#H16,#H18,#H17));");
 		addAdhocTaxonIds(network, taxaIdMap);
 
-		LSAUtils.computeLSAChildrenMap(network, network.newNodeArray());
+		LSAUtils.setLSAChildrenMap(network);
 		System.err.println(NewickIO.toString(network, false) + ";");
 
 		var softwiredClusters = collectAllSoftwiredClusters(network);
@@ -442,7 +442,7 @@ public class TreesUtils {
 					tree.deleteNode(w);
 			}
 			addAdhocTaxonIds(tree, taxaIdMap);
-			LSAUtils.computeLSAChildrenMap(tree, tree.newNodeArray());
+			LSAUtils.setLSAChildrenMap(tree);
 			list.add(tree);
 		}
 		return list;

@@ -174,7 +174,7 @@ public class ALTSExternal extends Trees2Trees implements IExperimental {
 					}
 					if (network.isReticulated())
 						outputBlock.setReticulated(true);
-					LSAUtils.computeLSAChildrenMap(network, network.newNodeArray());
+					LSAUtils.setLSAChildrenMap(network);
 
 					if (false)
 						System.err.println(newickIO.toBracketString(network, false) + ";");

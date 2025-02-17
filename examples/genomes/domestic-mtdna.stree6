@@ -1,0 +1,258 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=8 nAlgorithms=5;
+PROGRAM version='SplitsTree App (version 6.4.12, built 29 Jan 2025)';
+WORKFLOW creationDate='1739313972641'; [Wed Feb 12 11:46:12 NZDT 2025]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2024).
+The original input consisted of 12 taxa and .
+The Mash method (Ondov et al 2016) was used (default options, except KMerSize=21, SketchSize=16000) so as to obtain a 12 x 12 distance matrix.
+The Neighbor Net method (Bryant & Moulton 2004, Bryant & Huson 2023) was used (default options) so as to obtain 35 splits, cyclic.
+The Show Splits method was used (default options) so as to obtain a Split Network visualization.
+
+References:
+Bryant & Huson 2023: D. Bryant and DH Huson, NeighborNet- improved algorithms and implementation. Front. Bioinform. 3, 2023.
+Bryant & Moulton 2004: D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255– 265, 2004.
+Huson and Bryant 2024: D.H. Huson and D. Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024.
+Ondov et al 2016: BD Ondov, TJ Treangen, P. Melsted, AB Mallonee, NH Bergman, S. Koren & AM Phillippy. Mash: fast genome and metagenome distance estimation using MinHash. Genome Biol 17:132, 2016.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+DIMENSIONS ntax=12;
+TAXLABELS
+	[1] 'Meleagris gallopavo'
+	[2] 'Anas platyrhynchos'
+	[3] 'Capra hircus V07-146'
+	[4] 'Ovis aries'
+	[5] 'Gallus gallus bGalGal1 sequence,'
+	[6] 'Bos taurus'
+	[7] 'Sus scrofa cristatus ABT/SWFH/1'
+	[8] 'Sus scrofa domesticus'
+	[9] 'Sus scrofa taiwanensis'
+	[10] 'Sus scrofa'
+	[11] 'Equus caballus H_3958 breed thoroughbred sequence,'
+	[12] 'Gallus gallus spadiceus YP19903 breed Red jungle fowl'
+;
+DISPLAYLABELS
+	[1] 'Meleagris gallopavo'
+	[2] 'Anas platyrhynchos'
+	[3] 'Capra hircus V07-146'
+	[4] 'Ovis aries'
+	[5] 'Gallus gallus bGalGal1'
+	[6] 'Bos taurus'
+	[7] 'Sus scrofa cristatus ABT/SWFH/1'
+	[8] 'Sus scrofa domesticus'
+	[9] 'Sus scrofa taiwanensis'
+	[10] 'Sus scrofa'
+	[11] 'Equus caballus H_3958'
+	[12] 'Gallus gallus spadiceus YP19903'
+;
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=12;
+TAXLABELS
+	[1] 'Meleagris gallopavo'
+	[2] 'Anas platyrhynchos'
+	[3] 'Capra hircus V07-146'
+	[4] 'Ovis aries'
+	[5] 'Gallus gallus bGalGal1 sequence,'
+	[6] 'Bos taurus'
+	[7] 'Sus scrofa cristatus ABT/SWFH/1'
+	[8] 'Sus scrofa domesticus'
+	[9] 'Sus scrofa taiwanensis'
+	[10] 'Sus scrofa'
+	[11] 'Equus caballus H_3958 breed thoroughbred sequence,'
+	[12] 'Gallus gallus spadiceus YP19903 breed Red jungle fowl'
+;
+DISPLAYLABELS
+	[1] 'Meleagris gallopavo'
+	[2] 'Anas platyrhynchos'
+	[3] 'Capra hircus V07-146'
+	[4] 'Ovis aries'
+	[5] 'Gallus gallus bGalGal1'
+	[6] 'Bos taurus'
+	[7] 'Sus scrofa cristatus ABT/SWFH/1'
+	[8] 'Sus scrofa domesticus'
+	[9] 'Sus scrofa taiwanensis'
+	[10] 'Sus scrofa'
+	[11] 'Equus caballus H_3958'
+	[12] 'Gallus gallus spadiceus YP19903'
+;
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN GENOMES;
+TITLE 'Input Genomes';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=12;
+FORMAT labels=no accessions=no multiPart=no dataType=dna;
+MATRIX
+	 16719 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 68316,
+	 16604 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 119078,
+	 16643 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 85339,
+	 16616 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 186596,
+	 16784 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 16989,
+	 16338 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 153061,
+	 16738 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 51253,
+	 16770 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 135984,
+	 16480 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 102294,
+	 16613 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 169689,
+	 16624 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 0,
+	 16784 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 34122
+;
+END; [GENOMES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK GENOMES = 'Input Genomes';
+NAME 'Genomes Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN GENOMES;
+TITLE 'Working Genomes';
+LINK ALGORITHM = 'Input Data Filter';
+DIMENSIONS ntax=12;
+FORMAT labels=no accessions=no multiPart=no dataType=dna;
+MATRIX
+	 16719 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 68316,
+	 16604 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 119078,
+	 16643 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 85339,
+	 16616 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 186596,
+	 16784 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 16989,
+	 16338 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 153061,
+	 16738 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 51253,
+	 16770 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 135984,
+	 16480 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 102294,
+	 16613 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 169689,
+	 16624 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 0,
+	 16784 'file:///Users/huson/IdeaProjects/apps/splitstree6/examples/genomes/domestic-mtdna.fasta' 34122
+;
+END; [GENOMES]
+
+BEGIN ALGORITHM;
+TITLE 'Mash';
+LINK GENOMES = 'Working Genomes';
+NAME 'Mash';
+OPTIONS
+	KMerSize = 21,
+	SketchSize = 16000,
+	Distances = 'Mash',
+	HashSeed = 42,
+	IgnoreUniqueKMers = 'false';
+END; [ALGORITHM]
+
+BEGIN DISTANCES;
+TITLE 'Distances';
+LINK ALGORITHM = 'Mash';
+DIMENSIONS ntax=12;
+FORMAT labels=left diagonal triangle=Both;
+MATRIX
+[1] 'Meleagris gallopavo'                                     0 0.164662 0.256123 0.274756 0.1191 0.26156 0.254856 0.254856 0.253622 0.256123 0.274756 0.119909
+[2] 'Anas platyrhynchos'                                      0.164662 0 0.260141 0.267701 0.154958 0.272892 0.236445 0.23478 0.23478 0.236445 0.266089 0.155405
+[3] 'Capra hircus V07-146'                                    0.256123 0.260141 0 0.088361 0.254856 0.116634 0.14646 0.150176 0.150849 0.150849 0.163397 0.254856
+[4] 'Ovis aries'                                              0.274756 0.267701 0.088361 0 0.25242 0.112312 0.154369 0.153643 0.154958 0.154958 0.165961 0.25242
+[5] 'Gallus gallus bGalGal1 sequence,'                        0.1191 0.154958 0.254856 0.25242 0 0.254856 0.235605 0.235605 0.23478 0.235605 0.254856 0.003005
+[6] 'Bos taurus'                                              0.26156 0.272892 0.116634 0.112312 0.254856 0 0.156312 0.154223 0.150849 0.157394 0.160131 0.254856
+[7] 'Sus scrofa cristatus ABT/SWFH/1'                         0.254856 0.236445 0.14646 0.154369 0.235605 0.156312 0 0.022552 0.021907 0.023868 0.155107 0.235605
+[8] 'Sus scrofa domesticus'                                   0.254856 0.23478 0.150176 0.153643 0.235605 0.154223 0.022552 0 0.012333 0.002254 0.160298 0.235605
+[9] 'Sus scrofa taiwanensis'                                  0.253622 0.23478 0.150849 0.154958 0.23478 0.150849 0.021907 0.012333 0 0.013535 0.162167 0.235605
+[10] 'Sus scrofa'                                              0.256123 0.236445 0.150849 0.154958 0.235605 0.157394 0.023868 0.002254 0.013535 0 0.161994 0.236445
+[11] 'Equus caballus H_3958 breed thoroughbred sequence,'      0.274756 0.266089 0.163397 0.165961 0.254856 0.160131 0.155107 0.160298 0.162167 0.161994 0 0.254856
+[12] 'Gallus gallus spadiceus YP19903 breed Red jungle fowl'   0.119909 0.155405 0.254856 0.25242 0.003005 0.254856 0.235605 0.235605 0.235605 0.236445 0.254856 0
+;
+END; [DISTANCES]
+
+BEGIN ALGORITHM;
+TITLE 'Neighbor Net';
+LINK DISTANCES = 'Distances';
+NAME 'Neighbor Net';
+OPTIONS
+	InferenceAlgorithm = 'ActiveSet';
+END; [ALGORITHM]
+
+BEGIN SPLITS;
+TITLE 'Splits';
+LINK ALGORITHM = 'Neighbor Net';
+DIMENSIONS ntax=12 nsplits=35;
+FORMAT labels=no weights=yes confidences=no;
+PROPERTIES fit=100 cyclic;
+CYCLE 1 2 8 10 9 7 3 4 6 11 12 5;
+MATRIX
+[1, size=1] 	 0.06382146 	 1,
+[2, size=3] 	 0.01923048 	 1 5 12,
+[3, size=5] 	 0.00078705 	 1 5 6 11 12,
+[4, size=5] 	 0.00645119 	 1 3 4 5 6 11 12,
+[5, size=4] 	 0.00013106 	 1 3 4 5 6 7 11 12,
+[6, size=2] 	 0.00033725 	 1 3 4 5 6 7 9 10 11 12,
+[7, size=1] 	 0.07335335 	 1 3 4 5 6 7 8 9 10 11 12,
+[8, size=1] 	 0.00136347 	 1 2 3 4 6 7 8 9 10 11 12,
+[9, size=2] 	 0.04961943 	 1 2 3 4 6 7 8 9 10 11,
+[10, size=5] 	 0.0005611 	 1 2 3 7 8 9 10,
+[11, size=2] 	 0.00345267 	 1 2,
+[12, size=1] 	 0.00179178 	 1 2 3 4 5 6 7 8 9 10 11,
+[13, size=3] 	 0.00019345 	 1 2 5,
+[14, size=1] 	 0.08079032 	 1 2 3 4 5 6 7 8 9 10 12,
+[15, size=2] 	 0.00299306 	 1 2 3 4 5 7 8 9 10 12,
+[16, size=4] 	 0.00433838 	 1 2 5 7 8 9 10 12,
+[17, size=5] 	 0.00098498 	 1 2 5 8 9 10 12,
+[18, size=4] 	 0.09501215 	 1 2 5 12,
+[19, size=1] 	 0.05281507 	 1 2 3 4 5 7 8 9 10 11 12,
+[20, size=2] 	 0.00360768 	 1 2 3 5 7 8 9 10 11 12,
+[21, size=3] 	 0.02108693 	 1 2 5 7 8 9 10 11 12,
+[22, size=5] 	 0.00148954 	 1 2 5 11 12,
+[23, size=1] 	 0.04246882 	 1 2 3 5 6 7 8 9 10 11 12,
+[24, size=2] 	 0.013655 	 1 2 5 6 7 8 9 10 11 12,
+[25, size=1] 	 0.040636 	 1 2 4 5 6 7 8 9 10 11 12,
+[26, size=2] 	 0.00109437 	 1 2 4 5 6 8 9 10 11 12,
+[27, size=1] 	 0.0091063 	 1 2 3 4 5 6 8 9 10 11 12,
+[28, size=2] 	 0.00039341 	 1 2 3 4 5 6 8 10 11 12,
+[29, size=4] 	 0.0505681 	 1 2 3 4 5 6 11 12,
+[30, size=1] 	 0.00554435 	 1 2 3 4 5 6 7 8 10 11 12,
+[31, size=2] 	 0.00012905 	 1 2 3 4 5 6 7 8 11 12,
+[32, size=3] 	 0.00455638 	 1 2 3 4 5 6 7 11 12,
+[33, size=1] 	 0.00164827 	 1 2 3 4 5 6 7 8 9 11 12,
+[34, size=2] 	 0.00579904 	 1 2 3 4 5 6 7 9 11 12,
+[35, size=1] 	 0.00014982 	 1 2 3 4 5 6 7 9 10 11 12,
+;
+END; [SPLITS]
+
+BEGIN ALGORITHM;
+TITLE 'Show Splits';
+LINK SPLITS = 'Splits';
+NAME 'Show Splits';
+OPTIONS
+	View = 'SplitNetwork';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'SplitNetwork';
+LINK ALGORITHM = 'Show Splits';
+NAME 'SplitNetwork';
+INPUT 'SPLITS';
+OPTIONS
+	Diagram = 'Splits',
+	Orientation = 'Rotate0Deg',
+	Rooting = 'None',
+	ZoomFactor = 0.86134947,
+	FontScaleFactor = 2.48832,
+	RootAngle = 160,
+	OutlineFill = 0xffe6b3ff,
+	LabelSplitsBy = 'None',
+	ShowQRCode = 'false';
+END; [VIEW]

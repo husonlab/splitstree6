@@ -58,12 +58,23 @@ public class PhylipReader extends DistancesReader {
 					numberOfTaxa = Integer.parseInt(line);
 					distances.setNtax(numberOfTaxa);
 				} else {
-					final var tokens = line.split("\\s+");
+					var tokens = line.split("\\s+");
+
+					// does this look like old Phylip in which positions 0-10 are the label?
+					if ((row == 1 || triangle == Triangle.Both) && tokens[0].length() > 10 && NumberUtils.isDouble(tokens[0].substring(10))) {
+						var tmp = new String[tokens.length + 1];
+						tmp[0] = tokens[0].substring(0, 10);
+						tmp[1] = tokens[0].substring(10);
+						System.arraycopy(tokens, 1, tmp, 2, tokens.length - 1);
+						tokens = tmp;
+					}
+
 					if (row == 1) {
 						if (tokens.length == 1)
 							triangle = Triangle.Lower;
-						else if (tokens.length == numberOfTaxa)
+						else if (tokens.length == numberOfTaxa) {
 							triangle = Triangle.Upper;
+						}
 						else if (tokens.length == numberOfTaxa + 1)
 							triangle = Triangle.Both;
 						else

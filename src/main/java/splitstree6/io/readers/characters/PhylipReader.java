@@ -248,7 +248,8 @@ public class PhylipReader extends CharactersReader {
 	}
 
 	public boolean acceptsFirstLine(String text) {
-		var tokens = text.trim().split("\\s+");
+		var line = StringUtils.getFirstLine(text);
+		var tokens = line.trim().split("\\s+");
 		return tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]);
 	}
 }
