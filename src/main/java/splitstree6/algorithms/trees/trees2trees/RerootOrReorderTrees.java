@@ -341,7 +341,7 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 		return above.get();
 	}
 
-	private String determineBestLabel(NodeArray<String> nodeLabelMap, Node v, Reorder optionReorder, TaxaBlock taxaBlock) {
+	private static String determineBestLabel(NodeArray<String> nodeLabelMap, Node v, Reorder optionReorder, TaxaBlock taxaBlock) {
 		if (v.isLeaf()) {
 			if (optionReorder == Reorder.ByTaxa) {
 				return "%08d".formatted(((PhyloGraph) v.getOwner()).getTaxon(v));
