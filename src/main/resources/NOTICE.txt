@@ -1,2 +1,2 @@
 SplitsTree - Phylogenetic trees and networks - https://github.com/husonlab/splitstree6
-Daniel Huson and David Bryant, since 2020
+Daniel Huson and David Bryant, since 2005

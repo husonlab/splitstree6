@@ -37,7 +37,7 @@ public class InputEditorViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(parseAndLoadButton, "play_circle");
+		MaterialIcons.setIcon(parseAndLoadButton, "play_circle", "", false);
 	}
 
 	public ToolBar getToolBar() {

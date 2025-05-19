@@ -42,7 +42,7 @@ public class DisplayDataController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(applyButton, "play_circle");
+		MaterialIcons.setIcon(applyButton, "play_circle", "", false);
 	}
 
 	public TitledPane getTitledPane() {

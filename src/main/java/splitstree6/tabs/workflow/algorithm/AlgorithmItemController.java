@@ -46,7 +46,7 @@ public class AlgorithmItemController {
 	@FXML
 	private void initialize() {
 		MaterialIcons.setIcon(editButton, "design_services");
-		MaterialIcons.setIcon(playButton, "play_circle");
+		MaterialIcons.setIcon(playButton, "play_circle", "", false);
 	}
 
 	public AnchorPane getAnchorPane() {

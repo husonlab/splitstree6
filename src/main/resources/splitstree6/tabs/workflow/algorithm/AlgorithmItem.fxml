@@ -49,7 +49,7 @@
                 </Button>
             </left>
             <right>
-                <Button fx:id="playButton" contentDisplay="CENTER" mnemonicParsing="false" text="Play"
+                <Button fx:id="playButton" contentDisplay="CENTER" mnemonicParsing="false" text="Run"
                         BorderPane.alignment="CENTER">
                     <tooltip>
                         <Tooltip text="Run this algorithm"/>

@@ -44,7 +44,7 @@
                         </Label>
                     </left>
                     <right>
-                        <Button fx:id="applyButton" contentDisplay="CENTER" mnemonicParsing="false" text="Apply"
+                        <Button fx:id="applyButton" contentDisplay="CENTER" mnemonicParsing="false" text="Run"
                                 BorderPane.alignment="CENTER">
                             <tooltip>
                                 <Tooltip text="Apply format"/>

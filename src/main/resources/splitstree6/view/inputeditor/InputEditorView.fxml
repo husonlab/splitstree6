@@ -29,7 +29,7 @@
 <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
          xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.inputeditor.InputEditorViewController">
 
-    <Button fx:id="parseAndLoadButton" mnemonicParsing="false" text="Parse and Load">
+    <Button fx:id="parseAndLoadButton" mnemonicParsing="false" text="Run">
         <tooltip>
             <Tooltip text="Parse text and load data"/>
         </tooltip>
