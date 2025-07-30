@@ -32,6 +32,10 @@ Our previous program,  SplitsTree4, was designed for computing phylogenetic tree
 
 While SplitsTree4 was designed for unrooted phylogenetic trees and networks, another previous program Dendroscope3 [(Huson and Scornavacca, 2012)](https://academic.oup.com/sysbio/article/61/6/1061/1666897) was designed for working with rooted trees and networks. This program, too, was designed for much smaller datasets than people work with today.
 
+## Rooted networks
+Starting with release 6.5.0, SplitsTree will be using new algorithms (including OD optimization) and code for visualizing rooted phylogentic networks, both in a combining view and a transfer view, as described here: 
+ [(Huson, 2025)](https://www.biorxiv.org/content/10.1101/2025.04.01.646633v1).
+
 ## How to cite
 
 If you use SplitsTree App, the please cite this paper:
