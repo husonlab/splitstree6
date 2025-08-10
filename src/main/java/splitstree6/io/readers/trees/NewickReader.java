@@ -22,7 +22,7 @@ package splitstree6.io.readers.trees;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.window.NotificationManager;
-import jloda.graph.Node;
+import jloda.graph.DAGTraversals;
 import jloda.graph.NodeArray;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
@@ -179,7 +179,7 @@ public class NewickReader extends TreesReader {
 					}
 				}
 
-				if (!treesBlock.isReticulated() && tree.edgeStream().anyMatch(tree::isReticulateEdge)) {
+				if (!treesBlock.isReticulated() && tree.hasReticulateEdges()) {
 					treesBlock.setReticulated(true);
 				}
 
@@ -231,18 +231,11 @@ public class NewickReader extends TreesReader {
 	 */
 	public static List<String> getNodeLabels(PhyloTree tree, boolean ignoreInternalNumericalLabels) {
 		final var list = new ArrayList<String>();
-		var queue = new LinkedList<Node>();
-		queue.add(tree.getRoot());
-		while (!queue.isEmpty()) {
-			var w = queue.pop();
-			var label = tree.getLabel(w);
-			if (label != null && (w.isLeaf() || !(ignoreInternalNumericalLabels && NumberUtils.isDouble(label))))
+		DAGTraversals.preOrderTraversal(tree.getRoot(), v -> {
+			var label = tree.getLabel(v);
+			if (label != null && (v.isLeaf() || !(ignoreInternalNumericalLabels && NumberUtils.isDouble(label))))
 				list.add(label);
-			for (var e : w.outEdges()) {
-				if (tree.okToDescendDownThisEdgeInTraversal(e))
-					queue.add(e.getTarget());
-			}
-		}
+		}, true);
 		return list;
 	}
 

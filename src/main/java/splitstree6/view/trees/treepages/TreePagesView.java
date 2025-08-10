@@ -28,11 +28,11 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.Pane;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.PhyloTree;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -64,7 +64,7 @@ public class TreePagesView implements IView {
 	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
 
 	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreeDiagramType.RectangularPhylogram);
-	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
+	private final ObjectProperty<Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", "Rotate0Deg");
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
@@ -83,7 +83,7 @@ public class TreePagesView implements IView {
 		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
 		ProgramProperties.track(optionRows, 2);
 		ProgramProperties.track(optionCols, 3);
-		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
+		ProgramProperties.track(optionAveraging, Averaging::valueOf, Averaging.ChildAverage);
 		ProgramProperties.track(optionTreeLabels, PaneLabel::valueOf, PaneLabel.Name);
 	}
 
@@ -214,15 +214,15 @@ public class TreePagesView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public HeightAndAngles.Averaging getOptionAveraging() {
+	public Averaging getOptionAveraging() {
 		return optionAveraging.get();
 	}
 
-	public ObjectProperty<HeightAndAngles.Averaging> optionAveragingProperty() {
+	public ObjectProperty<Averaging> optionAveragingProperty() {
 		return optionAveraging;
 	}
 
-	public void setOptionAveraging(HeightAndAngles.Averaging optionAveraging) {
+	public void setOptionAveraging(Averaging optionAveraging) {
 		this.optionAveraging.set(optionAveraging);
 	}
 

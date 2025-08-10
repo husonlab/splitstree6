@@ -32,6 +32,7 @@ import javafx.scene.control.RadioMenuItem;
 import javafx.scene.image.ImageView;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.qr.QRViewUtils;
 import jloda.fx.qr.TreeNewickQR;
 import jloda.fx.util.ClipboardUtils;
@@ -40,7 +41,6 @@ import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
@@ -180,16 +180,16 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		});
 		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
 
-		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
+		final ObservableSet<Averaging> disabledAveraging = FXCollections.observableSet();
 		view.optionDiagramProperty().addListener((v, o, n) -> {
 			disabledAveraging.clear();
 			if (n == DensiTreeDiagramType.RadialPhylogram) {
-				disabledAveraging.add(HeightAndAngles.Averaging.ChildAverage);
+				disabledAveraging.add(Averaging.ChildAverage);
 			}
 		});
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, HeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, HeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().getItems().addAll(HeightAndAngles.Averaging.values());
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, Averaging::createLabel));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, Averaging::createLabel));
+		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 		view.optionAveragingProperty().addListener(invalidationListener);
 

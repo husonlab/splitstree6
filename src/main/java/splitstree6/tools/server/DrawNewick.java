@@ -21,8 +21,12 @@
 package splitstree6.tools.server;
 
 import javafx.geometry.Point2D;
+import jloda.fx.phylo.embed.Averaging;
+import jloda.fx.phylo.embed.CircularPhylogenyLayout;
+import jloda.fx.phylo.embed.RectangularPhylogenyLayout;
+import jloda.fx.phylo.embed.TriangularTreeLayout;
 import jloda.graph.Node;
-import jloda.graph.NodeArray;
+import jloda.phylo.LSAUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.data.SplitsBlock;
@@ -30,7 +34,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.layout.splits.SplitNetworkLayout;
 import splitstree6.layout.splits.SplitsDiagramType;
-import splitstree6.layout.tree.*;
+import splitstree6.layout.tree.LayoutTreeRadial;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -108,16 +112,33 @@ public class DrawNewick {
 		}
 
 		Map<Node, Double> nodeAngleMap = new HashMap<>();
-		try (var nodePointMap = switch (layout) {
-			case "triangular" -> LayoutTreeTriangular.apply(tree);
-			case "cladogram" -> LayoutTreeRectangular.apply(tree, false, HeightAndAngles.Averaging.ChildAverage);
-			case "phylogram" -> LayoutTreeRectangular.apply(tree, true, HeightAndAngles.Averaging.ChildAverage);
-			case "circular_cladogram" ->
-					LayoutTreeCircular.apply(tree, nodeAngleMap, false, HeightAndAngles.Averaging.ChildAverage);
-			case "circular_phylogram" ->
-					LayoutTreeCircular.apply(tree, nodeAngleMap, true, HeightAndAngles.Averaging.ChildAverage);
-			default /*"radial"*/ -> LayoutTreeRadial.apply(tree);
-		}) {
+		Map<Node, Point2D> nodePointMap = new HashMap<>();
+
+		switch (layout) {
+			case "phylogram" -> {
+				LSAUtils.setLSAChildrenAndTransfersMap(tree);
+				RectangularPhylogenyLayout.apply(tree, true, Averaging.ChildAverage, true, nodePointMap);
+			}
+			case "cladogram" -> {
+				LSAUtils.setLSAChildrenAndTransfersMap(tree);
+				RectangularPhylogenyLayout.apply(tree, false, Averaging.ChildAverage, true, nodePointMap);
+			}
+			case "triangular" -> TriangularTreeLayout.apply(tree, nodePointMap);
+			case "radial" -> {
+				LayoutTreeRadial.apply(tree, nodePointMap);
+			}
+			case "radial_cladogram" -> {
+				CircularPhylogenyLayout.apply(tree, false, Averaging.ChildAverage, true, nodeAngleMap, nodePointMap);
+			}
+			case "circular_cladogram" -> {
+				LSAUtils.setLSAChildrenAndTransfersMap(tree);
+				CircularPhylogenyLayout.apply(tree, false, Averaging.ChildAverage, true, nodeAngleMap, nodePointMap);
+			}
+			case "circular_phylogram" -> {
+				LSAUtils.setLSAChildrenAndTransfersMap(tree);
+				CircularPhylogenyLayout.apply(tree, true, Averaging.ChildAverage, true, nodeAngleMap, nodePointMap);
+			}
+		}
 			scaleCoordinates(nodePointMap, width, height, (layout.contains("circular") || layout.contains("radial")));
 
 			var buf = new StringBuilder();
@@ -132,10 +153,9 @@ public class DrawNewick {
 						StringUtils.removeTrailingZerosAfterDot("%.8f", tree.getWeight(e))));
 			}
 			return buf.toString();
-		}
 	}
 
-	private static void scaleCoordinates(NodeArray<Point2D> nodePointMap, double width, double height, boolean maintainAspectRatio) {
+	private static void scaleCoordinates(Map<Node, Point2D> nodePointMap, double width, double height, boolean maintainAspectRatio) {
 		var minX = nodePointMap.values().stream().mapToDouble(Point2D::getX).min().orElse(0);
 		var maxX = nodePointMap.values().stream().mapToDouble(Point2D::getX).max().orElse(0);
 		var minY = nodePointMap.values().stream().mapToDouble(Point2D::getY).min().orElse(0);

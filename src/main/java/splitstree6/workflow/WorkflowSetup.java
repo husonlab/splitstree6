@@ -116,7 +116,7 @@ public class WorkflowSetup {
 						try {
 							workflow.getLoaderNode().getService().stateProperty().removeListener(changeListener.get());
 						} catch (Exception ignored) {
-							System.err.println(ignored);
+							// System.err.println(ignored);
 						}
 					}
 				});

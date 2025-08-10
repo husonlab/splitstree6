@@ -24,11 +24,16 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.phylo.embed.Averaging;
+import jloda.fx.phylo.embed.CircularPhylogenyLayout;
+import jloda.fx.phylo.embed.RectangularPhylogenyLayout;
+import jloda.fx.phylo.embed.TriangularTreeLayout;
 import jloda.fx.util.DraggableUtils;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
+import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 
@@ -54,7 +59,7 @@ public class ComputeTreeLayout {
 	 * @param alignLabels   align labels in rectangular and circular phylograms
 	 * @return groups and layout consumer
 	 */
-	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, HeightAndAngles.Averaging averaging,
+	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, Averaging averaging,
 							   double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
@@ -74,15 +79,33 @@ public class ComputeTreeLayout {
 		var labelGap = dimensions.fontHeight() + 1;
 
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
+		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
-		final NodeArray<Point2D> nodePointMap = switch (diagram) {
-			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, true, averaging);
-			case RectangularCladogram -> LayoutTreeRectangular.apply(tree, false, averaging);
-			case TriangularCladogram -> LayoutTreeTriangular.apply(tree);
-			case RadialPhylogram -> LayoutTreeRadial.apply(tree);
-			case RadialCladogram, CircularCladogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, false, averaging);
-			case CircularPhylogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, true, averaging);
-		};
+		switch (diagram) {
+			case RectangularPhylogram -> {
+				LSAUtils.setLSAChildrenAndTransfersMap(tree);
+				RectangularPhylogenyLayout.apply(tree, true, averaging, true, nodePointMap);
+			}
+			case RectangularCladogram -> {
+				LSAUtils.setLSAChildrenAndTransfersMap(tree);
+				RectangularPhylogenyLayout.apply(tree, false, averaging, true, nodePointMap);
+			}
+			case TriangularCladogram -> TriangularTreeLayout.apply(tree, nodePointMap);
+			case RadialPhylogram -> {
+				LayoutTreeRadial.apply(tree, nodePointMap);
+			}
+			case RadialCladogram -> {
+				CircularPhylogenyLayout.apply(tree, false, averaging, true, nodeAngleMap, nodePointMap);
+			}
+			case CircularCladogram -> {
+				LSAUtils.setLSAChildrenAndTransfersMap(tree);
+				CircularPhylogenyLayout.apply(tree, false, averaging, true, nodeAngleMap, nodePointMap);
+			}
+			case CircularPhylogram -> {
+				LSAUtils.setLSAChildrenAndTransfersMap(tree);
+				CircularPhylogenyLayout.apply(tree, true, averaging, true, nodeAngleMap, nodePointMap);
+			}
+		}
 
 		var unitLengthX = LayoutUtils.normalize(dimensions.width(), dimensions.height(), nodePointMap, diagram.isRadialOrCircular());
 
@@ -138,13 +161,13 @@ public class ComputeTreeLayout {
 
 		var labelConnectorGroup = alignLabels ? new Group() : null;
 
-		LayoutLabelsRadialPhylogram layoutLabelsRadialPhylogram = null;
+		RadialTreeLayout layoutLabelsRadialPhylogram = null;
 
 		switch (diagram) {
 			case CircularPhylogram, CircularCladogram, RadialCladogram ->
 					LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeAngleMap, labelGap, labelConnectorGroup);
 			case RadialPhylogram ->
-					layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeAngleMap, labelGap);
+					layoutLabelsRadialPhylogram = new RadialTreeLayout(tree, nodeShapeMap, nodeAngleMap, labelGap);
 			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, labelGap, labelConnectorGroup);
 		}
 		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, otherLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram, unitLengthX);

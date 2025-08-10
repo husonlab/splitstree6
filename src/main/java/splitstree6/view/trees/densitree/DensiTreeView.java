@@ -29,12 +29,12 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -71,7 +71,7 @@ public class DensiTreeView implements IView {
 
 	private final ObjectProperty<DensiTreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
 
-	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
+	private final ObjectProperty<Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 
 	private final BooleanProperty optionRerootAndRescale = new SimpleBooleanProperty(this, "optionRerootAndRescale");
 
@@ -99,7 +99,7 @@ public class DensiTreeView implements IView {
 	{
 		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
 		ProgramProperties.track(optionOrientation, LayoutOrientation.Rotate0Deg.toString());
-		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
+		ProgramProperties.track(optionAveraging, Averaging::valueOf, Averaging.ChildAverage);
 		ProgramProperties.track(optionRerootAndRescale, false);
 		ProgramProperties.track(optionShowTrees, true);
 		ProgramProperties.track(optionHideFirst10PercentTrees, true);
@@ -111,7 +111,7 @@ public class DensiTreeView implements IView {
 			startup = false;
 			optionDiagram.set(DensiTreeDiagramType.TriangularPhylogram);
 			optionOrientation.set(LayoutOrientation.Rotate0Deg.toString());
-			optionAveraging.set(HeightAndAngles.Averaging.ChildAverage);
+			optionAveraging.set(Averaging.ChildAverage);
 			optionRerootAndRescale.set(false);
 			optionShowTrees.set(true);
 			optionHideFirst10PercentTrees.set(true);
@@ -273,15 +273,15 @@ public class DensiTreeView implements IView {
 	}
 
 
-	public HeightAndAngles.Averaging getOptionAveraging() {
+	public Averaging getOptionAveraging() {
 		return optionAveraging.get();
 	}
 
-	public ObjectProperty<HeightAndAngles.Averaging> optionAveragingProperty() {
+	public ObjectProperty<Averaging> optionAveragingProperty() {
 		return optionAveraging;
 	}
 
-	public void setOptionAveraging(HeightAndAngles.Averaging optionAveraging) {
+	public void setOptionAveraging(Averaging optionAveraging) {
 		this.optionAveraging.set(optionAveraging);
 	}
 

@@ -30,13 +30,13 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.SwipeUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -108,17 +108,17 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getFlipVerticalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 
-		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
+		final ObservableSet<Averaging> disabledAveraging = FXCollections.observableSet();
 		view.optionDiagramProperty().addListener((v, o, n) -> {
 			disabledAveraging.clear();
 			if (n == TreeDiagramType.RadialPhylogram) {
-				disabledAveraging.add(HeightAndAngles.Averaging.ChildAverage);
+				disabledAveraging.add(Averaging.ChildAverage);
 			}
 		});
 
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, HeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, HeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().getItems().addAll(HeightAndAngles.Averaging.values());
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, Averaging::createLabel));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, Averaging::createLabel));
+		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 
 		controller.getRowsColsCBox().getItems().setAll(gridValues);

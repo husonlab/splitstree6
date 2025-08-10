@@ -1,5 +1,5 @@
 /*
- *  LayoutLabelsRadialPhylogram.java Copyright (C) 2024 Daniel H. Huson
+ *  RadialTreeLayout.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -32,14 +32,14 @@ import java.util.function.Consumer;
  * create labels for a radial layout
  * Daniel Huson, 12.2021
  */
-public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> {
+public class RadialTreeLayout implements Consumer<LayoutOrientation> {
 	private final RadialLabelLayout labelLayout;
 
 	/**
 	 * create labels for tree
 	 */
-	public LayoutLabelsRadialPhylogram(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap,
-									   Map<Node, Double> nodeAngleMap, double labelGap) {
+	public RadialTreeLayout(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap,
+							Map<Node, Double> nodeAngleMap, double labelGap) {
 
 		labelLayout = new RadialLabelLayout();
 		labelLayout.setGap(labelGap);

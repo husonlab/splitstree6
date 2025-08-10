@@ -35,6 +35,7 @@ import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.qr.QRViewUtils;
 import jloda.fx.qr.TreeNewickQR;
 import jloda.fx.undo.UndoManager;
@@ -45,20 +46,16 @@ import jloda.fx.util.SwipeUtils;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
-import jloda.util.CanceledException;
 import jloda.util.Single;
 import jloda.util.StringUtils;
-import jloda.util.progress.ProgressSilent;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.ScaleUtils;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
-import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
@@ -241,21 +238,15 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				TreeViewEdits.clearEdits(view.optionEditsProperty());
 		});
 
-
 		updateListener = e -> {
 			if (tree.get() != null) {
+				if (tree.get().hasReticulateEdges() &&
+					(view.getOptionDiagram() == TreeDiagramType.RadialPhylogram || view.getOptionDiagram() == TreeDiagramType.RadialCladogram || view.getOptionDiagram() == TreeDiagramType.TriangularCladogram)) {
+					view.setOptionDiagram(TreeDiagramType.CircularPhylogram);
+				}
+
 				RunAfterAWhile.apply(tree.get().getName(), () -> Platform.runLater(() -> {
 					var tree = this.tree.get();
-					if (tree.isReticulated()) {
-						tree = new PhyloTree(tree);
-						try {
-							if (true) {
-								EmbeddingOptimizer.apply(tree, new ProgressSilent());
-							} else
-								TreeEmbeddingOptimizer.apply(tree, new ProgressSilent());
-						} catch (CanceledException ignored) {
-						}
-					}
 					var bounds = targetBounds.get();
 					if (bounds != null) {
 						var width = bounds.getWidth();
@@ -324,17 +315,17 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		view.optionDiagramProperty().addListener(updateListener);
 		view.optionLabelEdgesByProperty().addListener(updateListener);
 
-		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
+		final ObservableSet<Averaging> disabledAveraging = FXCollections.observableSet();
 		view.optionDiagramProperty().addListener((v, o, n) -> {
 			disabledAveraging.clear();
 			if (n == TreeDiagramType.RadialPhylogram) {
-				disabledAveraging.add(HeightAndAngles.Averaging.ChildAverage);
+				disabledAveraging.add(Averaging.ChildAverage);
 			}
 		});
 
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, HeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, HeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().getItems().addAll(HeightAndAngles.Averaging.values());
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, Averaging::createLabel));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, Averaging::createLabel));
+		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 		view.optionAveragingProperty().addListener(updateListener);
 

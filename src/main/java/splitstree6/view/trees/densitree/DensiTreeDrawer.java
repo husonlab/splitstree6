@@ -41,6 +41,7 @@ import javafx.scene.shape.*;
 import javafx.stage.Stage;
 import jloda.fx.control.ProgressPane;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.*;
@@ -55,7 +56,6 @@ import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.main.SplitsTree6;
 import splitstree6.utils.TreesUtils;
@@ -118,7 +118,7 @@ public class DensiTreeDrawer {
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(invalidationListener));
 	}
 
-	public void apply(Bounds targetBounds, List<PhyloTree> trees0, StackPane parent, DensiTreeDiagramType diagramType, HeightAndAngles.Averaging averaging,
+	public void apply(Bounds targetBounds, List<PhyloTree> trees0, StackPane parent, DensiTreeDiagramType diagramType, Averaging averaging,
 					  boolean vFlip, boolean jitter, boolean rightAdjust,
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					  ReadOnlyBooleanProperty showTrees, boolean hideFirst10PercentTrees, ReadOnlyBooleanProperty showConsensus,
@@ -360,7 +360,7 @@ public class DensiTreeDrawer {
 		labelPane.getChildren().addAll(edgesGroup, labelGroup);
 	}
 
-	private static NodeArray<Point2D> computeTreeCoordinates(TaxaBlock taxaBlock, PhyloTree tree, HeightAndAngles.Averaging averaging, boolean vFlip, int[] taxon2pos, int lastTaxon,
+	private static NodeArray<Point2D> computeTreeCoordinates(TaxaBlock taxaBlock, PhyloTree tree, Averaging averaging, boolean vFlip, int[] taxon2pos, int lastTaxon,
 															 TreeScaleAndAlignment treeScaleAndAlignment, DensiTreeDiagramType diagramType,
 															 boolean jitter, Random random) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
@@ -660,7 +660,7 @@ public class DensiTreeDrawer {
 		}
 	}
 
-	public static void computeTriangularLayout(PhyloTree tree, HeightAndAngles.Averaging averaging, int[] taxon2pos, NodeArray<Point2D> nodePointMap) {
+	public static void computeTriangularLayout(PhyloTree tree, Averaging averaging, int[] taxon2pos, NodeArray<Point2D> nodePointMap) {
 		if (false) {
 			computeTriangularTopologyLayout(tree, taxon2pos, nodePointMap);
 			return;
@@ -681,7 +681,7 @@ public class DensiTreeDrawer {
 				});
 
 				// compute all y-coordinates:
-				if (averaging == HeightAndAngles.Averaging.ChildAverage) {
+				if (averaging == Averaging.ChildAverage) {
 					{
 						LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
 							if (tree.isLeaf(v) || tree.isLsaLeaf(v)) {

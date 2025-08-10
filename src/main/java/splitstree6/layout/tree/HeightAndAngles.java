@@ -19,11 +19,10 @@
 
 package splitstree6.layout.tree;
 
-import javafx.scene.control.Label;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
-import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
@@ -37,13 +36,6 @@ import java.util.Map;
  * computes the y-coordinates for the rectangular layout
  */
 public class HeightAndAngles {
-	public enum Averaging {
-		ChildAverage, LeafAverage;
-
-		public static Label createLabel(Averaging t) {
-			return new Label(t == ChildAverage ? "CA" : "LA");
-		}
-	}
 
 	/**
 	 * compute the y-coordinates for the parallel view

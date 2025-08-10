@@ -28,11 +28,11 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.PhyloTree;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -65,11 +65,11 @@ public class TanglegramView implements IView {
 
 	private final IntegerProperty optionTree1 = new SimpleIntegerProperty(this, "optionTree1", 1); // 1-based
 	private final ObjectProperty<TreeDiagramType> optionDiagram1 = new SimpleObjectProperty<>(this, "optionDiagram1", TreeDiagramType.RectangularPhylogram);
-	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging1 = new SimpleObjectProperty<>(this, "optionAveraging1");
+	private final ObjectProperty<Averaging> optionAveraging1 = new SimpleObjectProperty<>(this, "optionAveraging1");
 
 	private final IntegerProperty optionTree2 = new SimpleIntegerProperty(this, "optionTree2", 2); // 1-based
 	private final ObjectProperty<TreeDiagramType> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2", TreeDiagramType.RectangularPhylogram);
-	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging2 = new SimpleObjectProperty<>(this, "optionAveraging2");
+	private final ObjectProperty<Averaging> optionAveraging2 = new SimpleObjectProperty<>(this, "optionAveraging2");
 
 	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", LayoutOrientation.Rotate0Deg.toString());
 
@@ -90,8 +90,8 @@ public class TanglegramView implements IView {
 		ProgramProperties.track(optionDiagram1, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionDiagram2, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
-		ProgramProperties.track(optionAveraging1, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
-		ProgramProperties.track(optionAveraging2, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
+		ProgramProperties.track(optionAveraging1, Averaging::valueOf, Averaging.ChildAverage);
+		ProgramProperties.track(optionAveraging2, Averaging::valueOf, Averaging.ChildAverage);
 		ProgramProperties.track(optionShowTreeNames, true);
 		ProgramProperties.track(optionShowTreeInfo, true);
 		ProgramProperties.track(optionShowInternalLabels, true);
@@ -224,15 +224,15 @@ public class TanglegramView implements IView {
 		return optionDiagram1;
 	}
 
-	public HeightAndAngles.Averaging getOptionAveraging1() {
+	public Averaging getOptionAveraging1() {
 		return optionAveraging1.get();
 	}
 
-	public ObjectProperty<HeightAndAngles.Averaging> optionAveraging1Property() {
+	public ObjectProperty<Averaging> optionAveraging1Property() {
 		return optionAveraging1;
 	}
 
-	public void setOptionAveraging1(HeightAndAngles.Averaging optionAveraging1) {
+	public void setOptionAveraging1(Averaging optionAveraging1) {
 		this.optionAveraging1.set(optionAveraging1);
 	}
 
@@ -256,15 +256,15 @@ public class TanglegramView implements IView {
 		return optionDiagram2;
 	}
 
-	public HeightAndAngles.Averaging getOptionAveraging2() {
+	public Averaging getOptionAveraging2() {
 		return optionAveraging2.get();
 	}
 
-	public ObjectProperty<HeightAndAngles.Averaging> optionAveraging2Property() {
+	public ObjectProperty<Averaging> optionAveraging2Property() {
 		return optionAveraging2;
 	}
 
-	public void setOptionAveraging2(HeightAndAngles.Averaging optionAveraging2) {
+	public void setOptionAveraging2(Averaging optionAveraging2) {
 		this.optionAveraging2.set(optionAveraging2);
 	}
 

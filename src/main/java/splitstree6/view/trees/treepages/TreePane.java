@@ -33,6 +33,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -84,7 +85,7 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(Stage stage, UndoManager undoManager, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, HeightAndAngles.Averaging averaging, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
+					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, Averaging averaging, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<PaneLabel> showTreeLabels, DoubleProperty unitLengthX,
 					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 

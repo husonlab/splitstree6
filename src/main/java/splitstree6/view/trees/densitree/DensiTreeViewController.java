@@ -25,9 +25,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import jloda.fx.icons.MaterialIcons;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.main.SplitsTree6;
 
@@ -119,7 +119,7 @@ public class DensiTreeViewController {
 	private Button flipButton;
 
 	@FXML
-	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
+	private ComboBox<Averaging> averagingCBox;
 
 
 	private final ToggleGroup diagramToggleGroup = new ToggleGroup();
@@ -281,7 +281,7 @@ public class DensiTreeViewController {
 		return flipButton;
 	}
 
-	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {
+	public ComboBox<Averaging> getAveragingCBox() {
 		return averagingCBox;
 	}
 }

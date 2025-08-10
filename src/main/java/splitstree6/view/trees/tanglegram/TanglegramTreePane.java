@@ -28,6 +28,7 @@ import javafx.collections.ObservableMap;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
 import javafx.stage.Stage;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.RunAfterAWhile;
@@ -35,7 +36,6 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -56,7 +56,7 @@ public class TanglegramTreePane extends Group {
 
 	public TanglegramTreePane(Stage stage, UndoManager undoManager, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
-							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LabelEdgesBy> labelByEdges, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, StringProperty optionOrientation,
+							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LabelEdgesBy> labelByEdges, ObjectProperty<Averaging> optionAveraging, StringProperty optionOrientation,
 							  ReadOnlyDoubleProperty fontScaleFactor, ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->

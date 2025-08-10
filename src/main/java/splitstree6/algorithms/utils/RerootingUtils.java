@@ -42,7 +42,7 @@ public class RerootingUtils {
 	 */
 	public static void rerootByMidpoint(PhyloTree tree) {
 		var list = computeRootingRecords(tree);
-		if (list.size() > 0) {
+		if (!list.isEmpty()) {
 			list.sort(RootingRecord.comparatorForMidpointRooting());
 			reroot(tree, list.get(0), false);
 		}

@@ -52,6 +52,7 @@ public class SampleTrees {
 
 	public static void main(String[] args) {
 		try {
+			PhyloTree.SUPPORT_RICH_NEWICK = true;
 			ProgramProperties.setProgramName("SampleTrees");
 			ProgramProperties.setProgramVersion(splitstree6.main.Version.SHORT_DESCRIPTION);
 

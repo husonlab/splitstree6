@@ -34,10 +34,7 @@ import javafx.util.Callback;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.phylo.PhyloTree;
-import jloda.util.CanceledException;
-import jloda.util.progress.ProgressSilent;
 import splitstree6.layout.tree.LayoutOrientation;
-import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.window.MainWindow;
 
 /**
@@ -107,13 +104,6 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		var c = 0;
 		for (int which = start; which < top; which++) {
 			var tree = trees.get(which);
-			if (tree.isReticulated()) {
-				tree = new PhyloTree(tree);
-				try {
-					EmbeddingOptimizer.apply(tree, new ProgressSilent());
-				} catch (CanceledException ignored) {
-				}
-			}
 			var name = (tree.getName() != null ? tree.getName() : "tree-" + (which + 1));
 
 			Pane pane;

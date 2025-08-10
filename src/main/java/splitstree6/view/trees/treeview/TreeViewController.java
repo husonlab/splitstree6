@@ -29,10 +29,10 @@ import javafx.scene.layout.VBox;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.icons.MaterialIcons;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreeViewController {
@@ -69,7 +69,7 @@ public class TreeViewController {
 	private Button flipVerticalButton;
 
 	@FXML
-	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
+	private ComboBox<Averaging> averagingCBox;
 
 	@FXML
 	private ComboBox<String> treeCBox;
@@ -206,7 +206,7 @@ public class TreeViewController {
 		return treeCBox;
 	}
 
-	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {
+	public ComboBox<Averaging> getAveragingCBox() {
 		return averagingCBox;
 	}
 

@@ -20,11 +20,15 @@
 package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.algorithms.FruchtermanReingoldLayout;
 import jloda.phylo.PhyloTree;
 import jloda.util.APoint2D;
+
+import java.util.Map;
 
 /**
  * compute a radial layout
@@ -34,16 +38,15 @@ public class LayoutTreeRadial {
 	/**
 	 * compute layout for a radial phylogram
 	 */
-	public static NodeArray<Point2D> apply(PhyloTree tree) {
+	public static void apply(PhyloTree tree, Map<Node, Point2D> nodePointMap) {
 		// compute angles:
 		try (var nodeAngleMap = tree.newNodeDoubleArray()) {
-			HeightAndAngles.computeAngles(tree, nodeAngleMap, HeightAndAngles.Averaging.LeafAverage);
+			HeightAndAngles.computeAngles(tree, nodeAngleMap, Averaging.LeafAverage);
 
 			var percentOffset = 50.0;
 			var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);
 			var smallOffsetForRecticulateEdge = (percentOffset / 100.0) * averageWeight;
 
-			final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 			nodePointMap.put(tree.getRoot(), new Point2D(0, 0));
 			tree.preorderTraversal(v -> {
 				if (v.getInDegree() == 1) {
@@ -85,7 +88,6 @@ public class LayoutTreeRadial {
 					}
 				}
 			}
-			return nodePointMap;
 		}
 	}
 }

@@ -26,10 +26,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.icons.MaterialIcons;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.phylo.PhyloTree;
-import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreePagesViewController {
@@ -59,7 +59,7 @@ public class TreePagesViewController {
 	private Button flipVerticalButton;
 
 	@FXML
-	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
+	private ComboBox<Averaging> averagingCBox;
 
 	@FXML
 	private ComboBox<String> rowsColsCBox;
@@ -160,7 +160,7 @@ public class TreePagesViewController {
 		return flipVerticalButton;
 	}
 
-	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {
+	public ComboBox<Averaging> getAveragingCBox() {
 		return averagingCBox;
 	}
 

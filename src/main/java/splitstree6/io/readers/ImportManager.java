@@ -34,7 +34,7 @@ public class ImportManager {
 	public static final String UNKNOWN_FORMAT = "Unknown";
 	private static ImportManager instance;
 
-	private final ArrayList<DataReaderBase> readers = new ArrayList<>();
+	private final ArrayList<DataReaderBase<?>> readers = new ArrayList<>();
 	private final ArrayList<String> extensions = new ArrayList<>();
 
 	public synchronized static ImportManager getInstance() {
@@ -78,13 +78,13 @@ public class ImportManager {
 	public Class<DataBlock> determineInputType(String fileName) {
 		for (var reader : readers) {
 			if (reader.accepts(fileName))
-				return reader.getToClass();
+				return (Class<DataBlock>) reader.getToClass();
 		}
 		return null;
 	}
 
-	public ArrayList<DataReaderBase> getReaders(String fileName) {
-		var list = new ArrayList<DataReaderBase>();
+	public ArrayList<DataReaderBase<?>> getReaders(String fileName) {
+		var list = new ArrayList<DataReaderBase<?>>();
 		for (var reader : readers) {
 			if (reader.accepts(fileName))
 				list.add(reader);
@@ -93,9 +93,9 @@ public class ImportManager {
 	}
 
 
-	public DataReaderBase getReader(String fileName) {
+	public DataReaderBase<?> getReader(String fileName) {
 		var readers = getReaders(fileName);
-		return readers.size() > 0 ? readers.get(0) : null;
+		return readers.isEmpty() ? null : readers.get(0);
 	}
 
 	public Class<? extends DataBlock> getDataType(String fileName) {
@@ -143,7 +143,7 @@ public class ImportManager {
 		return result;
 	}
 
-	private static String getFileFormat(DataReaderBase reader) {
+	private static String getFileFormat(DataReaderBase<?> reader) {
 		var name = Basic.getShortName(reader.getClass());
 		if (name.endsWith("Reader"))
 			return name.substring(0, name.length() - "Reader".length());
@@ -172,8 +172,8 @@ public class ImportManager {
 	}
 
 
-	public ArrayList<DataReaderBase> getReadersByText(String text) {
-		var list = new ArrayList<DataReaderBase>();
+	public ArrayList<DataReaderBase<?>> getReadersByText(String text) {
+		var list = new ArrayList<DataReaderBase<?>>();
 		for (var reader : readers) {
 			if (reader.acceptsFirstLine(text))
 				list.add(reader);
@@ -185,7 +185,7 @@ public class ImportManager {
 		var list = new ArrayList<DataReaderBase<S>>();
 		for (var reader : readers) {
 			if (reader.getToClass().equals(clazz))
-				list.add(reader);
+				list.add((DataReaderBase<S>) reader);
 		}
 		return list;
 	}
@@ -197,7 +197,7 @@ public class ImportManager {
 	public Collection<FileChooser.ExtensionFilter> getExtensionFilters() {
 		var filters = new HashSet<FileChooser.ExtensionFilter>();
 		for (var reader : readers) {
-			if (reader.getFileExtensions().size() > 0)
+			if (!reader.getFileExtensions().isEmpty())
 				filters.add(reader.getExtensionFilter());
 		}
 		var list = new ArrayList<>(filters);
@@ -212,7 +212,7 @@ public class ImportManager {
 	 *
 	 * @return importer or null
 	 */
-	public DataReaderBase getImporterByDataTypeAndFileFormat(Class<? extends DataBlock> dataType, String fileFormat) {
+	public DataReaderBase<?> getImporterByDataTypeAndFileFormat(Class<? extends DataBlock> dataType, String fileFormat) {
 		for (var importer : readers) {
 			if (importer.getToClass().equals(dataType) && getFileFormat(importer).equals(fileFormat))
 				return importer;

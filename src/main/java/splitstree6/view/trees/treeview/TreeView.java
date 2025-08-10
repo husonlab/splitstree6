@@ -31,6 +31,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
+import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -40,7 +41,10 @@ import jloda.fx.util.FuzzyBoolean;
 import jloda.fx.util.ProgramProperties;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
-import splitstree6.layout.tree.*;
+import splitstree6.layout.tree.LabeledEdgeShape;
+import splitstree6.layout.tree.LabeledNodeShape;
+import splitstree6.layout.tree.PaneLabel;
+import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.edgelabel.EdgeLabelFormat;
@@ -79,7 +83,7 @@ public class TreeView implements IView {
 	private final ObjectProperty<PhyloTree> tree = new SimpleObjectProperty<>(this, "tree");
 
 	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreeDiagramType.RectangularPhylogram);
-	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
+	private final ObjectProperty<Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 
 	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", "Rotate0Deg");
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0);
@@ -108,7 +112,7 @@ public class TreeView implements IView {
 	{
 		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
-		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
+		ProgramProperties.track(optionAveraging, Averaging::valueOf, Averaging.ChildAverage);
 		ProgramProperties.track(optionPaneLabel, PaneLabel::valueOf, PaneLabel.ScaleBarNone);
 		ProgramProperties.track(optionShowQRCode, false);
 	}
@@ -304,15 +308,15 @@ public class TreeView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public HeightAndAngles.Averaging getOptionAveraging() {
+	public Averaging getOptionAveraging() {
 		return optionAveraging.get();
 	}
 
-	public ObjectProperty<HeightAndAngles.Averaging> optionAveragingProperty() {
+	public ObjectProperty<Averaging> optionAveragingProperty() {
 		return optionAveraging;
 	}
 
-	public void setOptionAveraging(HeightAndAngles.Averaging optionAveraging) {
+	public void setOptionAveraging(Averaging optionAveraging) {
 		this.optionAveraging.set(optionAveraging);
 	}
 
