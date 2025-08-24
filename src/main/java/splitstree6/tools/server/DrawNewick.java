@@ -22,11 +22,9 @@ package splitstree6.tools.server;
 
 import javafx.geometry.Point2D;
 import jloda.fx.phylo.embed.Averaging;
-import jloda.fx.phylo.embed.CircularPhylogenyLayout;
-import jloda.fx.phylo.embed.RectangularPhylogenyLayout;
+import jloda.fx.phylo.embed.LayoutRootedPhylogeny;
 import jloda.fx.phylo.embed.TriangularTreeLayout;
 import jloda.graph.Node;
-import jloda.phylo.LSAUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.data.SplitsBlock;
@@ -34,12 +32,12 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.layout.splits.SplitNetworkLayout;
 import splitstree6.layout.splits.SplitsDiagramType;
-import splitstree6.layout.tree.LayoutTreeRadial;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static jloda.util.FileLineIterator.PREFIX_TO_INDICATE_TO_PARSE_FILENAME_STRING;
 
@@ -114,30 +112,22 @@ public class DrawNewick {
 		Map<Node, Double> nodeAngleMap = new HashMap<>();
 		Map<Node, Point2D> nodePointMap = new HashMap<>();
 
+		var averaging = Averaging.ChildAverage;
+
 		switch (layout) {
-			case "phylogram" -> {
-				LSAUtils.setLSAChildrenAndTransfersMap(tree);
-				RectangularPhylogenyLayout.apply(tree, true, Averaging.ChildAverage, true, nodePointMap);
-			}
-			case "cladogram" -> {
-				LSAUtils.setLSAChildrenAndTransfersMap(tree);
-				RectangularPhylogenyLayout.apply(tree, false, Averaging.ChildAverage, true, nodePointMap);
-			}
+			case "phylogram" ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Rectangular, LayoutRootedPhylogeny.Scaling.ToScale, averaging, true, new Random(666), nodeAngleMap, nodePointMap);
+			case "cladogram" ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Rectangular, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, true, new Random(666), nodeAngleMap, nodePointMap);
 			case "triangular" -> TriangularTreeLayout.apply(tree, nodePointMap);
-			case "radial" -> {
-				LayoutTreeRadial.apply(tree, nodePointMap);
-			}
-			case "radial_cladogram" -> {
-				CircularPhylogenyLayout.apply(tree, false, Averaging.ChildAverage, true, nodeAngleMap, nodePointMap);
-			}
-			case "circular_cladogram" -> {
-				LSAUtils.setLSAChildrenAndTransfersMap(tree);
-				CircularPhylogenyLayout.apply(tree, false, Averaging.ChildAverage, true, nodeAngleMap, nodePointMap);
-			}
-			case "circular_phylogram" -> {
-				LSAUtils.setLSAChildrenAndTransfersMap(tree);
-				CircularPhylogenyLayout.apply(tree, true, Averaging.ChildAverage, true, nodeAngleMap, nodePointMap);
-			}
+			case "radial" ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Radial, LayoutRootedPhylogeny.Scaling.ToScale, averaging, true, new Random(666), nodeAngleMap, nodePointMap);
+			case "radial_cladogram" ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Radial, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, true, new Random(666), nodeAngleMap, nodePointMap);
+			case "circular_cladogram" ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Circular, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, true, new Random(666), nodeAngleMap, nodePointMap);
+			case "circular_phylogram" ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Circular, LayoutRootedPhylogeny.Scaling.ToScale, averaging, true, new Random(666), nodeAngleMap, nodePointMap);
 		}
 			scaleCoordinates(nodePointMap, width, height, (layout.contains("circular") || layout.contains("radial")));
 

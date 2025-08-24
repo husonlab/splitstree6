@@ -27,13 +27,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
-import javafx.stage.Stage;
 import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
+import jloda.util.IteratorUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledNodeShape;
@@ -41,6 +41,7 @@ import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.treepages.TreePane;
+import splitstree6.window.MainWindow;
 
 /**
  * a tanglegram tree pane
@@ -54,18 +55,26 @@ public class TanglegramTreePane extends Group {
 
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
-	public TanglegramTreePane(Stage stage, UndoManager undoManager, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
+	public TanglegramTreePane(MainWindow mainWindow, UndoManager undoManager, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
 							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LabelEdgesBy> labelByEdges, ObjectProperty<Averaging> optionAveraging, StringProperty optionOrientation,
-							  ReadOnlyDoubleProperty fontScaleFactor, ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
+							  ReadOnlyDoubleProperty fontScaleFactor, ObservableMap<Node, LabeledNodeShape> nodeShapeMap, LongProperty updateRequested) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {
 					getChildren().clear();
+					double factor;
+					if (tree.get() != null && taxaBlock != null) {
+						var taxaCount = IteratorUtils.count(tree.get().getTaxa());
+						factor = (taxaBlock.getNtax() > taxaCount ? (double) taxaCount / taxaBlock.getNtax() : 1.0);
+					} else {
+						factor = 1.0;
+					}
+
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
-						treePane = new TreePane(stage, undoManager, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+						treePane = new TreePane(mainWindow, undoManager, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), factor * dimensions.get().getHeight(),
 								optionDiagram.get(), labelByEdges.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
-								null, nodeShapeMap, FXCollections.observableHashMap());
+								null, nodeShapeMap, FXCollections.observableHashMap(), false);
 
 						changingOrientation.bind(treePane.changingOrientationProperty());
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
@@ -81,6 +90,7 @@ public class TanglegramTreePane extends Group {
 		// optionOrientation.addListener(new WeakInvalidationListener(updater)); // treepane listens for changes of orientation
 		dimensions.addListener(new WeakInvalidationListener(updater));
 		optionAveraging.addListener(new WeakInvalidationListener(updater));
+		updateRequested.addListener(new WeakInvalidationListener(updater));
 	}
 
 	public Runnable getRunAfterUpdate() {

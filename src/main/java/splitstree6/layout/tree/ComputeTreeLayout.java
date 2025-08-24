@@ -25,20 +25,19 @@ import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.phylo.embed.Averaging;
-import jloda.fx.phylo.embed.CircularPhylogenyLayout;
-import jloda.fx.phylo.embed.RectangularPhylogenyLayout;
+import jloda.fx.phylo.embed.LayoutRootedPhylogeny;
 import jloda.fx.phylo.embed.TriangularTreeLayout;
 import jloda.fx.util.DraggableUtils;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
-import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -60,7 +59,7 @@ public class ComputeTreeLayout {
 	 * @return groups and layout consumer
 	 */
 	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, Averaging averaging,
-							   double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap) {
+							   double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
 
@@ -82,29 +81,19 @@ public class ComputeTreeLayout {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		switch (diagram) {
-			case RectangularPhylogram -> {
-				LSAUtils.setLSAChildrenAndTransfersMap(tree);
-				RectangularPhylogenyLayout.apply(tree, true, averaging, true, nodePointMap);
-			}
-			case RectangularCladogram -> {
-				LSAUtils.setLSAChildrenAndTransfersMap(tree);
-				RectangularPhylogenyLayout.apply(tree, false, averaging, true, nodePointMap);
-			}
+			case RectangularPhylogram ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Rectangular, LayoutRootedPhylogeny.Scaling.ToScale, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
+			case RectangularCladogram ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Rectangular, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
 			case TriangularCladogram -> TriangularTreeLayout.apply(tree, nodePointMap);
-			case RadialPhylogram -> {
-				LayoutTreeRadial.apply(tree, nodePointMap);
-			}
-			case RadialCladogram -> {
-				CircularPhylogenyLayout.apply(tree, false, averaging, true, nodeAngleMap, nodePointMap);
-			}
-			case CircularCladogram -> {
-				LSAUtils.setLSAChildrenAndTransfersMap(tree);
-				CircularPhylogenyLayout.apply(tree, false, averaging, true, nodeAngleMap, nodePointMap);
-			}
-			case CircularPhylogram -> {
-				LSAUtils.setLSAChildrenAndTransfersMap(tree);
-				CircularPhylogenyLayout.apply(tree, true, averaging, true, nodeAngleMap, nodePointMap);
-			}
+			case RadialPhylogram ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Radial, LayoutRootedPhylogeny.Scaling.ToScale, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
+			case RadialCladogram ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Radial, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
+			case CircularCladogram ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Circular, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
+			case CircularPhylogram ->
+					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Circular, LayoutRootedPhylogeny.Scaling.ToScale, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
 		}
 
 		var unitLengthX = LayoutUtils.normalize(dimensions.width(), dimensions.height(), nodePointMap, diagram.isRadialOrCircular());
@@ -161,13 +150,13 @@ public class ComputeTreeLayout {
 
 		var labelConnectorGroup = alignLabels ? new Group() : null;
 
-		RadialTreeLayout layoutLabelsRadialPhylogram = null;
+		SetupRadialLabelLayout layoutLabelsRadialPhylogram = null;
 
 		switch (diagram) {
-			case CircularPhylogram, CircularCladogram, RadialCladogram ->
+			case CircularPhylogram, CircularCladogram ->
 					LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeAngleMap, labelGap, labelConnectorGroup);
-			case RadialPhylogram ->
-					layoutLabelsRadialPhylogram = new RadialTreeLayout(tree, nodeShapeMap, nodeAngleMap, labelGap);
+			case RadialPhylogram, RadialCladogram ->
+					layoutLabelsRadialPhylogram = new SetupRadialLabelLayout(tree, nodeShapeMap, nodeAngleMap, labelGap);
 			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, labelGap, labelConnectorGroup);
 		}
 		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, otherLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram, unitLengthX);

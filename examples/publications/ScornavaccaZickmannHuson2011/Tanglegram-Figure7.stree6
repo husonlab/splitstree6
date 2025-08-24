@@ -1,0 +1,349 @@
+#nexus [SplitsTree6]
+
+[!Network and tree from Fig 7 of Scornavacca, Zickmann and Huson, 2011.
+Original data from Kim and Donoghue, 2008]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=6 nAlgorithms=4;
+PROGRAM version='SplitsTree App (version 6.5.1, built 31 Jul 2025)';
+WORKFLOW creationDate='1755757815992'; [Thu Aug 21 08:30:15 CEST 2025]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2024).
+The original input consisted of 60 taxa and 2 rooted networks.
+The Show Trees method was used (View=Tanglegram) so as to obtain a Tanglegram visualization (Scornavacca et al, 2011).
+
+References:
+Huson and Bryant 2024: D.H. Huson and D. Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024.
+Scornavacca et al, 2011: C. Scornavacca, F. Zickmann and D.H. Huson. Tanglegrams for rooted phylogenetic trees and networks. Bioinformatics, 27(13):i248–i256, 2011.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=60;
+TAXLABELS
+	[1] 'virginiana'
+	[2] 'filiformis'
+	[3] 'amphibia.p1'
+	[4] 'amphibia.p2'
+	[5] 'maackiana'
+	[6] 'arifolia'
+	[7] 'meisneriana'
+	[8] 'sagittata'
+	[9] 'japonica'
+	[10] 'pubescens'
+	[11] 'hydropiper.p1'
+	[12] 'hydropiper.p2'
+	[13] 'punctata.p1'
+	[14] 'punctata.p2'
+	[15] 'kawagoeana'
+	[16] 'maculosa'
+	[17] 'tinctoria'
+	[18] 'longiseta.p1'
+	[19] 'longiseta.p2'
+	[20] 'macrantha'
+	[21] 'posumbu'
+	[22] 'foliosa'
+	[23] 'taquetii'
+	[24] 'minor.p1'
+	[25] 'minor.p2'
+	[26] 'opelousana'
+	[27] 'hydropiperoides.p1'
+	[28] 'hydropiperoides.p3'
+	[29] 'puritanorum'
+	[30] 'hydropiperoides.p2'
+	[31] 'densiflora'
+	[32] 'robustior'
+	[33] 'hirsuta.p2'
+	[34] 'hirsuta.p1'
+	[35] 'setacea'
+	[36] 'barbata'
+	[37] 'mexicana'
+	[38] 'segetum'
+	[39] 'bicornis'
+	[40] 'pensylvanica'
+	[41] 'viscofera'
+	[42] 'nodosa'
+	[43] 'viscosa'
+	[44] 'careyi'
+	[45] 'glabra.p2'
+	[46] 'hispida'
+	[47] 'paraguayensis'
+	[48] 'orientalis'
+	[49] 'limbata'
+	[50] 'accuminata'
+	[51] 'tomentosa'
+	[52] 'ferruginea'
+	[53] 'glabra.p1'
+	[54] 'senegalensis'
+	[55] 'lapathifolia.p3'
+	[56] 'lapathifolia.p1'
+	[57] 'lapathifolia.p2'
+	[58] 'nepalensis'
+	[59] 'capitata'
+	[60] 'runcinata'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=60;
+TAXLABELS
+	[1] 'virginiana'
+	[2] 'filiformis'
+	[3] 'amphibia.p1'
+	[4] 'amphibia.p2'
+	[5] 'maackiana'
+	[6] 'arifolia'
+	[7] 'meisneriana'
+	[8] 'sagittata'
+	[9] 'japonica'
+	[10] 'pubescens'
+	[11] 'hydropiper.p1'
+	[12] 'hydropiper.p2'
+	[13] 'punctata.p1'
+	[14] 'punctata.p2'
+	[15] 'kawagoeana'
+	[16] 'maculosa'
+	[17] 'tinctoria'
+	[18] 'longiseta.p1'
+	[19] 'longiseta.p2'
+	[20] 'macrantha'
+	[21] 'posumbu'
+	[22] 'foliosa'
+	[23] 'taquetii'
+	[24] 'minor.p1'
+	[25] 'minor.p2'
+	[26] 'opelousana'
+	[27] 'hydropiperoides.p1'
+	[28] 'hydropiperoides.p3'
+	[29] 'puritanorum'
+	[30] 'hydropiperoides.p2'
+	[31] 'densiflora'
+	[32] 'robustior'
+	[33] 'hirsuta.p2'
+	[34] 'hirsuta.p1'
+	[35] 'setacea'
+	[36] 'barbata'
+	[37] 'mexicana'
+	[38] 'segetum'
+	[39] 'bicornis'
+	[40] 'pensylvanica'
+	[41] 'viscofera'
+	[42] 'nodosa'
+	[43] 'viscosa'
+	[44] 'careyi'
+	[45] 'glabra.p2'
+	[46] 'hispida'
+	[47] 'paraguayensis'
+	[48] 'orientalis'
+	[49] 'limbata'
+	[50] 'accuminata'
+	[51] 'tomentosa'
+	[52] 'ferruginea'
+	[53] 'glabra.p1'
+	[54] 'senegalensis'
+	[55] 'lapathifolia.p3'
+	[56] 'lapathifolia.p1'
+	[57] 'lapathifolia.p2'
+	[58] 'nepalensis'
+	[59] 'capitata'
+	[60] 'runcinata'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
+[Number of trees: 2]
+PROPERTIES partialTrees=no rooted=yes reticulated=yes;
+TRANSLATE
+	1 'virginiana',
+	2 'filiformis',
+	3 'amphibia.p1',
+	4 'amphibia.p2',
+	5 'maackiana',
+	6 'arifolia',
+	7 'meisneriana',
+	8 'sagittata',
+	9 'japonica',
+	10 'pubescens',
+	11 'hydropiper.p1',
+	12 'hydropiper.p2',
+	13 'punctata.p1',
+	14 'punctata.p2',
+	15 'kawagoeana',
+	16 'maculosa',
+	17 'tinctoria',
+	18 'longiseta.p1',
+	19 'longiseta.p2',
+	20 'macrantha',
+	21 'posumbu',
+	22 'foliosa',
+	23 'taquetii',
+	24 'minor.p1',
+	25 'minor.p2',
+	26 'opelousana',
+	27 'hydropiperoides.p1',
+	28 'hydropiperoides.p3',
+	29 'puritanorum',
+	30 'hydropiperoides.p2',
+	31 'densiflora',
+	32 'robustior',
+	33 'hirsuta.p2',
+	34 'hirsuta.p1',
+	35 'setacea',
+	36 'barbata',
+	37 'mexicana',
+	38 'segetum',
+	39 'bicornis',
+	40 'pensylvanica',
+	41 'viscofera',
+	42 'nodosa',
+	43 'viscosa',
+	44 'careyi',
+	45 'glabra.p2',
+	46 'hispida',
+	47 'paraguayensis',
+	48 'orientalis',
+	49 'limbata',
+	50 'accuminata',
+	51 'tomentosa',
+	52 'ferruginea',
+	53 'glabra.p1',
+	54 'senegalensis',
+	55 'lapathifolia.p3',
+	56 'lapathifolia.p1',
+	57 'lapathifolia.p2',
+	58 'nepalensis',
+	59 'capitata',
+	60 'runcinata',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] (((((1,2),(3,4)))#H1:0,((((5,6),(7,8)):1)#H2:0,(((((9,((((10,11,12,13,14),(15,(16,17),18,19,20,21)),(22,23)),((24,25),((26,27,28,29,30),31)))),((32,((33,34),35)),(36,((37,38),(39,40))))),(((41,42):1)#H3:0,43,(44:1)#H4:0),((45,(46,47)),(48,(49,50),#H4:0))),((51,(((52,53),(54,55),56),57)):1)#H5:0),(#H3:0,#H5:0))),(#H1:0,#H2:0)):0.95,(58,(59,60)):0.05);
+		[2] tree 'tree-2'=[&R] (((((5,6),7),8),((1,2),((3,4),((9,(((10,11),12),(24,25)),(15,36),(16,((17,(18,19)),((20,21),22,23)))),(((13,26,27,(14,28,29),32),(33,34,(30,35))),41),((37,39),(31,(38,40,((52,53,(51,54)),43,48),55,56,(57,42))),(45,46),47),((49,50),44))))):0.95,(58:1,(59:1,60:1):1):0.05);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 2]
+PROPERTIES partialTrees=no rooted=yes reticulated=yes;
+TRANSLATE
+	1 'virginiana',
+	2 'filiformis',
+	3 'amphibia.p1',
+	4 'amphibia.p2',
+	5 'maackiana',
+	6 'arifolia',
+	7 'meisneriana',
+	8 'sagittata',
+	9 'japonica',
+	10 'pubescens',
+	11 'hydropiper.p1',
+	12 'hydropiper.p2',
+	13 'punctata.p1',
+	14 'punctata.p2',
+	15 'kawagoeana',
+	16 'maculosa',
+	17 'tinctoria',
+	18 'longiseta.p1',
+	19 'longiseta.p2',
+	20 'macrantha',
+	21 'posumbu',
+	22 'foliosa',
+	23 'taquetii',
+	24 'minor.p1',
+	25 'minor.p2',
+	26 'opelousana',
+	27 'hydropiperoides.p1',
+	28 'hydropiperoides.p3',
+	29 'puritanorum',
+	30 'hydropiperoides.p2',
+	31 'densiflora',
+	32 'robustior',
+	33 'hirsuta.p2',
+	34 'hirsuta.p1',
+	35 'setacea',
+	36 'barbata',
+	37 'mexicana',
+	38 'segetum',
+	39 'bicornis',
+	40 'pensylvanica',
+	41 'viscofera',
+	42 'nodosa',
+	43 'viscosa',
+	44 'careyi',
+	45 'glabra.p2',
+	46 'hispida',
+	47 'paraguayensis',
+	48 'orientalis',
+	49 'limbata',
+	50 'accuminata',
+	51 'tomentosa',
+	52 'ferruginea',
+	53 'glabra.p1',
+	54 'senegalensis',
+	55 'lapathifolia.p3',
+	56 'lapathifolia.p1',
+	57 'lapathifolia.p2',
+	58 'nepalensis',
+	59 'capitata',
+	60 'runcinata',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] (((((1,2),(3,4)))#H1:0,((((5,6),(7,8)):1)#H2:0,(((((9,((((10,11,12,13,14),(15,(16,17),18,19,20,21)),(22,23)),((24,25),((26,27,28,29,30),31)))),((32,((33,34),35)),(36,((37,38),(39,40))))),(((41,42):1)#H3:0,43,(44:1)#H4:0),((45,(46,47)),(48,(49,50),#H4:0))),((51,(((52,53),(54,55),56),57)):1)#H5:0),(#H3:0,#H5:0))),(#H1:0,#H2:0)):0.95,(58,(59,60)):0.05);
+		[2] tree 'tree-2'=[&R] (((((5,6),7),8),((1,2),((3,4),((9,(((10,11),12),(24,25)),(15,36),(16,((17,(18,19)),((20,21),22,23)))),(((13,26,27,(14,28,29),32),(33,34,(30,35))),41),((37,39),(31,(38,40,((52,53,(51,54)),43,48),55,56,(57,42))),(45,46),47),((49,50),44))))):0.95,(58:1,(59:1,60:1):1):0.05);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'Tanglegram';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Tanglegram';
+LINK ALGORITHM = 'Show Trees';
+NAME 'Tanglegram';
+INPUT 'TREES';
+OPTIONS
+	Tree1 = 1,
+	Diagram1 = 'RectangularCladogram',
+	Averaging1 = 'LeafAverage',
+	Tree2 = 2,
+	Diagram2 = 'RectangularCladogram',
+	Averaging2 = 'LeafAverage',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 1,
+	VerticalZoomFactor = 1,
+	FontScaleFactor = 1,
+	ShowTreeNames = 'true',
+	ShowTreeInfo = 'false',
+	ShowInternalLabels = 'false',
+	LabelEdgesBy = 'None';
+END; [VIEW]

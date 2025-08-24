@@ -31,7 +31,7 @@ import jloda.fx.util.ResourceManagerFX;
  * Daniel Huson, 12.2021
  */
 public enum TreeDiagramType {
-	RectangularCladogram, RectangularPhylogram, CircularCladogram, CircularPhylogram, TriangularCladogram, RadialCladogram, RadialPhylogram;
+	RectangularCladogram, RectangularPhylogram, CircularCladogram, CircularPhylogram, RadialCladogram, RadialPhylogram, TriangularCladogram;
 
 	public boolean isRadialOrCircular() {
 		return this == RadialPhylogram || this == RadialCladogram || this == CircularPhylogram || this == CircularCladogram;

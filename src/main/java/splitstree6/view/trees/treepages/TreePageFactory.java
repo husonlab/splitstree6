@@ -108,10 +108,10 @@ public class TreePageFactory implements Callback<Integer, Node> {
 
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
-				var treePane = new TreePane(mainWindow.getStage(), treePagesView.getUndoManager(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+				var treePane = new TreePane(mainWindow, treePagesView.getUndoManager(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 						treePagesView.getOptionDiagram(), treePagesView.getOptionLabelEdgesBy(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(),
 						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), null,
-						FXCollections.observableHashMap(), FXCollections.observableHashMap());
+						FXCollections.observableHashMap(), FXCollections.observableHashMap(), true);
 				treePane.changingOrientationProperty().addListener((v, o, n) -> numberChangingOrientation.set(numberChangingOrientation.get() + (n ? 1 : -1)));
 				treePane.setRunAfterUpdate(() -> {
 					for (var treeViewPane : BasicFX.findRecursively(treePane, p -> p.getId() != null && p.getId().equals("treeView"))) {

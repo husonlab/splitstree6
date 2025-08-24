@@ -1,5 +1,5 @@
 /*
- *  RadialTreeLayout.java Copyright (C) 2024 Daniel H. Huson
+ *  SetupRadialLabelLayout.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -29,17 +29,16 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * create labels for a radial layout
+ * setup labels and layout for a radial layout
  * Daniel Huson, 12.2021
  */
-public class RadialTreeLayout implements Consumer<LayoutOrientation> {
+public class SetupRadialLabelLayout implements Consumer<LayoutOrientation> {
 	private final RadialLabelLayout labelLayout;
 
 	/**
 	 * create labels for tree
 	 */
-	public RadialTreeLayout(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap,
-							Map<Node, Double> nodeAngleMap, double labelGap) {
+	public SetupRadialLabelLayout(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Node, Double> nodeAngleMap, double labelGap) {
 
 		labelLayout = new RadialLabelLayout();
 		labelLayout.setGap(labelGap);
@@ -62,7 +61,7 @@ public class RadialTreeLayout implements Consumer<LayoutOrientation> {
 					} else
 						angle = 0.0;
 				}
-
+				System.err.println(angle);
 				label.setVisible(false);
 				label.setLayoutX(0);
 				label.setLayoutY(0);

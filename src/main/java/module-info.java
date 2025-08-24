@@ -220,5 +220,6 @@ module splitstreesix {
 
 	opens splitstree6.tools.server;
 	exports splitstree6.tools.server;
+	exports splitstree6.view.trees.tanglegram.odoptimize;
 
 }

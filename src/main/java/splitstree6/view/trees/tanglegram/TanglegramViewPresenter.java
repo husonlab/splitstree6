@@ -36,7 +36,9 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SwipeUtils;
+import jloda.fx.window.NotificationManager;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
@@ -48,6 +50,7 @@ import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
+import splitstree6.view.trees.tanglegram.odoptimize.TanglegramOptimizer;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
@@ -71,6 +74,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
+	private final LongProperty updateRequested1 = new SimpleLongProperty(this, "updateRequested1", 0L);
+	private final LongProperty updateRequested2 = new SimpleLongProperty(this, "updateRequested2", 0L);
+
 	private final FindToolBar findToolBar;
 
 	private final ObjectProperty<Dimension2D> treePaneDimensions = new SimpleObjectProperty<>(new Dimension2D(0, 0));
@@ -87,9 +93,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		);
 
 		final ObservableMap<Node, LabeledNodeShape> nodeShapeMap1 = FXCollections.observableHashMap();
-		var tree1Pane = new TanglegramTreePane(mainWindow.getStage(), view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
+		var tree1Pane = new TanglegramTreePane(mainWindow, view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
 				view.optionDiagram1Property(), view.optionLabelEdgesByProperty(), view.optionAveraging1Property(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(),
-				nodeShapeMap1);
+				nodeShapeMap1, updateRequested1);
 
 
 		controller.getLeftPane().getChildren().add(tree1Pane);
@@ -109,9 +115,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		orientation2Property.set(view.getOptionOrientation().equals("Rotate0Deg") ? "FlipRotate0Deg" : "Rotate180Deg");
 
 		ObservableMap<Node, LabeledNodeShape> nodeShapeMap2 = FXCollections.observableHashMap();
-		var tree2Pane = new TanglegramTreePane(mainWindow.getStage(), view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
+		var tree2Pane = new TanglegramTreePane(mainWindow, view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
 				view.optionDiagram2Property(), view.optionLabelEdgesByProperty(), view.optionAveraging2Property(), orientation2Property, view.optionFontScaleFactorProperty(),
-				nodeShapeMap2);
+				nodeShapeMap2, updateRequested2);
 
 		controller.getRightPane().getChildren().add(tree2Pane);
 
@@ -155,24 +161,67 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 
-		{
-			final var optimizeEmbeddings = new TanglegramEmbeddingOptimizer(mainWindow);
-			InvalidationListener treeChangedListener = e -> {
-				var t1 = view.getOptionTree1();
-				var t2 = view.getOptionTree2();
+		controller.getTanglegramCrossingsFirstCBox().selectedProperty().bindBidirectional(view.optimizeTanglegramCrossings1Property());
+		controller.getReticulateCrossingsFirstCBox().selectedProperty().bindBidirectional(view.optimizeReticulateCrossings1Property());
+		controller.getTanglegramCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optimizeTanglegramCrossings2Property());
+		controller.getReticulateCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optimizeReticulateCrossings2Property());
 
-				if (t1 >= 1 && t1 <= trees.size() && t2 >= 1 && t2 <= trees.size()) {
-					controller.getBorderPane().disableProperty().bind(optimizeEmbeddings.runningProperty());
-					optimizeEmbeddings.apply(trees.get(t1 - 1), trees.get(t2 - 1), result -> {
-						tree1.set(result.getFirst());
-						tree2.set(result.getSecond());
-					});
+
+		// todo: don't run optimization when opening a previously saved file
+
+		{
+			Runnable runOptimization = () -> {
+				var first = tree1.get();
+				var second = tree2.get();
+				if (first != null && second != null && first != second) {
+					first.getLSAChildrenMap().clear();
+					second.getLSAChildrenMap().clear();
+					TanglegramOptimizer.apply(mainWindow.getController().getBottomFlowPane(), first, second,
+							view.isOptimizeTanglegramCrossings1(),
+							view.isOptimizeReticulateCrossings1(),
+							view.isOptimizeTanglegramCrossings2(),
+							view.isOptimizeReticulateCrossings2(),
+							r -> controller.getBorderPane().setDisable(r), () -> {
+								updateRequested1.set(updateRequested1.get() + 1);
+								updateRequested2.set(updateRequested2.get() + 1);
+							},
+							a -> NotificationManager.showError("Layout failed: " + a.getMessage()));
 				}
 			};
-			view.optionTree1Property().addListener(treeChangedListener);
-			view.optionTree2Property().addListener(treeChangedListener);
-			view.getTrees().addListener(treeChangedListener);
-			treeChangedListener.invalidated(null);
+
+			{
+				InvalidationListener listener1 = e -> {
+					var t = view.getOptionTree1();
+					if (t >= 1 && t <= trees.size()) {
+						tree1.set(trees.get(t - 1));
+						RunAfterAWhile.applyInFXThread(runOptimization, runOptimization);
+					}
+				};
+
+				view.optionTree1Property().addListener(listener1);
+				listener1.invalidated(null);
+
+				InvalidationListener listener2 = e -> {
+					var t = view.getOptionTree2();
+					if (t >= 1 && t <= trees.size()) {
+						tree2.set(trees.get(t - 1));
+						RunAfterAWhile.applyInFXThread(runOptimization, runOptimization);
+					}
+				};
+				view.optionTree2Property().addListener(listener2);
+				listener2.invalidated(null);
+
+
+				view.getTrees().addListener((InvalidationListener) e -> {
+					listener1.invalidated(e);
+					listener2.invalidated(e);
+				});
+			}
+
+			view.optimizeReticulateCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optimizeTanglegramCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optimizeReticulateCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optimizeTanglegramCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
 
 			view.optionShowTreeNamesProperty().addListener(e -> {
 				setLabel(tree1.get(), view.isOptionShowTreeNames(), view.isOptionShowTreeInfo(), controller.getTree1NameLabel());

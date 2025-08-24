@@ -24,7 +24,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="1200.0" style="-fx-background-color: transparent;"
-            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.tanglegram.TanglegramViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -60,40 +60,76 @@
                                 </font>
                             </ToggleButton>
                             <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
+                            <MenuButton mnemonicParsing="false" fx:id="optimizeMenuButton" text="Optimize">
+                                <items>
+                                    <MenuItem mnemonicParsing="false">
+                                        <graphic>
+                                            <CheckBox fx:id="tanglegramCrossingsFirstCBox" mnemonicParsing="false"
+                                                      selected="true" text="Optimize Tanglegram Crossings in First"/>
+                                        </graphic>
+                                    </MenuItem>
+                                    <MenuItem mnemonicParsing="false">
+                                        <graphic>
+                                            <CheckBox fx:id="reticulateCrossingsFirstCBox" mnemonicParsing="false"
+                                                      selected="true" text="Optimize Reticulate Crossings in First"/>
+                                        </graphic>
+                                    </MenuItem>
+                                    <SeparatorMenuItem mnemonicParsing="false"/>
+                                    <MenuItem mnemonicParsing="false">
+                                        <graphic>
+                                            <CheckBox fx:id="tanglegramCrossingsSecondCBox" mnemonicParsing="false"
+                                                      selected="true" text="Optimize Tanglegram Crossings in Second"/>
+                                        </graphic>
+                                    </MenuItem>
+                                    <MenuItem mnemonicParsing="false">
+                                        <graphic>
+                                            <CheckBox fx:id="reticulateCrossingsSecondCBox" mnemonicParsing="false"
+                                                      selected="true" text="Optimize Reticulate Crossings in Second"/>
+                                        </graphic>
+                                    </MenuItem>
+                                </items>
+                            </MenuButton>
+                            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"/>
 
-                            <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false"
-                                    text="Flip"/>
-                            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
+                            <Button fx:id="flipButton" mnemonicParsing="false" text="Flip">
+                                <tooltip>
+                                    <Tooltip text="Flip tanglegram vertically"/>
+                                </tooltip>
+                            </Button>
 
                             <Button fx:id="expandVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
                                     text="X Vert">
                                 <tooltip>
-                                    <Tooltip text="Expand tree vertically"/>
+                                    <Tooltip text="Expand tanglegram vertically"/>
                                 </tooltip>
                             </Button>
 
                             <Button fx:id="contractVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
                                     text="C  Vert">
                                 <tooltip>
-                                    <Tooltip text="Contract tree vertically"/>
+                                    <Tooltip text="Contract tanglegram vertically"/>
                                 </tooltip>
                             </Button>
+
                             <Button fx:id="expandHorizontallyButton" contentDisplay="CENTER" mnemonicParsing="false"
                                     prefHeight="20.0" text="X Horiz">
                                 <tooltip>
-                                    <Tooltip text="Expand tree horizontally"/>
+                                    <Tooltip text="Expand tanglegram horizontally"/>
                                 </tooltip>
                             </Button>
+
                             <Button fx:id="contractHorizontallyButton" mnemonicParsing="false" text="C Horiz">
                                 <tooltip>
-                                    <Tooltip text="Contract tree horizontally"/>
+                                    <Tooltip text="Contract tanglegram horizontally"/>
                                 </tooltip>
                             </Button>
+
                             <Button fx:id="expandCollapseVerticallyButton" mnemonicParsing="false" text="Fit">
                                 <tooltip>
-                                    <Tooltip text="Expand or collapse tree vertically"/>
+                                    <Tooltip text="Expand or collapse tanglegram vertically"/>
                                 </tooltip>
                             </Button>
+
                         </ToolBar>
                     </children>
                 </AnchorPane>

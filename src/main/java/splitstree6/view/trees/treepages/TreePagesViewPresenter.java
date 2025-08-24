@@ -28,6 +28,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
+import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.phylo.embed.Averaging;
@@ -85,15 +86,16 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			disabledDiagrams.clear();
 			if (n) {
 				disabledDiagrams.add(TreeDiagramType.TriangularCladogram);
-				disabledDiagrams.add(TreeDiagramType.RadialCladogram);
-				disabledDiagrams.add(TreeDiagramType.RadialPhylogram);
 			}
 			if (view.getOptionDiagram() == TreeDiagramType.TriangularCladogram)
 				view.setOptionDiagram(TreeDiagramType.RectangularCladogram);
 		});
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, TreeDiagramType::icon));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::icon));
+		controller.getDiagramCBox().setPrefWidth(50);
+		controller.getDiagramCBox().setMinWidth(Pane.USE_PREF_SIZE);
+		controller.getDiagramCBox().setMaxWidth(Pane.USE_PREF_SIZE);
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::icon, true, false));
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 

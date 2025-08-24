@@ -116,6 +116,22 @@ public class TanglegramViewController {
 	@FXML
 	private ToggleButton formatToggleButton;
 
+	@FXML
+	private CheckBox tanglegramCrossingsFirstCBox;
+
+	@FXML
+	private CheckBox reticulateCrossingsFirstCBox;
+
+	@FXML
+	private CheckBox tanglegramCrossingsSecondCBox;
+
+	@FXML
+	private CheckBox reticulateCrossingsSecondCBox;
+
+	@FXML
+	private MenuButton optimizeMenuButton;
+
+
 	private final CopyableLabel tree1NameLabel = new CopyableLabel();
 	private final CopyableLabel tree2NameLabel = new CopyableLabel();
 
@@ -123,15 +139,17 @@ public class TanglegramViewController {
 	@FXML
 	private void initialize() {
 		MaterialIcons.setIcon(flipButton, "flip", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(previousButton, "arrow_left");
-		MaterialIcons.setIcon(nextButton, "arrow_right");
-		MaterialIcons.setIcon(settingsToggleButton, "tune");
-		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
-		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(expandCollapseVerticallyButton, "sync_alt", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
-		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
+		MaterialIcons.setIcon(previousButton, MaterialIcons.arrow_left);
+		MaterialIcons.setIcon(nextButton, MaterialIcons.arrow_right);
+		MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.tune);
+		MaterialIcons.setIcon(formatToggleButton, MaterialIcons.format_shapes);
+		MaterialIcons.setIcon(expandHorizontallyButton, MaterialIcons.unfold_more, "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(contractHorizontallyButton, MaterialIcons.unfold_less, "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(expandCollapseVerticallyButton, MaterialIcons.sync_alt, "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(expandVerticallyButton, MaterialIcons.unfold_more);
+		MaterialIcons.setIcon(contractVerticallyButton, MaterialIcons.unfold_less);
+		MaterialIcons.setIcon(optimizeMenuButton, MaterialIcons.rule);
+
 
 		// draw applyCentering first:
 		var left = borderPane.getLeft();
@@ -287,4 +305,19 @@ public class TanglegramViewController {
 		return scrollPane;
 	}
 
+	public CheckBox getTanglegramCrossingsFirstCBox() {
+		return tanglegramCrossingsFirstCBox;
+	}
+
+	public CheckBox getReticulateCrossingsFirstCBox() {
+		return reticulateCrossingsFirstCBox;
+	}
+
+	public CheckBox getTanglegramCrossingsSecondCBox() {
+		return tanglegramCrossingsSecondCBox;
+	}
+
+	public CheckBox getReticulateCrossingsSecondCBox() {
+		return reticulateCrossingsSecondCBox;
+	}
 }

@@ -71,6 +71,11 @@ public class TanglegramView implements IView {
 	private final ObjectProperty<TreeDiagramType> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2", TreeDiagramType.RectangularPhylogram);
 	private final ObjectProperty<Averaging> optionAveraging2 = new SimpleObjectProperty<>(this, "optionAveraging2");
 
+	private final BooleanProperty optimizeTanglegramCrossings1 = new SimpleBooleanProperty(this, "optimizeTanglegramCrossings1", true);
+	private final BooleanProperty optimizeReticulateCrossings1 = new SimpleBooleanProperty(this, "optimizeReticulateCrossings1", true);
+	private final BooleanProperty optimizeTanglegramCrossings2 = new SimpleBooleanProperty(this, "optimizeTanglegramCrossings2", true);
+	private final BooleanProperty optimizeReticulateCrossings2 = new SimpleBooleanProperty(this, "optimizeReticulateCrossings2", true);
+
 	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", LayoutOrientation.Rotate0Deg.toString());
 
 	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
@@ -90,8 +95,8 @@ public class TanglegramView implements IView {
 		ProgramProperties.track(optionDiagram1, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionDiagram2, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionLabelEdgesBy, LabelEdgesBy::valueOf, LabelEdgesBy.None);
-		ProgramProperties.track(optionAveraging1, Averaging::valueOf, Averaging.ChildAverage);
-		ProgramProperties.track(optionAveraging2, Averaging::valueOf, Averaging.ChildAverage);
+		ProgramProperties.track(optionAveraging1, Averaging::valueOf, Averaging.LeafAverage);
+		ProgramProperties.track(optionAveraging2, Averaging::valueOf, Averaging.LeafAverage);
 		ProgramProperties.track(optionShowTreeNames, true);
 		ProgramProperties.track(optionShowTreeInfo, true);
 		ProgramProperties.track(optionShowInternalLabels, true);
@@ -100,8 +105,10 @@ public class TanglegramView implements IView {
 
 	public List<String> listOptions() {
 		return List.of(optionTree1.getName(), optionDiagram1.getName(), optionAveraging1.getName(),
-				optionTree2.getName(), optionDiagram2.getName(), optionAveraging2.getName(), optionOrientation.getName(),
-				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName(),
+				optionTree2.getName(), optionDiagram2.getName(), optionAveraging2.getName(),
+				optimizeTanglegramCrossings1.getName(), optimizeReticulateCrossings1.getName(),
+				optimizeTanglegramCrossings2.getName(), optimizeReticulateCrossings2.getName(),
+				optionOrientation.getName(), optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName(),
 				optionShowTreeNames.getName(), optionShowTreeInfo.getName(), optionShowInternalLabels.getName(), optionLabelEdgesBy.getName());
 	}
 
@@ -375,6 +382,38 @@ public class TanglegramView implements IView {
 
 	public void setOptionLabelEdgesBy(LabelEdgesBy optionLabelEdgesBy) {
 		this.optionLabelEdgesBy.set(optionLabelEdgesBy);
+	}
+
+	public boolean isOptimizeTanglegramCrossings1() {
+		return optimizeTanglegramCrossings1.get();
+	}
+
+	public BooleanProperty optimizeTanglegramCrossings1Property() {
+		return optimizeTanglegramCrossings1;
+	}
+
+	public boolean isOptimizeReticulateCrossings1() {
+		return optimizeReticulateCrossings1.get();
+	}
+
+	public BooleanProperty optimizeReticulateCrossings1Property() {
+		return optimizeReticulateCrossings1;
+	}
+
+	public boolean isOptimizeTanglegramCrossings2() {
+		return optimizeTanglegramCrossings2.get();
+	}
+
+	public BooleanProperty optimizeTanglegramCrossings2Property() {
+		return optimizeTanglegramCrossings2;
+	}
+
+	public boolean isOptimizeReticulateCrossings2() {
+		return optimizeReticulateCrossings2.get();
+	}
+
+	public BooleanProperty optimizeReticulateCrossings2Property() {
+		return optimizeReticulateCrossings2;
 	}
 
 	@Override

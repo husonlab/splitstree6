@@ -62,6 +62,7 @@ import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -82,7 +83,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
-	private final InvalidationListener updateListener;
+	private final Consumer<Boolean> update;
+
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
@@ -197,12 +199,13 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			disabledDiagrams.clear();
 			if (n) {
 				disabledDiagrams.add(TreeDiagramType.TriangularCladogram);
-				disabledDiagrams.add(TreeDiagramType.RadialCladogram);
-				disabledDiagrams.add(TreeDiagramType.RadialPhylogram);
 			}
 		});
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, TreeDiagramType::icon));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::icon));
+		controller.getDiagramCBox().setPrefWidth(50);
+		controller.getDiagramCBox().setMinWidth(Pane.USE_PREF_SIZE);
+		controller.getDiagramCBox().setMaxWidth(Pane.USE_PREF_SIZE);
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::icon, true, false));
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
@@ -238,11 +241,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				TreeViewEdits.clearEdits(view.optionEditsProperty());
 		});
 
-		updateListener = e -> {
+
+		update = optimize -> {
 			if (tree.get() != null) {
-				if (tree.get().hasReticulateEdges() &&
-					(view.getOptionDiagram() == TreeDiagramType.RadialPhylogram || view.getOptionDiagram() == TreeDiagramType.RadialCladogram || view.getOptionDiagram() == TreeDiagramType.TriangularCladogram)) {
-					view.setOptionDiagram(TreeDiagramType.CircularPhylogram);
+				if (tree.get().hasReticulateEdges() && view.getOptionDiagram() == TreeDiagramType.TriangularCladogram) {
+					view.setOptionDiagram(TreeDiagramType.RectangularCladogram);
 				}
 
 				RunAfterAWhile.apply(tree.get().getName(), () -> Platform.runLater(() -> {
@@ -256,9 +259,9 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						var box = new Dimension2D(view.getOptionHorizontalZoomFactor() * width - 100, view.getOptionVerticalZoomFactor() * height - 150);
 
 						if (!view.emptyProperty().get()) {
-							var pane = new TreePane(mainWindow.getStage(), view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
+							var pane = new TreePane(mainWindow, view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
 									view.getOptionDiagram(), view.getOptionLabelEdgesBy(), view.getOptionAveraging(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(), null,
-									controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap());
+									controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap(), optimize);
 							view.setEdgeSelectionModel(pane.getEdgeSelectionModel());
 							treePane.set(pane);
 							pane.setRunAfterUpdate(() -> {
@@ -293,14 +296,14 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			if (treePane.get() != null) {
 				treePane.get().setScaleX(treePane.get().getScaleX() / o.doubleValue() * n.doubleValue());
 				if (!lockAspectRatio.get())
-					updateListener.invalidated(null);
+					update.accept(false);
 			}
 		});
 
 		view.optionVerticalZoomFactorProperty().addListener((v, o, n) -> {
 			if (treePane.get() != null) {
 				treePane.get().setScaleY(treePane.get().getScaleY() / o.doubleValue() * n.doubleValue());
-				updateListener.invalidated(null);
+				update.accept(false);
 			}
 		});
 
@@ -310,10 +313,10 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				//	ProgramExecutorService.submit(100, () -> Platform.runLater(() -> treePane.get().layoutLabels(treeView.getOptionOrientation())));
 			});
 
-		view.getTrees().addListener(updateListener);
-		view.optionTreeProperty().addListener(updateListener);
-		view.optionDiagramProperty().addListener(updateListener);
-		view.optionLabelEdgesByProperty().addListener(updateListener);
+		view.getTrees().addListener((InvalidationListener) e -> update.accept(true));
+		view.optionTreeProperty().addListener(e -> update.accept(true));
+		view.optionDiagramProperty().addListener(e -> update.accept(false));
+		view.optionLabelEdgesByProperty().addListener(e -> update.accept(false));
 
 		final ObservableSet<Averaging> disabledAveraging = FXCollections.observableSet();
 		view.optionDiagramProperty().addListener((v, o, n) -> {
@@ -327,7 +330,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, Averaging::createLabel));
 		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
-		view.optionAveragingProperty().addListener(updateListener);
+		view.optionAveragingProperty().addListener(e -> update.accept(false));
 
 		controller.getContractHorizontallyButton().setOnAction(e -> {
 			view.setOptionHorizontalZoomFactor(view.getOptionHorizontalZoomFactor() / 1.1);
@@ -426,7 +429,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		QRViewUtils.setup(controller.getAnchorPane(), tree, () -> TreeNewickQR.apply(tree.get(), true, false, false, 4296), qrImageView, view.optionShowQRCodeProperty());
 
 		Platform.runLater(this::setupMenuItems);
-		updateListener.invalidated(null);
+		update.accept(true);
 	}
 
 	public void setupMenuItems() {

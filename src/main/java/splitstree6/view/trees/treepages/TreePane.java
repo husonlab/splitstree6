@@ -30,7 +30,6 @@ import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.phylo.embed.Averaging;
@@ -49,6 +48,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.*;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.InteractionSetup;
+import splitstree6.window.MainWindow;
 
 import java.util.OptionalDouble;
 import java.util.function.Consumer;
@@ -84,11 +84,10 @@ public class TreePane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public TreePane(Stage stage, UndoManager undoManager, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
+	public TreePane(MainWindow mainWindow, UndoManager undoManager, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, Averaging averaging, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<PaneLabel> showTreeLabels, DoubleProperty unitLengthX,
-					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
-
+					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges) {
 		nodeShapeMap.clear();
 		edgeShapeMap.clear();
 
@@ -99,7 +98,7 @@ public class TreePane extends StackPane {
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
-		interactionSetup = new InteractionSetup(stage, this, undoManager, taxaBlock, diagram, orientationLabel, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
+		interactionSetup = new InteractionSetup(mainWindow.getStage(), this, undoManager, taxaBlock, diagram, orientationLabel, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
 
 		fontScaleChangeListener = (v, o, n) -> {
 			if (result != null) {
@@ -111,6 +110,8 @@ public class TreePane extends StackPane {
 
 		// compute the tree in a separate thread:
 		service = new AService<>();
+		service.setProgressParentPane(mainWindow.getController().getBottomFlowPane());
+		service.setProgressBarShowStopButton(false);
 		service.setExecutor(ProgramExecutorService.getInstance());
 
 		orientationLabel.addListener((v, o, n) -> {
@@ -122,6 +123,8 @@ public class TreePane extends StackPane {
 		});
 
 		service.setCallable(() -> {
+			service.getProgressListener().setTasks("Layout", "");
+
 			edgeSelectionModel.clearSelection();
 			double width;
 			double height;
@@ -162,7 +165,7 @@ public class TreePane extends StackPane {
 						phyloTree.edgeStream().filter(e -> !e.getTarget().isLeaf()).forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeProbabilities().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getProbability(e)) : null));
 				}
 			}
-			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap);
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap, optimizeReticulationEdges);
 		});
 
 		service.setOnSucceeded(a -> {
@@ -223,7 +226,6 @@ public class TreePane extends StackPane {
 				Platform.runLater(() -> getRunAfterUpdate().run());
 			}
 		});
-
 		service.setOnFailed(a -> System.err.println("Draw tree failed: " + service.getException()));
 	}
 

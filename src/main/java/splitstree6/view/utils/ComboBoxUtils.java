@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
+import jloda.util.StringUtils;
 
 import java.util.function.Function;
 
@@ -44,6 +45,13 @@ public class ComboBoxUtils {
 	 * create list cell for diagram combo box
 	 */
 	public static <T> ListCell<T> createButtonCell(ObservableSet<T> disabledItems, Function<T, Node> itemNodeFunction, boolean flip) {
+		return createButtonCell(disabledItems, itemNodeFunction, false, flip);
+	}
+
+	/**
+	 * create list cell for diagram combo box
+	 */
+	public static <T> ListCell<T> createButtonCell(ObservableSet<T> disabledItems, Function<T, Node> itemNodeFunction, boolean showText, boolean flip) {
 		return new ListCell<>() {
 			{
 				setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -60,9 +68,16 @@ public class ComboBoxUtils {
 						var node = itemNodeFunction.apply(item);
 						if (flip)
 							node.setScaleX(-node.getScaleX());
-						setGraphic(node);
+						if (showText) {
+							var label = new Label(StringUtils.fromCamelCase(item.toString()));
+							label.setGraphic(node);
+							setGraphic(label);
+						} else
+							setGraphic(node);
+
 						if (disabledItems != null) {
-							node.disableProperty().bind(Bindings.createBooleanBinding(() -> disabledItems.contains(item), disabledItems));
+							if (getGraphic() != null)
+								getGraphic().disableProperty().bind(Bindings.createBooleanBinding(() -> disabledItems.contains(item), disabledItems));
 							disableProperty().bind(Bindings.createBooleanBinding(() -> disabledItems.contains(item), disabledItems));
 							node.opacityProperty().bind(new When(node.disableProperty()).then(0.4).otherwise(1.0));
 						}
@@ -88,5 +103,12 @@ public class ComboBoxUtils {
 	 */
 	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, Node> itemNodeFunction, boolean flip) {
 		return p -> createButtonCell(disabled, itemNodeFunction, flip);
+	}
+
+	/**
+	 * creates the callback method for diagram combo box
+	 */
+	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, Node> itemNodeFunction, boolean showText, boolean flip) {
+		return p -> createButtonCell(disabled, itemNodeFunction, showText, flip);
 	}
 }
