@@ -120,12 +120,19 @@ public class TreesUtils {
 				}
 			}
 			if (inducedTree.getRoot() == v) {
-				inducedTree.deleteNode(v);
 				inducedTree.setRoot(null);
-				return null; // tree has completely disappeared...
+				//return null; // tree has completely disappeared...
 			}
 			inducedTree.deleteNode(v);
 		}
+
+		if (inducedTree.getRoot() == null) {
+			var root = inducedTree.nodeStream().filter(v -> v.getInDegree() == 0).findFirst();
+			if (root.isPresent())
+				inducedTree.setRoot(root.get());
+			else return null;
+		}
+
 
 		// remove path from original root to new root:
 

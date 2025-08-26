@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package splitstree6.view.trees.tanglegram.optimize;
+package splitstree6.view.trees.tanglegram.optimize_old;
 
 
 import jloda.graph.Edge;

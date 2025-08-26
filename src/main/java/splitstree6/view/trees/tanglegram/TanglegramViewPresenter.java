@@ -50,7 +50,6 @@ import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.trees.tanglegram.odoptimize.TanglegramOptimizer;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
@@ -85,6 +84,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		this.mainWindow = mainWindow;
 		this.view = view;
 		controller = view.getController();
+
+		view.getUndoManager().undoableProperty().addListener((v, o, n) -> {
+			if (n)
+				mainWindow.setDirty(true);
+		});
 
 		tree1.addListener((v, o, n) -> {
 					controller.getTree1CBox().setValue(n == null ? null : n.getName());
@@ -161,11 +165,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 
-		controller.getTanglegramCrossingsFirstCBox().selectedProperty().bindBidirectional(view.optimizeTanglegramCrossings1Property());
-		controller.getReticulateCrossingsFirstCBox().selectedProperty().bindBidirectional(view.optimizeReticulateCrossings1Property());
-		controller.getTanglegramCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optimizeTanglegramCrossings2Property());
-		controller.getReticulateCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optimizeReticulateCrossings2Property());
-
+		controller.getTanglegramCrossingsFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings1Property());
+		controller.getReticulateCrossingsFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings1Property());
+		controller.getTanglegramCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings2Property());
+		controller.getReticulateCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings2Property());
 
 		// todo: don't run optimization when opening a previously saved file
 
@@ -177,10 +180,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 					first.getLSAChildrenMap().clear();
 					second.getLSAChildrenMap().clear();
 					TanglegramOptimizer.apply(mainWindow.getController().getBottomFlowPane(), first, second,
-							view.isOptimizeTanglegramCrossings1(),
-							view.isOptimizeReticulateCrossings1(),
-							view.isOptimizeTanglegramCrossings2(),
-							view.isOptimizeReticulateCrossings2(),
+							view.getOptionOptimizeTanglegramCrossings1(),
+							view.getOptionOptimizeReticulateCrossings1(),
+							view.getOptionOptimizeTanglegramCrossings2(),
+							view.getOptionOptimizeReticulateCrossings2(),
 							r -> controller.getBorderPane().setDisable(r), () -> {
 								updateRequested1.set(updateRequested1.get() + 1);
 								updateRequested2.set(updateRequested2.get() + 1);
@@ -218,10 +221,15 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				});
 			}
 
-			view.optimizeReticulateCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
-			view.optimizeTanglegramCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
-			view.optimizeReticulateCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
-			view.optimizeTanglegramCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optionOptimizeReticulateCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optionOptimizeTanglegramCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optionOptimizeReticulateCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optionOptimizeTanglegramCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+
+			view.optionOptimizeReticulateCrossings1Property().addListener((v, o, n) -> view.getUndoManager().add("reticulate crossings", view.optionOptimizeReticulateCrossings1Property(), o, n));
+			view.optionOptimizeTanglegramCrossings1Property().addListener((v, o, n) -> view.getUndoManager().add("tanglegram crossings", view.optionOptimizeTanglegramCrossings1Property(), o, n));
+			view.optionOptimizeReticulateCrossings2Property().addListener((v, o, n) -> view.getUndoManager().add("reticulate crossings", view.optionOptimizeReticulateCrossings2Property(), o, n));
+			view.optionOptimizeTanglegramCrossings2Property().addListener((v, o, n) -> view.getUndoManager().add("tanglegram crossings", view.optionOptimizeTanglegramCrossings2Property(), o, n));
 
 			view.optionShowTreeNamesProperty().addListener(e -> {
 				setLabel(tree1.get(), view.isOptionShowTreeNames(), view.isOptionShowTreeInfo(), controller.getTree1NameLabel());
@@ -370,13 +378,13 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		view.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("show tree info", view.optionShowTreeInfoProperty(), o, n));
 
 		controller.getContractHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor((1.0 / 1.1) * view.getOptionHorizontalZoomFactor()));
-		controller.getContractHorizontallyButton().disableProperty().bind(view.emptyProperty().or(view.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));
+		controller.getContractHorizontallyButton().disableProperty().bind(view.emptyProperty().or(view.optionHorizontalZoomFactorProperty().greaterThan(128)));
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor(1.1 * view.getOptionHorizontalZoomFactor()));
 		controller.getExpandHorizontallyButton().disableProperty().bind(view.emptyProperty());
 
 		controller.getExpandVerticallyButton().setOnAction(e -> view.setOptionVerticalZoomFactor(1.1 * view.getOptionVerticalZoomFactor()));
-		controller.getExpandVerticallyButton().disableProperty().bind(view.emptyProperty().or(view.optionVerticalZoomFactorProperty().greaterThan(8.0 / 1.1)));
+		controller.getExpandVerticallyButton().disableProperty().bind(view.emptyProperty().or(view.optionVerticalZoomFactorProperty().greaterThan(128)));
 
 		controller.getContractVerticallyButton().setOnAction(e -> view.setOptionVerticalZoomFactor((1.0 / 1.1) * view.getOptionVerticalZoomFactor()));
 		controller.getContractVerticallyButton().disableProperty().bind(view.emptyProperty());

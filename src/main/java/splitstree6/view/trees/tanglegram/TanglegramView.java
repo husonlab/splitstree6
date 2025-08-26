@@ -71,10 +71,10 @@ public class TanglegramView implements IView {
 	private final ObjectProperty<TreeDiagramType> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2", TreeDiagramType.RectangularPhylogram);
 	private final ObjectProperty<Averaging> optionAveraging2 = new SimpleObjectProperty<>(this, "optionAveraging2");
 
-	private final BooleanProperty optimizeTanglegramCrossings1 = new SimpleBooleanProperty(this, "optimizeTanglegramCrossings1", true);
-	private final BooleanProperty optimizeReticulateCrossings1 = new SimpleBooleanProperty(this, "optimizeReticulateCrossings1", true);
-	private final BooleanProperty optimizeTanglegramCrossings2 = new SimpleBooleanProperty(this, "optimizeTanglegramCrossings2", true);
-	private final BooleanProperty optimizeReticulateCrossings2 = new SimpleBooleanProperty(this, "optimizeReticulateCrossings2", true);
+	private final BooleanProperty optionOptimizeTanglegramCrossings1 = new SimpleBooleanProperty(this, "optionOptimizeTanglegramCrossings1", true);
+	private final BooleanProperty optionOptimizeReticulateCrossings1 = new SimpleBooleanProperty(this, "optionOptimizeReticulateCrossings1", true);
+	private final BooleanProperty optionOptimizeTanglegramCrossings2 = new SimpleBooleanProperty(this, "optionOptimizeTanglegramCrossings2", true);
+	private final BooleanProperty optionOptimizeReticulateCrossings2 = new SimpleBooleanProperty(this, "optionOptimizeReticulateCrossings2", true);
 
 	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", LayoutOrientation.Rotate0Deg.toString());
 
@@ -106,8 +106,8 @@ public class TanglegramView implements IView {
 	public List<String> listOptions() {
 		return List.of(optionTree1.getName(), optionDiagram1.getName(), optionAveraging1.getName(),
 				optionTree2.getName(), optionDiagram2.getName(), optionAveraging2.getName(),
-				optimizeTanglegramCrossings1.getName(), optimizeReticulateCrossings1.getName(),
-				optimizeTanglegramCrossings2.getName(), optimizeReticulateCrossings2.getName(),
+				optionOptimizeTanglegramCrossings1.getName(), optionOptimizeReticulateCrossings1.getName(),
+				optionOptimizeTanglegramCrossings2.getName(), optionOptimizeReticulateCrossings2.getName(),
 				optionOrientation.getName(), optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName(),
 				optionShowTreeNames.getName(), optionShowTreeInfo.getName(), optionShowInternalLabels.getName(), optionLabelEdgesBy.getName());
 	}
@@ -384,36 +384,36 @@ public class TanglegramView implements IView {
 		this.optionLabelEdgesBy.set(optionLabelEdgesBy);
 	}
 
-	public boolean isOptimizeTanglegramCrossings1() {
-		return optimizeTanglegramCrossings1.get();
+	public boolean getOptionOptimizeTanglegramCrossings1() {
+		return optionOptimizeTanglegramCrossings1.get();
 	}
 
-	public BooleanProperty optimizeTanglegramCrossings1Property() {
-		return optimizeTanglegramCrossings1;
+	public BooleanProperty optionOptimizeTanglegramCrossings1Property() {
+		return optionOptimizeTanglegramCrossings1;
 	}
 
-	public boolean isOptimizeReticulateCrossings1() {
-		return optimizeReticulateCrossings1.get();
+	public boolean getOptionOptimizeReticulateCrossings1() {
+		return optionOptimizeReticulateCrossings1.get();
 	}
 
-	public BooleanProperty optimizeReticulateCrossings1Property() {
-		return optimizeReticulateCrossings1;
+	public BooleanProperty optionOptimizeReticulateCrossings1Property() {
+		return optionOptimizeReticulateCrossings1;
 	}
 
-	public boolean isOptimizeTanglegramCrossings2() {
-		return optimizeTanglegramCrossings2.get();
+	public boolean getOptionOptimizeTanglegramCrossings2() {
+		return optionOptimizeTanglegramCrossings2.get();
 	}
 
-	public BooleanProperty optimizeTanglegramCrossings2Property() {
-		return optimizeTanglegramCrossings2;
+	public BooleanProperty optionOptimizeTanglegramCrossings2Property() {
+		return optionOptimizeTanglegramCrossings2;
 	}
 
-	public boolean isOptimizeReticulateCrossings2() {
-		return optimizeReticulateCrossings2.get();
+	public boolean getOptionOptimizeReticulateCrossings2() {
+		return optionOptimizeReticulateCrossings2.get();
 	}
 
-	public BooleanProperty optimizeReticulateCrossings2Property() {
-		return optimizeReticulateCrossings2;
+	public BooleanProperty optionOptimizeReticulateCrossings2Property() {
+		return optionOptimizeReticulateCrossings2;
 	}
 
 	@Override
@@ -439,8 +439,7 @@ public class TanglegramView implements IView {
 
 	@Override
 	public String getCitation() {
-		return "Scornavacca et al, 2011; " +
-			   "C. Scornavacca, F. Zickmann and D.H. Huson. Tanglegrams for rooted phylogenetic trees and networks. " +
-			   "Bioinformatics, 27(13):i248–i256, 2011.";
+		return "Huson 2025; " +
+			   "D.h. Huson. Tanglegrams for phylogenetic trees and networks. Manuscript in preparation (2025).";
 	}
 }

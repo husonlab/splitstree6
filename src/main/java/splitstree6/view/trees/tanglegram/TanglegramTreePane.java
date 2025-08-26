@@ -64,7 +64,7 @@ public class TanglegramTreePane extends Group {
 				Platform.runLater(() -> {
 					getChildren().clear();
 					double factor;
-					if (tree.get() != null && taxaBlock != null) {
+					if (false && tree.get() != null && taxaBlock != null) {
 						var taxaCount = IteratorUtils.count(tree.get().getTaxa());
 						factor = (taxaBlock.getNtax() > taxaCount ? (double) taxaCount / taxaBlock.getNtax() : 1.0);
 					} else {

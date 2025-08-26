@@ -28,7 +28,6 @@ import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.utils.TreesUtils;
-import splitstree6.view.trees.tanglegram.optimize.LSATree;
 
 import java.util.*;
 
@@ -40,7 +39,7 @@ import java.util.*;
 public class TreeEmbeddingOptimizer {
 	public static void apply(PhyloTree tree, ProgressListener progress) throws CanceledException {
 		if (tree.isReticulated()) {
-			LSATree.computeNodeLSAChildrenMap(tree);
+			LSAUtils.setLSAChildrenAndTransfersMap(tree);
 			var bestSize = 0;
 			var bestOrder = new ArrayList<Integer>();
 			var taxa = BitSetUtils.asBitSet(tree.getTaxa());

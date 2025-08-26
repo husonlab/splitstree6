@@ -135,9 +135,11 @@ public class Connectors {
 				{
 					var graph1 = (PhyloGraph) nodeShapeMap1.keySet().iterator().next().getOwner();
 					for (var v : nodeShapeMap1.keySet()) {
-						for (var t : graph1.getTaxa(v)) {
-							var taxon = taxaBlock.get(t);
-							taxonShapeMap1.put(taxon, nodeShapeMap1.get(v));
+						if (v.isLeaf()) {
+							for (var t : graph1.getTaxa(v)) {
+								var taxon = taxaBlock.get(t);
+								taxonShapeMap1.put(taxon, nodeShapeMap1.get(v));
+							}
 						}
 					}
 				}
@@ -145,9 +147,11 @@ public class Connectors {
 				{
 					var graph2 = (PhyloGraph) nodeShapeMap2.keySet().iterator().next().getOwner();
 					for (var v : nodeShapeMap2.keySet()) {
-						for (var t : graph2.getTaxa(v)) {
-							var taxon = taxaBlock.get(t);
-							taxonShapeMap2.put(taxon, nodeShapeMap2.get(v));
+						if (v.isLeaf()) {
+							for (var t : graph2.getTaxa(v)) {
+								var taxon = taxaBlock.get(t);
+								taxonShapeMap2.put(taxon, nodeShapeMap2.get(v));
+							}
 						}
 					}
 				}

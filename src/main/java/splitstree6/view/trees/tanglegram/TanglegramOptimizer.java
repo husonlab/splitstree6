@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.view.trees.tanglegram.odoptimize;
+package splitstree6.view.trees.tanglegram;
 
 import javafx.scene.layout.Pane;
 import jloda.fx.phylo.embed.Averaging;
@@ -28,6 +28,7 @@ import jloda.graph.*;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
+import jloda.util.progress.ProgressListener;
 
 import java.util.*;
 import java.util.concurrent.atomic.DoubleAdder;
@@ -39,36 +40,54 @@ import java.util.function.Function;
  * Daniel Huson, 8.2025
  */
 public class TanglegramOptimizer {
-
+	/**
+	 * optimize the tanglegram layout by updating the LSA children map
+	 *
+	 * @param statusPane                   used for progress bar
+	 * @param network1                     first phylogeny
+	 * @param network2                     second phylogeny
+	 * @param optimizeTanglegramCrossings1 optimize tanglegram crossings in first phylogeny
+	 * @param optimizeReticulateCrossings1 optimize reticulate crossings in first phylogeny
+	 * @param optimizeTanglegramCrossings2 optimize tanglegram crossings in second phylogeny
+	 * @param optimizeReticulateCrossings2 optimize reticulate crossings in second phylogeny
+	 * @param runningConsumer              this is called in the FX thread when the running state is set to true and again, when set to false
+	 * @param successRunnable              this is run in the FX thread once the calculation has successfully completed
+	 * @param failedConsumer               this is called in the FX thread if the computation failed
+	 */
 	public static void apply(Pane statusPane, PhyloTree network1, PhyloTree network2, boolean optimizeTanglegramCrossings1, boolean optimizeReticulateCrossings1, boolean optimizeTanglegramCrossings2,
 							 boolean optimizeReticulateCrossings2, Consumer<Boolean> runningConsumer, Runnable successRunnable, Consumer<Throwable> failedConsumer) {
-		network1.getLSAChildrenMap().clear();
-		network2.getLSAChildrenMap().clear();
+		var childrenMap1 = new HashMap<Node, List<Node>>();
+		LSAUtils.computeLSAChildrenMap(network1, childrenMap1);
+		var childrenMap2 = new HashMap<Node, List<Node>>();
+		LSAUtils.computeLSAChildrenMap(network2, childrenMap2);
 
-		var alpha1 = setAlpha(optimizeReticulateCrossings1, optimizeTanglegramCrossings1);
-		var alpha2 = setAlpha(optimizeReticulateCrossings2, optimizeTanglegramCrossings2);
-		int rounds;
-		if ((optimizeTanglegramCrossings1 || optimizeReticulateCrossings1) && (optimizeTanglegramCrossings2 || optimizeReticulateCrossings2))
-			rounds = 2;
-		else if (optimizeTanglegramCrossings1 || optimizeReticulateCrossings1 || optimizeTanglegramCrossings2 || optimizeReticulateCrossings2)
-			rounds = 1;
-		else rounds = 0;
+		if (optimizeTanglegramCrossings1 || optimizeReticulateCrossings1 || optimizeTanglegramCrossings2 || optimizeReticulateCrossings2) {
 
-		if (rounds > 0) {
+			var alpha1 = setAlpha(optimizeReticulateCrossings1, optimizeTanglegramCrossings1);
+			var alpha2 = setAlpha(optimizeReticulateCrossings2, optimizeTanglegramCrossings2);
+			int rounds;
+			if (((optimizeTanglegramCrossings1 || optimizeReticulateCrossings1) && network1.getNumberOfNodes() > 500)
+				|| ((optimizeTanglegramCrossings2 || optimizeReticulateCrossings2) && network2.getNumberOfNodes() > 500))
+				rounds = 2;
+			else rounds = 5;
+
 			var random = new Random(666);
 			var service = new AService<Boolean>();
 			service.setProgressParentPane(statusPane);
-			if (false) service.getProgressListener().setTasks("Tanglegram", "");
 			service.setCallable(() -> {
+				var progress = service.getProgressListener();
+				progress.setTasks("Tanglegram", "");
+				progress.setMaximum(2*rounds);
 				for (var i = 0; i < rounds; i++) {
-					if (optimizeTanglegramCrossings2 || optimizeReticulateCrossings2) {
-						if (false) service.getProgressListener().setTasks("Tanglegram", "tree2");
-						apply(network1, network2, alpha2, random);
-					}
 					if (optimizeTanglegramCrossings1 || optimizeReticulateCrossings1) {
-						if (false) service.getProgressListener().setTasks("Tanglegram", "tree1");
-						apply(network2, network1, alpha1, random);
+						apply(network2, childrenMap2, network1, childrenMap1, alpha1, random, progress);
+						progress.setProgress(2 * i);
 					}
+					if (optimizeTanglegramCrossings2 || optimizeReticulateCrossings2) {
+						apply(network1, childrenMap1, network2, childrenMap2, alpha2, random, progress);
+						progress.setProgress(2*i+1);
+					}
+
 				}
 				return true;
 			});
@@ -78,10 +97,16 @@ public class TanglegramOptimizer {
 				failedConsumer.accept(service.getException());
 			});
 			service.setOnSucceeded(e -> {
+				network1.getLSAChildrenMap().clear();
+				network1.getLSAChildrenMap().putAll(childrenMap1);
+				network2.getLSAChildrenMap().clear();
+				network2.getLSAChildrenMap().putAll(childrenMap2);
 				runningConsumer.accept(false);
 				successRunnable.run();
 			});
-			service.setOnCancelled(e -> runningConsumer.accept(false));
+			service.setOnCancelled(e -> {
+				runningConsumer.accept(false);
+			});
 			service.start();
 		} else {
 			successRunnable.run();
@@ -96,25 +121,23 @@ public class TanglegramOptimizer {
 	 * @param alpha    cost weight, between 0: only optimize tanglegram crossings and 1: only optimize reticulate OD
 	 * @param random   random number generator
 	 */
-	public static void apply(PhyloTree network1, PhyloTree network2, double alpha, Random random) {
-		if (network1.getRoot() != null && (!network1.hasLSAChildrenMap() || network1.getLSAChildrenMap().isEmpty() || network1.getLSAChildrenMap().get(network1.getRoot()).isEmpty())) {
-			LSAUtils.setLSAChildrenAndTransfersMap(network1);
-		}
-		if (network2.getRoot() != null && (!network2.hasLSAChildrenMap() || network2.getLSAChildrenMap().isEmpty() || network2.getLSAChildrenMap().get(network2.getRoot()).isEmpty())) {
-			LSAUtils.setLSAChildrenAndTransfersMap(network2);
-		}
-
+	private static void apply(PhyloTree network1, Map<Node, List<Node>> childrenMap1, PhyloTree network2, Map<Node, List<Node>> childrenMap2, double alpha, Random random, ProgressListener progress) {
 		System.err.println("One sided tanglegram: fixed: " + network1.getName() + ", optimizing: " + network2.getName());
 
-		var commonTaxa = BitSetUtils.intersection(BitSetUtils.asBitSet(network1.getTaxa()), BitSetUtils.asBitSet(network2.getTaxa()));
+		var taxaOnLeaves1 = new BitSet();
+		network1.nodeStream().filter(v -> v.isLeaf() && network1.hasTaxa(v)).forEach(v -> taxaOnLeaves1.set(network1.getTaxon(v)));
+		var taxaOnLeaves2 = new BitSet();
+		network2.nodeStream().filter(v -> v.isLeaf() && network2.hasTaxa(v)).forEach(v -> taxaOnLeaves2.set(network2.getTaxon(v)));
+		var commonLeafTaxa = BitSetUtils.intersection(taxaOnLeaves1, taxaOnLeaves2);
 
-		if (commonTaxa.cardinality() == 0)
+
+		if (commonLeafTaxa.cardinality() == 0)
 			return; // no taxa in common
 
-		var taxonRankMap1 = computeTaxonRankMap(network1, commonTaxa);
+		var taxonRankMap1 = computeTaxonRankMap(network1, childrenMap1, commonLeafTaxa);
 
-		try (NodeArray<Height> nodeHeightMap2 = computeNodeFullHeightMap(network2);
-			 var leafRankMap2 = computeLeafRankMap(network2, commonTaxa)) {
+		try (NodeArray<Height> nodeHeightMap2 = computeNodeFullHeightMap(network2, childrenMap2);
+			 var leafRankMap2 = computeLeafRankMap(network2,childrenMap2, commonLeafTaxa)) {
 
 			Function<Node, Double> costFunction = v -> { // evaluate LSA children ordering
 				var totalPenalty = 0.0;
@@ -129,7 +152,7 @@ public class TanglegramOptimizer {
 				if (alpha < 1) {
 					var tanglegramPenalty = 0;
 					for (var t : network2.getTaxa(v)) {
-						if (commonTaxa.get(t)) {
+						if (commonLeafTaxa.get(t)) {
 							tanglegramPenalty += (Math.abs(leafRankMap2.get(v) - taxonRankMap1.get(t)));
 							// System.err.printf("costFunction(): taxon t=%d, penalty=%d=abs(%d-%d)%n", t,tanglegramPenalty,leafRankMap2.get(v),taxonRankMap1.get(t));
 						}
@@ -139,29 +162,29 @@ public class TanglegramOptimizer {
 				return totalPenalty;
 			};
 
-			var originalCost = computeCostBelow(network2, network2.getRoot(), costFunction);
+			var originalCost = computeCostBelow(network2, childrenMap2,network2.getRoot(), costFunction);
 			System.err.println("Original cost:  " + originalCost);
-			if (false) {
+			/* {
 				for (var v : network2.nodes()) {
-					if (network2.hasTaxa(v)) {
-						System.err.println("taxon " + network2.getTaxon(v) + " rank=" + leafRankMap2.get(v) + ": y=" + nodeHeightMap2.get(v).value() + " cost=" + costFunction.apply(v));
-					} else {
 						System.err.println("node " + v + ": y=" + nodeHeightMap2.get(v).value() + " cost=" + costFunction.apply(v));
+						if (network2.hasTaxa(v) && leafRankMap2.get(v)!=null) {
+							System.err.println("taxon " + network2.getTaxon(v) + " rank=" + leafRankMap2.get(v) + ": y=" + nodeHeightMap2.get(v).value() + " cost: " + costFunction.apply(v));
+						}
 					}
-				}
-			}
+			} */
 
 			if (true) {
-				DAGTraversals.preOrderTraversal(network2.getRoot(), v -> network2.getLSAChildrenMap().get(v), v -> optimizeOrdering(network2, v, leafRankMap2, nodeHeightMap2, costFunction, random));
-				System.err.println("Optimized cost: " + computeCostBelow(network2, network2.getRoot(), costFunction));
-				if (false) {
-					for (var v : network2.nodes())
-						if (network2.hasTaxa(v)) {
+				DAGTraversals.preOrderTraversal(network2.getRoot(), childrenMap2::get, v -> optimizeOrdering(network2, childrenMap2, v, leafRankMap2, nodeHeightMap2, costFunction, random, progress));
+				System.err.println("Optimized cost: " + computeCostBelow(network2, childrenMap2, network2.getRoot(), costFunction));
+
+				/* {
+					for (var v : network2.nodes()) {
+						System.err.println("node " + v + ": y=" + nodeHeightMap2.get(v).value() + " cost=" + costFunction.apply(v));
+					if (network2.hasTaxa(v) && leafRankMap2.get(v)!=null) {
 							System.err.println("taxon " + network2.getTaxon(v) + " rank=" + leafRankMap2.get(v) + ": y=" + nodeHeightMap2.get(v).value() + " cost: " + costFunction.apply(v));
-						} else {
-							System.err.println("node " + v + ": y=" + nodeHeightMap2.get(v).value() + " cost=" + costFunction.apply(v));
 						}
-				}
+					}
+				} */
 			}
 		}
 	}
@@ -175,25 +198,26 @@ public class TanglegramOptimizer {
 	 * @param costFunction  the cost function
 	 * @param random        random number generator used in simulated annealing
 	 */
-	public static void optimizeOrdering(PhyloTree network, Node v, Map<Node, Integer> nodeRankMap, Map<Node, Height> nodeHeightMap, Function<Node, Double> costFunction, Random random) {
-		var originalOrdering = new ArrayList<>(network.getLSAChildrenMap().get(v));
+	public static void optimizeOrdering(PhyloTree network, Map<Node, List<Node>> childrenMap, Node v, Map<Node, Integer> nodeRankMap, Map<Node, Height> nodeHeightMap, Function<Node, Double> costFunction, Random random, ProgressListener progress) {
+		if(progress.isUserCancelled())
+			return;
 
-		// System.err.println("original order: "+StringUtils.toString(network.getLSAChildrenMap().get(v).stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
-		if (false) {
-			DAGTraversals.preOrderTraversal(v, u -> network.getLSAChildrenMap().get(u), u -> {
+		var originalOrdering = new ArrayList<>(childrenMap.get(v));
+
+		// System.err.println("original order: "+StringUtils.toString(childrenMap.get(v).stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
+		/* {
+			DAGTraversals.preOrderTraversal(v, u -> childrenMap.get(u), u -> {
 				if (network.hasTaxa(u))
 					System.err.println(network.getTaxon(u) + ": " + nodeHeightMap.get(u));
 			});
-		}
+		} */
 
 		if (originalOrdering.size() <= 8) {
 			var bestCost = new Single<>(Double.MAX_VALUE);
 			var bestOrdering = new Single<List<Node>>(originalOrdering);
 			for (var permuted : Permutations.generateAllPermutations(originalOrdering)) {
-				// System.err.println("permuted: "+StringUtils.toString(permuted.stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
-
-				changeOrderOfChildren(network, v, permuted, nodeRankMap, nodeHeightMap);
-				var cost = computeCostBelow(network, v, costFunction);
+				changeOrderOfChildren(network, childrenMap, v, permuted, nodeRankMap, nodeHeightMap);
+				var cost = computeCostBelow(network,childrenMap, v, costFunction);
 				// System.err.println("cost: "+cost);
 				if (cost < bestCost.get()) {
 					bestCost.set(cost);
@@ -201,35 +225,40 @@ public class TanglegramOptimizer {
 					if (bestCost.get() == 0)
 						break;
 				}
+				if (progress.isUserCancelled())
+					return;
 			}
+			//System.err.println("permutations(v="+v+", list="+originalOrdering.size()+"): "+all.size());
 			if (bestCost.get() < Double.MAX_VALUE) {
 				// System.err.println("bestCost: "+bestCost.get());
 
-				changeOrderOfChildren(network, v, bestOrdering.get(), nodeRankMap, nodeHeightMap);
-				// System.err.println("updated order: "+StringUtils.toString(network.getLSAChildrenMap().get(v).stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
-				if (false) {
-					DAGTraversals.preOrderTraversal(v, u -> network.getLSAChildrenMap().get(u), u -> {
+				changeOrderOfChildren(network, childrenMap, v, bestOrdering.get(), nodeRankMap, nodeHeightMap);
+				// System.err.println("updated order: "+StringUtils.toString(childrenMap.get(v).stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
+				/* {
+					DAGTraversals.preOrderTraversal(v, u -> childrenMap.get(u), u -> {
 						if (network.hasTaxa(u))
 							System.err.println(network.getTaxon(u) + ": " + nodeHeightMap.get(u));
 					});
-				}
+				} */
 				// System.err.println("cost of updated: "+ computeCostBelow(network,v,nodeHeightMap,costFunction));
 			}
 		} else {
 			var simulatedAnnealing = new SimulatedAnnealingMinLA<Node>();
 			var pair = simulatedAnnealing.apply(originalOrdering, random, (permuted) -> {
-				changeOrderOfChildren(network, v, permuted, nodeRankMap, nodeHeightMap);
-				return computeCostBelow(network, v, costFunction);
+				if (progress.isUserCancelled())
+					return 0.0;
+				changeOrderOfChildren(network, childrenMap, v, permuted, nodeRankMap, nodeHeightMap);
+				return computeCostBelow(network,childrenMap, v, costFunction);
 			});
 			// System.err.println("simulated annealing on v="+v+": " + pair.getSecond());
-			changeOrderOfChildren(network, v, pair.getFirst(), nodeRankMap, nodeHeightMap);
+			changeOrderOfChildren(network, childrenMap, v, pair.getFirst(), nodeRankMap, nodeHeightMap);
 		}
 	}
 
 
-	private static double computeCostBelow(PhyloTree network, Node v, Function<Node, Double> costFunction) {
+	private static double computeCostBelow(PhyloTree network, Map<Node, List<Node>> childrenMap, Node v, Function<Node, Double> costFunction) {
 		var cost = new DoubleAdder();
-		DAGTraversals.postOrderTraversal(v, u -> network.getLSAChildrenMap().get(u), u -> cost.add(costFunction.apply(u)));
+		DAGTraversals.postOrderTraversal(v, childrenMap::get, u -> cost.add(costFunction.apply(u)));
 		return cost.doubleValue();
 	}
 
@@ -241,16 +270,18 @@ public class TanglegramOptimizer {
 	 * @param newOrder      the new order of the children of v in the LSA map
 	 * @param nodeHeightMap the node min-height-below, height and max height below values, these are also changed for v and all descendants
 	 */
-	private static void changeOrderOfChildren(PhyloTree network, Node v, List<Node> newOrder, Map<Node, Integer> nodeRankMap, Map<Node, Height> nodeHeightMap) {
-		var oldOrder = network.getLSAChildrenMap().get(v);
+	private static void changeOrderOfChildren(PhyloTree network, Map<Node, List<Node>> childrenMap, Node v, List<Node> newOrder, Map<Node, Integer> nodeRankMap, Map<Node, Height> nodeHeightMap) {
+		var oldOrder = childrenMap.get(v);
 		if (oldOrder.size() > 1) {
 
-			// System.err.println("change old: "+StringUtils.toString(oldOrder.stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
-			if (false) {
+			/* {
+				System.err.println("change old nodes="+StringUtils.toString(oldOrder.stream().mapToInt(u->u.getId()).toArray()," "));
+				System.err.println("change old taxa= "+StringUtils.toString(oldOrder.stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
+				System.err.println("change old ranks="+StringUtils.toString(oldOrder.stream().filter(network::hasTaxa).mapToInt(nodeRankMap::get).toArray()," "));
 				for (var w : oldOrder) {
 					System.err.println("old order node " + w + ": " + nodeHeightMap.get(w));
 				}
-			}
+			} */
 
 			if (oldOrder.size() != newOrder.size()) {
 				throw new RuntimeException("Order mismatch");
@@ -268,32 +299,38 @@ public class TanglegramOptimizer {
 				var minHeight = nodeHeightMap.get(oldOrder.get(start)).minBelow();
 				var rank = new Counter(Integer.MAX_VALUE); // set this to smallest rank in subtrees to be shuffled
 				{
-					DAGTraversals.postOrderTraversal(v, u -> network.getLSAChildrenMap().get(u), u -> {
-						if (nodeRankMap.containsKey(u))
-							rank.set(Math.min(rank.get(), nodeRankMap.get(u)));
-					});
+					for (var i = start; i < end; i++) {
+						var w = newOrder.get(i);
+						DAGTraversals.postOrderTraversal(w, childrenMap::get, u -> {
+							if (nodeRankMap.containsKey(u))
+								rank.set(Math.min(rank.get(), nodeRankMap.get(u)));
+						});
+					}
 				}
 				// System.err.println("min rank: "+rank.get());
 				for (var i = start; i < end; i++) {
 					var w = newOrder.get(i);
 					var delta = minHeight - nodeHeightMap.get(w).minBelow();
-					// System.err.println("node " + w + ": delta=" + delta);
-					DAGTraversals.postOrderTraversal(w, u -> network.getLSAChildrenMap().get(u), u -> {
+					// System.err.println("node " + w.getId());
+					DAGTraversals.postOrderTraversal(w, childrenMap::get, u -> {
 						nodeHeightMap.replace(u, nodeHeightMap.get(u).update(delta));
 						if (nodeRankMap.containsKey(u)) {
+							// System.err.println("rank "+v.getId()+": "+nodeRankMap.get(u)+" -> "+rank.get());
 							nodeRankMap.put(u, (int) rank.getAndIncrement());
 						}
 					});
 					minHeight = nodeHeightMap.get(w).maxBelow() + 1.0;
 				}
 			}
-			// System.err.println("change new: "+StringUtils.toString(newOrder.stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
-			if (false) {
+			/* {
+				System.err.println("change new node= "+StringUtils.toString(newOrder.stream().mapToInt(u->u.getId()).toArray()," "));
+				System.err.println("change new taxa=  "+StringUtils.toString(newOrder.stream().filter(network::hasTaxa).mapToInt(network::getTaxon).toArray()," "));
+				System.err.println("change new ranks= "+StringUtils.toString(newOrder.stream().filter(network::hasTaxa).mapToInt(nodeRankMap::get).toArray()," "));
 				for (var w : newOrder) {
 					System.err.println("new order node " + w + ": " + nodeHeightMap.get(w));
 				}
-			}
-			network.getLSAChildrenMap().put(v, newOrder);
+			} */
+			childrenMap.put(v, newOrder);
 		}
 	}
 
@@ -303,14 +340,14 @@ public class TanglegramOptimizer {
 		return nodeHeightMap;
 	}
 
-	private static NodeArray<Height> computeNodeFullHeightMap(PhyloTree network) {
+	private static NodeArray<Height> computeNodeFullHeightMap(PhyloTree network,Map<Node,List<Node>> childrenMap) {
 		NodeArray<Height> nodeFullHeightMap = network.newNodeArray();
 		try (var nodeHeightMap = computeNodeHeightMap(network)) {
-			DAGTraversals.postOrderTraversal(network.getRoot(), v -> network.getLSAChildrenMap().get(v), v -> {
+			DAGTraversals.postOrderTraversal(network.getRoot(), childrenMap::get, v -> {
 				var height = nodeHeightMap.get(v);
 				var min = height;
 				var max = height;
-				for (var w : network.getLSAChildrenMap().get(v)) {
+				for (var w : childrenMap.get(v)) {
 					min = Math.min(min, nodeFullHeightMap.get(w).minBelow());
 					max = Math.max(max, nodeFullHeightMap.get(w).maxBelow());
 				}
@@ -320,10 +357,10 @@ public class TanglegramOptimizer {
 		return nodeFullHeightMap;
 	}
 
-	private static Map<Integer, Integer> computeTaxonRankMap(PhyloTree network, BitSet taxa) {
+	private static Map<Integer, Integer> computeTaxonRankMap(PhyloTree network, Map<Node,List<Node>> childrenMap,BitSet taxa) {
 		var counter = new Counter(0);
 		var rankMap = new HashMap<Integer, Integer>();
-		DAGTraversals.preOrderTraversal(network.getRoot(), v -> network.getLSAChildrenMap().get(v), v -> {
+		DAGTraversals.preOrderTraversal(network.getRoot(), childrenMap::get, v -> {
 			if (network.hasTaxa(v)) {
 				var t = network.getTaxon(v);
 				if (taxa.get(t)) {
@@ -334,10 +371,10 @@ public class TanglegramOptimizer {
 		return rankMap;
 	}
 
-	private static NodeIntArray computeLeafRankMap(PhyloTree network, BitSet taxa) {
+	private static NodeIntArray computeLeafRankMap(PhyloTree network, Map<Node,List<Node>> childrenMap, BitSet taxa) {
 		var counter = new Counter(0);
 		var rankMap = network.newNodeIntArray();
-		DAGTraversals.preOrderTraversal(network.getRoot(), v -> network.getLSAChildrenMap().get(v), v -> {
+		DAGTraversals.preOrderTraversal(network.getRoot(), childrenMap::get, v -> {
 			if (network.hasTaxa(v) && taxa.get(network.getTaxon(v)))
 				rankMap.put(v, (int) counter.incrementAndGet());
 		});
@@ -358,7 +395,6 @@ public class TanglegramOptimizer {
 		public Height update(double dy) {
 			return new Height(minBelow + dy, value + dy, maxBelow + dy);
 		}
-
 	}
 }
 

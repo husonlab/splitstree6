@@ -183,7 +183,7 @@ module splitstreesix {
 	exports splitstree6.layout.tree;
 	exports splitstree6.layout.splits;
 	exports splitstree6.layout.network;
-	exports splitstree6.view.trees.tanglegram.optimize;
+	exports splitstree6.view.trees.tanglegram.optimize_old;
 
 	opens splitstree6.algorithms.distances.distances2splits.neighbornet;
 
@@ -220,6 +220,7 @@ module splitstreesix {
 
 	opens splitstree6.tools.server;
 	exports splitstree6.tools.server;
-	exports splitstree6.view.trees.tanglegram.odoptimize;
+	opens splitstree6.view.trees.tanglegram.optimize_old;
+	exports splitstree6.view.trees.tanglegram;
 
 }
