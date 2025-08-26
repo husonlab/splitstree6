@@ -439,7 +439,6 @@ public class TanglegramView implements IView {
 
 	@Override
 	public String getCitation() {
-		return "Huson 2025; " +
-			   "D.H. Huson. Tanglegrams for phylogenetic trees and networks. Manuscript in preparation (2025).";
+		return "Huson 2025;D.H. Huson. Tanglegrams for phylogenetic trees and networks. Manuscript in preparation (2025).";
 	}
 }
