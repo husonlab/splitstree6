@@ -157,7 +157,7 @@ public class ClusterReduction {
 
 		var pairOfConnectedComponents = getPairOfSeparatableConnectedComponents(root1, root2);
 
-		if (pairOfConnectedComponents != null) // has pair of connected components, one below each root
+		if (pairOfConnectedComponents != null) // has pair of connected connectedComponents, one below each root
 		{
 			var component1 = pairOfConnectedComponents.getFirst();
 			var subTreeRoot1 = root1.newNode();
@@ -270,7 +270,7 @@ public class ClusterReduction {
 				throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(X) + " vs " + StringUtils.toString(Y));
 
 			return new Pair<>(subTreeRoot1, subTreeRoot2);
-		} else if (X.equals(Y)) // no pair of connected components, but perhaps both nodes give us a component
+		} else if (X.equals(Y)) // no pair of connected connectedComponents, but perhaps both nodes give us a component
 		{
 			if (root1.getInDegree() == 0 || root2.getInDegree() == 0)
 				throw new RuntimeException("Indegree should not be zero");
@@ -446,7 +446,7 @@ public class ClusterReduction {
 
 		// System.err.println("----- Intersection graph:\n"+intersectionGraph.toString());
 
-		// find a component that contains at least three nodes and has same taxa in both components
+		// find a component that contains at least three nodes and has same taxa in both connectedComponents
 		for (var a : intersectionGraph.nodes()) {
 			if (a.getDegree() > 1) {
 				var nodesInComponent = getNodesInComponent(a, sets1, sets2);

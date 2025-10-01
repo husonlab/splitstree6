@@ -42,7 +42,6 @@ public class LabeledNodeShape extends Group {
 
 	public LabeledNodeShape(RichTextLabel label) {
 		this(label, null);
-
 	}
 
 	public LabeledNodeShape(RichTextLabel label, Shape shape) {
@@ -67,7 +66,7 @@ public class LabeledNodeShape extends Group {
 	public void setShape(Shape shape, boolean useIceBerg) {
 		getChildren().clear();
 		if (shape != null) {
-			if (false && useIceBerg) { // node icebergs seem to get in the way...
+			if (useIceBerg) { // node icebergs seem to get in the way...
 				getChildren().add(Icebergs.create(shape, true));
 			}
 			getChildren().add(shape);

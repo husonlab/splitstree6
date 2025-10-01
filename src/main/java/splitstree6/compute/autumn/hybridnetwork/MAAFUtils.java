@@ -84,7 +84,7 @@ public class MAAFUtils {
 
 
 	/**
-	 * computes the MAAF for the given network. Note that all components of the MAAF are attached below an auxiliary root node
+	 * computes the MAAF for the given network. Note that all connectedComponents of the MAAF are attached below an auxiliary root node
 	 *
 	 * @param extendedMAAF if true, compute extended MAAF in which all unlabeled nodes of outdegree 0 are kept
 	 * @return MAAF
@@ -142,7 +142,7 @@ public class MAAFUtils {
 		}
 
 
-		// make a new root and attach all components to the root:
+		// make a new root and attach all connectedComponents to the root:
 		var aNode = (Root) graph.getFirstNode();
 		if (aNode != null) {
 			var maaf = aNode.newNode();

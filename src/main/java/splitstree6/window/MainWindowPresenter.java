@@ -30,11 +30,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.dialog.ExportImageDialog;
@@ -87,6 +84,7 @@ import splitstree6.dialog.SaveDialog;
 import splitstree6.dialog.analyzegenomes.AnalyzeGenomesDialog;
 import splitstree6.dialog.exporting.ExportTaxonDisplayLabels;
 import splitstree6.dialog.exporting.ExportTaxonTraits;
+import splitstree6.dialog.haplotype.HaplotypeDialog;
 import splitstree6.dialog.importdialog.ImportDialog;
 import splitstree6.dialog.importing.ImportMultipleTrees;
 import splitstree6.dialog.importing.ImportTaxonDisplayLabels;
@@ -131,8 +129,6 @@ public class MainWindowPresenter {
 
 	private final SplitPanePresenter splitPanePresenter;
 
-	private final EventHandler<KeyEvent> keyEventEventHandler;
-
 	private final HashMap<String, Pair<Algorithm, CheckMenuItem>> nameAlgorithmMenuItemMap = new HashMap<>();
 
 	public MainWindowPresenter(MainWindow mainWindow) {
@@ -158,19 +154,6 @@ public class MainWindowPresenter {
 		var workflowTreeView = mainWindow.getWorkflowTreeView();
 
 		controller.getWorkflowBorderPane().setCenter(workflowTreeView);
-
-		keyEventEventHandler = e -> {
-			if (mainWindow.getStage().isFocused()) {
-				if ((e.getCharacter().equals("=") || e.getCode() == KeyCode.EQUALS || e.getCharacter().equals("+") || e.getCode() == KeyCode.ADD || e.getCode() == KeyCode.PLUS) && e.isShortcutDown()
-					&& controller.getIncreaseFontSizeMenuItem().getOnAction() != null && !controller.getIncreaseFontSizeMenuItem().isDisable()) {
-					controller.getIncreaseFontSizeMenuItem().fire();
-					e.consume();
-				} else if ((e.getCharacter().equals("-") || e.getCode() == KeyCode.SUBTRACT || e.getCode() == KeyCode.MINUS) && controller.getDecreaseFontSizeMenuItem().getOnAction() != null && !controller.getDecreaseFontSizeMenuItem().isDisable()) {
-					controller.getDecreaseFontSizeMenuItem().fire();
-					e.consume();
-				}
-			}
-		};
 
 		InvalidationListener listener = e -> {
 			try {
@@ -262,7 +245,6 @@ public class MainWindowPresenter {
 
 	public void setStage(Stage stage) {
 		this.stage = stage;
-		stage.addEventFilter(KeyEvent.KEY_TYPED, keyEventEventHandler);
 		stage.getScene().focusOwnerProperty().addListener((v, o, n) -> {
 			try {
 				var displayTab = getContainingDisplayTab(n);
@@ -349,6 +331,9 @@ public class MainWindowPresenter {
 
 		controller.getImportDialogMenuItem().setOnAction(e -> ImportDialog.show(mainWindow, ""));
 		controller.getImportDialogMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty().not()));
+
+		controller.getImportHaplotypeMenuItem().setOnAction(e -> HaplotypeDialog.show(mainWindow.getStage()));
+		controller.getImportHaplotypeMenuItem().disableProperty().bind(workflow.runningProperty());
 
 		controller.getImportTaxonDisplayMenuItem().setOnAction(e -> ImportTaxonDisplayLabels.apply(mainWindow));
 		controller.getImportTaxonDisplayMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
@@ -598,6 +583,8 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getK2pMenuItem(), new K2PDistance());
 		setupAlgorithmMenuItem(controller.getF81MenuItem(), new F81Distance());
 		setupAlgorithmMenuItem(controller.getF84MenuItem(), new F84Distance());
+		setupAlgorithmMenuItem(controller.getTn93MenuItem(), new TN93Distance());
+
 		setupAlgorithmMenuItem(controller.getProteinMLDistanceMenuItem(), new ProteinMLDistance());
 		setupAlgorithmMenuItem(controller.getGeneContentDistanceMenuItem(), new GeneContentDistance());
 		setupAlgorithmMenuItem(controller.getNjMenuItem(), new NeighborJoining());

@@ -80,4 +80,14 @@ public class AmbiguityCodes {
 		charactersBlock.setHasAmbiguityCodes(false);
 		return false;
 	}
+
+	public static boolean codesOverlap(char ch1, char ch2) {
+		var a1 = getNucleotides(ch1);
+		var a2 = getNucleotides(ch2);
+		for (var i = 0; i < a1.length(); i++) {
+			if (a2.indexOf(a1.charAt(i)) != -1)
+				return true;
+		}
+		return false;
+	}
 }

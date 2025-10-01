@@ -33,7 +33,6 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.IteratorUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledNodeShape;
@@ -63,16 +62,8 @@ public class TanglegramTreePane extends Group {
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {
 					getChildren().clear();
-					double factor;
-					if (false && tree.get() != null && taxaBlock != null) {
-						var taxaCount = IteratorUtils.count(tree.get().getTaxa());
-						factor = (taxaBlock.getNtax() > taxaCount ? (double) taxaCount / taxaBlock.getNtax() : 1.0);
-					} else {
-						factor = 1.0;
-					}
-
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
-						treePane = new TreePane(mainWindow, undoManager, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), factor * dimensions.get().getHeight(),
+						treePane = new TreePane(mainWindow, undoManager, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 								optionDiagram.get(), labelByEdges.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
 								null, nodeShapeMap, FXCollections.observableHashMap(), false);
 

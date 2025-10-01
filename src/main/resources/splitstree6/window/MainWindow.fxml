@@ -24,7 +24,7 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18"
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/22"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.window.MainWindowController">
     <BorderPane fx:id="outsideBorderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -70,6 +70,10 @@
                                 <MenuItem fx:id="importDialogMenuItem" mnemonicParsing="false"
                                           text="Data Import Dialog..." userData="Open the data import dialog"/>
                                 <SeparatorMenuItem/>
+                                <MenuItem fx:id="importHaplotypeMenuItem" mnemonicParsing="false"
+                                          text="Haplotype Data..." userData="Import haplotype data"/>
+                                <SeparatorMenuItem/>
+
                                 <MenuItem fx:id="importTaxonDisplayMenuItem" mnemonicParsing="false"
                                           text="Taxon Display Labels..."
                                           userData="Import taxon display labels from a text file"/>
@@ -288,14 +292,14 @@
                         <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size"
                                   userData="Increase the font size in the current tab">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="ADD" control="UP" meta="UP" shift="UP"
+                                <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <MenuItem fx:id="decreaseFontSizeMenuItem" text="Decrease Font Size"
                                   userData="Decrease the font size in the current tab">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="MINUS" control="UP" meta="UP" shift="UP"
+                                <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
@@ -318,14 +322,14 @@
                         <MenuItem fx:id="zoomInHorizontalMenuItem" text="Zoom In Horizontal"
                                   userData="Increase the horizontal scale factor in the current tab">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP" shift="DOWN"
+                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <MenuItem fx:id="zoomOutHorizontalMenuItem" text="Zoom Out Horizontal"
                                   userData="Decrease the horizontal scale factor in the current tab">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="DOWN"
+                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
@@ -400,6 +404,8 @@
                                        userData="Compute distances using the Hasegawa-Kishino-Yano model"/>
                         <CheckMenuItem fx:id="f84MenuItem" text="F84"
                                        userData="Compute distances using the Felsenstein-1984 model"/>
+                        <CheckMenuItem fx:id="tn93MenuItem" text="TN93"
+                                       userData="Compute distances using the Tamura–Nei 1993 model"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="proteinMLDistanceMenuItem" text="Protein ML Dist"
                                        userData="Compute distances for proteins using maximum-likelihood estimation"/>

@@ -22,6 +22,8 @@ package splitstree6.tools;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 import jloda.fx.util.ArgsOptions;
 import jloda.fx.util.ProgramProperties;
@@ -49,6 +51,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class RunWorkflow extends Application {
 	private static String[] args;
+	public static ObservableList<Object> runningJobsInView; // calculation intensive jobs in the view need to be registered here while they are running so that we wait for them to end
 
 	@Override
 	public void init() {
@@ -76,6 +79,7 @@ public class RunWorkflow extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+		runningJobsInView = FXCollections.observableArrayList();
 		ProgramExecutorService.getInstance().submit(() -> {
 			try {
 				run(args);
@@ -247,6 +251,9 @@ public class RunWorkflow extends Application {
 						Platform.runLater(() -> workflow.getInputTaxaFilterNode().restart());
 						// wait for end of update:
 						latch.await();
+						do {
+							Thread.sleep(500);
+						} while (!runningJobsInView.isEmpty());
 					} finally {
 						workflow.validProperty().removeListener(listener);
 					}
@@ -257,7 +264,7 @@ public class RunWorkflow extends Application {
 					(new WorkflowNexusOutput()).save(workflow, "stdout", false);
 				}
 
-				// save updated workflow:
+				// save updated workflow
 				try {
 					final var outputFile = (outputFiles.length == inputFiles.length ? outputFiles[i] : outputFiles[0]);
 					if (!appendToFile) {
@@ -288,6 +295,5 @@ public class RunWorkflow extends Application {
 				outputWriter.close();
 			}
 		}
-
 	}
 }

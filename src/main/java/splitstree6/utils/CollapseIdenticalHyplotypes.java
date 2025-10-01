@@ -125,11 +125,7 @@ public class CollapseIdenticalHyplotypes {
 
 		var outputTraits = new TraitsBlock();
 
-		if (inputTraits == null || inputTraits.getNTraits() == 0)
-			outputTraits.setDimensions(outputNTax, outputNTax);
-		else
-			outputTraits.setDimensions(outputNTax, 0);
-
+		outputTraits.setDimensions(outputNTax, 0);
 
 		var outInMap = new HashMap<Integer, int[]>();
 

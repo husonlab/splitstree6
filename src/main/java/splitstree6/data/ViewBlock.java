@@ -66,7 +66,7 @@ public class ViewBlock extends DataBlock {
 				Platform.runLater(() -> viewTab = new ViewTab(mainWindow, getNode(), false));
 
 			invalidationListener = e -> {
-				if (getNode().getParents().size() == 0) { // have removed the node from the workflow
+				if (getNode().getParents().isEmpty()) { // have removed the node from the workflow
 					if (viewTab != null)
 						mainWindow.removeTabFromMainTabPane(viewTab);
 				} else { // have added the node to the workflow, e.g. after undo delete

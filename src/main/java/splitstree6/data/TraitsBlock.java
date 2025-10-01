@@ -150,7 +150,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	}
 
 	public Collection<String> getTraitLabels() {
-		return List.of(labels);
+		return labels != null ? List.of(labels) : Collections.emptyList();
 	}
 
 	public float getTraitLongitude(int traitId) {

@@ -167,7 +167,7 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 
 		var numComponentsMSN = array.length;
 
-		// TODO: This implementation of the minimum spanning network is wrong, add only edges between different connected components
+		// TODO: This implementation of the minimum spanning network is wrong, add only edges between different connected connectedComponents
 
 		var maxValue = Double.POSITIVE_INFINITY;
 		// all sets of edges in ascending order of lengths
@@ -176,7 +176,7 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 				break;
 			var ijPairs = value2pairs.get(value);
 
-			// update threshold graph components:
+			// update threshold graph connectedComponents:
 			for (int i = 0; i < array.length; i++) {
 				for (int j = i + 1; j < array.length; j++) {
 					if (componentsOfThresholdGraph[i] != componentsOfThresholdGraph[j] && matrix[i][j] < value - epsilon) {
@@ -207,7 +207,7 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 				newPairs.add(new Pair<>(i, j));
 			}
 
-			// update MSN components
+			// update MSN connectedComponents
 			for (var pair : newPairs) {
 				var i = pair.getFirst();
 				var j = pair.getSecond();

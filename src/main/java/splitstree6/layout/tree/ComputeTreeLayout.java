@@ -34,6 +34,8 @@ import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
+import jloda.util.progress.ProgressPercentage;
+import splitstree6.view.trees.tanglegram.NetworkORDLayout;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +81,11 @@ public class ComputeTreeLayout {
 
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
+
+		if (false && optimizeReticulationEdges) {
+			NetworkORDLayout.apply(tree, tree.getLSAChildrenMap(), new ProgressPercentage());
+			optimizeReticulationEdges = false;
+		}
 
 		switch (diagram) {
 			case RectangularPhylogram ->

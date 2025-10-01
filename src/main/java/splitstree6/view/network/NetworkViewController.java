@@ -51,6 +51,9 @@ public class NetworkViewController {
 	private ComboBox<DiagramType> diagramCBox;
 
 	@FXML
+	private Button newLayoutButton;
+
+	@FXML
 	private Button rotateLeftButton;
 
 	@FXML
@@ -90,6 +93,8 @@ public class NetworkViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(newLayoutButton, MaterialIcons.play_circle);
+
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
 		MaterialIcons.setIcon(flipButton, "flip");
@@ -156,6 +161,10 @@ public class NetworkViewController {
 
 	public ComboBox<DiagramType> getDiagramCBox() {
 		return diagramCBox;
+	}
+
+	public Button getNewLayoutButton() {
+		return newLayoutButton;
 	}
 
 	public Button getRotateLeftButton() {

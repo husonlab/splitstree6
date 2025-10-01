@@ -132,7 +132,7 @@ public class MinSpanningNetwork extends Distances2Network {
 				}
 			}
 
-			// update MSN components
+			// update MSN connectedComponents
 			if (mustUpdateMSNComponents) {
 				for (var pair : distancesToTaxonPairs.get(value)) {
 					final var a = pair.getFirst();

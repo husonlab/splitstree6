@@ -35,7 +35,7 @@ public enum OptionValueType {
 	Integer, Float, Double, String, Boolean, stringArray, intArray, doubleArray, doubleSquareMatrix, Enum, Color;
 
 	/**
-	 * get the type of a value
+	 * get the type of value
 	 *
 	 * @return type
 	 */
@@ -77,8 +77,8 @@ public enum OptionValueType {
 			case Float -> NumberUtils.isFloat(text);
 			case Double, doubleArray, doubleSquareMatrix -> NumberUtils.isDouble(text);
 			case Boolean -> NumberUtils.isBoolean(text);
-			case String -> text.length() > 0;
-			case stringArray -> text.length() > 0;
+			case String -> !text.isEmpty();
+			case stringArray -> !text.isEmpty();
 			case Color -> ColorUtilsFX.isColor(text);
 			default -> false;
 		};

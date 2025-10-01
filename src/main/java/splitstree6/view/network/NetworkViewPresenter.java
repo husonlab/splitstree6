@@ -29,6 +29,7 @@ import jloda.fx.find.FindToolBar;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.*;
+import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
@@ -58,8 +59,11 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 	private final InteractionSetup interactionSetup;
 
-	private final SelectionModel<LabeledNodeShape> networkNodeSelection = new SetSelectionModel<>();
+	private final SelectionModel<LabeledNodeShape> networkNodeSelectionModel = new SetSelectionModel<>();
+	private final SelectionModel<Node> nodeSelectionModel = new SetSelectionModel<>();
+	private final SelectionModel<Edge> edgeSelectionModel = new SetSelectionModel<>();
 
+	private final RubberBandSelector rubberBandSelection;
 	private boolean first = true;
 
 	/**
@@ -78,6 +82,10 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		this.mainWindow = mainWindow;
 		this.view = view;
 		this.controller = view.getController();
+
+		targetBounds.addListener((InvalidationListener) e -> {
+			if (false) System.err.println("target bounds: " + targetBounds.get());
+		});
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
@@ -110,17 +118,20 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		networkPane = new NetworkPane(mainWindow, mainWindow.workingTaxaProperty(), networkBlock,
 				paneWidth, paneHeight, view.optionDiagramProperty(), view.optionOrientationProperty(),
 				view.optionZoomFactorProperty(), view.optionFontScaleFactorProperty(),
-				taxonLabelMap, nodeShapeMap, edgeShapeMap);
+				taxonLabelMap, nodeShapeMap, edgeShapeMap, view.optionLayoutSeedProperty());
 
 		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, view.getUndoManager(), view.optionEditsProperty(),
-				t -> mainWindow.getWorkingTaxa().get(t), networkNodeSelection, mainWindow.getTaxonSelectionModel());
+				t -> mainWindow.getWorkingTaxa().get(t), nodeSelectionModel, edgeSelectionModel, mainWindow.getTaxonSelectionModel());
+
+		networkPane.setRunBeforeUpdate(() -> {
+			nodeSelectionModel.clearSelection();
+			edgeSelectionModel.clearSelection();
+		});
 
 		networkPane.setRunAfterUpdate(() -> {
 			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
-			interactionSetup.apply(taxonLabelMap, nodeShapeMap,
+			interactionSetup.apply(taxonLabelMap, nodeShapeMap, edgeShapeMap,
 					t -> (t >= 1 && t <= taxa.getNtax() ? taxa.get(t) : null), taxa::indexOf);
-
-
 			if (first) {
 				first = false;
 				if (view.getOptionEdits().length > 0) {
@@ -141,12 +152,36 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			controller.getInfoLabel().setText(networkBlock.get().getInfoString());
 		});
 
+
+		rubberBandSelection = new RubberBandSelector(networkPane, nodeShapeMap.values(), edgeShapeMap.values(), nodeSelectionModel::clearSelection, edgeSelectionModel::clearSelection,
+				shape -> {
+					var v = nodeShapeMap.keySet().stream().filter(k -> nodeShapeMap.get(k) == shape).findFirst();
+					v.ifPresent(nodeSelectionModel::toggleSelection);
+				}, shape -> {
+			var e = edgeShapeMap.keySet().stream().filter(k -> edgeShapeMap.get(k) == shape).findFirst();
+			e.ifPresent(edgeSelectionModel::toggleSelection);
+		});
+
 		controller.getScrollPane().setContent(networkPane);
 
 		updateListener = e -> networkPane.drawNetwork();
 
 		networkBlock.addListener(updateListener);
 		view.optionDiagramProperty().addListener(updateListener);
+
+		controller.getNewLayoutButton().setOnAction(e -> {
+			var oldValue = view.getOptionLayoutSeed();
+			var newValue = oldValue + 7;
+			view.getUndoManager().doAndAdd("layout", () -> {
+				view.optionLayoutSeedProperty().set(oldValue);
+				updateListener.invalidated(null);
+			}, () -> {
+				view.optionLayoutSeedProperty().set(newValue);
+				updateListener.invalidated(null);
+			});
+
+		});
+		controller.getNewLayoutButton().disableProperty().bind(view.emptyProperty());
 
 		controller.getZoomInButton().setOnAction(e -> view.setOptionZoomFactor(1.1 * view.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(view.emptyProperty().or(view.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
@@ -214,22 +249,24 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
-		mainController.getSelectAllMenuItem().setOnAction(e -> networkNodeSelection.getSelectedItems().addAll(BasicFX.getAllRecursively(view.getMainNode(), LabeledNodeShape.class)));
-		mainController.getSelectAllMenuItem().disableProperty().bind(view.emptyProperty());
+		if (false) {
+			mainController.getSelectAllMenuItem().setOnAction(e -> networkNodeSelectionModel.getSelectedItems().addAll(BasicFX.getAllRecursively(view.getMainNode(), LabeledNodeShape.class)));
+			mainController.getSelectAllMenuItem().disableProperty().bind(view.emptyProperty());
 
-		mainController.getSelectInverseMenuItem().setOnAction(e -> {
-			for (var shape : BasicFX.getAllRecursively(view.getMainNode(), LabeledNodeShape.class)) {
-				networkNodeSelection.toggleSelection(shape);
-			}
-		});
-		mainController.getSelectInverseMenuItem().disableProperty().bind(view.emptyProperty());
+			mainController.getSelectInverseMenuItem().setOnAction(e -> {
+				for (var shape : BasicFX.getAllRecursively(view.getMainNode(), LabeledNodeShape.class)) {
+					networkNodeSelectionModel.toggleSelection(shape);
+				}
+			});
+			mainController.getSelectInverseMenuItem().disableProperty().bind(view.emptyProperty());
 
-		mainController.getSelectNoneMenuItem().setOnAction(e -> networkNodeSelection.clearSelection());
-		mainController.getSelectNoneMenuItem().disableProperty().bind(view.emptyProperty());
+			mainController.getSelectNoneMenuItem().setOnAction(e -> networkNodeSelectionModel.clearSelection());
+			mainController.getSelectNoneMenuItem().disableProperty().bind(view.emptyProperty());
+		}
 
 		mainController.getSelectButton().setOnAction(e -> {
 			var all = BasicFX.getAllRecursively(view.getMainNode(), LabeledNodeShape.class);
-			if (networkNodeSelection.size() < all.size())
+			if (networkNodeSelectionModel.size() < all.size())
 				mainController.getSelectAllMenuItem().fire();
 			else
 				mainController.getSelectNoneMenuItem().fire();

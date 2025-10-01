@@ -103,6 +103,10 @@ public class NetworkBlock extends DataBlock {
 		return nodeData;
 	}
 
+	public void removeNodeData(Node v) {
+		node2data.remove(v);
+	}
+
 	public EdgeData getEdgeData(Edge e) {
 		EdgeData edgeData = edge2data.get(e);
 		if (edgeData == null) {

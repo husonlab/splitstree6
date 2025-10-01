@@ -170,7 +170,7 @@ public class PhiTest extends AnalyzeCharactersBase {
 				}
 			}
 		}
-		/* Now do DFS to count components */
+		/* Now do DFS to count connectedComponents */
 
 		for (i = 0; i < total_states; i++) {
 			marked[i] = false;

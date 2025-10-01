@@ -29,8 +29,7 @@ import javafx.scene.shape.Line;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.*;
-import jloda.graph.fmm.FastMultiLayerMethodLayout;
-import jloda.graph.fmm.FastMultiLayerMethodOptions;
+import jloda.phylo.PhyloGraph;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
@@ -44,7 +43,8 @@ import splitstree6.layout.tree.RadialLabelLayout;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.function.ToDoubleFunction;
 
 import static splitstree6.layout.tree.LayoutUtils.computeFontHeightGraphWidthHeight;
 import static splitstree6.layout.tree.LayoutUtils.normalize;
@@ -55,14 +55,8 @@ import static splitstree6.layout.tree.LayoutUtils.normalize;
  */
 public class NetworkLayout {
 	private final RadialLabelLayout labelLayout = new RadialLabelLayout();
-	private final FastMultiLayerMethodOptions options;
-
-	public NetworkLayout() {
-		options = new FastMultiLayerMethodOptions();
-	}
-
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock networkBlock, DiagramType diagram, double width, double height, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
-					   ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) throws CanceledException {
+					   ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, int randomLayoutSeed) throws CanceledException {
 		labelLayout.clear();
 		Platform.runLater(nodeShapeMap::clear);
 		Platform.runLater(edgeShapeMap::clear);
@@ -77,9 +71,11 @@ public class NetworkLayout {
 			 var nodeAngleMap = graph.newNodeDoubleArray();
 			 NodeArray<LabeledNodeShape> newNodeShapeMap = graph.newNodeArray();
 			 EdgeArray<LabeledEdgeShape> newEdgeShapeMap = graph.newEdgeArray()) {
-			Function<Edge, Double> edgeWeightFunction;
+			ToDoubleFunction<Edge> edgeWeightFunction;
 			if (diagram == DiagramType.Network) {
-				edgeWeightFunction = e -> Math.max(0.00001, graph.getWeight(e));
+				if (false)
+					edgeWeightFunction = e -> Math.max(0.00001, graph.getWeight(e));
+				else edgeWeightFunction = setupScaling(graph);
 			} else {
 				edgeWeightFunction = e -> 1.0;
 			}
@@ -92,7 +88,11 @@ public class NetworkLayout {
 					nodePointMap.put(v, new Point2D(x, y));
 				}
 			} else {
-				FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, (v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY())));
+				var params = new WeightedLayout.Params();
+				params.randomSeed = randomLayoutSeed;
+				var layout = new WeightedLayout<Node, Edge>();
+				layout.layout(graph.getNodesAsList(), Node::adjacentEdges,
+						Node::getOpposite, edgeWeightFunction, nodePointMap::put, params);
 			}
 
 			if (graph.getNumberOfEdges() == 0) {
@@ -126,8 +126,10 @@ public class NetworkLayout {
 					labeledNode.setId("graph-node");
 					labeledNode.setTranslateX(point.getX());
 					labeledNode.setTranslateY(point.getY());
-					networkBlock.getNode2data().get(v).put("x", StringUtils.removeTrailingZerosAfterDot("%.4f", point.getX()));
-					networkBlock.getNode2data().get(v).put("y", StringUtils.removeTrailingZerosAfterDot("%.4f", point.getY()));
+					if (!networkBlock.getNode2data().containsKey(v)) {
+						networkBlock.getNodeData(v).put("x", StringUtils.removeTrailingZerosAfterDot("%.4f", point.getX()));
+						networkBlock.getNodeData(v).put("y", StringUtils.removeTrailingZerosAfterDot("%.4f", point.getY()));
+					}
 
 					if (graph.hasTaxa(v))
 						labeledNode.setTaxa(BitSetUtils.asBitSet(graph.getTaxa(v)));
@@ -175,7 +177,7 @@ public class NetworkLayout {
 						var translateXProperty = labeledNode.translateXProperty();
 						var translateYProperty = labeledNode.translateYProperty();
 
-						labelLayout.addItem(translateXProperty, translateYProperty, nodeAngleMap.get(v), label.widthProperty(), label.heightProperty(),
+						labelLayout.addItem(translateXProperty, translateYProperty, nodeAngleMap.getOrDefault(v, 0.0), label.widthProperty(), label.heightProperty(),
 								xOffset -> {
 									label.setLayoutX(0);
 									label.translateXProperty().bind(translateXProperty.add(xOffset));
@@ -204,7 +206,6 @@ public class NetworkLayout {
 
 				var edgeShape = new LabeledEdgeShape(line);
 				edgesGroup.getChildren().add(edgeShape);
-
 				newEdgeShapeMap.put(e, edgeShape);
 
 				progress.incrementProgress();
@@ -251,5 +252,21 @@ public class NetworkLayout {
 
 	public RadialLabelLayout getLabelLayout() {
 		return labelLayout;
+	}
+
+	public static ToDoubleFunction<Edge> setupScaling(PhyloGraph graph) {
+		var epsilon = 0.00001;
+		var minNonZero = graph.edgeStream().mapToDouble(graph::getWeight).filter(x -> x > epsilon).min().orElse(1.0);
+		var max = graph.edgeStream().mapToDouble(graph::getWeight).max().orElse(1.0);
+
+		var maxDesiredLength = 5;
+
+		var edgeWeights = new HashMap<Edge, Double>();
+		for (var e : graph.edges()) {
+			var w = Math.max(minNonZero, graph.getWeight(e));
+			var transformed = Math.max(epsilon, Math.sqrt(1 + (maxDesiredLength - 1) * (maxDesiredLength - 1) * (w - minNonZero) / max));
+			edgeWeights.put(e, transformed);
+		}
+		return edgeWeights::get;
 	}
 }

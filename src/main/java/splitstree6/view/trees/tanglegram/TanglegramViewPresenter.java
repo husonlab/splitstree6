@@ -165,10 +165,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 
-		controller.getTanglegramCrossingsFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings1Property());
-		controller.getReticulateCrossingsFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings1Property());
+		controller.getTaxonDisplacementFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings1Property());
+		controller.getReticulateDisplacementFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings1Property());
 		controller.getTanglegramCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings2Property());
-		controller.getReticulateCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings2Property());
+		controller.getTaxonDisplacementSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings2Property());
+		controller.getUsePQTreeCBox().selectedProperty().bindBidirectional(view.optionUsePQTreeProperty());
 
 		// todo: don't run optimization when opening a previously saved file
 
@@ -179,11 +180,12 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				if (first != null && second != null && first != second) {
 					first.getLSAChildrenMap().clear();
 					second.getLSAChildrenMap().clear();
-					TanglegramOptimizer.apply(mainWindow.getController().getBottomFlowPane(), first, second,
+					ODTanglegramAlgorithm.apply(mainWindow.getController().getBottomFlowPane(), first, second,
 							view.getOptionOptimizeTanglegramCrossings1(),
 							view.getOptionOptimizeReticulateCrossings1(),
 							view.getOptionOptimizeTanglegramCrossings2(),
 							view.getOptionOptimizeReticulateCrossings2(),
+							view.getOptionUsePQTree(),
 							r -> controller.getBorderPane().setDisable(r), () -> {
 								updateRequested1.set(updateRequested1.get() + 1);
 								updateRequested2.set(updateRequested2.get() + 1);
@@ -225,6 +227,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			view.optionOptimizeTanglegramCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
 			view.optionOptimizeReticulateCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
 			view.optionOptimizeTanglegramCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optionUsePQTreeProperty().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			controller.getUsePQTreeCBox().disableProperty().bind((view.optionOptimizeReticulateCrossings1Property().not().and(view.optionOptimizeTanglegramCrossings1Property().not())).or(view.optionOptimizeReticulateCrossings2Property().not().and(view.optionOptimizeTanglegramCrossings2Property().not())));
 
 			view.optionOptimizeReticulateCrossings1Property().addListener((v, o, n) -> view.getUndoManager().add("reticulate crossings", view.optionOptimizeReticulateCrossings1Property(), o, n));
 			view.optionOptimizeTanglegramCrossings1Property().addListener((v, o, n) -> view.getUndoManager().add("tanglegram crossings", view.optionOptimizeTanglegramCrossings1Property(), o, n));

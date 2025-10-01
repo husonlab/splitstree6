@@ -21,6 +21,7 @@ module splitstreesix {
 	requires org.xerial.sqlitejdbc;
 	requires com.fasterxml.jackson.databind;
 	requires jdk.httpserver;
+	requires org.apache.commons.numbers.gamma;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;
@@ -39,6 +40,9 @@ module splitstreesix {
 
 	opens splitstree6.algorithms.distances.distances2distances;
 	opens splitstree6.algorithms.distances.distances2network;
+	opens splitstree6.algorithms.distances.distances2network.razor1;
+	opens splitstree6.algorithms.distances.distances2network.razor2;
+
 	opens splitstree6.algorithms.distances.distances2view;
 	opens splitstree6.algorithms.distances.distances2splits;
 	opens splitstree6.algorithms.distances.distances2trees;
@@ -119,7 +123,9 @@ module splitstreesix {
 
 	opens splitstree6.dialog.exporting.data;
 	opens splitstree6.dialog.analyzegenomes;
-
+	opens splitstree6.dialog.haplotype;
+	opens splitstree6.dialog.importdialog;
+	opens splitstree6.dialog.exporting;
 	opens splitstree6.workflowtree;
 
 	opens splitstree6.tabs.inputeditor;
@@ -174,10 +180,7 @@ module splitstreesix {
 	opens splitstree6.view.worldmap;
 
 	opens splitstree6.layout.network;
-	opens splitstree6.dialog.importdialog;
 
-
-	opens splitstree6.dialog.exporting;
 
 	exports splitstree6.layout;
 	exports splitstree6.layout.tree;
@@ -189,6 +192,7 @@ module splitstreesix {
 	exports splitstree6.dialog;
 	exports splitstree6.dialog.importdialog;
 	exports splitstree6.dialog.exporting.data;
+	exports splitstree6.dialog.haplotype;
 
 	exports splitstree6.io.utils;
 	exports splitstree6.io;

@@ -69,6 +69,10 @@ public class MainWindowController {
 
 	@FXML
 	private MenuItem importDialogMenuItem;
+
+	@FXML
+	private MenuItem importHaplotypeMenuItem;
+
 	@FXML
 	private MenuItem importTaxonDisplayMenuItem;
 
@@ -278,6 +282,9 @@ public class MainWindowController {
 
 	@FXML
 	private CheckMenuItem f84MenuItem;
+
+	@FXML
+	private CheckMenuItem tn93MenuItem;
 
 	@FXML
 	private CheckMenuItem proteinMLDistanceMenuItem;
@@ -629,6 +636,10 @@ public class MainWindowController {
 		return importDialogMenuItem;
 	}
 
+	public MenuItem getImportHaplotypeMenuItem() {
+		return importHaplotypeMenuItem;
+	}
+
 	public MenuItem getImportTaxonDisplayMenuItem() {
 		return importTaxonDisplayMenuItem;
 	}
@@ -911,6 +922,10 @@ public class MainWindowController {
 
 	public CheckMenuItem getF84MenuItem() {
 		return f84MenuItem;
+	}
+
+	public CheckMenuItem getTn93MenuItem() {
+		return tn93MenuItem;
 	}
 
 	public CheckMenuItem getProteinMLDistanceMenuItem() {

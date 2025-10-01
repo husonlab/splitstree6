@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="splitstree6.dialog.haplotype.HaplotypeController">
+
+    <center>
+        <VBox spacing="10" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="14" right="16" bottom="14" left="16"/>
+            </padding>
+
+            <!-- Row 1: Sequences -->
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="90" halignment="RIGHT"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints minWidth="90"/>
+                </columnConstraints>
+
+                <Label text="Sequences" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="sequencesField" promptText="Select or type file…" GridPane.rowIndex="0"
+                           GridPane.columnIndex="1"/>
+                <Button fx:id="browseSequencesBtn" text="Browse…" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+
+                <!-- Row 2: Traits -->
+                <Label text="Traits file" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="traitsField" promptText="(optional) Select or type file…" GridPane.rowIndex="1"
+                           GridPane.columnIndex="1"/>
+                <Button fx:id="browseTraitsBtn" text="Browse…" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+
+                <!-- Row 3: Distances -->
+                <Label text="Distances" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <ChoiceBox fx:id="distanceChoice" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <!-- Row 4: Method -->
+                <Label text="Method" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <ChoiceBox fx:id="methodChoice" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            </GridPane>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" BorderPane.alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="0" right="16" bottom="16" left="16"/>
+            </padding>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="cancelBtn" text="Cancel" cancelButton="true"/>
+            <Button fx:id="applyBtn" text="Apply" defaultButton="true"/>
+        </HBox>
+    </bottom>
+</BorderPane>

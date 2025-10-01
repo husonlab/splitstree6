@@ -20,6 +20,6 @@
 package splitstree6.view.format.sites;
 
 public enum SitesStyle {
-	Hatches, Labels, CompactLabels, Counts, None
+	Hatches, Labels, CompactLabels, Counts, Weights, None
 
 }

@@ -106,6 +106,22 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		dataFilterNode.addChild(workingDataNode);
 	}
 
+	public <T extends DataBlock> void setupInputAndWorkingNodes(TaxaBlock inputTaxaBlock, T inputDataBlock) {
+		var inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
+		var inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
+
+		var workingTaxaNode = newDataNode(inputTaxaBlock.newInstance(), WORKING_TAXA);
+		var workingData = inputDataBlock.newInstance();
+		var workingDataNode = newDataNode(inputDataBlock.newInstance(), WORKING_PREFIX + workingData.getName());
+		newAlgorithmNode(new TaxaFilter(), null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
+
+		var dataFilterNode = newAlgorithmNode(inputDataBlock.createTaxaDataFilter(), INPUT_TAXA_DATA_FILTER);
+		dataFilterNode.addParent(inputTaxaNode);
+		dataFilterNode.addParent(workingTaxaNode);
+		dataFilterNode.addParent(inputDataNode);
+		dataFilterNode.addChild(workingDataNode);
+	}
+
 	public <T extends DataBlock> void setupInputAndWorkingNodes(SourceBlock source, TaxaBlock inputTaxaBlock, TaxaFilter taxaFilter, TaxaBlock workingTaxaBlock,
 																DataBlock inputDataBlock, DataTaxaFilter dataTaxaFilter, DataBlock workingDataBlock) {
 		var sourceNode = newDataNode(source, INPUT_SOURCE); // todo: what is the purpose of the source node?

@@ -19,8 +19,10 @@
 
 package splitstree6.io.nexus;
 
+import jloda.fx.window.NotificationManager;
 import jloda.graph.Edge;
 import jloda.graph.Node;
+import jloda.phylo.PhyloGraph;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -234,8 +236,10 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		np.matchIgnoreCase(";");
 		np.matchEndBlock();
 
-		if (!graph.isConnected())
-			throw new IOException("Network is not connected");
+		if (!graph.isConnected()) {
+			NotificationManager.showError("Network is not connected");
+			createStar(taxaBlock, graph);
+		}
 
 		return taxonNamesFound;
 	}
@@ -349,5 +353,16 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		}
 		np.matchEndBlock();
 		return taxonNamesFound;
+	}
+
+	private static void createStar(TaxaBlock taxaBlock, PhyloGraph graph) {
+		graph.clear();
+		var center = graph.newNode();
+		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
+			var v = graph.newNode();
+			graph.addTaxon(v, t);
+			var e = graph.newEdge(center, v);
+			graph.setWeight(e, 1.0);
+		}
 	}
 }

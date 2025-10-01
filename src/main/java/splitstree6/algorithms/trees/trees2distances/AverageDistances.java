@@ -19,6 +19,9 @@
 
 package splitstree6.algorithms.trees.trees2distances;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import jloda.fx.util.ProgramProperties;
 import jloda.util.CanceledException;
 import jloda.util.NumberUtils;
 import jloda.util.ProgramExecutorService;
@@ -32,6 +35,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +45,17 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class AverageDistances extends Trees2Distances {
+	private final BooleanProperty optionUseTopologicalDistance = new SimpleBooleanProperty(this, "optionUseTopologicalDistance");
+
+	{
+		ProgramProperties.track(optionUseTopologicalDistance, false);
+	}
+
+	@Override
+	public List<String> listOptions() {
+		return List.of(optionUseTopologicalDistance.getName());
+	}
+
 	@Override
 	public String getCitation() {
 		return "Lapointe and Cucumel 1997;FJ Lapointe and G. Cucumel, " +
@@ -82,6 +97,11 @@ public class AverageDistances extends Trees2Distances {
 							var tmpTaxa = (TaxaBlock) taxaBlock.clone();
 							var splits = new SplitsBlock();
 							selector.compute(new ProgressSilent(), tmpTaxa, treesBlock, splits); // modifies tmpTaxa, too!
+							if (isOptionUseTopologicalDistance()) {
+								for (var s : splits.getSplits()) {
+									s.setWeight(1.0);
+								}
+							}
 							for (var a = 1; a <= nTax; a++) {
 								for (var b = 1; b <= nTax; b++) {
 									var i = taxaBlock.indexOf(tmpTaxa.getLabel(a)); // translate numbering
@@ -148,12 +168,16 @@ public class AverageDistances extends Trees2Distances {
 			}
 
 			// divide by count
-			for (var i = 1; i <= nTax; i++) {
-				for (var j = 1; j <= nTax; j++) {
-					if (allDistances[i][j] > 0)
-						distancesBlock.set(i, j, allDistances[i][j] / allCounts[i][j]);
-					else
-						distancesBlock.set(i, j, 0); // shouldn't ever happen!
+			{
+				for (var i = 1; i <= nTax; i++) {
+					for (var j = 1; j <= nTax; j++) {
+						if (isOptionUseTopologicalDistance()) {
+							distancesBlock.set(i, j, allDistances[i][j] / treesBlock.getNTrees());
+						} else if (allDistances[i][j] > 0)
+							distancesBlock.set(i, j, allDistances[i][j] / allCounts[i][j]);
+						else
+							distancesBlock.set(i, j, 0); // shouldn't ever happen!
+					}
 				}
 			}
 		}
@@ -162,5 +186,13 @@ public class AverageDistances extends Trees2Distances {
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
 		return !parent.isPartial() && !parent.isReticulated();
+	}
+
+	public boolean isOptionUseTopologicalDistance() {
+		return optionUseTopologicalDistance.get();
+	}
+
+	public BooleanProperty optionUseTopologicalDistanceProperty() {
+		return optionUseTopologicalDistance;
 	}
 }

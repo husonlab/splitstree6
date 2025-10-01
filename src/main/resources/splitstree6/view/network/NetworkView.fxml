@@ -50,6 +50,13 @@
                     </ComboBox>
                     <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
 
+                    <Button fx:id="newLayoutButton" contentDisplay="CENTER" mnemonicParsing="false" text="New Layout">
+                        <tooltip>
+                            <Tooltip text="Rerun layout using different random seed"/>
+                        </tooltip>
+                    </Button>
+                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+
                     <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
                     <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"
                             text="Rotate Right"/>

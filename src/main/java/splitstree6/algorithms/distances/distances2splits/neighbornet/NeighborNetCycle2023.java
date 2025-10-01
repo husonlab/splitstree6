@@ -48,7 +48,7 @@ public class NeighborNetCycle2023 {
 
 		var graph = new Graph();
 		var nodeMap = new Node[nTax + 1]; // taxa are 1-based
-		var components = new ArrayList<Component>(); // components are 0-based
+		var components = new ArrayList<Component>(); // connectedComponents are 0-based
 
 		for (var t = 1; t <= nTax; t++) {
 			nodeMap[t] = graph.newNode(t);
@@ -100,7 +100,7 @@ public class NeighborNetCycle2023 {
 					}
 				}
 
-				// update graph and components:
+				// update graph and connectedComponents:
 				graph.newEdge(nodeMap[p], nodeMap[q]);
 
 				var newComponent = new Component(p, qb);

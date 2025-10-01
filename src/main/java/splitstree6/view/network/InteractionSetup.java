@@ -36,16 +36,21 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SelectionEffectBlue;
+import jloda.graph.Edge;
+import jloda.graph.GraphTraversals;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
 import jloda.util.BitSetUtils;
+import jloda.util.SetUtils;
 import jloda.util.Single;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.main.SplitsTree6;
 import splitstree6.view.utils.NodeLabelDialog;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -61,36 +66,43 @@ public class InteractionSetup {
 	private final UndoManager undoManager;
 	private final ObjectProperty<String[]> edits;
 
-	private static boolean nodeShapeOrLabelEntered;
-	private static boolean edgeShapeEntered;
 	private static double mouseDownX;
 	private static double mouseDownY;
 
 	private final SelectionModel<Taxon> taxonSelectionModel;
 
-	private final SelectionModel<LabeledNodeShape> networkNodeSelectionModel;
+	private final SelectionModel<Node> nodeSelectionModel;
+	private final SelectionModel<Edge> edgeSelectionModel;
 
 	private final SetChangeListener<Taxon> taxonSelectionListener;
 
 	private Map<Node, LabeledNodeShape> nodeShapeMap;
+	private Map<Edge, LabeledEdgeShape> edgeShapeMap;
 
 	/**
 	 * constructor
 	 */
 	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, ObjectProperty<String[]> edits,
 							Function<Integer, Taxon> idTaxonMap,
-							SelectionModel<LabeledNodeShape> networkNodeSelectionModel, SelectionModel<Taxon> taxonSelectionModel) {
+							SelectionModel<Node> nodeSelectionModel,
+							SelectionModel<Edge> edgeSelectionModel,
+							SelectionModel<Taxon> taxonSelectionModel) {
 		this.stage = stage;
 		this.edits = edits;
 		this.undoManager = undoManager;
-		this.networkNodeSelectionModel = networkNodeSelectionModel;
+		this.nodeSelectionModel = nodeSelectionModel;
+		this.edgeSelectionModel = edgeSelectionModel;
+
 		this.taxonSelectionModel = taxonSelectionModel;
 
 		pane.setOnMouseClicked(e -> {
 			if (e.isStillSincePress() && !e.isShiftDown()) {
-				Platform.runLater(networkNodeSelectionModel::clearSelection);
+				Platform.runLater(nodeSelectionModel::clearSelection);
+				Platform.runLater(edgeSelectionModel::clearSelection);
+				Platform.runLater(taxonSelectionModel::clearSelection);
+
 				for (var textField : BasicFX.getAllRecursively(pane, TextField.class)) {
-					if (textField.getParent() instanceof Group group) {
+					if (textField.getParent() instanceof Group group && textField.getUserData() == null) {
 						Platform.runLater(() -> group.getChildren().remove(textField));
 					}
 				}
@@ -100,40 +112,6 @@ public class InteractionSetup {
 
 		var inUpdate = new Single<>(false);
 
-		networkNodeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super LabeledNodeShape>) e -> {
-			if (!inUpdate.get()) {
-				inUpdate.set(true);
-				try {
-					if (e.wasAdded()) {
-						var shape = e.getElementAdded();
-						shape.setEffect(SelectionEffectBlue.getInstance());
-						if (shape.getLabel() != null)
-							shape.getLabel().setEffect(SelectionEffectBlue.getInstance());
-						if (shape.getTaxa() != null) {
-							Platform.runLater(() -> {
-								if (shape.getTaxa() != null)
-									taxonSelectionModel.getSelectedItems().addAll(BitSetUtils.asList(shape.getTaxa()).stream().map(idTaxonMap).toList());
-							});
-						}
-					} else if (e.wasRemoved()) {
-						var shape = e.getElementRemoved();
-						shape.setEffect(null);
-						if (shape.getLabel() != null)
-							shape.getLabel().setEffect(null);
-
-						if (shape.getTaxa() != null) {
-							Platform.runLater(() -> {
-								if (shape.getTaxa() != null)
-									taxonSelectionModel.getSelectedItems().removeAll(BitSetUtils.asList(shape.getTaxa()).stream().map(idTaxonMap).toList());
-							});
-						}
-					}
-				} finally {
-					inUpdate.set(false);
-				}
-			}
-		});
-
 		taxonSelectionListener = e -> {
 			if (!inUpdate.get()) {
 				inUpdate.set(true);
@@ -141,12 +119,14 @@ public class InteractionSetup {
 					if (e.wasAdded()) {
 						var taxon = e.getElementAdded();
 						if (nodeShapeMap != null) {
-							for (var shape : nodeShapeMap.values()) {
+							for (var entry : nodeShapeMap.entrySet()) {
+								var node = entry.getKey();
+								var shape = entry.getValue();
 								if (shape.getTaxa() != null) {
 									for (var t : BitSetUtils.members(shape.getTaxa())) {
 										if (idTaxonMap.apply(t).equals(taxon)) {
 											// not sure why this is necessary, without, selection can flicker
-											RunAfterAWhile.applyInFXThread(shape, () -> networkNodeSelectionModel.select(shape));
+											RunAfterAWhile.applyInFXThread(shape, () -> nodeSelectionModel.select(node));
 											return;
 										}
 									}
@@ -156,12 +136,14 @@ public class InteractionSetup {
 					} else if (e.wasRemoved()) {
 						var taxon = e.getElementRemoved();
 						if (nodeShapeMap != null) {
-							for (var shape : nodeShapeMap.values()) {
+							for (var entry : nodeShapeMap.entrySet()) {
+								var node = entry.getKey();
+								var shape = entry.getValue();
 								if (shape.getTaxa() != null) {
 									for (var t : BitSetUtils.members(shape.getTaxa())) {
 										if (idTaxonMap.apply(t).equals(taxon)) {
 											// not sure why this is necessary, without, selection can flicker
-											RunAfterAWhile.applyInFXThread(shape, () -> networkNodeSelectionModel.clearSelection(shape));
+											RunAfterAWhile.applyInFXThread(shape, () -> nodeSelectionModel.clearSelection(node));
 											return;
 										}
 									}
@@ -175,13 +157,84 @@ public class InteractionSetup {
 			}
 		};
 		taxonSelectionModel.getSelectedItems().addListener(taxonSelectionListener);
+
+		nodeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super Node>) e -> {
+
+			if (e.wasAdded()) {
+				var shape = nodeShapeMap.get(e.getElementAdded());
+				if (shape != null) {
+					shape.setEffect(SelectionEffectBlue.getInstance());
+					if (shape.getShape() != null)
+						shape.getShape().setEffect(SelectionEffectBlue.getInstance());
+					if (shape.getLabel() != null)
+						shape.getLabel().setEffect(SelectionEffectBlue.getInstance());
+
+					if (!inUpdate.get()) {
+						try {
+							inUpdate.set(true);
+							if (shape.getTaxa() != null) {
+								Platform.runLater(() -> {
+									if (shape.getTaxa() != null)
+										taxonSelectionModel.getSelectedItems().addAll(BitSetUtils.asList(shape.getTaxa()).stream().map(idTaxonMap).toList());
+								});
+							}
+						} finally {
+							inUpdate.set(false);
+						}
+					}
+				}
+			}
+			if (e.wasRemoved()) {
+				var shape = nodeShapeMap.get(e.getElementRemoved());
+				if (shape != null) {
+					shape.setEffect(null);
+					if (shape.getShape() != null)
+						shape.getShape().setEffect(null);
+					if (shape.getLabel() != null)
+						shape.getLabel().setEffect(null);
+
+					if (!inUpdate.get()) {
+						try {
+							inUpdate.set(true);
+							if (shape.getTaxa() != null) {
+
+								Platform.runLater(() -> {
+									if (shape.getTaxa() != null)
+										taxonSelectionModel.getSelectedItems().removeAll(BitSetUtils.asList(shape.getTaxa()).stream().map(idTaxonMap).toList());
+								});
+							}
+						} finally {
+							inUpdate.set(false);
+						}
+					}
+				}
+			}
+		});
+
+		edgeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super Edge>) c -> {
+			if (edgeShapeMap != null) {
+				if (c.wasAdded()) {
+					var shape = edgeShapeMap.get(c.getElementAdded());
+					if (shape != null)
+						shape.setEffect(SelectionEffectBlue.getInstance());
+				}
+				if (c.wasRemoved()) {
+					var shape = edgeShapeMap.get(c.getElementRemoved());
+					if (shape != null)
+						shape.setEffect(null);
+				}
+			}
+		});
+
 	}
 
 	/**
 	 * setup network mouse interaction
 	 */
-	public void apply(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap) {
+	public void apply(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap) {
 		this.nodeShapeMap = nodeShapeMap;
+		this.edgeShapeMap = edgeShapeMap;
+
 		for (var node : nodeShapeMap.keySet()) {
 			var shape = nodeShapeMap.get(node);
 			shape.translateXProperty().addListener((v, o, n) -> {
@@ -194,42 +247,49 @@ public class InteractionSetup {
 			var start = new Single<Point2D>();
 			var end = new Single<Point2D>();
 
-			var selectedShapes = new ArrayList<LabeledNodeShape>();
+			var selectedShapes = new ArrayList<Group>();
+
 			shape.setOnMousePressed(e -> {
 				mouseDownX = e.getScreenX();
 				mouseDownY = e.getScreenY();
 				start.set(new Point2D(mouseDownX, mouseDownY));
 				end.set(start.get());
+
 				selectedShapes.clear();
-				selectedShapes.addAll(networkNodeSelectionModel.getSelectedItems());
+				for (var anode : nodeSelectionModel.getSelectedItems()) {
+					var one = nodeShapeMap.get(anode);
+					if (one != null)
+						selectedShapes.add(one);
+				}
 				e.consume();
 			});
+			if (shape.hasLabel())
+				shape.getLabel().setOnMouseClicked(shape.getOnMouseClicked());
 			shape.setOnMouseDragged(e -> {
-				if (selectedShapes.contains(shape)) {
-					var dx = e.getScreenX() - mouseDownX;
-					var dy = e.getScreenY() - mouseDownY;
-					for (var selected : selectedShapes) {
-						selected.setTranslateX(selected.getTranslateX() + dx);
-						selected.setTranslateY(selected.getTranslateY() + dy);
-					}
+				var dx = e.getScreenX() - mouseDownX;
+				var dy = e.getScreenY() - mouseDownY;
+				for (var selected : selectedShapes) {
+					selected.setTranslateX(selected.getTranslateX() + dx);
+					selected.setTranslateY(selected.getTranslateY() + dy);
+				}
 					mouseDownX = e.getScreenX();
 					mouseDownY = e.getScreenY();
 					end.set(new Point2D(mouseDownX, mouseDownY));
-				}
 				e.consume();
 			});
 			shape.setOnMouseReleased(e -> {
 				if (selectedShapes.contains(shape)) {
+					var finalSelected = new ArrayList<>(selectedShapes);
 					if (!e.isStillSincePress()) {
 						undoManager.add("move nodes",
 								() -> {
-									for (var selected : selectedShapes) {
+									for (var selected : finalSelected) {
 										selected.setTranslateX(selected.getTranslateX() - (end.get().getX() - start.get().getX()));
 										selected.setTranslateY(selected.getTranslateY() - (end.get().getY() - start.get().getY()));
 									}
 								},
 								() -> {
-									for (var selected : selectedShapes) {
+									for (var selected : finalSelected) {
 										selected.setTranslateX(selected.getTranslateX() + (end.get().getX() - start.get().getX()));
 										selected.setTranslateY(selected.getTranslateY() + (end.get().getY() - start.get().getY()));
 									}
@@ -240,12 +300,15 @@ public class InteractionSetup {
 			});
 		}
 
-		for (var shape : nodeShapeMap.values()) {
+		for (var entry : nodeShapeMap.entrySet()) {
+			var v = entry.getKey();
+			var shape = entry.getValue();
 			shape.setOnMouseClicked(e -> {
 				if (e.isStillSincePress()) {
-					if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
-						networkNodeSelectionModel.clearSelection();
-					networkNodeSelectionModel.toggleSelection(shape);
+					if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop()) {
+						nodeSelectionModel.clearSelection();
+					}
+					nodeSelectionModel.select(v);
 					e.consume();
 				}
 			});
@@ -272,7 +335,6 @@ public class InteractionSetup {
 						var taxon = idTaxonMap.apply(id);
 						if (taxon != null && shape != null) {
 							shape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
-							label.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 
 							label.setOnMouseClicked(e -> {
 								if (e.isStillSincePress()) {
@@ -333,6 +395,38 @@ public class InteractionSetup {
 					}
 				} catch (Exception ignored) {
 				}
+			}
+
+			for (var entry : edgeShapeMap.entrySet()) {
+				var edge = entry.getKey();
+				var shape = entry.getValue();
+				shape.setOnMouseClicked(e -> {
+					if (e.isStillSincePress()) {
+						if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop()) {
+							edgeSelectionModel.clearSelection();
+						}
+						edgeSelectionModel.select(edge);
+						if (e.getClickCount() == 2 && edgeSelectionModel.isSelected(edge)) {
+							var fromSource = new HashSet<Node>();
+							var fromTarget = new HashSet<Node>();
+							GraphTraversals.traverseReachable(edge.getSource(), f -> !edgeSelectionModel.isSelected(f), fromSource::add);
+							GraphTraversals.traverseReachable(edge.getTarget(), f -> !edgeSelectionModel.isSelected(f), fromTarget::add);
+
+							if (!SetUtils.intersect(fromSource, fromTarget)) {
+								if (fromSource.size() < fromTarget.size()) {
+									nodeSelectionModel.selectAll(fromSource);
+								}
+								if (fromSource.size() > fromTarget.size()) {
+									nodeSelectionModel.selectAll(fromTarget);
+								}
+							}
+						}
+						e.consume();
+					}
+				});
+				if (shape.hasLabel())
+					shape.getLabel().setOnMouseClicked(shape.getOnMouseClicked());
+
 			}
 		}
 	}

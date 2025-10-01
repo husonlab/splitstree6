@@ -65,7 +65,7 @@ public class Kernelize {
 			System.err.println("Incompatible clusters: " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() > 0).count());
 		}
 
-		// extract all incompatibility components
+		// extract all incompatibility connectedComponents
 		var components = incompatibilityGraph.extractAllConnectedComponents();
 		if (false) {
 			System.err.println("Components:     " + components.stream().filter(c -> c.getNumberOfNodes() > 1).count());
@@ -97,7 +97,7 @@ public class Kernelize {
 			blobTreeClusters.sort((a, b) -> -Integer.compare(a.cardinality(), b.cardinality()));
 		}
 
-		if (verbose) { // report incompatibility components and the associated reduced trees:
+		if (verbose) { // report incompatibility connectedComponents and the associated reduced trees:
 			var count = 0;
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
@@ -119,7 +119,7 @@ public class Kernelize {
 		report("  blob tree", blobTree);
 			checkNetwork("Blob tree", blobTree);
 
-		// run the algorithm on all components:
+		// run the algorithm on all connectedComponents:
 		try (NodeArray<TreesAndTaxonClasses> blobNetworksMap = blobTree.newNodeArray()) {
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
@@ -217,7 +217,7 @@ public class Kernelize {
 	 * @param blobTree           the backbone tree
 	 * @param clusterNodeMap     maps clusters to the blob tree
 	 * @param blobNetworksMap    the blob to networks map
-	 * @param numberOfBlobs      total number of blobs (non-trivial connected components in the incompatibity graph)
+	 * @param numberOfBlobs      total number of blobs (non-trivial connected connectedComponents in the incompatibity graph)
 	 * @param resolvedBlobs      blobs that have been resolved
 	 * @param maxNumberOfResults max number of desired results
 	 * @param networks           resulting networks

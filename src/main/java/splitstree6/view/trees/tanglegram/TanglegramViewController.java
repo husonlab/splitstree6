@@ -117,16 +117,19 @@ public class TanglegramViewController {
 	private ToggleButton formatToggleButton;
 
 	@FXML
-	private CheckBox tanglegramCrossingsFirstCBox;
+	private CheckBox taxonDisplacementFirstCBox;
 
 	@FXML
-	private CheckBox reticulateCrossingsFirstCBox;
+	private CheckBox reticulateDisplacementFirstCBox;
 
 	@FXML
-	private CheckBox tanglegramCrossingsSecondCBox;
+	private CheckBox taxonDisplacementSecondCBox;
 
 	@FXML
-	private CheckBox reticulateCrossingsSecondCBox;
+	private CheckBox reticulateDisplacementSecondCBox;
+
+	@FXML
+	private CheckBox usePQTreeCBox;
 
 	@FXML
 	private MenuButton optimizeMenuButton;
@@ -305,19 +308,23 @@ public class TanglegramViewController {
 		return scrollPane;
 	}
 
-	public CheckBox getTanglegramCrossingsFirstCBox() {
-		return tanglegramCrossingsFirstCBox;
+	public CheckBox getTaxonDisplacementFirstCBox() {
+		return taxonDisplacementFirstCBox;
 	}
 
-	public CheckBox getReticulateCrossingsFirstCBox() {
-		return reticulateCrossingsFirstCBox;
+	public CheckBox getReticulateDisplacementFirstCBox() {
+		return reticulateDisplacementFirstCBox;
 	}
 
 	public CheckBox getTanglegramCrossingsSecondCBox() {
-		return tanglegramCrossingsSecondCBox;
+		return taxonDisplacementSecondCBox;
 	}
 
-	public CheckBox getReticulateCrossingsSecondCBox() {
-		return reticulateCrossingsSecondCBox;
+	public CheckBox getTaxonDisplacementSecondCBox() {
+		return reticulateDisplacementSecondCBox;
+	}
+
+	public CheckBox getUsePQTreeCBox() {
+		return usePQTreeCBox;
 	}
 }

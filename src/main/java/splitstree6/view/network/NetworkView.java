@@ -79,6 +79,7 @@ public class NetworkView implements IView {
 
 	private final ObjectProperty<SitesStyle> optionSitesStyle = new SimpleObjectProperty<>(this, "optionSitesStyle");
 
+	private final IntegerProperty optionLayoutSeed = new SimpleIntegerProperty(this, "optionLayoutSeed", 666);
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 
@@ -93,7 +94,7 @@ public class NetworkView implements IView {
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(),
 				optionFontScaleFactor.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(), optionSitesStyle.getName(),
-				optionEdits.getName());
+				optionEdits.getName(), optionLayoutSeed.getName());
 	}
 
 	public NetworkView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -314,6 +315,14 @@ public class NetworkView implements IView {
 
 	public void setOptionEdits(String[] optionEdits) {
 		this.optionEdits.set(optionEdits);
+	}
+
+	public int getOptionLayoutSeed() {
+		return optionLayoutSeed.get();
+	}
+
+	public IntegerProperty optionLayoutSeedProperty() {
+		return optionLayoutSeed;
 	}
 
 	public void setNetworkBlock(NetworkBlock networkBlock) {

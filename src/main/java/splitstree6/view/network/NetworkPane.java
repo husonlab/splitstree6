@@ -21,10 +21,7 @@ package splitstree6.view.network;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
@@ -42,6 +39,7 @@ import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Edge;
 import jloda.graph.Node;
+import jloda.util.Basic;
 import jloda.util.ProgramExecutorService;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
@@ -64,10 +62,12 @@ public class NetworkPane extends StackPane {
 	private final ChangeListener<LayoutOrientation> orientChangeListener;
 	private final InvalidationListener layoutLabelsListener;
 
+
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
 	private final AService<Group> service;
 	private final NetworkLayout networkLayout = new NetworkLayout();
+	private Runnable runBeforeUpdate;
 	private Runnable runAfterUpdate;
 
 	/**
@@ -76,7 +76,7 @@ public class NetworkPane extends StackPane {
 	public NetworkPane(MainWindow mainWindow, ReadOnlyObjectProperty<TaxaBlock> taxaBlock, ReadOnlyObjectProperty<NetworkBlock> networkBlock,
 					   ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight,
 					   ReadOnlyObjectProperty<DiagramType> diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
-					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
+					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, ReadOnlyIntegerProperty layoutSeed) {
 		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
 
@@ -111,7 +111,7 @@ public class NetworkPane extends StackPane {
 				return new Group();
 
 			var result = networkLayout.apply(service.getProgressListener(), taxaBlock.get(), networkBlock.get(), diagram.get(),
-					getPrefWidth() - 4, getPrefHeight() - 16, taxonLabelMap, nodeShapeMap, edgeShapeMap);
+					getPrefWidth() - 4, getPrefHeight() - 16, taxonLabelMap, nodeShapeMap, edgeShapeMap, layoutSeed.get());
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());
@@ -119,20 +119,26 @@ public class NetworkPane extends StackPane {
 			return result;
 		});
 
+		service.setOnScheduled(a -> runBeforeUpdate.run());
+
 		service.setOnSucceeded(a -> {
-			if (zoomFactor.get() != 1) {
-				setScaleX(zoomFactor.get());
-				setScaleY(zoomFactor.get());
-			}
+			try {
+				if (zoomFactor.get() != 1) {
+					setScaleX(zoomFactor.get());
+					setScaleY(zoomFactor.get());
+				}
 
-			setMinHeight(getPrefHeight() - 12);
-			setMinWidth(getPrefWidth());
-			group.getChildren().setAll(service.getValue());
+				setMinHeight(getPrefHeight() - 12);
+				setMinWidth(getPrefWidth());
+				group.getChildren().setAll(service.getValue());
 
-			Platform.runLater(() -> applyOrientation(orientation.get()));
+				Platform.runLater(() -> applyOrientation(orientation.get()));
 
-			if (getRunAfterUpdate() != null) {
-				Platform.runLater(() -> getRunAfterUpdate().run());
+				if (getRunAfterUpdate() != null) {
+					Platform.runLater(() -> getRunAfterUpdate().run());
+				}
+			} catch (Exception ex) {
+				Basic.caught(ex);
 			}
 		});
 
@@ -212,6 +218,14 @@ public class NetworkPane extends StackPane {
 
 	public void setRunAfterUpdate(Runnable runAfterUpdate) {
 		this.runAfterUpdate = runAfterUpdate;
+	}
+
+	public Runnable getRunBeforeUpdate() {
+		return runBeforeUpdate;
+	}
+
+	public void setRunBeforeUpdate(Runnable runBeforeUpdate) {
+		this.runBeforeUpdate = runBeforeUpdate;
 	}
 
 	public void layoutLabels(LayoutOrientation orientation) {

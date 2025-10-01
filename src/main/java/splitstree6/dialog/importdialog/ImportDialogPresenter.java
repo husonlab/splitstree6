@@ -29,15 +29,10 @@ import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.io.readers.ImportManager;
-import splitstree6.io.utils.SimilaritiesToDistances;
-import splitstree6.window.MainWindow;
-import splitstree6.workflow.WorkflowSetup;
 
 import java.io.File;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class ImportDialogPresenter {
 
@@ -112,7 +107,7 @@ public class ImportDialogPresenter {
 			if (importer == null)
 				NotificationManager.showWarning("Can't import selected data type and file format");
 			else {
-				parseAndLoad(mainWindow, fileName.get(), controller);
+				ImportApply.parseAndLoad(mainWindow, fileName.get(), controller);
 				importDialog.getStage().hide();
 			}
 		});
@@ -121,42 +116,6 @@ public class ImportDialogPresenter {
 						.or(Bindings.equal(controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty(), "Unknown"))
 						.or(Bindings.isNull(controller.getFileFormatComboBox().getSelectionModel().selectedItemProperty()))
 						.or(Bindings.equal(controller.getFileFormatComboBox().getSelectionModel().selectedItemProperty(), "Unknown"))));
-	}
-
-	private static void parseAndLoad(MainWindow mainWindow, String fileName, ImportDialogController controller) {
-		var dataType = controller.getDataTypeComboBox().getValue();
-		try {
-			final Consumer<Throwable> failedHandler = ex -> {
-				mainWindow.getWorkflow().clear();
-				NotificationManager.showError("Import failed: " + ex.getMessage());
-			};
-			final Runnable runOnSuccess = () -> {
-				if (dataType.equals(DistancesBlock.class)) {
-					if (controller.getSimilarityValues().isSelected()) {
-						var method = controller.getSimilarityToDistanceMethod().getValue();
-						if (method != null) {
-							if (mainWindow.getWorkflow().getInputDataBlock() instanceof DistancesBlock distancesBlock) {
-								SimilaritiesToDistances.apply(method, distancesBlock);
-							}
-							if (mainWindow.getWorkflow().getWorkingDataBlock() instanceof DistancesBlock distancesBlock) {
-								SimilaritiesToDistances.apply(method, distancesBlock);
-							}
-						}
-					}
-				}
-				mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
-				mainWindow.setFileName(fileName);
-				mainWindow.setDirty(true);
-			};
-			if (WorkflowNexusInput.isApplicable(fileName)) {
-				WorkflowNexusInput.open(mainWindow, fileName, failedHandler, runOnSuccess);
-			} else
-				WorkflowSetup.apply(fileName, mainWindow.getWorkflow(), failedHandler, runOnSuccess, dataType);
-
-		} catch (Exception ex) {
-
-			NotificationManager.showError("Import failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
-		}
 	}
 
 }

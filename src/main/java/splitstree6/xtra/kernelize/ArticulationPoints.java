@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * compute articulation points, that is, nodes that separate bi-connected components
+ * compute articulation points, that is, nodes that separate bi-connected connectedComponents
  * Daniel Huson, 10.2024, using ChatGPT
  */
 public class ArticulationPoints {
