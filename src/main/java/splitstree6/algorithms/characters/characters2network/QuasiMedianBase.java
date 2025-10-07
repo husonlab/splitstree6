@@ -40,15 +40,15 @@ public abstract class QuasiMedianBase {
 	/**
 	 * Applies the method to the given data
 	 *
-	 * @param taxa            the taxa
+	 * @param taxaBlock            the taxa
 	 * @param charactersBlock the characters
 	 */
-	public void apply(ProgressListener progress, TaxaBlock taxa, CharactersBlock charactersBlock, NetworkBlock networkBlock) throws CanceledException {
+	public void apply(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, NetworkBlock networkBlock) throws CanceledException {
 		progress.setSubtask(Basic.getShortName(getClass()));
 		progress.setProgress(0);
 		progress.setMaximum(100);    //initialize maximum progress
 
-		final int ntax = taxa.getNtax();
+		final int ntax = taxaBlock.getNtax();
 		final int nchar = charactersBlock.getNchar();
 
 		final char[][] characters = getCharacters(charactersBlock);
@@ -98,34 +98,32 @@ public abstract class QuasiMedianBase {
 		computeGraph(progress, condensedInputSet, weights, graph);
 
 
-		for (var v : graph.nodes()) {
-			var condensed = (String) v.getInfo();
+		var originalNodes = graph.getNodesAsList();
+		for (var v : originalNodes) {
 			graph.setLabel(v, null);
-			if (condensedInputSet.contains(condensed)) {
-				for (var t = 1; t <= taxa.getNtax(); t++) {
-					var o = orig2CondensedTaxa[t];
-					if (condensedCharacters[o].equals(condensed)) {
-						graph.addTaxon(v, t);
-					}
-				}
-
-				if (graph.hasTaxa(v)) {
-					final StringBuilder buf = new StringBuilder();
-					int count = 0;
-					for (Integer t : graph.getTaxa(v)) {
-						if (buf.length() > 0)
-							buf.append(", ");
-						buf.append(taxa.getLabel(t));
-						count++;
-					}
-					if (count == 1)
-						graph.setLabel(v, taxa.get(graph.getTaxa(v).iterator().next()).getDisplayLabelOrName());
-					else if (count > 1)
-						graph.setLabel(v, "{" + buf + "}");
-				}
-			}
+			var condensed = (String) v.getInfo();
 			var full = expandCondensed(condensed, orig2CondensedPos, translator);
 			networkBlock.getNodeData(v).put(NetworkBlock.NODE_STATES_KEY, full);
+
+			if (condensedInputSet.contains(condensed)) {
+				var first = true;
+				for (var t = 1; t <= taxaBlock.getNtax(); t++) {
+					var o = orig2CondensedTaxa[t];
+					if (condensedCharacters[o].equals(condensed)) {
+						if (first) {
+							graph.addTaxon(v, t);
+							graph.setLabel(v, taxaBlock.getLabel(t));
+							first = false;
+						} else {
+							var w = graph.newNode();
+							graph.addTaxon(w, t);
+							graph.setLabel(w, taxaBlock.getLabel(t));
+							graph.newEdge(v, w);
+							networkBlock.getNodeData(w).put(NetworkBlock.NODE_STATES_KEY, full);
+						}
+					}
+				}
+			}
 		}
 
 		for (var e : graph.edges()) {

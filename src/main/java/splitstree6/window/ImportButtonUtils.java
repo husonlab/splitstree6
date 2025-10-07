@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Button;
 import javafx.scene.input.TransferMode;
 import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.FileUtils;
 import jloda.util.StringUtils;
@@ -97,6 +98,7 @@ public class ImportButtonUtils {
 					}
 				});
 			});
+			RunAfterAWhile.applyInFXThread(mainWindow.getStage(), () -> mainWindow.getStage().toFront());
 		}
 	}
 }

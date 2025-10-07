@@ -37,7 +37,7 @@ public class ViewNexusOutput extends NexusIOBase {
 	public void write(Writer w, TaxaBlock taxaBlock, ViewBlock viewBlock) throws IOException {
 		w.write("\nBEGIN VIEW;\n");
 		writeTitleAndLink(w);
-		w.write("NAME '" + viewBlock.getName() + "';\n");
+		w.write("NAME '" + viewBlock.getName() + "View';\n");
 		w.write("INPUT '" + viewBlock.getInputBlockName() + "';\n");
 		OptionIO.writeOptions(w, viewBlock.getView());
 		w.write("END; [VIEW]\n");

@@ -38,7 +38,7 @@ public class NexusIOBase {
 	 * write the block title and link, if set
 	 */
 	public void writeTitleAndLink(Writer w) throws IOException {
-		if (getTitle() != null && getTitle().length() > 0) {
+		if (getTitle() != null && !getTitle().isEmpty()) {
 			w.write("TITLE '" + getTitle() + "';\n");
 			if (getLink() != null)
 				w.write("LINK " + getLink().getFirst() + " = '" + getLink().getSecond() + "';\n");

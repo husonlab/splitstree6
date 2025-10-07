@@ -21,6 +21,7 @@
 package splitstree6.algorithms.distances.distances2network;
 
 import javafx.util.Pair;
+import jloda.fx.control.RichTextLabel;
 import jloda.graph.Node;
 import jloda.graph.algorithms.Dijkstra;
 import jloda.phylo.PhyloGraph;
@@ -41,28 +42,42 @@ public class CheckPairwiseDistances {
 		var taxonNodePairs = graph.nodeStream().filter(graph::hasTaxa)
 				.map(v -> new Pair<>(graph.getTaxon(v), v)).toList();
 		var differences = 0;
+		var totalDifference = 0.0;
+		var totalInput = 0.0;
+		var totalOutput = 0.0;
 		for (var i = 0; i < taxonNodePairs.size(); i++) {
 			var a = taxonNodePairs.get(i);
 			for (var j = i + 1; j < taxonNodePairs.size(); j++) {
 				var b = taxonNodePairs.get(j);
 				var inputDistance = D[a.getKey() - 1][b.getKey() - 1];
+				totalInput += inputDistance;
 				var outputDistance = graphDistance(graph, a.getValue(), b.getValue());
+				totalOutput += outputDistance;
 				var diff = Math.abs(inputDistance - outputDistance);
 				if (diff > epsilon) {
-					System.err.println("'" + graph.getLabel(a.getValue()) + "' - '" + graph.getLabel(b.getValue()) + "': in=%s, out=%s, diff=%s".formatted(
-							StringUtils.removeTrailingZerosAfterDot(inputDistance),
-							StringUtils.removeTrailingZerosAfterDot(outputDistance),
-							StringUtils.removeTrailingZerosAfterDot(diff)));
+					totalDifference += diff;
+					if (false) {
+						System.err.println("'" + RichTextLabel.getRawText(graph.getLabel(a.getValue())) + "' - '" + RichTextLabel.getRawText(graph.getLabel(b.getValue())) + "': in=%s, out=%s, diff=%s".formatted(
+								StringUtils.removeTrailingZerosAfterDot(inputDistance),
+								StringUtils.removeTrailingZerosAfterDot(outputDistance),
+								StringUtils.removeTrailingZerosAfterDot(diff)));
+					}
 					differences++;
 				}
 			}
 		}
+
+		System.err.printf("Total input length:  %.3f%n", totalInput);
+		System.err.printf("Total output length: %.3f%n", totalOutput);
 		if (differences == 0)
 			System.err.println("All path distances correct");
-		else
-			System.err.println("Incorrect path distances: " + differences);
-		System.err.println("Total length: " + graph.edgeStream().mapToDouble(graph::getWeight).sum());
+		else {
+			System.err.printf("Sum of differences: %.1f%%%n%n", 100 * (totalDifference / totalInput));
+			// System.err.println("Incorrect path distances: " + differences);
+		}
+		System.err.printf("Total network length: %.3f%n", graph.edgeStream().mapToDouble(graph::getWeight).sum());
 	}
+
 
 	public static double graphDistance(PhyloGraph graph, Node v, Node w) {
 		var list = Dijkstra.compute(graph, v, w, graph::getWeight, true);

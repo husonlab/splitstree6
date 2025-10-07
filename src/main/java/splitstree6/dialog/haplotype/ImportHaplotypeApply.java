@@ -20,13 +20,14 @@
 
 package splitstree6.dialog.haplotype;
 
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
+import razornetaccess.RazorHaplotypeNetwork;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
-import splitstree6.algorithms.characters.characters2network.RazorHaplotypeNetwork;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
@@ -158,6 +159,7 @@ public class ImportHaplotypeApply {
 				workflow.newAlgorithmNode(algorithm, workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), networkNode);
 				workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), networkNode, workflow.newDataNode(new ViewBlock()));
 				workflow.restart(workflow.getInputTaxaFilterNode());
+				RunAfterAWhile.applyInFXThread(mainWindow.getStage(), () -> mainWindow.getStage().toFront());
 			}
 		} else {
 			if (data != null) {

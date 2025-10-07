@@ -140,6 +140,7 @@ public class CollapseIdenticalHyplotypes {
 				var name = (members.size() == 1 ? inputTaxa.getLabel(inId) : "TYPE" + (++which));
 
 				if (inputTraits == null) {
+					outputTraits.setDimensions(outputNTax, outputNTax);
 					outputTraits.setTraitLabel(outId, name);
 					for (var i = 1; i <= outputNTax; i++) {
 						outputTraits.setTraitValue(outId, i, i == outId ? members.size() : 0);

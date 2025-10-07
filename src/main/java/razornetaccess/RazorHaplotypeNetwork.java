@@ -1,38 +1,14 @@
-/*
- * RazorHaplotypeNetwork.java Copyright (C) 2025 Daniel H. Huson
- *
- *  (Some files contain contributions from other authors, who are then mentioned separately.)
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+package razornetaccess;
 
-package splitstree6.algorithms.characters.characters2network;
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import jloda.graph.Edge;
 import jloda.graph.Node;
-import jloda.util.SetUtils;
 import jloda.util.progress.ProgressListener;
+import razornet_old.razor.ParsimonyLabeler;
+import razornet_old.razor.SuperfluousEdge;
+import razornet_old.razor1.InterfaceUtils;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.TN93Distance;
-import splitstree6.algorithms.distances.distances2network.RazorNet;
-import splitstree6.algorithms.distances.distances2network.razor1.InterfaceUtils;
-import splitstree6.algorithms.distances.distances2network.razor1.ParsimonyLabeler;
-import splitstree6.algorithms.distances.distances2network.razor1.SuperfluousEdge;
+import splitstree6.algorithms.characters.characters2network.Characters2Network;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.NetworkBlock;
@@ -42,11 +18,10 @@ import splitstree6.data.parts.AmbiguityCodes;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * computes a haplotype network using the RazorNet method
- * Daniel Huson, 9.2025
+ * computes a haplotype network using the RazorNet_old method
+ * Daniel Huson, 10.2025
  */
 public class RazorHaplotypeNetwork extends Characters2Network {
 	public enum AmbiguousOptions {Wildcard, State}
@@ -61,11 +36,22 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 
 	private final BooleanProperty optionPolish = new SimpleBooleanProperty(this, "optionPolish", true);
 	private final BooleanProperty optionLocalPruning = new SimpleBooleanProperty(this, "optionLocalPruning", true);
-	private final BooleanProperty optionAlgorithm2 = new SimpleBooleanProperty(this, "optionAlgorithm2", false);
+
+	private final IntegerProperty optionMaxRounds = new SimpleIntegerProperty(this, "optionMaxRounds", 20);
+
+	private final RazorNet razorNet;
+
+	public RazorHaplotypeNetwork() {
+		// get defaults from RazorNet:
+		this.razorNet = new RazorNet();
+		optionPolish.set(razorNet.isOptionPolish());
+		optionLocalPruning.set(razorNet.isOptionLocalPruning());
+		optionMaxRounds.set(razorNet.getOptionMaxRounds());
+	}
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionDistanceMethod.getName(), optionContractEdges.getName(), optionRemoveEdges.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionAlgorithm2.getName());
+		return List.of(optionDistanceMethod.getName(), optionRemoveEdges.getName(), optionContractEdges.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
 	}
 
 	@Override
@@ -84,12 +70,9 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 			computeHammingDistances(charactersBlock, distancesBlock.getDistances(), hammingOptions);
 		}
 
-		var razorNet = new RazorNet();
-		razorNet.optionEpsilonProperty().set(0.00001);
-		razorNet.optionMinDistanceProperty().set(0.00001);
 		razorNet.optionPolishProperty().set(isOptionPolish());
 		razorNet.optionLocalPruningProperty().set(isOptionLocalPruning());
-		razorNet.optionAlgorithm2Property().set(isOptionAlgorithm2());
+		razorNet.optionMaxRoundsProperty().set(getOptionMaxRounds());
 
 		razorNet.compute(progress, taxaBlock, distancesBlock, networkBlock);
 
@@ -109,45 +92,6 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 		var outputSequences = parsimonyLabeler.labelAllSites(inputSequences);
 		for (var entry : outputSequences.entrySet()) {
 			networkBlock.getNodeData(entry.getKey()).put(NetworkBlock.NODE_STATES_KEY, entry.getValue());
-		}
-
-		if (isOptionContractEdges()) {
-			progress.setSubtask("contracting empty edges");
-
-			var edgesContracted = 0;
-			for (var i = 0; i < 100; i++) {
-				var contracted = false;
-				for (var e : graph.edges()) {
-					if (isPartOfTriangle(e))
-						continue;
-					var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
-					var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
-
-					if (sequence1 != null && sequence2 != null) {
-						if ((!graph.hasTaxa(e.getSource()) || !graph.hasTaxa(e.getTarget())) && compareSequences(sequence1, sequence2, hammingOptions) == 0) {
-							var keep = (graph.hasTaxa(e.getSource()) ? e.getSource() : e.getTarget());
-							var other = e.getOpposite(keep);
-							for (var f : other.adjacentEdges()) {
-								if (f != e) {
-									var u = f.getOpposite(other);
-									var g = graph.newEdge(u, keep);
-									graph.setWeight(g, graph.getWeight(e));
-								}
-							}
-
-							networkBlock.removeNodeData(other);
-							graph.deleteNode(other);
-
-							edgesContracted++;
-							contracted = true;
-							break;
-						}
-					}
-				}
-				if (!contracted)
-					break;
-			}
-			System.err.println("Empty edges contracted: " + edgesContracted);
 		}
 
 		if (isOptionRemoveEdges()) {
@@ -171,7 +115,79 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 					edgesDeleted++;
 				}
 			}
+
+			while (true) {
+				var changed = false;
+				var vOptional = graph.nodeStream().filter(u -> u.getDegree() == 2 && !graph.hasTaxa(u)).findAny();
+				if (vOptional.isPresent()) {
+					var v = vOptional.get();
+					var e1 = v.getFirstAdjacentEdge();
+					var e2 = v.getLastAdjacentEdge();
+					var a = e1.getOpposite(v);
+					var b = e2.getOpposite(v);
+					var ab = a.getCommonEdge(b);
+					if (ab == null) {
+						var e = graph.newEdge(a, b);
+						graph.setWeight(e, graph.getWeight(e1) + graph.getWeight(e2));
+					} else {
+						var w = 0.5 * (graph.getWeight(ab) + graph.getWeight(e1) + graph.getWeight(e2));
+						graph.setWeight(ab, w);
+					}
+					graph.deleteNode(v);
+					changed = true;
+				}
+				if (true) {
+					var wOptional = graph.nodeStream().filter(u -> u.getDegree() == 1 && !graph.hasTaxa(u)).findAny();
+					if (wOptional.isPresent()) {
+						var w = wOptional.get();
+						graph.deleteNode(w);
+						changed = true;
+					}
+				}
+				if (!changed)
+					break;
+			}
 			System.err.println("Superfluous edges removed: " + edgesDeleted);
+		}
+
+		if (isOptionContractEdges()) {
+			progress.setSubtask("contracting empty edges");
+
+			var edgesContracted = 0;
+			for (var i = 0; i < 10000; i++) {
+				var contracted = false;
+				for (var e : graph.edges()) {
+					var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
+					var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
+
+					if ((!graph.hasTaxa(e.getSource()) || !graph.hasTaxa(e.getTarget())) && (compareSequences(sequence1, sequence2, hammingOptions) == 0)) {
+							var keep = (graph.hasTaxa(e.getSource()) ? e.getSource() : e.getTarget());
+							var other = e.getOpposite(keep);
+							for (var f : other.adjacentEdges()) {
+								if (f != e) {
+									var u = f.getOpposite(other);
+									var g = u.getCommonEdge(keep);
+									if (g != null) {
+										var w = 0.5 * (graph.getWeight(f) + graph.getWeight(g));
+										graph.setWeight(g, w);
+									} else {
+										var h = graph.newEdge(u, keep);
+										graph.setWeight(h, graph.getWeight(e));
+									}
+								}
+							}
+							networkBlock.removeNodeData(other);
+							graph.deleteNode(other);
+
+							edgesContracted++;
+							contracted = true;
+							break;
+						}
+				}
+				if (!contracted)
+					break;
+			}
+			System.err.println("Empty edges contracted: " + edgesContracted);
 		}
 
 		for (var e : graph.edges()) {
@@ -181,12 +197,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 				networkBlock.getEdgeData(e).put(NetworkBlock.EDGE_SITES_KEY, computeEdgeLabel(sequence1, sequence2, hammingOptions));
 			}
 		}
-	}
-
-	private boolean isPartOfTriangle(Edge e) {
-		var a = e.getSource().adjacentNodeStream(false).filter(v -> v != e.getTarget()).collect(Collectors.toSet());
-		var b = e.getTarget().adjacentNodeStream(false).filter(v -> v != e.getSource()).collect(Collectors.toSet());
-		return SetUtils.intersect(a, b);
+		networkBlock.setNetworkType(NetworkBlock.Type.HaplotypeNetwork);
 	}
 
 	private static void computeHammingDistances(CharactersBlock charactersBlock, double[][] distances, ComparisonOptions comparisonOptions) {
@@ -294,11 +305,11 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 		return optionDistanceMethod;
 	}
 
-	public boolean isOptionAlgorithm2() {
-		return optionAlgorithm2.get();
+	public int getOptionMaxRounds() {
+		return optionMaxRounds.get();
 	}
 
-	public BooleanProperty optionAlgorithm2Property() {
-		return optionAlgorithm2;
+	public IntegerProperty optionMaxRoundsProperty() {
+		return optionMaxRounds;
 	}
 }

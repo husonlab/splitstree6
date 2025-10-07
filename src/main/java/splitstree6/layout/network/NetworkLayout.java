@@ -29,6 +29,8 @@ import javafx.scene.shape.Line;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.*;
+import jloda.graph.fmm.FastMultiLayerMethodLayout;
+import jloda.graph.fmm.FastMultiLayerMethodOptions;
 import jloda.phylo.PhyloGraph;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
@@ -55,6 +57,28 @@ import static splitstree6.layout.tree.LayoutUtils.normalize;
  */
 public class NetworkLayout {
 	private final RadialLabelLayout labelLayout = new RadialLabelLayout();
+	private final FastMultiLayerMethodOptions options;
+
+	public NetworkLayout() {
+		options = new FastMultiLayerMethodOptions();
+		//options =FastMultiLayerMethodOptions.getDefaultForPhylogenetics();options =FastMultiLayerMethodOptions.getDefaultForMicrobialGenomes();
+		// options.setStopCriterion(FastMultiLayerMethodOptions.StopCriterion.FixedIterationsOrThreshold);
+		if (true) {
+			options.setMSingleLevel(true);
+			options.setMinGraphSize(Integer.MAX_VALUE); // ensures no coarsening
+			options.setInitialPlacementForces(FastMultiLayerMethodOptions.InitialPlacementForces.KeepPositions);
+			//options.setForceModel(FastMultiLayerMethodOptions.ForceModel.FruchtermanReingold);
+			options.setRepulsiveForcesCalculation(FastMultiLayerMethodOptions.RepulsiveForcesCalculation.Exact);
+			options.setAllowedPositions(FastMultiLayerMethodOptions.AllowedPositions.All);
+			options.setStopCriterion(FastMultiLayerMethodOptions.StopCriterion.FixedIterations);
+			options.setFixedIterations(1000);       // FR usually needs more iters than FMMM
+			options.setCoolTemperature(true);
+			options.setCoolValue(0.995f);
+			options.setFineTuningIterations(1000);     // not needed; FR is the main pass
+			options.validate();
+		}
+	}
+
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock networkBlock, DiagramType diagram, double width, double height, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 					   ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, int randomLayoutSeed) throws CanceledException {
 		labelLayout.clear();
@@ -87,12 +111,20 @@ public class NetworkLayout {
 					var y = Double.parseDouble(networkBlock.getNodeData(v).get(NetworkBlock.NodeData.BasicKey.y.name()));
 					nodePointMap.put(v, new Point2D(x, y));
 				}
-			} else {
+			} else if (randomLayoutSeed % 2 == 1) {
+				System.err.print("Running MDS-based layout...");
 				var params = new WeightedLayout.Params();
+				params.maxIterations = 5000;
 				params.randomSeed = randomLayoutSeed;
 				var layout = new WeightedLayout<Node, Edge>();
 				layout.layout(graph.getNodesAsList(), Node::adjacentEdges,
 						Node::getOpposite, edgeWeightFunction, nodePointMap::put, params);
+				System.err.println(" done");
+			} else {
+				options.setRandSeed(randomLayoutSeed);
+				System.err.print("Running MLML-based layout...");
+				FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, null, (v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY())));
+				System.err.println(" done");
 			}
 
 			if (graph.getNumberOfEdges() == 0) {

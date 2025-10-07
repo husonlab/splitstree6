@@ -32,7 +32,7 @@ import java.util.*;
 
 /**
  * Median Joining Algorithm
- * Daiel Huson, 2010, 2021
+ * Daniel Huson, 2010, 2021
  */
 public class MedianJoiningCalculator extends QuasiMedianBase {
 	private int optionEpsilon = 0;
@@ -62,7 +62,7 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 	}
 
 	/**
-	 * AlgorithmsToLaTeX loop of the median joining algorithm
+	 * Algorithm loop of the median joining algorithm
 	 */
 	private void computeMedianJoiningMainLoop(ProgressListener progress, Set<String> input, double[] weights, int epsilon, Set<String> outputSequences) throws CanceledException {
 		outputSequences.addAll(input);

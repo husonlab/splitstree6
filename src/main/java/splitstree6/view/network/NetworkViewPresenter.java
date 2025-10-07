@@ -126,6 +126,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		networkPane.setRunBeforeUpdate(() -> {
 			nodeSelectionModel.clearSelection();
 			edgeSelectionModel.clearSelection();
+			if (!first) NetworkEdits.clearEdits(view.optionEditsProperty());
 		});
 
 		networkPane.setRunAfterUpdate(() -> {

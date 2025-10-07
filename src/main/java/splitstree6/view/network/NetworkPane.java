@@ -19,6 +19,7 @@
 
 package splitstree6.view.network;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
@@ -32,11 +33,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
-import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.Basic;
@@ -209,7 +210,13 @@ public class NetworkPane extends StackPane {
 	}
 
 	public void drawNetwork() {
-		RunAfterAWhile.applyInFXThread(this, service::restart);
+		if (!service.isRunning())
+			service.restart();
+		else {
+			var pt = new PauseTransition(Duration.millis(100));
+			pt.setOnFinished(e -> drawNetwork());
+			pt.play();
+		}
 	}
 
 	public Runnable getRunAfterUpdate() {

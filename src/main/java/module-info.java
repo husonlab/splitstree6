@@ -28,8 +28,12 @@ module splitstreesix {
 
 	opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
+
 	opens splitstree6.algorithms.characters.characters2distances.nucleotide;
+	exports splitstree6.algorithms.characters.characters2distances.nucleotide;
+
 	opens splitstree6.algorithms.characters.characters2network;
+	exports splitstree6.algorithms.characters.characters2network;
 	opens splitstree6.algorithms.characters.characters2view;
 	opens splitstree6.algorithms.characters.characters2splits;
 	opens splitstree6.algorithms.characters.characters2trees;
@@ -40,8 +44,7 @@ module splitstreesix {
 
 	opens splitstree6.algorithms.distances.distances2distances;
 	opens splitstree6.algorithms.distances.distances2network;
-	opens splitstree6.algorithms.distances.distances2network.razor1;
-	opens splitstree6.algorithms.distances.distances2network.razor2;
+	exports splitstree6.algorithms.distances.distances2network;
 
 	opens splitstree6.algorithms.distances.distances2view;
 	opens splitstree6.algorithms.distances.distances2splits;
@@ -224,4 +227,9 @@ module splitstreesix {
 	opens splitstree6.tools.server;
 	exports splitstree6.tools.server;
 	exports splitstree6.view.trees.tanglegram;
+
+	opens razornetaccess;
+	opens razornet;
+	opens razornet_old;
+
 }

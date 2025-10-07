@@ -19,12 +19,16 @@
 
 package splitstree6.algorithms;
 
+import razornet_old.CactusRealizer;
+import razornet_old.RazorHaplotypeNetwork_old;
+import razornet_old.RazorNet_old;
+import razornetaccess.RazorHaplotypeNetwork;
+import razornetaccess.RazorNet;
 import splitstree6.algorithms.characters.characters2characters.CharactersFilter;
 import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter;
 import splitstree6.algorithms.characters.characters2distances.*;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
-import splitstree6.algorithms.characters.characters2network.RazorHaplotypeNetwork;
 import splitstree6.algorithms.characters.characters2report.EstimateInvariableSites;
 import splitstree6.algorithms.characters.characters2report.PhiTest;
 import splitstree6.algorithms.characters.characters2report.TajimaD;
@@ -33,7 +37,9 @@ import splitstree6.algorithms.characters.characters2splits.DnaToSplits;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.characters.characters2trees.ExternalProgram;
 import splitstree6.algorithms.distances.distances2distances.DistancesTaxaFilter;
-import splitstree6.algorithms.distances.distances2network.*;
+import splitstree6.algorithms.distances.distances2network.ExternalDistance2Network;
+import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
+import splitstree6.algorithms.distances.distances2network.PCOA;
 import splitstree6.algorithms.distances.distances2report.DeltaScore;
 import splitstree6.algorithms.distances.distances2splits.BunemanTree;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
@@ -127,7 +133,9 @@ public class AlgorithmList {
 
 		add(algorithms, names, new MinSpanningNetwork());
 		add(algorithms, names, new ExternalDistance2Network());
-		add(algorithms, names, new NetworkPruning());
+		add(algorithms, names, new CactusRealizer());
+		add(algorithms, names, new RazorNet_old());
+		add(algorithms, names, new RazorHaplotypeNetwork_old());
 		add(algorithms, names, new RazorNet());
 		add(algorithms, names, new RazorHaplotypeNetwork());
 

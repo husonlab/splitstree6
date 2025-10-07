@@ -128,13 +128,15 @@ public class LayoutUtils {
 
 	public static RichTextLabel getLabel(Function<Integer, StringProperty> taxonLabelMap, PhyloGraph graph, Node v) {
 		if (graph.getNumberOfTaxa(v) == 1) {
-			var label = new RichTextLabel();
-			var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
-			if (taxonId != null) {
-				label.textProperty().bindBidirectional(taxonLabelMap.apply(taxonId));
-			} else
-				label.setText(graph.getLabel(v));
-			return label;
+			var taxonId = graph.getTaxon(v);
+			if (taxonId == -1) {
+				var again = graph.getTaxon(v);
+				System.err.println(StringUtils.toString(graph.getTaxa(v), " "));
+				return null;
+			}
+			var textLabel = new RichTextLabel();
+			textLabel.textProperty().bindBidirectional(taxonLabelMap.apply(taxonId));
+			return textLabel;
 		} else if (graph.getNumberOfTaxa(v) >= 2) {
 			var label = StringUtils.toString(IteratorUtils.asStream(graph.getTaxa(v)).map(t -> taxonLabelMap.apply(t).getValue()).collect(Collectors.toList()), ",");
 			return new RichTextLabel(label);
