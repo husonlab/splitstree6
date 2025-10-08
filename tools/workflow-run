@@ -23,7 +23,7 @@ else
 fi
 
 bin_dir=$(dirname "$0")       # may be relative path
-bin_dir=$(cd "$bin_dir" && pwd)    # ensure absolute path
+bin_dir=$(cd "$bin_dir" && pwd)    # ensureNode absolute path
 jars_dir="$bin_dir/../jars"
 jars2_dir="$bin_dir/../jars2"
 

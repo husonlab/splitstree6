@@ -74,7 +74,7 @@ public class SplitUtils {
 		}
 		final var posPrev = (posOf1 == 1 ? cycle.length - 1 : posOf1 - 1);
 		final var posNext = (posOf1 == cycle.length - 1 ? 1 : posOf1 + 1);
-		if (cycle[posPrev] > cycle[posNext]) { // has correct orientation, ensure that taxon 1 is at first position
+		if (cycle[posPrev] > cycle[posNext]) { // has correct orientation, ensureNode that taxon 1 is at first position
 			if (posOf1 != 1) {
 				var tmp = new int[cycle.length];
 				var i = posOf1;

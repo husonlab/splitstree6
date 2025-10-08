@@ -1,5 +1,5 @@
 /*
- * RazorNet.java Copyright (C) 2025 Daniel H. Huson
+ * RazorNet_next.java Copyright (C) 2025 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -20,15 +20,15 @@
 
 package razornetaccess;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import jloda.graph.Node;
+import javafx.beans.property.*;
+import jloda.fx.util.ProgramProperties;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import razornet.RazorNetAlgorithm;
-import razornet.utils.Progress;
+import razornet.cactusrealizer.RunCactusRealizer;
+import razornet.razor_broken.RunRazorNet2Broken;
+import razornet.razor_double.RunRazorNet1;
+import razornet.razor_int.RunRazorNetInt;
+import razornet.utils.Quantization;
 import splitstree6.algorithms.distances.distances2network.CheckPairwiseDistances;
 import splitstree6.algorithms.distances.distances2network.Distances2Network;
 import splitstree6.data.DistancesBlock;
@@ -36,22 +36,32 @@ import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.TreeSet;
+
+import static razornetaccess.RazorNet.Algorithm.Tighten2Polish1;
 
 /**
  * implementation of the  Razor-net algorithm
  * Momomoko Hayamizu and Daniel Huson, 10.2025
  */
 public class RazorNet extends Distances2Network {
+	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, Tighten2Polish2, Algorithm1Double, Algorithm2Broken, CactusRealizer}
+
+	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Tighten2Polish1);
 	private final BooleanProperty optionPolish = new SimpleBooleanProperty(this, "optionPolish", true);
-	private final BooleanProperty optionLocalPruning = new SimpleBooleanProperty(this, "optionLocalPruning", false);
+	private final BooleanProperty optionLocalPruning = new SimpleBooleanProperty(this, "optionLocalPruning", true);
 	private final IntegerProperty optionMaxRounds = new SimpleIntegerProperty(this, "optionMaxRounds", 100);
+
+	{
+		ProgramProperties.track(optionAlgorithm, Algorithm::valueOf, Tighten2Polish1);
+		ProgramProperties.track(optionPolish, true);
+		ProgramProperties.track(optionLocalPruning, true);
+		ProgramProperties.track(optionMaxRounds, 100);
+	}
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
+		return List.of(optionAlgorithm.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
 	}
 
 	@Override
@@ -70,41 +80,65 @@ public class RazorNet extends Distances2Network {
 	@Override
 	public void compute(ProgressListener progressListener, TaxaBlock taxaBlock, DistancesBlock distancesBlock, NetworkBlock networkBlock) throws IOException {
 		System.err.println("Running " + this.getClass().getSimpleName());
+		var progress = new ProgressAdapter(progressListener);
 		var distances = distancesBlock.getDistances();
-		var progress = new Progress() {
-			@Override
-			public void setProgress(long progress, long maximum) throws IOException {
-				progressListener.setMaximum(maximum);
-				progressListener.setProgress(progress);
+
+		var quantization = Quantization.quantizeToEvenRazorMatrix(distances, 0.0000001, 0.0000001);
+
+		var graphAdapter = new PhyloGraphAdapter(networkBlock.getGraph());
+
+		switch (optionAlgorithm.get()) {
+			case Algorithm1Double ->
+					RunRazorNet1.run(graphAdapter, quantization.matrixAsDoubles(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), progress);
+			case Tighten1Polish1 ->
+					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 1, 1, progress);
+			case Tighten2Polish1 ->
+					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 1, progress);
+			case Tighten2Polish2 ->
+					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 2, progress);
+			case Algorithm2Broken ->
+					RunRazorNet2Broken.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), progress);
+			case CactusRealizer ->
+					RunCactusRealizer.run(graphAdapter, quantization.matrixAsDoubles(), isOptionPolish(), isOptionLocalPruning(), progress);
+		}
+
+		if (true) {
+			// update edge weights
+			for (var e : graphAdapter.edges()) {
+				var weight = quantization.mapDistanceBack().applyAsDouble((int) graphAdapter.getWeight(e));
+				graphAdapter.setWeight(e, weight);
 			}
-		};
-		var computedEdges = RazorNetAlgorithm.run(distances, isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), progress);
-		var computeNodes = new TreeSet<Integer>();
-		for (var e : computedEdges) {
-			computeNodes.add(e.i());
-			computeNodes.add(e.j());
-		}
-
-		var graph = networkBlock.getGraph();
-
-		var nodes = new HashMap<Integer, Node>();
-		for (var i : computeNodes) {
-			var v = nodes.computeIfAbsent(i, k -> graph.newNode());
-			if (i < taxaBlock.getNtax()) {
-				var t = (i + 1);
-				graph.addTaxon(v, t);
-				graph.setLabel(v, taxaBlock.getLabel(t));
+			// uncollapse identical taxa
+			for (var v0 : graphAdapter.nodes()) {
+				var rep1 = graphAdapter.getTaxon(v0);
+				if (rep1 != -1) {
+					var rep0 = rep1 - 1;
+					var taxa = quantization.mapNodeBack().apply(rep0);
+					var v = v0;
+					var first = true;
+					for (var t0 : taxa) {
+						var t1 = t0 + 1;
+						if (first)
+							first = false;
+						else {
+							v = graphAdapter.newNode();
+							var e = graphAdapter.newEdge(v0, v);
+							graphAdapter.setWeight(e, 0);
+						}
+						graphAdapter.setTaxon(v, t1);
+						graphAdapter.setLabel(v, taxaBlock.getLabel(t1));
+					}
+				}
 			}
-		}
-		for (var computedEdge : computedEdges) {
-			var u = nodes.get(computedEdge.i());
-			var v = nodes.get(computedEdge.j());
-			var e = graph.newEdge(u, v);
-			graph.setWeight(e, computedEdge.weight());
-			networkBlock.getEdgeData(e).put("weight", StringUtils.removeTrailingZerosAfterDot(graph.getWeight(e)));
+
 		}
 
-		CheckPairwiseDistances.apply(graph, distances, 0.0000001);
+		for (var e : graphAdapter.edges()) {
+			networkBlock.getEdgeData(e).put("weight", StringUtils.removeTrailingZerosAfterDot(graphAdapter.getWeight(e)));
+		}
+
+		CheckPairwiseDistances.apply(graphAdapter.getGraph(), distancesBlock.getDistances(), 0.000001);
+
 	}
 
 	public boolean isOptionPolish() {
@@ -129,5 +163,13 @@ public class RazorNet extends Distances2Network {
 
 	public IntegerProperty optionMaxRoundsProperty() {
 		return optionMaxRounds;
+	}
+
+	public Algorithm getOptionAlgorithm() {
+		return optionAlgorithm.get();
+	}
+
+	public ObjectProperty<Algorithm> optionAlgorithmProperty() {
+		return optionAlgorithm;
 	}
 }

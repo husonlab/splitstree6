@@ -1204,7 +1204,7 @@ public class MainWindowController {
 	private final Map<Property, Property> bidirectionalBoundPairs = new HashMap<>();
 
 	/**
-	 * use this to ensure that bidirectional bindings to menu items are kept unique
+	 * use this to ensureNode that bidirectional bindings to menu items are kept unique
 	 *
 	 * @param uniquelyBoundProperty
 	 * @param otherProperty

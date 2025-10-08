@@ -67,17 +67,16 @@ public class CheckPairwiseDistances {
 			}
 		}
 
-		System.err.printf("Total input length:  %.3f%n", totalInput);
-		System.err.printf("Total output length: %.3f%n", totalOutput);
+		System.err.printf("Total input length:  %s%n", StringUtils.removeTrailingZerosAfterDot("%.8f", totalInput));
+		System.err.printf("Total output length: %s%n", StringUtils.removeTrailingZerosAfterDot("%.8f", totalOutput));
 		if (differences == 0)
 			System.err.println("All path distances correct");
 		else {
-			System.err.printf("Sum of differences: %.1f%%%n%n", 100 * (totalDifference / totalInput));
+			System.err.printf("Sum of differences: %s%%%n%n", StringUtils.removeTrailingZerosAfterDot("%.1f", 100 * (totalDifference / totalInput)));
 			// System.err.println("Incorrect path distances: " + differences);
 		}
-		System.err.printf("Total network length: %.3f%n", graph.edgeStream().mapToDouble(graph::getWeight).sum());
+		System.err.printf("Total network length: %s%n", StringUtils.removeTrailingZerosAfterDot("%.8f", graph.edgeStream().mapToDouble(graph::getWeight).sum()));
 	}
-
 
 	public static double graphDistance(PhyloGraph graph, Node v, Node w) {
 		var list = Dijkstra.compute(graph, v, w, graph::getWeight, true);

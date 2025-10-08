@@ -398,7 +398,7 @@ public class TaxaBlock extends DataBlock {
 	}
 
 	/**
-	 * we update this to the working taxa when we have read in the data from a Splitstree6 file to ensure that
+	 * we update this to the working taxa when we have read in the data from a Splitstree6 file to ensureNode that
 	 * display labels are handled property
 	 *
 	 * @param inputTaxaBlock input data block

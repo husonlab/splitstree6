@@ -4,9 +4,6 @@ import javafx.beans.property.*;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.progress.ProgressListener;
-import razornet_old.razor.ParsimonyLabeler;
-import razornet_old.razor.SuperfluousEdge;
-import razornet_old.razor1.InterfaceUtils;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.TN93Distance;
 import splitstree6.algorithms.characters.characters2network.Characters2Network;
 import splitstree6.data.CharactersBlock;
@@ -16,14 +13,15 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.AmbiguityCodes;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.ToIntFunction;
 
 /**
  * computes a haplotype network using the RazorNet_old method
  * Daniel Huson, 10.2025
  */
 public class RazorHaplotypeNetwork extends Characters2Network {
+	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, Tighten2Polish2, Algorithm1Double, Algorithm2Broken, CactusRealizer}
 	public enum AmbiguousOptions {Wildcard, State}
 
 	public enum DistanceMethods {Hamming, TN93}
@@ -34,24 +32,30 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 	private final BooleanProperty optionContractEdges = new SimpleBooleanProperty(this, "optionContractEdges", false);
 	private final BooleanProperty optionRemoveEdges = new SimpleBooleanProperty(this, "optionRemoveEdges", false);
 
+	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Algorithm.Tighten2Polish1);
+
 	private final BooleanProperty optionPolish = new SimpleBooleanProperty(this, "optionPolish", true);
 	private final BooleanProperty optionLocalPruning = new SimpleBooleanProperty(this, "optionLocalPruning", true);
 
-	private final IntegerProperty optionMaxRounds = new SimpleIntegerProperty(this, "optionMaxRounds", 20);
+	private final IntegerProperty optionMaxRounds = new SimpleIntegerProperty(this, "optionMaxRounds", 100);
 
 	private final RazorNet razorNet;
 
 	public RazorHaplotypeNetwork() {
-		// get defaults from RazorNet:
+		// get defaults from RazorNet_next:
 		this.razorNet = new RazorNet();
-		optionPolish.set(razorNet.isOptionPolish());
-		optionLocalPruning.set(razorNet.isOptionLocalPruning());
-		optionMaxRounds.set(razorNet.getOptionMaxRounds());
+		try {
+			optionPolish.set(razorNet.isOptionPolish());
+			optionLocalPruning.set(razorNet.isOptionLocalPruning());
+			optionMaxRounds.set(razorNet.getOptionMaxRounds());
+			optionAlgorithm.set(Algorithm.valueOf(razorNet.getOptionAlgorithm().name()));
+		} catch (Exception ignored) {
+		}
 	}
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionDistanceMethod.getName(), optionRemoveEdges.getName(), optionContractEdges.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
+		return List.of(optionDistanceMethod.getName(), optionRemoveEdges.getName(), optionContractEdges.getName(), optionAlgorithm.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
 	}
 
 	@Override
@@ -70,9 +74,13 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 			computeHammingDistances(charactersBlock, distancesBlock.getDistances(), hammingOptions);
 		}
 
-		razorNet.optionPolishProperty().set(isOptionPolish());
-		razorNet.optionLocalPruningProperty().set(isOptionLocalPruning());
-		razorNet.optionMaxRoundsProperty().set(getOptionMaxRounds());
+		try {
+			razorNet.optionPolishProperty().set(isOptionPolish());
+			razorNet.optionLocalPruningProperty().set(isOptionLocalPruning());
+			razorNet.optionMaxRoundsProperty().set(getOptionMaxRounds());
+			razorNet.optionAlgorithmProperty().set(RazorNet.Algorithm.valueOf(razorNet.getOptionAlgorithm().name()));
+		} catch (Exception ignored) {
+		}
 
 		razorNet.compute(progress, taxaBlock, distancesBlock, networkBlock);
 
@@ -80,7 +88,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 
 		progress.setSubtask("parsimony labeling");
 
-		var parsimonyLabeler = new ParsimonyLabeler<>(InterfaceUtils.getGraphAdapter(graph));
+		var parsimonyLabeler = new ParsimonyLabeler<>(graph.nodes(), graph.edges(), Edge::getSource, Edge::getTarget);
 		var inputSequences = new HashMap<Node, String>();
 		for (var v : graph.nodes()) {
 			if (graph.hasTaxa(v)) {
@@ -110,7 +118,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 			var edges = graph.getEdgesAsList();
 			edges.sort((a, b) -> -Double.compare(graph.getWeight(a), graph.getWeight(b)));
 			for (var f : edges) {
-				if (SuperfluousEdge.isSuperfluous(f.getSource(), f.getTarget(), f, changes::get)) {
+				if (isSuperfluous(f.getSource(), f.getTarget(), f, changes::get)) {
 					graph.deleteEdge(f);
 					edgesDeleted++;
 				}
@@ -311,5 +319,63 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 
 	public IntegerProperty optionMaxRoundsProperty() {
 		return optionMaxRounds;
+	}
+
+	public Algorithm getOptionAlgorithm() {
+		return optionAlgorithm.get();
+	}
+
+	public ObjectProperty<Algorithm> optionAlgorithmProperty() {
+		return optionAlgorithm;
+	}
+
+
+	/**
+	 * Is e=(s,t) superfluous? i.e. is there an s->t path not using e with total weight == weight(e)?
+	 * Runs a bounded Dijkstra that:
+	 * - never traverses e
+	 * - never explores paths with distance > w(e)
+	 * - stops immediately if t is popped with distance == w(e)
+	 */
+	public static boolean isSuperfluous(Node s, Node t, Edge e, ToIntFunction<Edge> getWeight) {
+		final var W = getWeight.applyAsInt(e);
+		// Trivial quick reject: if s or t aren't endpoints, or W < 0 (shouldn't happen)
+		if (!e.nodes().containsAll(List.of(s, t)) || W < 0)
+			throw new IllegalArgumentException("Edge e must be exactly (s,t) and have non-negative weight");
+
+		// Dijkstra (bounded by W)
+		Map<Node, Integer> dist = new HashMap<>();
+
+		record NodeDist(Node n, int d) {
+		}
+
+		PriorityQueue<NodeDist> pq = new PriorityQueue<>(Comparator.comparingInt(nd -> nd.d));
+		dist.put(s, 0);
+		pq.add(new NodeDist(s, 0));
+
+		while (!pq.isEmpty()) {
+			NodeDist cur = pq.poll();
+			if (cur.d != dist.get(cur.n)) continue;     // stale
+			if (cur.d > W) break;                       // past the limit -> cannot reach exactly W
+			if (cur.n == t) {
+				// First time we pop t is the shortest distance s->t without using e.
+				return cur.d == W;                      // equal -> superfluous; smaller -> not (under simple paths)
+			}
+			for (var a : cur.n.adjacentEdges()) {
+				// Forbid using e itself
+				if (a == e) continue;
+				var nb = a.getOpposite(cur.n);
+				if (nb == null) continue;               // not incident
+				int nd = cur.d + getWeight.applyAsInt(a);
+				if (nd < 0) throw new ArithmeticException("Integer overflow or negative weight");
+				if (nd > W) continue;                   // prune paths longer than W
+				Integer best = dist.get(nb);
+				if (best == null || nd < best) {
+					dist.put(nb, nd);
+					pq.add(new NodeDist(nb, nd));
+				}
+			}
+		}
+		return false;
 	}
 }

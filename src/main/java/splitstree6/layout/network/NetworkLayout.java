@@ -112,7 +112,7 @@ public class NetworkLayout {
 					nodePointMap.put(v, new Point2D(x, y));
 				}
 			} else if (randomLayoutSeed % 2 == 1) {
-				System.err.print("Running MDS-based layout...");
+				if (false) System.err.print("Running MDS-based layout...");
 				var params = new WeightedLayout.Params();
 				params.maxIterations = 5000;
 				params.randomSeed = randomLayoutSeed;
@@ -122,7 +122,7 @@ public class NetworkLayout {
 				System.err.println(" done");
 			} else {
 				options.setRandSeed(randomLayoutSeed);
-				System.err.print("Running MLML-based layout...");
+				if (false) System.err.print("Running MLML-based layout...");
 				FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, null, (v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY())));
 				System.err.println(" done");
 			}

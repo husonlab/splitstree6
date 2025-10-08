@@ -19,9 +19,6 @@
 
 package splitstree6.algorithms;
 
-import razornet_old.CactusRealizer;
-import razornet_old.RazorHaplotypeNetwork_old;
-import razornet_old.RazorNet_old;
 import razornetaccess.RazorHaplotypeNetwork;
 import razornetaccess.RazorNet;
 import splitstree6.algorithms.characters.characters2characters.CharactersFilter;
@@ -133,11 +130,10 @@ public class AlgorithmList {
 
 		add(algorithms, names, new MinSpanningNetwork());
 		add(algorithms, names, new ExternalDistance2Network());
-		add(algorithms, names, new CactusRealizer());
-		add(algorithms, names, new RazorNet_old());
-		add(algorithms, names, new RazorHaplotypeNetwork_old());
 		add(algorithms, names, new RazorNet());
+
 		add(algorithms, names, new RazorHaplotypeNetwork());
+		add(algorithms, names, new RazorNet());
 
 		add(algorithms, names, new MinSpanningTree());
 

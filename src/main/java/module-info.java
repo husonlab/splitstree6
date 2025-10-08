@@ -229,7 +229,4 @@ module splitstreesix {
 	exports splitstree6.view.trees.tanglegram;
 
 	opens razornetaccess;
-	opens razornet;
-	opens razornet_old;
-
 }
