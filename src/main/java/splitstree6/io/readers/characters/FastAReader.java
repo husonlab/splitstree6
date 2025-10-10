@@ -96,7 +96,7 @@ public class FastAReader extends CharactersReader {
 						throw new IOExceptionWithLineNumber("Sequences must be the same length. " +
 															"Wrong number of chars, Length " + nchar + " expected", counter - 1);
 
-					if (!currentSequence.toString().equals("")) matrix.add(currentSequence.toString());
+					if (!currentSequence.toString().isBlank()) matrix.add(currentSequence.toString());
 					nchar = currentSequenceLength;
 					currentSequenceLength = 0;
 					currentSequence = new StringBuilder();
@@ -119,7 +119,7 @@ public class FastAReader extends CharactersReader {
 				progressListener.setProgress(it.getProgress());
 			}
 
-			if (currentSequence.length() == 0)
+			if (currentSequence.isEmpty())
 				throw new IOExceptionWithLineNumber("SequenceType " + ntax + " is zero", counter);
 			matrix.add(currentSequence.toString());
 			if (nchar != currentSequenceLength)

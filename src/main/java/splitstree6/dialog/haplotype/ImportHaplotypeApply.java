@@ -116,7 +116,7 @@ public class ImportHaplotypeApply {
 					}
 				}
 			}
-			{
+			if (false) {
 				var w = new StringWriter();
 				(new TraitsNexusOutput()).write(w, originalTaxa, traitsBlock);
 				System.err.println("Input traits:\n" + w);
@@ -129,8 +129,7 @@ public class ImportHaplotypeApply {
 				var traitsBlock = data.getSecond();
 				var charactersBlock = data.getThird();
 				taxaBlock.setTraitsBlock(traitsBlock);
-
-				{
+				if (false) {
 					var w = new StringWriter();
 					(new TraitsNexusOutput()).write(w, originalTaxa, traitsBlock);
 					System.err.println("Output traits:\n" + w);

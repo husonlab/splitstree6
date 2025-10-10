@@ -61,7 +61,8 @@ public class SetupRadialLabelLayout implements Consumer<LayoutOrientation> {
 					} else
 						angle = 0.0;
 				}
-				System.err.println(angle);
+				if (false)
+					System.err.println(angle);
 				label.setVisible(false);
 				label.setLayoutX(0);
 				label.setLayoutY(0);

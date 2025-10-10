@@ -67,12 +67,11 @@ public class CheckPairwiseDistances {
 			}
 		}
 
-		System.err.printf("Total input length:  %s%n", StringUtils.removeTrailingZerosAfterDot("%.8f", totalInput));
-		System.err.printf("Total output length: %s%n", StringUtils.removeTrailingZerosAfterDot("%.8f", totalOutput));
+		System.err.printf("Total input length:  %s output length: %s %n", StringUtils.removeTrailingZerosAfterDot("%.8f", totalInput), StringUtils.removeTrailingZerosAfterDot("%.8f", totalOutput));
 		if (differences == 0)
 			System.err.println("All path distances correct");
 		else {
-			System.err.printf("Sum of differences: %s%%%n%n", StringUtils.removeTrailingZerosAfterDot("%.1f", 100 * (totalDifference / totalInput)));
+			System.err.printf("Path distances incorrect, difference: %s%%%n", StringUtils.removeTrailingZerosAfterDot("%.1f", 100 * (totalDifference / totalInput)));
 			// System.err.println("Incorrect path distances: " + differences);
 		}
 		System.err.printf("Total network length: %s%n", StringUtils.removeTrailingZerosAfterDot("%.8f", graph.edgeStream().mapToDouble(graph::getWeight).sum()));

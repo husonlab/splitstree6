@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public enum CharactersType {
 	Standard("01"),
-	DNA("acgt"), // todo: have changed this to acgt from atgc 25Feb2019, does this break anything?
+	DNA("acgt"),
 	DNAwithAmbiguityCodes("acgtvhdbry"),
 	RNA("acgu"),
 	RNAwithAmbiguityCodes("acgury"),
@@ -79,19 +79,24 @@ public enum CharactersType {
 		var result = Unknown;
 		var best = 0.0;
 
-		for (var type : values()) {
-			var size = (float) intersection(type.symbols, alphabet).size() / (float) union(type.symbols, alphabet).size();
-			if (size > best) {
-				best = size;
-				result = type;
-			}
+		if (DNAwithAmbiguityCodes.containsAllLetters(alphabet))
+			return DNAwithAmbiguityCodes;
+		else if (RNAwithAmbiguityCodes.containsAllLetters(alphabet))
+			return RNAwithAmbiguityCodes;
+		else return Unknown;
+	}
 
+	private boolean containsAllLetters(String alphabet) {
+		var matches = 0;
+		for (var ch : alphabet.toCharArray()) {
+			ch = Character.toLowerCase(ch);
+			if (Character.isLetter(ch) && ch != 'x' && ch != 'n') {
+				if (symbols.indexOf(ch) == -1)
+					return false;
+				else matches++;
+			}
 		}
-		if (result == DNAwithAmbiguityCodes)
-			result = DNA;
-		else if (result == RNAwithAmbiguityCodes)
-			result = RNA;
-		return result;
+		return matches > 1;
 	}
 
 	public static Set<Character> intersection(String a, String b) {

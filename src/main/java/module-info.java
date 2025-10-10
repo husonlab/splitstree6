@@ -23,6 +23,8 @@ module splitstreesix {
 	requires jdk.httpserver;
 	requires org.apache.commons.numbers.gamma;
 
+	// requires razornet;
+
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;
 

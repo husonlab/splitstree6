@@ -19,6 +19,7 @@
 
 package splitstree6.io.nexus.workflow;
 
+import javafx.application.Platform;
 import jloda.fx.util.AService;
 import jloda.fx.window.NotificationManager;
 import jloda.util.Basic;
@@ -26,19 +27,18 @@ import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.Pair;
 import jloda.util.parse.NexusStreamParser;
 import jloda.util.progress.ProgressListener;
-import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.*;
 import splitstree6.io.nexus.AlgorithmNexusInput;
+import splitstree6.io.nexus.NexusExporter;
 import splitstree6.io.nexus.SplitsTree6NexusInput;
 import splitstree6.io.nexus.TaxaNexusInput;
+import splitstree6.tabs.inputeditor.InputEditorTab;
+import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -66,26 +66,22 @@ public class WorkflowNexusInput {
 		workflow.clear();
 		mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 
-		if (false) {
-			try (var reader = new BufferedReader(new FileReader(fileName))) {
-				input(new ProgressPercentage(), workflow, reader);
-			} catch (Exception exception) {
-				NotificationManager.showError("Open file failed: " + exception);
-			}
-		} else {
+		var newWorkflow = new Workflow(mainWindow);
+
+		{
+			var inputWorkFlow = newWorkflow;
 			var service = new AService<Workflow>(mainWindow.getController().getBottomFlowPane());
 			service.setCallable(() -> {
-				var inputWorkFlow = new Workflow(mainWindow);
 				try (var reader = new BufferedReader(new FileReader(fileName))) {
 					input(service.getProgressListener(), inputWorkFlow, reader);
 				}
 				return inputWorkFlow;
 			});
 			service.setOnSucceeded(e -> {
-				var inputWorkFlow = service.getValue();
+				var resultWorkflow = service.getValue();
 				mainWindow.setFileName(fileName);
-				NotificationManager.showInformation("Loaded file: " + fileName + ", workflow nodes: " + inputWorkFlow.size());
-				workflow.shallowCopy(inputWorkFlow);
+				NotificationManager.showInformation("Loaded file: " + fileName + ", workflow nodes: " + resultWorkflow.size());
+				workflow.shallowCopy(resultWorkflow);
 
 				if (!isWorkflowFile(fileName)) {
 					for (var node : workflow.algorithmNodes()) {
@@ -104,6 +100,29 @@ public class WorkflowNexusInput {
 							exceptionHandler.accept(service.getException());
 						else
 							NotificationManager.showError("Open file failed : " + service.getException());
+
+				if (true) {
+					var taxa = newWorkflow.getInputTaxaBlock();
+					var data = (DataBlock) newWorkflow.getInputDataBlock();
+					if (taxa != null && taxa.size() > 0 && data != null) {
+						// open in editor
+						mainWindow.setFileName(fileName);
+						mainWindow.getPresenter().showInputEditor();
+						if (mainWindow.getTabByClass(InputEditorTab.class) instanceof InputEditorTab editorTab) {
+							try {
+								var w = new StringWriter();
+								(new NexusExporter()).export(w, taxa, data);
+
+								Platform.runLater(() -> {
+									if (editorTab.getView() instanceof InputEditorView view) {
+										view.replaceText("#nexus\n\n" + w.toString());
+									}
+								});
+							} catch (IOException ignored) {
+							}
+						}
+					}
+				}
 					}
 			);
 			service.setOnCancelled(e -> NotificationManager.showError("Open file : canceled"));
