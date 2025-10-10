@@ -21,7 +21,7 @@
 package razornetaccess;
 
 import javafx.beans.property.*;
-import jloda.fx.util.ProgramProperties;
+import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import razornet.cactusrealizer.RunCactusRealizer;
@@ -29,6 +29,7 @@ import razornet.razor_broken.RunRazorNet2Broken;
 import razornet.razor_double.RunRazorNet1;
 import razornet.razor_int.RunRazorNetInt;
 import razornet.utils.Quantization;
+import razornet.utils.TriangleInequalities;
 import splitstree6.algorithms.distances.distances2network.CheckPairwiseDistances;
 import splitstree6.algorithms.distances.distances2network.Distances2Network;
 import splitstree6.data.DistancesBlock;
@@ -48,20 +49,22 @@ public class RazorNet extends Distances2Network {
 	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, Tighten2Polish2, Algorithm1Double, Algorithm2Broken, CactusRealizer}
 
 	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Tighten2Polish1);
+	private final IntegerProperty optionSignificantDigits = new SimpleIntegerProperty(this, "optionSignificantDigits", 6);
+
 	private final BooleanProperty optionPolish = new SimpleBooleanProperty(this, "optionPolish", true);
 	private final BooleanProperty optionLocalPruning = new SimpleBooleanProperty(this, "optionLocalPruning", true);
 	private final IntegerProperty optionMaxRounds = new SimpleIntegerProperty(this, "optionMaxRounds", 100);
 
 	{
-		ProgramProperties.track(optionAlgorithm, Algorithm::valueOf, Tighten2Polish1);
-		ProgramProperties.track(optionPolish, true);
-		ProgramProperties.track(optionLocalPruning, true);
-		ProgramProperties.track(optionMaxRounds, 100);
+		//ProgramProperties.track(optionAlgorithm, Algorithm::valueOf, Tighten2Polish1);
+		//ProgramProperties.track(optionPolish, true);
+		//ProgramProperties.track(optionLocalPruning, true);
+		//ProgramProperties.track(optionMaxRounds, 100);
 	}
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionAlgorithm.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
+		return List.of(optionAlgorithm.getName(), optionSignificantDigits.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
 	}
 
 	@Override
@@ -79,27 +82,32 @@ public class RazorNet extends Distances2Network {
 
 	@Override
 	public void compute(ProgressListener progressListener, TaxaBlock taxaBlock, DistancesBlock distancesBlock, NetworkBlock networkBlock) throws IOException {
-		System.err.println("Running " + this.getClass().getSimpleName());
+		System.err.println("Running " + getOptionAlgorithm());
 		var progress = new ProgressAdapter(progressListener);
 		var distances = distancesBlock.getDistances();
 
-		var quantization = Quantization.quantizeToEvenRazorMatrix(distances, 0.0000001, 0.0000001);
+		var quantization = Quantization.apply(distances, getOptionSignificantDigits());
+
+		if (!TriangleInequalities.check(quantization.matrix(), false)) {
+			System.err.println("Triangle Inequality check failed, fixing distances");
+			TriangleInequalities.fix(quantization.matrix());
+		}
 
 		var graphAdapter = new PhyloGraphAdapter(networkBlock.getGraph());
 
 		switch (optionAlgorithm.get()) {
 			case Algorithm1Double ->
-					RunRazorNet1.run(graphAdapter, quantization.matrixAsDoubles(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), progress);
+					RunRazorNet1.run(graphAdapter, quantization.createDoubleMatrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), progress);
 			case Tighten1Polish1 ->
-					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 1, 1, progress);
+					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 1, 1, progress, NotificationManager::showWarning);
 			case Tighten2Polish1 ->
-					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 1, progress);
+					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 1, progress, NotificationManager::showWarning);
 			case Tighten2Polish2 ->
-					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 2, progress);
+					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 2, progress, NotificationManager::showWarning);
 			case Algorithm2Broken ->
 					RunRazorNet2Broken.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), progress);
 			case CactusRealizer ->
-					RunCactusRealizer.run(graphAdapter, quantization.matrixAsDoubles(), isOptionPolish(), isOptionLocalPruning(), progress);
+					RunCactusRealizer.run(graphAdapter, quantization.createDoubleMatrix(), isOptionPolish(), isOptionLocalPruning(), progress);
 		}
 
 		if (true) {
@@ -171,5 +179,13 @@ public class RazorNet extends Distances2Network {
 
 	public ObjectProperty<Algorithm> optionAlgorithmProperty() {
 		return optionAlgorithm;
+	}
+
+	public int getOptionSignificantDigits() {
+		return optionSignificantDigits.get();
+	}
+
+	public IntegerProperty optionSignificantDigitsProperty() {
+		return optionSignificantDigits;
 	}
 }

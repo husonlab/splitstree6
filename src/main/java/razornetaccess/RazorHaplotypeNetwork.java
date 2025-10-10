@@ -33,6 +33,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 	private final BooleanProperty optionRemoveEdges = new SimpleBooleanProperty(this, "optionRemoveEdges", false);
 
 	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Algorithm.Tighten2Polish1);
+	private final IntegerProperty optionSignificantDigits = new SimpleIntegerProperty(this, "optionSignificantDigits", 6);
 
 	private final BooleanProperty optionPolish = new SimpleBooleanProperty(this, "optionPolish", true);
 	private final BooleanProperty optionLocalPruning = new SimpleBooleanProperty(this, "optionLocalPruning", true);
@@ -49,13 +50,14 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 			optionLocalPruning.set(razorNet.isOptionLocalPruning());
 			optionMaxRounds.set(razorNet.getOptionMaxRounds());
 			optionAlgorithm.set(Algorithm.valueOf(razorNet.getOptionAlgorithm().name()));
+			optionSignificantDigits.set(razorNet.getOptionSignificantDigits());
 		} catch (Exception ignored) {
 		}
 	}
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionDistanceMethod.getName(), optionRemoveEdges.getName(), optionContractEdges.getName(), optionAlgorithm.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
+		return List.of(optionDistanceMethod.getName(), optionRemoveEdges.getName(), optionContractEdges.getName(), optionAlgorithm.getName(), optionSignificantDigits.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
 	}
 
 	@Override
@@ -78,6 +80,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 			razorNet.optionPolishProperty().set(isOptionPolish());
 			razorNet.optionLocalPruningProperty().set(isOptionLocalPruning());
 			razorNet.optionMaxRoundsProperty().set(getOptionMaxRounds());
+			razorNet.optionSignificantDigitsProperty().set(getOptionSignificantDigits());
 			razorNet.optionAlgorithmProperty().set(RazorNet.Algorithm.valueOf(razorNet.getOptionAlgorithm().name()));
 		} catch (Exception ignored) {
 		}
@@ -329,6 +332,13 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 		return optionAlgorithm;
 	}
 
+	public int getOptionSignificantDigits() {
+		return optionSignificantDigits.get();
+	}
+
+	public IntegerProperty optionSignificantDigitsProperty() {
+		return optionSignificantDigits;
+	}
 
 	/**
 	 * Is e=(s,t) superfluous? i.e. is there an s->t path not using e with total weight == weight(e)?
