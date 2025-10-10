@@ -80,7 +80,9 @@ public class TreesEdgesFilter extends Trees2Trees implements IFilter {
 			var trees = outputData.getTrees();
 			trees.clear();
 			for (var tree : inputData.getTrees()) {
-				trees.add(new PhyloTree(tree));
+				var newTree = new PhyloTree(tree);
+				newTree.clearLsaChildrenMap();
+				trees.add(newTree);
 			}
 			outputData.setRooted(inputData.isRooted());
 			outputData.setPartial(inputData.isPartial());
@@ -127,7 +129,7 @@ public class TreesEdgesFilter extends Trees2Trees implements IFilter {
 				}
 			}
 		}
-		outputData.setRooted(inputData.isRooted());
+		System.err.println(outputData.getTree(1).toBracketString(false));
 
 		if (outputData.getNTrees() == inputData.getNTrees())
 			setShortDescription("using all " + inputData.size() + " trees");
