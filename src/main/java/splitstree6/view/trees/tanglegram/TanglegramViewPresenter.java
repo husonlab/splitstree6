@@ -253,7 +253,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			view.optionFontScaleFactorProperty().addListener(e -> connectors.update());
 
 			view.optionOrientationProperty().addListener((v, o, n) -> {
-				LayoutUtils.applyOrientation(controller.getMiddlePane(), LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), false, new SimpleBooleanProperty(false), connectors::update);
+				LayoutUtils.applyOrientation(controller.getMiddlePane(), LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), node -> false, new SimpleBooleanProperty(false), connectors::update);
 			});
 		}
 

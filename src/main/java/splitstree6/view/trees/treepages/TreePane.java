@@ -27,6 +27,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -52,6 +53,7 @@ import splitstree6.window.MainWindow;
 
 import java.util.OptionalDouble;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static splitstree6.layout.tree.LayoutOrientation.Rotate0Deg;
 
@@ -115,11 +117,16 @@ public class TreePane extends StackPane {
 		service.setExecutor(ProgramExecutorService.getInstance());
 
 		orientationLabel.addListener((v, o, n) -> {
-			if (diagram == TreeDiagramType.RadialPhylogram) {
-				var shapes = BasicFX.getAllRecursively(pane, a -> "graph-node".equals(a.getId()));
-				LayoutOrientation.applyOrientation(shapes, o, n, orientationConsumer, changingOrientation);
-			} else
-				LayoutUtils.applyOrientation(pane, LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), false, changingOrientation);
+			Predicate<Node> keepLabelUnrotated = label -> {
+				if ("edge-label".equals(label.getId()))
+					return true;
+				return switch (diagram) {
+					case RectangularPhylogram, RectangularCladogram, TriangularCladogram -> false;
+					case CircularPhylogram, CircularCladogram -> false;
+					case RadialPhylogram, RadialCladogram -> true;
+				};
+			};
+			LayoutUtils.applyOrientation(pane, LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), keepLabelUnrotated, changingOrientation);
 		});
 
 		service.setCallable(() -> {
@@ -186,16 +193,18 @@ public class TreePane extends StackPane {
 			pane.setMinWidth(getPrefWidth());
 
 			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
-			Platform.runLater(() -> {
-				var orientation = LayoutOrientation.valueOf(orientationLabel.get());
-				if (diagram == TreeDiagramType.RadialPhylogram && !orientation.equals(Rotate0Deg)) {
-					var shapes = BasicFX.getAllRecursively(pane, Group.class);
-					LayoutOrientation.applyOrientation(shapes, "Rotate0Deg", orientationLabel.get(), orientationConsumer, changingOrientation);
-				} else {
-					LayoutUtils.applyOrientation(orientationLabel.get(), pane, false);
-					updateLabelLayout(orientation);
-				}
-			});
+			if (false) {
+				Platform.runLater(() -> {
+					var orientation = LayoutOrientation.valueOf(orientationLabel.get());
+					if (diagram == TreeDiagramType.RadialPhylogram && !orientation.equals(Rotate0Deg)) {
+						var shapes = BasicFX.getAllRecursively(pane, Group.class);
+						LayoutOrientation.applyOrientation(shapes, "Rotate0Deg", orientationLabel.get(), orientationConsumer, changingOrientation);
+					} else {
+						LayoutUtils.applyOrientation(orientationLabel.get(), pane, false);
+						updateLabelLayout(orientation);
+					}
+				});
+			}
 
 			if (showTreeLabels != null) {
 				final var treeLabel = new CopyableLabel();

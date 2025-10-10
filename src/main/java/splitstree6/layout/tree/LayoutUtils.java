@@ -37,6 +37,7 @@ import jloda.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -178,14 +179,14 @@ public class LayoutUtils {
 		ensureRichTextLabelsUpright(node);
 	}
 
-	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, boolean keepLabelsUnrotated, BooleanProperty changingOrientation) {
-		applyOrientation(node, newOrientation, oldOrientation, keepLabelsUnrotated, changingOrientation, null);
+	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, Predicate<javafx.scene.Node> keepLabelUnrotated, BooleanProperty changingOrientation) {
+		applyOrientation(node, newOrientation, oldOrientation, keepLabelUnrotated, changingOrientation, null);
 	}
 
 	/**
 	 * update a change of orientation to a node
 	 */
-	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, boolean keepLabelsUnrotated, BooleanProperty changingOrientation, Runnable runAtFinished) {
+	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, Predicate<javafx.scene.Node> keepLabelUnrotated, BooleanProperty changingOrientation, Runnable runAtFinished) {
 		if (!changingOrientation.get()) {
 			changingOrientation.set(true);
 			final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
@@ -200,8 +201,11 @@ public class LayoutUtils {
 					node.setScaleY(oldScaleY);
 					node.setScaleX(-node.getScaleX());
 					node.setRotate(node.getRotate() + angle0);
-					if (keepLabelsUnrotated)
-						rotateLabels(node, -angle0);
+
+					for (var label : BasicFX.getAllRecursively(node, RichTextLabel.class)) {
+						if (keepLabelUnrotated.test(label))
+							label.setRotate(label.getRotate() + angle0);
+					}
 					ensureRichTextLabelsUpright(node);
 					changingOrientation.set(false);
 					if (runAtFinished != null)
@@ -228,8 +232,10 @@ public class LayoutUtils {
 				var parallelTransition = new ParallelTransition(rotateTransition, scaleTransition);
 				parallelTransition.play();
 				parallelTransition.setOnFinished(e -> {
-					if (keepLabelsUnrotated)
-						rotateLabels(node, -angle);
+					for (var label : BasicFX.getAllRecursively(node, RichTextLabel.class)) {
+						if (keepLabelUnrotated.test(label))
+							label.setRotate(label.getRotate() + angle0);
+					}
 					ensureRichTextLabelsUpright(node);
 					changingOrientation.set(false);
 					if (runAtFinished != null)

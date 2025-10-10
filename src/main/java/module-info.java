@@ -22,6 +22,7 @@ module splitstreesix {
 	requires com.fasterxml.jackson.databind;
 	requires jdk.httpserver;
 	requires org.apache.commons.numbers.gamma;
+	requires jdk.compiler;
 
 	// requires razornet;
 
