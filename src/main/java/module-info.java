@@ -42,6 +42,8 @@ module splitstreesix {
 	opens splitstree6.algorithms.characters.characters2trees;
 	opens splitstree6.algorithms.characters.characters2report;
 
+	exports splitstree6.view.format.edgelabel;
+
 	opens splitstree6.algorithms.genomes.genomes2genomes;
 	opens splitstree6.algorithms.genomes.genome2distances;
 
@@ -232,4 +234,6 @@ module splitstreesix {
 	exports splitstree6.view.trees.tanglegram;
 
 	opens razornetaccess;
+	exports splitstree6.xtra.layout;
+	opens splitstree6.xtra.layout;
 }

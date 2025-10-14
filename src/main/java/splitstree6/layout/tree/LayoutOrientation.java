@@ -109,19 +109,31 @@ public class LayoutOrientation {
 	}
 
 	public LayoutOrientation getRotateLeft(int angle) {
-		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha + angle));
+		var newAngle = GeometryUtilsFX.modulo360(alpha + angle);
+		if (newAngle == 360)
+			newAngle = 0.0;
+		return new LayoutOrientation(flip, newAngle);
 	}
 
 	public LayoutOrientation getRotateRight(int angle) {
-		return new LayoutOrientation(flip, GeometryUtilsFX.modulo360(alpha - angle));
+		var newAngle = GeometryUtilsFX.modulo360(alpha - angle);
+		if (newAngle == 360)
+			newAngle = 0.0;
+		return new LayoutOrientation(flip, newAngle);
 	}
 
 	public LayoutOrientation getFlipHorizontal() {
-		return new LayoutOrientation(!flip, GeometryUtilsFX.modulo360(360 - alpha));
+		var newAngle = GeometryUtilsFX.modulo360(360 - alpha);
+		if (newAngle == 360)
+			newAngle = 0.0;
+		return new LayoutOrientation(!flip, newAngle);
 	}
 
 	public LayoutOrientation getFlipVertical() {
-		return new LayoutOrientation(!flip, GeometryUtilsFX.modulo360(180 - alpha));
+		var newAngle = GeometryUtilsFX.modulo360(180 + alpha);
+		if (newAngle == 360)
+			newAngle = 0.0;
+		return new LayoutOrientation(!flip, newAngle);
 	}
 
 	public static void applyOrientation(Collection<? extends Node> shapes, String oldOrientationLabel, String newOrientationLabel,
@@ -191,6 +203,9 @@ public class LayoutOrientation {
 			if (matcher.find())
 				item.alpha = NumberUtils.parseDouble(matcher.group());
 			else
+				item.alpha = 0.0;
+			item.alpha = GeometryUtilsFX.modulo360(item.alpha);
+			if (item.alpha == 360)
 				item.alpha = 0.0;
 			item.flip = string.startsWith("Flip");
 		}

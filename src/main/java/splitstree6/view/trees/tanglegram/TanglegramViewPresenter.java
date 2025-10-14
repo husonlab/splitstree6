@@ -109,7 +109,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			Platform.runLater(() -> setLabel(n, view.isOptionShowTreeNames(), view.isOptionShowTreeInfo(), controller.getTree2NameLabel()));
 		});
 
-		var orientation2Property = new SimpleStringProperty();
+		var orientation2Property = new SimpleStringProperty(this, "orientation2Property");
 		view.optionOrientationProperty().addListener((v, o, n) -> {
 			if (n.equals("Rotate0Deg"))
 				orientation2Property.set("FlipRotate0Deg");
@@ -117,6 +117,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				orientation2Property.set("Rotate180Deg");
 		});
 		orientation2Property.set(view.getOptionOrientation().equals("Rotate0Deg") ? "FlipRotate0Deg" : "Rotate180Deg");
+		orientation2Property.addListener((v, o, n) -> {
+			System.err.println("orientation2Property " + o + " -> " + n);
+		});
 
 		ObservableMap<Node, LabeledNodeShape> nodeShapeMap2 = FXCollections.observableHashMap();
 		var tree2Pane = new TanglegramTreePane(mainWindow, view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
@@ -180,7 +183,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				if (first != null && second != null && first != second) {
 					first.getLSAChildrenMap().clear();
 					second.getLSAChildrenMap().clear();
-					ODTanglegramAlgorithm.apply(mainWindow.getController().getBottomFlowPane(), first, second,
+					ODTanglegram.apply(mainWindow.getController().getBottomFlowPane(), first, second,
 							view.getOptionOptimizeTanglegramCrossings1(),
 							view.getOptionOptimizeReticulateCrossings1(),
 							view.getOptionOptimizeTanglegramCrossings2(),
@@ -253,7 +256,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			view.optionFontScaleFactorProperty().addListener(e -> connectors.update());
 
 			view.optionOrientationProperty().addListener((v, o, n) -> {
-				LayoutUtils.applyOrientation(controller.getMiddlePane(), LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), node -> false, new SimpleBooleanProperty(false), connectors::update);
+				LayoutUtils.applyOrientation(controller.getMiddlePane(), LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), node -> false, new SimpleBooleanProperty(false), connectors::update, true);
 			});
 		}
 

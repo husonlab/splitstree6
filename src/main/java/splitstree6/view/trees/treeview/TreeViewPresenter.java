@@ -398,6 +398,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		view.optionPaneLabelProperty().addListener((v, o, n) -> undoManager.add("show tree names", view.optionPaneLabelProperty(), o, n));
 		view.optionAveragingProperty().addListener((v, o, n) -> undoManager.add("node averaging", view.optionAveragingProperty(), o, n));
 		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", view.optionOrientationProperty(), o, n));
+
+		view.optionOrientationProperty().addListener((v, o, n) -> {
+			System.err.println("optionOrientationProperty " + o + " -> " + n);
+		});
+
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
 
 		//view.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("horizontal zoom", view.optionHorizontalZoomFactorProperty(), o, n));

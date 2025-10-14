@@ -179,14 +179,14 @@ public class LayoutUtils {
 		ensureRichTextLabelsUpright(node);
 	}
 
-	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, Predicate<javafx.scene.Node> keepLabelUnrotated, BooleanProperty changingOrientation) {
-		applyOrientation(node, newOrientation, oldOrientation, keepLabelUnrotated, changingOrientation, null);
+	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, Predicate<javafx.scene.Node> keepLabelUnrotated, BooleanProperty changingOrientation, boolean animate) {
+		applyOrientation(node, newOrientation, oldOrientation, keepLabelUnrotated, changingOrientation, null, animate);
 	}
 
 	/**
 	 * update a change of orientation to a node
 	 */
-	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, Predicate<javafx.scene.Node> keepLabelUnrotated, BooleanProperty changingOrientation, Runnable runAtFinished) {
+	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, Predicate<javafx.scene.Node> keepLabelUnrotated, BooleanProperty changingOrientation, Runnable runAtFinished, boolean animate) {
 		if (!changingOrientation.get()) {
 			changingOrientation.set(true);
 			final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
@@ -221,26 +221,42 @@ public class LayoutUtils {
 				else
 					angle = angle0;
 
-				var rotateTransition = new RotateTransition(Duration.seconds(1));
-				rotateTransition.setNode(node);
-				rotateTransition.setByAngle(angle);
 
-				var scaleTransition = new ScaleTransition(Duration.seconds(1));
-				scaleTransition.setNode(node);
-				scaleTransition.setToX((flip ? -1 : 1) * node.getScaleX());
+				if (animate) {
+					var rotateTransition = new RotateTransition(Duration.seconds(1));
+					rotateTransition.setNode(node);
+					rotateTransition.setByAngle(angle);
 
-				var parallelTransition = new ParallelTransition(rotateTransition, scaleTransition);
-				parallelTransition.play();
-				parallelTransition.setOnFinished(e -> {
+					var scaleTransition = new ScaleTransition(Duration.seconds(1));
+					scaleTransition.setNode(node);
+					scaleTransition.setToX((flip ? -1 : 1) * node.getScaleX());
+
+					var parallelTransition = new ParallelTransition(rotateTransition, scaleTransition);
+					parallelTransition.play();
+					parallelTransition.setOnFinished(e -> {
+						for (var label : BasicFX.getAllRecursively(node, RichTextLabel.class)) {
+							if (keepLabelUnrotated.test(label))
+								label.setRotate(label.getRotate() + angle0);
+						}
+						ensureRichTextLabelsUpright(node);
+						changingOrientation.set(false);
+						if (runAtFinished != null)
+							runAtFinished.run();
+					});
+				} else {
+					if (angle != 0)
+						node.setRotate(node.getRotate() + angle);
+					if (flip)
+						node.setScaleX(-1 * node.getScaleX());
 					for (var label : BasicFX.getAllRecursively(node, RichTextLabel.class)) {
 						if (keepLabelUnrotated.test(label))
-							label.setRotate(label.getRotate() + angle0);
+							label.setRotate(label.getRotate() + angle);
 					}
 					ensureRichTextLabelsUpright(node);
 					changingOrientation.set(false);
 					if (runAtFinished != null)
 						runAtFinished.run();
-				});
+				}
 			}
 		}
 	}

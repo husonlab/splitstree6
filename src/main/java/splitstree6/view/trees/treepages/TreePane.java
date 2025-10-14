@@ -26,7 +26,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -54,8 +53,6 @@ import splitstree6.window.MainWindow;
 import java.util.OptionalDouble;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import static splitstree6.layout.tree.LayoutOrientation.Rotate0Deg;
 
 /**
  * display an individual phylogenetic tree
@@ -126,7 +123,7 @@ public class TreePane extends StackPane {
 					case RadialPhylogram, RadialCladogram -> true;
 				};
 			};
-			LayoutUtils.applyOrientation(pane, LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), keepLabelUnrotated, changingOrientation);
+			LayoutUtils.applyOrientation(pane, LayoutOrientation.valueOf(n), LayoutOrientation.valueOf(o), keepLabelUnrotated, changingOrientation, true);
 		});
 
 		service.setCallable(() -> {
@@ -193,17 +190,17 @@ public class TreePane extends StackPane {
 			pane.setMinWidth(getPrefWidth());
 
 			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
-			if (false) {
-				Platform.runLater(() -> {
-					var orientation = LayoutOrientation.valueOf(orientationLabel.get());
-					if (diagram == TreeDiagramType.RadialPhylogram && !orientation.equals(Rotate0Deg)) {
-						var shapes = BasicFX.getAllRecursively(pane, Group.class);
-						LayoutOrientation.applyOrientation(shapes, "Rotate0Deg", orientationLabel.get(), orientationConsumer, changingOrientation);
-					} else {
-						LayoutUtils.applyOrientation(orientationLabel.get(), pane, false);
-						updateLabelLayout(orientation);
-					}
-				});
+			if (true) {
+				Predicate<Node> keepLabelUnrotated = label -> {
+					if ("edge-label".equals(label.getId()))
+						return true;
+					return switch (diagram) {
+						case RectangularPhylogram, RectangularCladogram, TriangularCladogram -> false;
+						case CircularPhylogram, CircularCladogram -> false;
+						case RadialPhylogram, RadialCladogram -> true;
+					};
+				};
+				LayoutUtils.applyOrientation(pane, LayoutOrientation.valueOf(orientationLabel.get()), LayoutOrientation.valueOf("Rotate0"), keepLabelUnrotated, changingOrientation, false);
 			}
 
 			if (showTreeLabels != null) {

@@ -32,14 +32,12 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
+import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
-import jloda.util.progress.ProgressPercentage;
-import splitstree6.view.trees.tanglegram.NetworkORDLayout;
+import splitstree6.xtra.layout.ORDNetworkLayoutAlgorithm;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -83,7 +81,19 @@ public class ComputeTreeLayout {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		if (false && optimizeReticulationEdges) {
-			NetworkORDLayout.apply(tree, tree.getLSAChildrenMap(), new ProgressPercentage());
+			var childrenMap = new HashMap<Node, List<Node>>();
+			LSAUtils.computeLSAChildrenMap(tree, childrenMap);
+
+			var reticulateMap = new HashMap<Node, List<Node>>();
+			for (var e : tree.edges()) {
+				if (tree.isReticulateEdge(e) && !tree.isTransferAcceptorEdge(e)) {
+					reticulateMap.computeIfAbsent(e.getSource(), k -> new ArrayList<>()).add(e.getTarget());
+					reticulateMap.computeIfAbsent(e.getTarget(), k -> new ArrayList<>()).add(e.getSource());
+				}
+			}
+			var result = ORDNetworkLayoutAlgorithm.apply(tree.getRoot(), childrenMap, reticulateMap, diagram.isRadialOrCircular(), () -> false);
+			tree.getLSAChildrenMap().clear();
+			tree.getLSAChildrenMap().putAll(result);
 			optimizeReticulationEdges = false;
 		}
 
