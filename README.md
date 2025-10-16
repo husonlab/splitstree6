@@ -40,7 +40,7 @@ Starting with release 6.5.0, SplitsTree will be using new algorithms (including 
 
 If you use SplitsTree App, the please cite this paper:
 
-- Daniel H. Huson and David Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods (2024) [https://doi.org/10.1038/s41592-024-02406-3](https://doi.org/10.1038/s41592-024-02406-3)
+- Daniel H. Huson and David Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods (2024) [https://doi.org/10.1038/s41592-024-02406-3](https://doi.org/10.1038/s41592-024-02406-3). [(PDF)](https://uni-tuebingen.de/securedl/sdl-eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NjAyNTU3MjksImV4cCI6MTc2MDM0NTcyOSwidXNlciI6MCwiZ3JvdXBzIjpbMCwtMV0sImZpbGUiOiJmaWxlYWRtaW4vVW5pX1R1ZWJpbmdlbi9GYWt1bHRhZXRlbi9JbmZvS29nbmkvV1NJL0FsZ29CaW9pbmZvL1B1YmxpY2F0aW9ucy9TcGxpdHNUcmVlLUFwcC0yMDI0LnBkZiIsInBhZ2UiOjQ2NDQ5fQ.hFqWfrWU_ouaHy2nJyMOWOngvgk4ZcBNaxszUylO9zY/SplitsTree-App-2024.pdf)
 
 Papers associated with older versions of SplitsTree:
 
