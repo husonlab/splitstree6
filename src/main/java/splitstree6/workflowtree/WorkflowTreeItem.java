@@ -105,7 +105,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		node.getService().stateProperty().addListener(new WeakChangeListener<>(stateChangeListener));
 
 		vBox.setOnMouseClicked(e -> {
-			if (e.getClickCount() == 2) {
+			if (e.getClickCount() == 1) {
 				showView();
 				e.consume();
 			}
@@ -148,15 +148,29 @@ public class WorkflowTreeItem extends TreeItem<String> {
 
 		if (workflowNode.getDataBlock() instanceof ViewBlock viewBlock) {
 			vBox.setOnMouseClicked(e -> {
-				if (e.getClickCount() == 2) {
+				if (e.getClickCount() == 1) {
 					mainWindow.getController().getMainTabPane().getSelectionModel().select(viewBlock.getViewTab());
+					var parent = workflowNode.getPreferredParent();
+					if (parent != null)
+						mainWindow.getAlgorithmTabsManager().showTab(parent, true);
 					e.consume();
 				}
 			});
 		} else {
 			vBox.setOnMouseClicked(e -> {
-				if (e.getClickCount() == 2) {
-					mainWindow.getTextTabsManager().showDataNodeTab(workflowNode, true);
+				if (e.getClickCount() == 1) {
+					if (true) {
+						AlgorithmNode<?, ?> parent;
+						if (workflowNode == mainWindow.getWorkflow().getInputTaxaNode() || workflowNode == mainWindow.getWorkflow().getInputDataNode())
+							parent = null;
+						else if (workflowNode == mainWindow.getWorkflow().getWorkingDataNode())
+							parent = mainWindow.getWorkflow().getInputTaxaFilterNode();
+						else
+							parent = workflowNode.getPreferredParent();
+						if (parent != null)
+							mainWindow.getAlgorithmTabsManager().showTab(parent, true);
+					} else
+						mainWindow.getTextTabsManager().showDataNodeTab(workflowNode, true);
 					e.consume();
 				}
 			});

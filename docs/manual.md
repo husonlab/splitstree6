@@ -2,16 +2,14 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.4.11, built 19 Dec 2024)
+SplitsTree App (version 6.6.0, built 16 Oct 2025)
 
 ---
 author:
-
 - Daniel H. Huson and David Bryant
   bibliography:
 - manual.bib
   title: " **SplitsTree App User Manual**"
-
 ---
 
 ## Introduction
@@ -265,8 +263,9 @@ be used to navigate through the pages.
 
 ## Tanglegram tab
 
-The *Tanglegram tab* shows a tanglegram of trees or rooted networks
-[@Scornavaccaetal2011] .
+The *Tanglegram tab* shows a tanglegram of trees or rooted networks,
+which is calculated based on the objective of displacement optimization
+[@Huson2025Tanglegrams] .
 
 ![The tanglegram tab for comparing two phylogenetic trees or rooted
 networks.](figs/tanglegram-tab.png)
@@ -280,8 +279,15 @@ the same file) and for selecting how to draw either tree (or rooted
 network), the choices are between rectangular phylogram, rectangular
 cladogram and triangular cladogram (trees only). There is a button that
 toggles addition information (such as name of the tree, if any, and
-number of nodes, edges and leaves). In addition, there are buttons for
-rotating, flipping and zooming.
+number of nodes, edges and leaves). There are buttons for rotating,
+flipping and zooming.
+
+There is a menu that allows one to select precisely what the target of
+displacement optimization should be, namely taxa or reticulate edges in
+which of the two phylogenies. In addition, if one of the two input
+phylogenies has a very unresolved node, that using the PQ-tree cluster
+heuristic may help to untangle that situation (but only when both sides
+are being untangled.)
 
 The side panel contains items for styling the taxon labels and for
 adding marks to the taxa.
@@ -2999,10 +3005,252 @@ opened for this label. ](figs/bees-with-images.png)
 
 ## Acknowledgments
 
-We thank Daria Evseeva for working on the code with us. We thank Celine
-Scornavacca for her implementation of the tanglegram layout. This
-program uses the JAMA library in the neighbor-net algorithm.
+We thank Daria Evseeva for working on the code with us. This program
+uses the JAMA library in the neighbor-net algorithm.
 
 ## References
 
+Bagci, C., D. Bryant, B. Cetinkaya, and DH Huson. 2021. “Microbial
+Phylogenetic Context Using Phylogenetic Outlines.” *Genome Biology and
+Evolution* 13 (9).
+
+Bandelt, H-J. 1995. “Combination of Data in Phylogenetic Analysis.” In
+*Systematics and Evolution of the Ranunculiflorae*, 355–61. Springer.
+
+Bandelt, HJ, and AWM Dress. 1992. “A Canonical Decomposition Theory for
+Metrics on a Finite Set.” *Advances in Mathematics* 92: 47–105.
+
+Bandelt, HJ, P. Forster, and A. Röhl. 1999. “Median-Joining Networks for
+Inferring Intraspecific Phylogenies.” *Molecular Biology and Evolution*
+16: 37–48.
+
+Booth, K. S., and G. S. Lueker. 1976. “Testing for the Consecutive Ones
+Property, Interval Graphs, and Graph Planarity Using PQ-Tree
+Algorithms.” *Journal of Computer and System Sciences* 13 (3): 335–79.
+
+Bouckaert, RR. 2010. “DensiTree: Making Sense of Sets of Phylogenetic
+Trees.” *Bioinformatics* 26 (1): 1372–73.
+
+Bruen, TC, H. Philippe, and D. Bryant. 2006. “A Simple and Robust
+Statistical Test for Detecting the Presence of Recombination.”
+*Genetics* 173: 2665–81.
+
+Bryant, D. 2001. “A Classification of Consensus Methods for
+Phylogenetics.” In *Bioconsensus*.
+
+Bryant, D., and D. H. Huson. 2023. “NeighborNet–Improved Algorithms and
+Implementation.” *Frontiers in Bioinformatics*.
+
+Bryant, D., and V. Moulton. 2004. “Neighbor-Net: An Agglomerative Method
+for the Construction of Phylogenetic Networks.” *Molecular Biology and
+Evolution* 21 (2): 255–65.
+
+D. H. Huson, C. Scornavacca. 2012. “Dendroscope 3: An Interactive Tool
+for Rooted Phylogenetic Trees and Networks.” *Systematic Biology* 61
+(6): 1061–67.
+
+Dice, LR. 1945. “Measures of the Amount of Ecologic Association Between
+Species.” *Ecology* 26 (3): 297–302.
+
+Dress, Andreas W M, and Daniel H Huson. 2004. “Constructing Splits
+Graphs.” *IEEE/ACM Transactions on Computational Biology and
+Bioinformatics* 1 (3): 109–15.
+
+Excoffier, L., and PE Smouse. 1994. “Using Allele Frequencies and
+Geographic Subdivision to Reconstruct Gene Trees Within a Species:
+Molecular Variance Parsimony.” *Genetics* 136 (1): 343–59.
+
+Faith, DP. 1992. “Conservation Evaluation and Phylogenetic Diversity.”
+*Biological Conservation* 61: 1–10.
+
+Felsenstein, J. 1981. “Evolutionary Trees from DNA Sequences: A Maximum
+Likelihood Approach.” *Journal of Molecular Evolution* 17 (6): 368–76.
+
+———. 1985. “Confidence Limits on Phylogenies: An Approach Using the
+Bootstrap.” *Evolution* 39 (4): 783–91.
+
+Felsenstein, J., and GA Churchill. 1996. “A Hidden Markov Model Approach
+to Variation Among Sites in Rate of Evolution, and the Branching Order
+in Hominoidea.” *Molecular Biology and Evolution* 13 (1): 93–104.
+
+Francis, A., D. H. Huson, and M. A. Steel. 2021. “Normalising
+Phylogenetic Networks.” *Molecular Phylogenetics and Evolution* 163.
+
+Gascuel, O. 1997. “BIONJ: An Improved Version of the NJ Algorithm Based
+on a Simple Model of Sequence Data.” *Molecular Biology and Evolution*
+14: 685–95.
+
+Gower, JC. 1966. “Some Distance Properties of Latent Root and Vector
+Methods Used in Multivariate Analysis.” *Biometrika* 53 (3-4): 325–38.
+
+Gruenstaeudl, M. 2019. “Why the Monophyly of Nymphaeaceae Currently
+Remains Indeterminate: An Assessment Based on Gene-Wise Plastid
+Phylogenomics.” *Plant Systematics and Evolution* 305: 827–36.
+
+Haake, CJ, A. Kashiwada, and FE Su. 2008. “The Shapley Value of
+Phylogenetic Trees.” *J Math Biol* 56: 479–97.
+
+Hamming, RW. 1950. “Error Detecting and Error Correcting Codes.” *Bell
+System Technical Journal* 29 (2): 147–60.
+
+Hasegawa, M., H. Kishino, and T. Yano. 1985. “Dating of Human-Ape
+Splitting by a Molecular Clock of Mitochondrial DNA.” *Journal of
+Molecular Evolution* 22 (2): 160–74.
+
+Holland, BR, KT Huber, AWM Dress, and V. Moulton. 2002. “Delta Plots: A
+Tool for Analyzing Phylogenetic Distance Data.” *Molecular Biology and
+Evolution* 19 (12): 2051–59.
+
+Holland, BR, KT Huber, and Vincent PJ Lockhart V. Moulton. 2004.
+“<span class="nocase">Using Consensus Networks to Visualize
+Contradictory Evidence for Species Phylogeny</span>.” *Molecular Biology
+and Evolution* 21 (7): 1459–61.
+
+Hoppe, A., S. Tuerpitz, and MA Steel. 2019. “Species Notions That
+Combine Phylogenetic Trees and Phenotypic Partitions.” *Journal of
+Mathematical Biology* 78: 117–34.
+
+Huson, Daniel H. 2025a. “Displacement Optimized Tanglegrams for Rooted
+Phylogenetic Trees and Networks.”
+
+———. 2025b. “Sketch, Capture and Layout Phylogenies.”
+
+Huson, Daniel H., and David Bryant. 2024. “The SplitsTree App:
+Interactive Analysis and Visualization Using Phylogenetic Trees and
+Networks.” *Nature Methods*.
+<https://doi.org/10.1038/s41592-024-02406-3>.
+
+Huson, DH, and D Bryant. 2006. “Application of Phylogenetic Networks in
+Evolutionary Studies.” *Molecular Biology and Evolution* 23 (2): 254–67.
+
+Huson, DH, and B Cetinkaya. 2023. “Visualizing Incompatibilities in
+Phylogenetic Trees Using Consensus Outlines.” *Front. Bioinform.*
+
+Huson, DH, T. Dezulian, T. Kloepper, and MA Steel. 2004. “Phylogenetic
+Super-Networks from Partial Trees.” *IEEE/ACM Transactions in
+Computational Biology and Bioinformatics* 1 (4): 151–58.
+
+Huson, DH, and S. Linz. 2018. “Autumn Algorithm—Computation of
+Hybridization Networks for Realistic Phylogenetic Trees.” *IEEE/ACM
+Transactions on Computational Biology and Bioinformatics* 15: 398–420.
+
+Huson, DH, and R. Rupp. 2008. “Summarizing Multiple Gene Trees Using
+Cluster Networks.” In *Algorithms in Bioinformatics. WABI 2008*. Vol.
+
+5251. Lecture Notes in Computer Science.
+
+Huson, DH, R. Rupp, and C. Scornavacca. 2012. *Phylogenetic Networks*.
+Cambridge.
+
+Huson, DH, and MA Steel. 2004. “Phylogenetic Trees Based on Gene
+Content.” *Bioinformatics* 20 (13): 2044–49.
+
+Jaccard, P. 1901. “Étude Comparative de La Distribution Florale Dans Une
+Portion Des Alpes Et Des Jura.” *Bulletin de La Société Vaudoise Des
+Sciences Naturelles* 37: 547–79.
+
+Jukes, TH, and CR Cantor. 1969. “Evolution of Protein Molecules.” In,
+21–132. New York: Academic Press.
+
+Kimura, M. 1980. “A Simple Method for Estimating Evolutionary Rates of
+Base Substitutions Through Comparative Studies of Nucleotide Sequences.”
+*Journal of Molecular Evolution* 16 (2): 111–20.
+
+———. 1981. “Estimation of Evolutionary Sequences Between Homologous
+Nucleotide Sequences.” *Proc. Natl. Acad. Sci. USA* 78: 454–45.
+
+Lapointe, FJ, and G. Cucumel. 1997. “The Average Consensus Procedure:
+Combination of Weighted Trees Containing Identical or Overlapping Sets
+of Taxa.” *Systematic Biology* 46 (2): 306–12.
+
+Leigh, J. W., and D. Bryant. 2015. “PopART: Full-Feature Software for
+Haplotype Network Construction.” *Methods in Ecology and Evolution* 6
+(9): 1110–16.
+
+Lemoine, F., JB Entfellner, E Wilkinson, and et al. 2018. “Renewing
+Felsenstein’s Phylogenetic Bootstrap in the Era of Big Data.” *Nature*
+556: 452–56.
+
+Maddison, DR, DL Swofford, and WP Maddison. 1997. “NEXUS: An Extensible
+File Format for Systematic Information.” *Systematic Biology* 46 (4):
+590–621.
+
+Nei, M., and WH Li. 1979. “Mathematical Model for Studying Genetic
+Variation in Terms of Restriction Endonucleases.” *Proceedings of the
+National Academy of Sciences* 79 (1): 5269–73.
+
+Nei, M., and JC Miller. 1990. “A Simple Method for Estimating Average
+Number of Nucleotide Substitutions Within and Between Populations from
+Restriction Data.” *Genetics* 125: 873–79.
+
+Ondov, BD, TJ Treangen, P. Melsted, AB Mallonee, NH Bergman, S. Koren,
+and AM Phillippy. 2016. “Mash: Fast Genome and Metagenome Distance
+Estimation Using MinHash.” *Genome Biol* 17 (132).
+
+Parks, Donovan H., Maria Chuvochina, D. W. Waite, Christian Rinke, A.
+Skarshewski, P. A. Chaumeil, and Phil Hugenholtz. 2018. “A Standardized
+Bacterial Taxonomy Based on Genome Phylogeny Substantially Revises the
+Tree of Life.” *Nature Biotechnology* 36 (10): 996–1004.
+
+Redding, D. 2003. “Incorporating Genetic Distinctness and Reserve
+Occupancy into a Conservation Priorisation Approach.” Master’s thesis,
+University of East Anglia.
+
+Redding, DW, and AO Mooers. 2006. “Incorporating Evolutionary Measures
+into Conservation Prioritization.” *Conservation Biology* 20: 1670–78.
+
+Saitou, N., and M. Nei. 1987. “The Neighbor-Joining Method: A New Method
+for Reconstructing Phylogenetic Trees.” *Molecular Biology and
+Evolution* 4: 406–25.
+
+Scornavacca, C., F. Zickmann, and DH Huson. 2011. “Tanglegrams for
+Rooted Phylogenetic Trees and Networks.” *Bioinformatics* 27 (13):
+i248–56.
+
+Smouse, PE, and R. Peakall. 1999. “Spatial Autocorrelation Analysis of
+Individual Multiallele and Multilocus Genetic Structure.” *Heredity* 82:
+561–73.
+
+Snel, B., P. Bork, and M. A. Huynen. 1997. “Genome Phylogeny Based on
+Gene Content.” *Nature Genetics* 21: 108–10.
+
+Sokal, RR, and CD Michener. 1958. “A Statistical Method for Evaluating
+Systematic Relationships.” *University of Kansas Scientific Bulletin*
+28: 1409–38.
+
+Steel, MA. 1994. “Recovering a Tree from the Leaf Colorations It
+Generates Under a Markov Model.” *Appl. Math. Lett.* 7 (2): 19–24.
+
+Steel, MA, DH Huson, and PJ Lockhart. 2000. “Invariable Site Models and
+Their Use in Phylogeny Reconstruction.” *Sys. Biol.* 49 (2): 225–32.
+
+Swofford, DL, GJ Olsen, PJ Waddell, and DM Hillis. 1996. “Phylogenetic
+Inference.” In *Molecular Systematics*, 2nd ed., 407–514. Sinauer
+Associates, Inc.
+
+Tajima, F. 1989. “Statistical Method for Testing the Neutral Mutation
+Hypothesis by DNA Polymorphism.” *Genetics* 123 (3): 585–95.
+
+Tavaré, S. 1986. “Some Probabilistic and Statistical Problems in the
+Analysis of DNA Sequences.” *Lectures on Mathematics in the Life
+Sciences* 17: 57–86.
+
+Upholt, WB. 1977. “Estimation of DNA Sequence Divergence from Comparison
+of Restriction Endonuclease Digests.” *Nucleic Acids Res.* 4 (5):
+1257–65.
+
+Volkmann, L, I Martyn, V Moulton, A Spillner, and AO Mooers. 2014.
+“Prioritizing Populations for Conservation Using Phylogenetic Networks.”
+*PLoS ONE* 9 (2): e88945.
+
+Whitfield, JB, SA Cameron, DH Huson, and MA Steel. 2008. “Filtered
+z-Closure Supernetworks for Extracting and Visualizing Recurrent Signal
+from Incongruent Gene Trees.” *Systematic Biology* 57 (6): 939–47.
+
+Zhang, L., N. Abhari, C. Colijn, and Y. Wu. 2023. “A Fast and Scalable
+Method for Inferring Phylogenetic Networks from Trees by Aligning
+Lineage Taxon Strings.” *Genome Res*.
+
+Zhang, L., B. Cetinkaya, and DH Huson. 2024. “PhyloFusion- Fast and Easy
+Fusion of Rooted Phylogenetic Trees into a Network.”
 

@@ -27,6 +27,9 @@ import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import razornetaccess.RazorHaplotypeNetwork;
+import splitstree6.algorithms.characters.characters2distances.Characters2Distances;
+import splitstree6.algorithms.characters.characters2distances.HammingDistance;
+import splitstree6.algorithms.characters.characters2distances.nucleotide.TN93Distance;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
@@ -143,19 +146,28 @@ public class ImportHaplotypeApply {
 
 				var networkNode = workflow.newDataNode(new NetworkBlock());
 
-				var algorithm =
 						switch (result.method()) {
-							case "MedianJoining" -> new MedianJoining();
-							case "MinSpanningNetwork" -> new MinSpanningNetwork();
-							default -> {
+							case "RazorNet" -> {
 								var razor = new RazorHaplotypeNetwork();
 								if (result.distanceModel().equalsIgnoreCase("tn93"))
 									razor.optionDistanceMethodProperty().set(RazorHaplotypeNetwork.DistanceMethods.TN93);
-								yield razor;
+								workflow.newAlgorithmNode(razor, workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), networkNode);
+							}
+
+							case "MinSpanningNetwork" -> {
+								var distancesNode = workflow.newDataNode(new DistancesBlock());
+								Characters2Distances distancesAlgorithm;
+								if (result.distanceModel().equalsIgnoreCase("tn93"))
+									distancesAlgorithm = new TN93Distance();
+								else distancesAlgorithm = new HammingDistance();
+								workflow.newAlgorithmNode(distancesAlgorithm, workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
+								workflow.newAlgorithmNode(new MinSpanningNetwork(), workflow.getWorkingTaxaNode(), distancesNode, networkNode);
+							}
+							default -> {
+								workflow.newAlgorithmNode(new MedianJoining(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), networkNode);
 							}
 						};
 
-				workflow.newAlgorithmNode(algorithm, workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), networkNode);
 				workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), networkNode, workflow.newDataNode(new ViewBlock()));
 				workflow.restart(workflow.getInputTaxaFilterNode());
 				RunAfterAWhile.applyInFXThread(mainWindow.getStage(), () -> mainWindow.getStage().toFront());

@@ -76,7 +76,7 @@ public class HaplotypePresenter {
 			stage.close();
 		});
 
-		controller.getDistanceChoice().disableProperty().bind(controller.getMethodChoice().valueProperty().isNotEqualTo("RazorNet"));
+		controller.getDistanceChoice().disableProperty().bind(controller.getMethodChoice().valueProperty().isEqualTo("MedianJoining"));
 	}
 
 	private File chooseFile(String title) {

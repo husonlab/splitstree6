@@ -35,7 +35,7 @@ import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
-import splitstree6.xtra.layout.ORDNetworkLayoutAlgorithm;
+import phylogeny_algorithms.layout.ODNetworkLayoutAlgorithm;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -80,7 +80,7 @@ public class ComputeTreeLayout {
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
-		if (false && optimizeReticulationEdges) {
+		if (true && optimizeReticulationEdges) { // use the new code in phylogeny-algorithms
 			var childrenMap = new HashMap<Node, List<Node>>();
 			LSAUtils.computeLSAChildrenMap(tree, childrenMap);
 
@@ -91,7 +91,7 @@ public class ComputeTreeLayout {
 					reticulateMap.computeIfAbsent(e.getTarget(), k -> new ArrayList<>()).add(e.getSource());
 				}
 			}
-			var result = ORDNetworkLayoutAlgorithm.apply(tree.getRoot(), childrenMap, reticulateMap, diagram.isRadialOrCircular(), () -> false);
+			var result = ODNetworkLayoutAlgorithm.apply(tree.getRoot(), childrenMap::get, reticulateMap::get, diagram.isRadialOrCircular(), () -> false);
 			tree.getLSAChildrenMap().clear();
 			tree.getLSAChildrenMap().putAll(result);
 			optimizeReticulationEdges = false;

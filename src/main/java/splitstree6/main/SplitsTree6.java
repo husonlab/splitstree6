@@ -55,6 +55,7 @@ public class SplitsTree6 extends Application {
 	private static boolean desktop = true;
 
 	private static boolean allowExperimental = false;
+	public static boolean allowRazorNet = false;
 
 	private static boolean showSplash;
 

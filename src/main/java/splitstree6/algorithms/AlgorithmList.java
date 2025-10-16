@@ -75,7 +75,6 @@ import splitstree6.workflow.Algorithm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 /**
  * list all algorithms
  * Daniel Huson, 12.2023
@@ -130,10 +129,11 @@ public class AlgorithmList {
 
 		add(algorithms, names, new MinSpanningNetwork());
 		add(algorithms, names, new ExternalDistance2Network());
-		add(algorithms, names, new RazorNet());
 
-		add(algorithms, names, new RazorHaplotypeNetwork());
-		add(algorithms, names, new RazorNet());
+		if (splitstree6.main.SplitsTree6.allowRazorNet) {
+			add(algorithms, names, new RazorHaplotypeNetwork());
+			add(algorithms, names, new RazorNet());
+		}
 
 		add(algorithms, names, new MinSpanningTree());
 

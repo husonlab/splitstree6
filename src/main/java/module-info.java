@@ -24,7 +24,9 @@ module splitstreesix {
 	requires org.apache.commons.numbers.gamma;
 	requires jdk.compiler;
 
-	// requires razornet;
+	requires razornet;
+
+	requires phylogeny_algorithms;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;
@@ -234,6 +236,4 @@ module splitstreesix {
 	exports splitstree6.view.trees.tanglegram;
 
 	opens razornetaccess;
-	exports splitstree6.xtra.layout;
-	opens splitstree6.xtra.layout;
 }

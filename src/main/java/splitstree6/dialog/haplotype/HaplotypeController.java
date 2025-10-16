@@ -62,7 +62,11 @@ public class HaplotypeController {
 		distanceChoice.getItems().setAll("Hamming", "TN93");
 		distanceChoice.getSelectionModel().selectFirst();
 
-		methodChoice.getItems().setAll(RazorNet.class.getSimpleName(), MedianJoining.class.getSimpleName(), MinSpanningNetwork.class.getSimpleName());
+		if (splitstree6.main.SplitsTree6.allowRazorNet) {
+			methodChoice.getItems().setAll(RazorNet.class.getSimpleName(), MedianJoining.class.getSimpleName(), MinSpanningNetwork.class.getSimpleName());
+		} else {
+			methodChoice.getItems().setAll(MedianJoining.class.getSimpleName(), MinSpanningNetwork.class.getSimpleName());
+		}
 		methodChoice.getSelectionModel().selectFirst();
 
 		ProgramProperties.track("HaplotypeSequencesFile", sequencesField.textProperty(), "");

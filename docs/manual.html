@@ -7,7 +7,7 @@
      <meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)">
      <!-- html -->
      <meta name="src" content="manual.tex">
-     <meta name="date" content="2025-01-05 16:31:00">
+     <meta name="date" content="2025-10-16 12:19:00">
      <link rel="stylesheet" type="text/css" href="manual.css">
      <style> body {
           font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
              class="cmss-12">Daniel H. Huson and David Bryant</span></div>
      <br/>
      <div class="date"><span
-             class="cmss-12">SplitsTree App (version 6.4.11, built 19 Dec 2024)  </span></div>
+             class="cmss-12">SplitsTree App (version 6.6.0, built 16 Oct 2025)  </span></div>
 
 
 </div>
@@ -708,11 +708,12 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
         id="x1-110001.8"></a>Tanglegram tab</h3>
 <!--l. 232--><p class="noindent">The <span
         class="cmssi-10">Tanglegram tab</span><a
-        id="x1-11001"></a> shows a tanglegram of trees or rooted networks [<a
-        href="#XScornavaccaetal2011">Scornavacca et&#x00A0;al.</a>,&#x00A0;<a
-        href="#XScornavaccaetal2011">2011</a>] (see Fig.&#x00A0;<a
-        href="#x1-110027">1.7<!--tex4ht:ref: fig:tanglegram-tab --></a>).
-     <!--l. 234-->
+        id="x1-11001"></a> shows a tanglegram of trees or rooted networks, which is calculated based on the objective of
+     displacement optimization [<a
+             href="#XHuson2025Tanglegrams">Huson</a>,&#x00A0;<a
+             href="#XHuson2025Tanglegrams">2025</a>] (see Fig.&#x00A0;<a
+             href="#x1-110027">1.7<!--tex4ht:ref: fig:tanglegram-tab --></a>).
+     <!--l. 235-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -723,7 +724,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              id="x1-110027"></a>
 
 
-     <!--l. 235--><p class="noindent"><img
+     <!--l. 236--><p class="noindent"><img
         src="figs/tanglegram-tab.png" alt="PIC"
 >
      <br/>
@@ -733,33 +734,40 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      <!--tex4ht:label?: x1-110027 -->
 
 
-     <!--l. 237--><p class="noindent"></div>
+     <!--l. 238--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 239--><p class="noindent">The tanglegram tab has a toolbar and side panel that are hidden by default, but can be
+<!--l. 240--><p class="noindent">The tanglegram tab has a toolbar and side panel that are hidden by default, but can be
      opened using two toggle buttons
      at the top right of the tab.
-     <!--l. 243-->
+     <!--l. 244-->
 <p class="noindent">The toolbar provides items to determine the first and second trees (from the same file) and for
      selecting how to draw
-     either tree (or rooted network), the choices are between rectangular phylogram, rectangular cladogram and
-     triangular
-     cladogram (trees only). There is a button that toggles addition information (such as name of the tree,
-     if any, and number of nodes, edges and leaves). In addition, there are buttons for rotating, flipping and
+     either tree (or rooted network), the choices are between rectangular phylogram, rectangular cladogram
+     and triangular cladogram (trees only). There is a button that toggles addition information (such as name
+     of the tree, if any, and number of nodes, edges and leaves). There are buttons for rotating, flipping and
      zooming.
      <!--l. 253-->
+<p class="noindent">There is a menu that allows one to select precisely what the target of displacement optimization
+     should be, namely taxa
+     or reticulate edges in which of the two phylogenies. In addition, if one of the two input phylogenies has a very
+     unresolved
+     node, that using the PQ-tree cluster heuristic may help to untangle that situation (but only when both sides are
+     being
+     untangled.)
+     <!--l. 258-->
 <p class="noindent">The side panel contains items for styling the taxon labels and for adding marks to the taxa.
 
 
 <h3 class="sectionHead"><span class="titlemark">1.9   </span> <a
         id="x1-120001.9"></a>DensiTree tab</h3>
-<!--l. 262--><p class="noindent">The <span
+<!--l. 267--><p class="noindent">The <span
         class="cmssi-10">Densi-Tree tab</span><a
         id="x1-12001"></a> shows a densi-tree visualization of a Bayesian profile of trees [<a
         href="#XBouckaert2010">Bouckaert</a>,&#x00A0;<a
         href="#XBouckaert2010">2010</a>] (see
      Fig.&#x00A0;<a
              href="#x1-120028">1.8<!--tex4ht:ref: fig:densitree-tab --></a>).
-     <!--l. 264-->
+     <!--l. 269-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -770,7 +778,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              id="x1-120028"></a>
 
 
-     <!--l. 265--><p class="noindent"><img
+     <!--l. 270--><p class="noindent"><img
         src="figs/densitree-tab.png" alt="PIC"
 >
      <br/>
@@ -780,18 +788,18 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      <!--tex4ht:label?: x1-120028 -->
 
 
-     <!--l. 267--><p class="noindent"></div>
+     <!--l. 272--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 269--><p class="noindent">The densi-tree tab has a toolbar and side panel that are hidden by default, but can be
+<!--l. 274--><p class="noindent">The densi-tree tab has a toolbar and side panel that are hidden by default, but can be
      opened using two toggle buttons at
      the top right of the tab.
-     <!--l. 273-->
+     <!--l. 278-->
 <p class="noindent">The toolbar provides items for determining how to draw the trees, choices are between rectangular,
      triangular, rounded
      and radial phylogram. (The rounded phylograms are time-consuming to draw and can cause problems.) In addition,
      there
      are buttons for rotating, flipping and zooming.
-     <!--l. 278-->
+     <!--l. 283-->
 <p class="noindent">The side panel contains items for styling the taxon labels and for adding marks to the taxa. The
      line width can be set
      here. In addition, two colors can be set. The first is used for edges that in the tree profile that are compatible
@@ -801,7 +809,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      red).
 <h3 class="sectionHead"><span class="titlemark">1.10   </span> <a
         id="x1-130001.10"></a>Split-Network tab</h3>
-<!--l. 291--><p class="noindent">The <span
+<!--l. 296--><p class="noindent">The <span
         class="cmssi-10">Split-Network tab</span><a
         id="x1-13001"></a> shows a split network [<a
         href="#XDressHuson2004">Dress and Huson</a>,&#x00A0;<a
@@ -810,7 +818,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
         href="#XBagcietal2021">2021</a>] (see
      Fig.&#x00A0;<a
              href="#x1-130029">1.9<!--tex4ht:ref: fig:splits-tab --></a>).
-     <!--l. 294-->
+     <!--l. 299-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -821,7 +829,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              id="x1-130029"></a>
 
 
-     <!--l. 295--><p class="noindent"><img
+     <!--l. 300--><p class="noindent"><img
         src="figs/splits-tab.png" alt="PIC"
 >
      <br/>
@@ -831,16 +839,16 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
 </span></div><!--tex4ht:label?: x1-130029 -->
 
 
-     <!--l. 300--><p class="noindent"></div>
+     <!--l. 305--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 302--><p class="noindent">To reshape the layout of the network by rotating the edges associated with one or more
+<!--l. 307--><p class="noindent">To reshape the layout of the network by rotating the edges associated with one or more
      selected splits, press-and-drag on
      the network.
-     <!--l. 305-->
+     <!--l. 310-->
 <p class="noindent">The split-network tab has a toolbar and side panel that are hidden by default, but can be opened
      using two toggle buttons
      at the top right of the tab.
-     <!--l. 309-->
+     <!--l. 314-->
 <p class="noindent">The toolbar provides a choice box to determine how to draw the splits. The choices are as a split
      network, to-scale or as a
      topology (with all edges of uniform length), or as a phylogenetic outline, again, either to-scale or as a topology
@@ -856,13 +864,13 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              class="cmssi-10">outgroup rooting</span><a
              id="x1-13008"></a>. The latter requires that some taxa have been selected; these
      are treated as the outgroup.
-     <!--l. 319-->
+     <!--l. 324-->
 <p class="noindent">In addition, there are buttons for rotating, flipping, zooming and for setting the <span
         class="cmssi-10">scale ratio</span> <a
         id="x1-13009"></a>to a specific value to
      ensure that different networks are drawn to the same scale. Use the rotate buttons to rotate the entire
      network.
-     <!--l. 324-->
+     <!--l. 329-->
 <p class="noindent">The right side panel contains items for styling the taxon labels and for adding marks to the taxa.
      The line width can be
      set here. In addition, the line width and color can be set. The color of the inner area of an outline can be set.
@@ -871,13 +879,13 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      ids.
 <h3 class="sectionHead"><span class="titlemark">1.11   </span> <a
         id="x1-140001.11"></a>Network tab</h3>
-<!--l. 335--><p class="noindent">The <span
+<!--l. 340--><p class="noindent">The <span
         class="cmssi-10">Network tab</span><a
         id="x1-14001"></a> shows a network (see Fig.&#x00A0;<a
         href="#x1-1400210">1.10<!--tex4ht:ref: fig:network-tab --></a>). The network tab has a toolbar and side panel
      that are hidden by
      default, but can be opened using two toggle buttons at the top right of the tab.
-     <!--l. 341-->
+     <!--l. 346-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -888,7 +896,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              id="x1-1400210"></a>
 
 
-     <!--l. 342--><p class="noindent"><img
+     <!--l. 347--><p class="noindent"><img
         src="figs/network-tab.png" alt="PIC"
 >
      <br/>
@@ -898,12 +906,12 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      </div><!--tex4ht:label?: x1-1400210 -->
 
 
-     <!--l. 346--><p class="noindent"></div>
+     <!--l. 351--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 349--><p class="noindent">The toolbar provides a choice box to determine how to draw the network. In addition,
+<!--l. 354--><p class="noindent">The toolbar provides a choice box to determine how to draw the network. In addition,
      there are buttons for rotating,
      flipping and zooming.
-     <!--l. 353-->
+     <!--l. 358-->
 <p class="noindent">The side panel contains items for styling the taxon labels and for adding marks to the taxa. The
      line width can be set
      here. In addition, there are items to determine which traits are to be shown in pie charts and whether to a
@@ -915,7 +923,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      counts.
 <h3 class="sectionHead"><span class="titlemark">1.12   </span> <a
         id="x1-150001.12"></a>World map tab</h3>
-<!--l. 367--><p class="noindent">The <span
+<!--l. 372--><p class="noindent">The <span
         class="cmssi-10">World Map tab</span><a
         id="x1-15001"></a> shows a map of the world and places any traits data that comes with latitude and longitude
      assignments on the map (see Fig.&#x00A0;<a
@@ -925,12 +933,12 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              class="cmtt-10">TAXONCOLOR</span></span></span> entry. The world tab has a toolbar and side
      panel, the latter is hidden by default, but can be opened using the toggle button at the top right of the
      tab.
-     <!--l. 377-->
+     <!--l. 382-->
 <p class="noindent">This tab appears when the input data contains a traits block that has latitude and longitude
      specifications (see
      Section&#x00A0;<a
              href="#x1-62000B.2">B.2<!--tex4ht:ref: sec:traits-block --></a>).
-     <!--l. 380-->
+     <!--l. 385-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -941,7 +949,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              id="x1-1500211"></a>
 
 
-     <!--l. 381--><p class="noindent"><img
+     <!--l. 386--><p class="noindent"><img
         src="figs/world-map.png" alt="PIC"
 >
      <br/>
@@ -951,9 +959,9 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      <!--tex4ht:label?: x1-1500211 -->
 
 
-     <!--l. 385--><p class="noindent"></div>
+     <!--l. 390--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 388--><p class="noindent">There is a <span class="obeylines-h"><span class="verb"><span
+<!--l. 393--><p class="noindent">There is a <span class="obeylines-h"><span class="verb"><span
         class="cmtt-10">Show</span></span></span> menu button to determine whether country names, continent names and/or
      oceans should appear as
      labels. There is a button to determine whether to show two copies of the map side-by-side for Pacific-centric data.
@@ -961,13 +969,13 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      is a button to zoom to the shown haplotype data.
 <h3 class="sectionHead"><span class="titlemark">1.13   </span> <a
         id="x1-160001.13"></a>Workflow graph tab</h3>
-<!--l. 401--><p class="noindent">The <span
+<!--l. 406--><p class="noindent">The <span
         class="cmssi-10">workflow tab</span><a
         id="x1-16001"></a> provides access to the <span
         class="cmssi-10">workflow graph</span><a
         id="x1-16002"></a> (see Fig.&#x00A0;<a
         href="#x1-1600312">1.12<!--tex4ht:ref: fig:workflow-tab --></a>).
-     <!--l. 405-->
+     <!--l. 410-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -978,7 +986,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              id="x1-1600312"></a>
 
 
-     <!--l. 406--><p class="noindent"><img
+     <!--l. 411--><p class="noindent"><img
         src="figs/workflow-tab.png" alt="PIC"
 >
      <br/>
@@ -988,35 +996,35 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
      <!--tex4ht:label?: x1-1600312 -->
 
 
-     <!--l. 410--><p class="noindent"></div>
+     <!--l. 415--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 412--><p class="noindent">The workflow tab has a toolbar that contains a number of items, whose purpose and
+<!--l. 417--><p class="noindent">The workflow tab has a toolbar that contains a number of items, whose purpose and
      enabled state depends on which
      nodes in the workflow graph are currently selected.
-     <!--l. 417-->
+     <!--l. 422-->
 <p class="noindent">The first toolbar item will open the corresponding algorithm, text display or view tab, depending on
      whether
      the selected node is an algorithm node, data node or view node. Double-clicking on a node has the same
      effect.
-     <!--l. 422-->
+     <!--l. 427-->
 <p class="noindent">When a data node is selected, then the second toolbar item can be used to attach an additional
      algorithm to the data
      node.
-     <!--l. 425-->
+     <!--l. 430-->
 <p class="noindent">When an algorithm node is selected, then the next two items can be used either to duplicate the
      analysis, or to delete it,
      respectively. Each algorithm node also carries a similar menu button.
-     <!--l. 428-->
+     <!--l. 433-->
 <p class="noindent">There are two items for zooming in and out.
 <h3 class="sectionHead"><span class="titlemark">1.14   </span> <a
         id="x1-170001.14"></a>How to cite tab</h3>
-<!--l. 436--><p class="noindent">The <span
+<!--l. 441--><p class="noindent">The <span
         class="cmssi-10">How to cite tab</span><a
         id="x1-17001"></a> provides a description of the data and algorithms used, and provides the necessary citations
      (see
      Fig.&#x00A0;<a
              href="#x1-1700213">1.13<!--tex4ht:ref: fig:cite-tab --></a>).
-     <!--l. 438-->
+     <!--l. 443-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -1027,7 +1035,7 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
              id="x1-1700213"></a>
 
 
-     <!--l. 439--><p class="noindent"><img
+     <!--l. 444--><p class="noindent"><img
         src="figs/cite-tab.png" alt="PIC"
 >
      <br/>
@@ -1037,12 +1045,12 @@ all/none, find/replace and export.</span></div><!--tex4ht:label?: x1-60033 -->
 suggested references for the methods used. </span></div><!--tex4ht:label?: x1-1700213 -->
 
 
-     <!--l. 443--><p class="noindent"></div>
+     <!--l. 448--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 445--><p class="noindent">The toolbar of the input tab contains a button to copy the complete or selected content
+<!--l. 450--><p class="noindent">The toolbar of the input tab contains a button to copy the complete or selected content
      of the tab. There are buttons to
      turn line-wrapping and lines numbers on and off.
-     <!--l. 449-->
+     <!--l. 454-->
 <p class="noindent">If the input is a Nexus or SplitsTree file that contains a comment at the beginning of the file
      describing the source of the
      data, then this will be reported at the top of the text area. This is followed by a description of the methods
@@ -1050,11 +1058,11 @@ suggested references for the methods used. </span></div><!--tex4ht:label?: x1-17
      all suggested references are listed.
 <h3 class="sectionHead"><span class="titlemark">1.15   </span> <a
         id="x1-180001.15"></a>Input editor tab</h3>
-<!--l. 458--><p class="noindent">The <span
+<!--l. 463--><p class="noindent">The <span
         class="cmssi-10">Input editor tab</span><a
         id="x1-18001"></a> provides an interactive editor for entering and parsing input data (see Fig.&#x00A0;<a
         href="#x1-1800214">1.14<!--tex4ht:ref: fig:editor-tab --></a>).
-     <!--l. 460-->
+     <!--l. 465-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -1065,7 +1073,7 @@ suggested references for the methods used. </span></div><!--tex4ht:label?: x1-17
              id="x1-1800214"></a>
 
 
-     <!--l. 461--><p class="noindent"><img
+     <!--l. 466--><p class="noindent"><img
         src="figs/editor-tab.png" alt="PIC"
 >
      <br/>
@@ -1075,30 +1083,30 @@ suggested references for the methods used. </span></div><!--tex4ht:label?: x1-17
 data and launch an analysis of the entered data. </span></div><!--tex4ht:label?: x1-1800214 -->
 
 
-     <!--l. 464--><p class="noindent"></div>
+     <!--l. 469--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 466--><p class="noindent">The toolbar of the input tab contains a button to copy the complete or selected content
+<!--l. 471--><p class="noindent">The toolbar of the input tab contains a button to copy the complete or selected content
      of the tab. There buttons to turn
      line-wrapping and lines numbers on and off.
-     <!--l. 470-->
+     <!--l. 475-->
 <p class="noindent">The program will try to guess to which input format the entered text adheres to and will indicate
      the name of the format
      in the toolbar. When a valid format has been detected, then the run button will be enabled. Pressing the run button
      will
      parse the data and launch an analysis of the entered data.
-     <!--l. 473-->
+     <!--l. 478-->
 <p class="noindent">The input editor can be opened from the File menu and is automatically open when the user imports a
      text or file into the
      program that is not in one of the recognized input formats.
 <h3 class="sectionHead"><span class="titlemark">1.16   </span> <a
         id="x1-190001.16"></a>Report tabs</h3>
-<!--l. 484--><p class="noindent"><span
+<!--l. 489--><p class="noindent"><span
         class="cmssi-10">Report tabs</span><a
         id="x1-19001"></a> are used to present the results of analyses such as Tajima&#8217; D, phylogenetic diversity
      or Shapely values as a
      text (see Fig.&#x00A0;<a
              href="#x1-1900215">1.15<!--tex4ht:ref: fig:report-tab --></a>).
-     <!--l. 488-->
+     <!--l. 493-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -1109,7 +1117,7 @@ data and launch an analysis of the entered data. </span></div><!--tex4ht:label?:
              id="x1-1900215"></a>
 
 
-     <!--l. 489--><p class="noindent"><img
+     <!--l. 494--><p class="noindent"><img
         src="figs/report-tab.png" alt="PIC"
 >
      <br/>
@@ -1119,19 +1127,19 @@ data and launch an analysis of the entered data. </span></div><!--tex4ht:label?:
 for a set of taxa based on splits. </span></div><!--tex4ht:label?: x1-1900215 -->
 
 
-     <!--l. 494--><p class="noindent"></div>
+     <!--l. 499--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 496--><p class="noindent">The toolbar of the report tab contains a button to copy the complete or selected
+<!--l. 501--><p class="noindent">The toolbar of the report tab contains a button to copy the complete or selected
      content of the tab. There are buttons to
      turn line-wrapping and lines numbers on and off.
 <h3 class="sectionHead"><span class="titlemark">1.17   </span> <a
         id="x1-200001.17"></a>Text tabs</h3>
-<!--l. 504--><p class="noindent"><span
+<!--l. 509--><p class="noindent"><span
         class="cmssi-10">Text tabs</span><a
         id="x1-20001"></a> are used to show the content of data blocks, in a choice of several different formats (see
      Fig.&#x00A0;<a
              href="#x1-2000216">1.16<!--tex4ht:ref: fig:text-tab --></a>).
-     <!--l. 508-->
+     <!--l. 513-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -1142,7 +1150,7 @@ for a set of taxa based on splits. </span></div><!--tex4ht:label?: x1-1900215 --
              id="x1-2000216"></a>
 
 
-     <!--l. 509--><p class="noindent"><img
+     <!--l. 514--><p class="noindent"><img
         src="figs/text-tab.png" alt="PIC"
 >
      <br/>
@@ -1153,24 +1161,24 @@ three such tabs, one for characters data, one for distance data and one for spli
      <!--tex4ht:label?: x1-2000216 -->
 
 
-     <!--l. 513--><p class="noindent"></div>
+     <!--l. 518--><p class="noindent"></div>
 <hr class="endfigure">
-<!--l. 515--><p class="noindent">The toolbar of any text tab contains a button to copy the complete or selected content
+<!--l. 520--><p class="noindent">The toolbar of any text tab contains a button to copy the complete or selected content
      of the tab. There are buttons to
      turn line-wrapping and lines numbers on and off. There is a format pane that can be used to select the desired
      display
      format and to specify any options associated with the format.
-     <!--l. 520-->
+     <!--l. 525-->
 <p class="noindent">Such a text tab can be opened by selecting a data node item in the sidebar and then pressing the
      show/edit button at the
      top of the sidebar, or by double-clicking on the item.
 <h3 class="sectionHead"><span class="titlemark">1.18   </span> <a
         id="x1-210001.18"></a>The sidebar</h3>
-<!--l. 532--><p class="noindent">The sidebar (see Fig.&#x00A0;<a
+<!--l. 537--><p class="noindent">The sidebar (see Fig.&#x00A0;<a
         href="#x1-50012">1.2<!--tex4ht:ref: fig:main-window --></a>) (figure part b) contains a representation of the
      workflow as a tree at the top, and the
      algorithms tab pane at the bottom (figure parts c,d).
-     <!--l. 535-->
+     <!--l. 540-->
 <p class="noindent">The <span
         class="cmssi-10">workflow tree view</span><a
         id="x1-21001"></a> contains a representation of all input data, computed data and algorithms used in the
@@ -1189,19 +1197,19 @@ three such tabs, one for characters data, one for distance data and one for spli
              id="x1-21004"></a> that represent visualizations.
      </li>
 </ul>
-<!--l. 543--><p class="noindent">Double-clicking on a data node will open a text tab displaying the corresponding data,
+<!--l. 548--><p class="noindent">Double-clicking on a data node will open a text tab displaying the corresponding data,
      or analysis result, if
      the data block is a report. Double-clicking on an algorithm node will open the corresponding algorithm
      tab.
-     <!--l. 546-->
+     <!--l. 551-->
 <p class="noindent">An algorithm tab has a run button (at the right) to execute the algorithm and may contain some
      optional input items
      (below) to set parameters of the algorithm.
-     <!--l. 549-->
+     <!--l. 554-->
 <p class="noindent">
 <h3 class="sectionHead"><span class="titlemark">1.19   </span> <a
         id="x1-220001.19"></a>The draft genome dialog</h3>
-<!--l. 552--><p class="noindent">The SplitsTree App supports the calculation of the <span
+<!--l. 557--><p class="noindent">The SplitsTree App supports the calculation of the <span
         class="cmssi-10">phylogenetic context </span>of a draft prokaryotic genome [<a
         href="#XBagcietal2021">Bagci
      et&#x00A0;al.</a>,&#x00A0;<a
@@ -1218,14 +1226,14 @@ three such tabs, one for characters data, one for distance data and one for spli
              id="x1-22003"></a>and then represented as a phylogenetic outline.
      <a
              id="x1-22004"></a>
-     <!--l. 559-->
+     <!--l. 564-->
 <p class="noindent">The dialog is opened using the <span class="obeylines-h"><span class="verb"><span
         class="cmtt-10">File-&#x003E;Analyze</span><span
         class="cmtt-10">&#x00A0;Draft</span><span
         class="cmtt-10">&#x00A0;Genomes...</span></span></span> menu item and is set up using three tabs, as shown
      in the Figure (see Fig.&#x00A0;<a
              href="#x1-2200517">1.17<!--tex4ht:ref: fig:draft-genomes-dialog --></a>).
-     <!--l. 562-->
+     <!--l. 567-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -1236,7 +1244,7 @@ three such tabs, one for characters data, one for distance data and one for spli
              id="x1-2200517"></a>
 
 
-     <!--l. 563--><p class="noindent"><img
+     <!--l. 568--><p class="noindent"><img
         src="figs/draft-genomes.png" alt="PIC"
 >
      <br/>
@@ -1249,7 +1257,7 @@ tab is used to specify the database to compare against (downloaded from the Spli
 search in, and distance within which to include references. </span></div><!--tex4ht:label?: x1-2200517 -->
 
 
-     <!--l. 574--><p class="noindent"></div>
+     <!--l. 579--><p class="noindent"></div>
 <hr class="endfigure">
 
 
@@ -3270,8 +3278,8 @@ on the left and the outline consensus on the right (rooted by the three taxa at 
         class="cmss-8">- use maximum likelihood estimation of distances (rather than exact distances)</span>
      <!--l. 151-->
 <p class="noindent">Reference: [<a
-        href="#XTavarÃ©1986">Tavar</a>,&#x00A0;<a
-        href="#XTavarÃ©1986">1986</a>]
+        href="#XTavaré1986">Tavar</a>,&#x00A0;<a
+        href="#XTavaré1986">1986</a>]
 
 
      <!--l. 153-->
@@ -6337,9 +6345,9 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
 
 <h3 class="likesectionHead"><a
         id="x1-184000F"></a>Acknowledgments</h3>
-<!--l. 115--><p class="noindent">We thank Daria Evseeva for working on the code with us. We thank Celine Scornavacca for
-     her implementation of the
-     tanglegram layout. This program uses the JAMA library in the neighbor-net algorithm.
+<!--l. 115--><p class="noindent">We thank Daria Evseeva for working on the code with us. This program uses the JAMA
+     library in the neighbor-net
+     algorithm.
 
 
      <!--l. 1-->
@@ -6553,6 +6561,12 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
      </p>
      <p class="bibitem"><span class="biblabel">
 <a
+        id="XHuson2025Tanglegrams"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>Daniel&#x00A0;H. Huson.
+          Displacement optimized tanglegrams for rooted phylogenetic trees and networks. In
+          preparation, 2025.
+     </p>
+     <p class="bibitem"><span class="biblabel">
+<a
         id="XHusonBryant2024"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>Daniel&#x00A0;H. Huson and
           David Bryant. The splitstree app: interactive analysis and visualization using phylogenetic
           trees and networks. <span
@@ -6576,6 +6590,8 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
           <span
                   class="cmssi-10">Bioinform.</span>, 2023.
      </p>
+
+
      <p class="bibitem"><span class="biblabel">
 <a
         id="XHusonLinz2018"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>DH&#x00A0;Huson and S.&#x00A0;Linz.
@@ -6584,8 +6600,6 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
                   class="cmssi-10">IEEE/ACM Transactions on Computational Biology and Bioinformatics</span>, 15:398&#8211;420,
           2018.
      </p>
-
-
      <p class="bibitem"><span class="biblabel">
 <a
         id="XHusonRupp2008"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>DH&#x00A0;Huson and R.&#x00A0;Rupp.
@@ -6667,6 +6681,8 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
           <span
                   class="cmssi-10">Proceedings of the National Academy of Sciences</span>, 79(1):5269&#8211;5273, 1979.
      </p>
+
+
      <p class="bibitem"><span class="biblabel">
 <a
         id="XOndovetal2016"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>BD&#x00A0;Ondov, TJ&#x00A0;Treangen,
@@ -6674,8 +6690,6 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
           genome and metagenome distance estimation using minhash. <span
                   class="cmssi-10">Genome Biol</span>, 17(132), 2016.
      </p>
-
-
      <p class="bibitem"><span class="biblabel">
 <a
         id="XParksetal2018"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>Donovan&#x00A0;H. Parks, Maria
@@ -6747,6 +6761,8 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
                   class="cmssi-10">Phylogenetic  inference</span>, pages 407&#8211;514. Sinauer
           Associates, Inc., 2nd edition, 1996.
      </p>
+
+
      <p class="bibitem"><span class="biblabel">
 <a
         id="XTajima1989"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>F.&#x00A0;Tajima. Statistical
@@ -6754,11 +6770,9 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
                   class="cmssi-10">Genetics</span>,
           123(3):585&#8211;595, 1989.
      </p>
-
-
      <p class="bibitem"><span class="biblabel">
 <a
-        id="XTavarÃ©1986"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>S.&#x00A0;Tavar. Some
+        id="XTavaré1986"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>S.&#x00A0;Tavar. Some
           probabilistic and statistical problems in the analysis of dna sequences. <span
                   class="cmssi-10">Lectures on Mathematics</span>
           <span

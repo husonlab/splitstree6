@@ -77,21 +77,24 @@ public class DataNodeContextMenuPresenter {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
-		{
-			var algorithms = new ArrayList<Algorithm>();
-
+		var seen = new HashSet<String>();
+		for (var algorithm : AlgorithmList.list()) {
+			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
+				if (AddTreePipelineCommand.isApplicable(dataNode, algorithm)) {
+					if (!seen.contains(algorithm.getName())) {
+						seen.add(algorithm.getName());
+						list.add(new Pair<>(algorithm.getName(), algorithm));
+					}
+				}
+			}
 		}
 		list.sort(Comparator.comparing(Pair::getKey));
 
 		var result = new ArrayList<MenuItem>();
-		var seen = new HashSet<String>();
 		for (var pair : list) {
-			if (!seen.contains(pair.getKey())) {
-				seen.add(pair.getKey());
-				var menuItem = new MenuItem(pair.getKey());
-				menuItem.setOnAction(e -> undoManager.doAndAdd(AddTreePipelineCommand.create(workflow, dataNode, pair.getValue())));
-				result.add(menuItem);
-			}
+			var menuItem = new MenuItem(pair.getKey());
+			menuItem.setOnAction(e -> undoManager.doAndAdd(AddTreePipelineCommand.create(workflow, dataNode, pair.getValue())));
+			result.add(menuItem);
 		}
 		return result;
 	}
