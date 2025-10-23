@@ -31,10 +31,10 @@ import java.util.Set;
 public enum CharactersType {
 	Standard("01"),
 	DNA("acgt"),
-	DNAwithAmbiguityCodes("acgtvhdbry"),
+	DNAwithAmbiguityCodes("acgtryswkmbdhvn"),
 	RNA("acgu"),
 	RNAwithAmbiguityCodes("acgury"),
-	Protein("arndcqeghilkmfpstwyvz"),
+	Protein("arndcqeghilkmfpstwyvbzx*"),
 	Microsat(""),
 	Unknown("");
 
@@ -83,6 +83,8 @@ public enum CharactersType {
 			return DNAwithAmbiguityCodes;
 		else if (RNAwithAmbiguityCodes.containsAllLetters(alphabet))
 			return RNAwithAmbiguityCodes;
+		else if (Protein.containsAllLetters(alphabet))
+			return Protein;
 		else return Unknown;
 	}
 

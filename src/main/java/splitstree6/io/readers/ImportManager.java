@@ -54,6 +54,7 @@ public class ImportManager {
 		readers.add(new splitstree6.io.readers.distances.CSVReader());
 		readers.add(new splitstree6.io.readers.genomes.NexusReader());
 		readers.add(new splitstree6.io.readers.network.NexusReader());
+		readers.add(new splitstree6.io.readers.network.GMLReader());
 		readers.add(new splitstree6.io.readers.report.NexusReader());
 		readers.add(new splitstree6.io.readers.splits.NewickReader());
 		readers.add(new splitstree6.io.readers.splits.NexusReader());

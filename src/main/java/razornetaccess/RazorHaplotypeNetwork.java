@@ -21,7 +21,7 @@ import java.util.function.ToIntFunction;
  * Daniel Huson, 10.2025
  */
 public class RazorHaplotypeNetwork extends Characters2Network {
-	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, Tighten2Polish2, Algorithm1Double, Algorithm2Broken, CactusRealizer}
+	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, CactusRealizer}
 	public enum AmbiguousOptions {Wildcard, State}
 
 	public enum DistanceMethods {Hamming, TN93}
@@ -81,7 +81,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 			razorNet.optionLocalPruningProperty().set(isOptionLocalPruning());
 			razorNet.optionMaxRoundsProperty().set(getOptionMaxRounds());
 			razorNet.optionSignificantDigitsProperty().set(getOptionSignificantDigits());
-			razorNet.optionAlgorithmProperty().set(RazorNet.Algorithm.valueOf(razorNet.getOptionAlgorithm().name()));
+			razorNet.optionAlgorithmProperty().set(RazorNet.Algorithm.valueOf(getOptionAlgorithm().name()));
 		} catch (Exception ignored) {
 		}
 

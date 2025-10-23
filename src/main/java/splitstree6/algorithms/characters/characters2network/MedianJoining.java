@@ -74,7 +74,7 @@ public class MedianJoining extends Characters2Network {
 	 */
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, CharactersBlock chars) {
-		return taxa != null && chars != null && chars.getDataType().isNucleotides();
+		return taxa != null && chars != null && (chars.getDataType().isNucleotides() || chars.getNcolors() <= 8);
 	}
 
 	@Override

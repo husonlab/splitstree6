@@ -59,6 +59,8 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	public void setDimensions(int ntax, int ntraits) {
 		matrix = new double[ntax][ntraits];
 		labels = new String[ntraits];
+		for (var t = 0; t < ntraits; t++)
+			labels[t] = "";
 	}
 
 	public void clear() {

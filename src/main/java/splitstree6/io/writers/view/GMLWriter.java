@@ -31,6 +31,7 @@ import splitstree6.view.splits.viewer.SplitsView;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.function.BiFunction;
 
 /**
@@ -71,24 +72,39 @@ public class GMLWriter extends ViewWriterBase {
 						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
 			}
 		} else if (view instanceof NetworkView networkView) {
-			var graph = networkView.getNetworkBlock().getGraph();
+			var networkBlock = networkView.getNetworkBlock();
+			var graph = networkBlock.getGraph();
 			if (graph != null) {
+				var labelNodes = new TreeSet<String>();
+				for (var v : graph.nodes()) {
+					var data = networkBlock.getNodeData(v);
+					labelNodes.addAll(data.keySet());
+				}
+				labelNodes.addAll(List.of("label", "x", "y"));
+
 				var nodeShapeMap = networkView.getNodeShapeMap();
-				var labelNodes = List.of("label", "x", "y");
-				BiFunction<String, Node, String> labelNodeValue = (label, v) -> switch (label) {
-					case "label" ->
-							nodeShapeMap.get(v).getLabel() != null ? nodeShapeMap.get(v).getLabel().getRawText() : null;
-					case "x" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodeShapeMap.get(v).getTranslateX());
-					case "y" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodeShapeMap.get(v).getTranslateY());
-					default -> null;
-				};
-				var labelEdges = List.of("weight", "sites");
-				var edgeShapeMap = networkView.getEdgeShapeMap();
-				BiFunction<String, Edge, String> labelEdgeValue = (label, e) -> switch (label) {
-					case "weight" -> StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e));
-					case "sites" -> networkView.getNetworkBlock().getEdgeData(e).get("sites");
-					default -> null;
-				};
+
+				BiFunction<String, Node, String> labelNodeValue = (label, v) ->
+						switch (label) {
+							case "label" ->
+									nodeShapeMap.get(v).getLabel() != null ? nodeShapeMap.get(v).getLabel().getRawText() : null;
+							case "x" ->
+									StringUtils.removeTrailingZerosAfterDot("%.4f", nodeShapeMap.get(v).getTranslateX());
+							case "y" ->
+									StringUtils.removeTrailingZerosAfterDot("%.4f", nodeShapeMap.get(v).getTranslateY());
+							default -> networkBlock.getNodeData(v).get(label);
+						};
+				var labelEdges = new TreeSet<String>();
+				for (var e : graph.edges()) {
+					var data = networkBlock.getEdgeData(e);
+					labelEdges.addAll(data.keySet());
+				}
+				labelEdges.add("weight");
+				BiFunction<String, Edge, String> labelEdgeValue = (label, e) ->
+						switch (label) {
+							case "weight" -> StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e));
+							default -> networkView.getNetworkBlock().getEdgeData(e).get(label);
+						};
 				var comment = "Exported from SplitsTree: %,d nodes, %,d edges,".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges());
 				var graphLabel = (graph.getName() != null ? graph.getName() : networkView.getName());
 				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,

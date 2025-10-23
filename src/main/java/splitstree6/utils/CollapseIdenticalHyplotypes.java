@@ -132,6 +132,9 @@ public class CollapseIdenticalHyplotypes {
 		{
 			var which = 0;
 			var outId = 0;
+			if (inputTraits == null) {
+				outputTraits.setDimensions(outputNTax, outputNTax);
+			}
 			for (var e : taxLabelMap.entrySet().stream().filter(e -> !e.getValue().isEmpty()).toList()) {
 				var inId = e.getKey();
 				var members = e.getValue();
@@ -140,7 +143,6 @@ public class CollapseIdenticalHyplotypes {
 				var name = (members.size() == 1 ? inputTaxa.getLabel(inId) : "TYPE" + (++which));
 
 				if (inputTraits == null) {
-					outputTraits.setDimensions(outputNTax, outputNTax);
 					outputTraits.setTraitLabel(outId, name);
 					for (var i = 1; i <= outputNTax; i++) {
 						outputTraits.setTraitValue(outId, i, i == outId ? members.size() : 0);
@@ -156,9 +158,7 @@ public class CollapseIdenticalHyplotypes {
 		}
 		if (countCollapsed == 0) {
 			NotificationManager.showInformation("All haplotypes unique");
-			return null;
 		} else {
-
 			if (inputTraits != null) {
 				for (var inTraitId = 1; inTraitId <= inputTraits.getNTraits(); inTraitId++) {
 					if (inputTraits.isNumerical(inTraitId)) {
@@ -177,7 +177,7 @@ public class CollapseIdenticalHyplotypes {
 				}
 			}
 			NotificationManager.showInformation("Unique haplotypes: " + outputTaxa.getNtax());
-			return new Triplet<>(outputTaxa, outputTraits, outputCharacters);
 		}
+		return new Triplet<>(outputTaxa, outputTraits, outputCharacters);
 	}
 }

@@ -22,13 +22,15 @@ package razornetaccess;
 
 import javafx.beans.property.*;
 import jloda.fx.window.NotificationManager;
+import jloda.graph.Node;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import razornet.cactusrealizer.RunCactusRealizer;
-import razornet.razor_broken.RunRazorNet2Broken;
-import razornet.razor_double.RunRazorNet1;
-import razornet.razor_int.RunRazorNetInt;
+import razornet.razor_int.RunRazorNetIntDeprecated;
+import razornet.razor_int.RunRazorNetIntGraph;
+import razornet.utils.CanceledException;
 import razornet.utils.Quantization;
+import razornet.utils.TriConsumer;
 import razornet.utils.TriangleInequalities;
 import splitstree6.algorithms.distances.distances2network.CheckPairwiseDistances;
 import splitstree6.algorithms.distances.distances2network.Distances2Network;
@@ -37,18 +39,18 @@ import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-
-import static razornetaccess.RazorNet.Algorithm.Tighten2Polish1;
+import java.util.function.IntConsumer;
 
 /**
  * implementation of the  Razor-net algorithm
  * Momomoko Hayamizu and Daniel Huson, 10.2025
  */
 public class RazorNet extends Distances2Network {
-	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, Tighten2Polish2, Algorithm1Double, Algorithm2Broken, CactusRealizer}
+	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, CactusRealizer}
 
-	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Tighten2Polish1);
+	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Algorithm.Tighten1Polish1);
 	private final IntegerProperty optionSignificantDigits = new SimpleIntegerProperty(this, "optionSignificantDigits", 6);
 
 	private final BooleanProperty optionPolish = new SimpleBooleanProperty(this, "optionPolish", true);
@@ -85,6 +87,7 @@ public class RazorNet extends Distances2Network {
 		System.err.println("Running " + getOptionAlgorithm());
 		var progress = new ProgressAdapter(progressListener);
 		var distances = distancesBlock.getDistances();
+		var n = distances.length;
 
 		var quantization = Quantization.apply(distances, getOptionSignificantDigits());
 
@@ -93,59 +96,50 @@ public class RazorNet extends Distances2Network {
 			TriangleInequalities.fix(quantization.matrix());
 		}
 
-		var graphAdapter = new PhyloGraphAdapter(networkBlock.getGraph());
-
-		switch (optionAlgorithm.get()) {
-			case Algorithm1Double ->
-					RunRazorNet1.run(graphAdapter, quantization.createDoubleMatrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), progress);
-			case Tighten1Polish1 ->
-					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 1, 1, progress, NotificationManager::showWarning);
-			case Tighten2Polish1 ->
-					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 1, progress, NotificationManager::showWarning);
-			case Tighten2Polish2 ->
-					RunRazorNetInt.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 2, progress, NotificationManager::showWarning);
-			case Algorithm2Broken ->
-					RunRazorNet2Broken.run(graphAdapter, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), progress);
-			case CactusRealizer ->
-					RunCactusRealizer.run(graphAdapter, quantization.createDoubleMatrix(), isOptionPolish(), isOptionLocalPruning(), progress);
-		}
-
-		if (true) {
-			// update edge weights
-			for (var e : graphAdapter.edges()) {
-				var weight = quantization.mapDistanceBack().applyAsDouble((int) graphAdapter.getWeight(e));
-				graphAdapter.setWeight(e, weight);
-			}
-			// uncollapse identical taxa
-			for (var v0 : graphAdapter.nodes()) {
-				var rep1 = graphAdapter.getTaxon(v0);
-				if (rep1 != -1) {
-					var rep0 = rep1 - 1;
-					var taxa = quantization.mapNodeBack().apply(rep0);
-					var v = v0;
-					var first = true;
-					for (var t0 : taxa) {
-						var t1 = t0 + 1;
-						if (first)
-							first = false;
-						else {
-							v = graphAdapter.newNode();
-							var e = graphAdapter.newEdge(v0, v);
-							graphAdapter.setWeight(e, 0);
-						}
-						graphAdapter.setTaxon(v, t1);
-						graphAdapter.setLabel(v, taxaBlock.getLabel(t1));
-					}
+		var graph = networkBlock.getGraph();
+		var nodeMap = new HashMap<Integer, Node>();
+		IntConsumer ensureNode = (id) -> {
+			if (!nodeMap.containsKey(id)) {
+				var v = graph.newNode();
+				nodeMap.put(id, v);
+				if (id < n) {
+					var t = id + 1;
+					graph.addTaxon(v, t);
+					graph.setLabel(v, taxaBlock.getLabel(t));
 				}
 			}
+		};
+		TriConsumer<Integer, Integer, Integer> newEdgeInteger = (u, v, w) -> {
+			var e = graph.newEdge(nodeMap.get(u), nodeMap.get(v));
+			graph.setWeight(e, quantization.mapDistanceBack().applyAsDouble(w));
+		};
+		TriConsumer<Integer, Integer, Double> newEdgeDouble = (u, v, w) -> {
+			var e = graph.newEdge(nodeMap.get(u), nodeMap.get(v));
+			graph.setWeight(e, w);
+		};
 
+		var verbose = true;
+
+		try {
+			switch (optionAlgorithm.get()) {
+				case Tighten1Polish1 ->
+						RunRazorNetIntGraph.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 1, 1, verbose, progress, NotificationManager::showWarning);
+				case Tighten2Polish1 ->
+						RunRazorNetIntDeprecated.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 1, verbose, progress, NotificationManager::showWarning);
+				case CactusRealizer -> {
+					RunCactusRealizer.run(ensureNode, newEdgeDouble, quantization.createDoubleMatrix(), progress);
+				}
+			}
+		} catch (CanceledException ex) {
+			System.err.println("RazorNet canceled");
+			throw ex;
 		}
 
-		for (var e : graphAdapter.edges()) {
-			networkBlock.getEdgeData(e).put("weight", StringUtils.removeTrailingZerosAfterDot(graphAdapter.getWeight(e)));
+		for (var e : graph.edges()) {
+			networkBlock.getEdgeData(e).put("weight", StringUtils.removeTrailingZerosAfterDot(graph.getWeight(e)));
 		}
 
-		CheckPairwiseDistances.apply(graphAdapter.getGraph(), distancesBlock.getDistances(), 0.000001);
+		CheckPairwiseDistances.apply(graph, distancesBlock.getDistances(), 0.000001);
 
 	}
 

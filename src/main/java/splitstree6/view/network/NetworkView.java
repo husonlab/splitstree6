@@ -79,7 +79,7 @@ public class NetworkView implements IView {
 
 	private final ObjectProperty<SitesStyle> optionSitesStyle = new SimpleObjectProperty<>(this, "optionSitesStyle");
 
-	private final IntegerProperty optionLayoutSeed = new SimpleIntegerProperty(this, "optionLayoutSeed", 666);
+	private final IntegerProperty optionLayoutSeed = new SimpleIntegerProperty(this, "optionLayoutSeed", 1);
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 
