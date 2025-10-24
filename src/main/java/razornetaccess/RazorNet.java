@@ -26,7 +26,6 @@ import jloda.graph.Node;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import razornet.cactusrealizer.RunCactusRealizer;
-import razornet.razor_int.RunRazorNetIntDeprecated;
 import razornet.razor_int.RunRazorNetIntGraph;
 import razornet.utils.CanceledException;
 import razornet.utils.Quantization;
@@ -125,7 +124,7 @@ public class RazorNet extends Distances2Network {
 				case Tighten1Polish1 ->
 						RunRazorNetIntGraph.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 1, 1, verbose, progress, NotificationManager::showWarning);
 				case Tighten2Polish1 ->
-						RunRazorNetIntDeprecated.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 1, verbose, progress, NotificationManager::showWarning);
+						RunRazorNetIntGraph.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 1, verbose, progress, NotificationManager::showWarning);
 				case CactusRealizer -> {
 					RunCactusRealizer.run(ensureNode, newEdgeDouble, quantization.createDoubleMatrix(), progress);
 				}
