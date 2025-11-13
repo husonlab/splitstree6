@@ -19,7 +19,6 @@
 
 package splitstree6.algorithms.characters.characters2network;
 
-import jloda.graph.Edge;
 import jloda.graph.EdgeSet;
 import jloda.graph.Node;
 import jloda.graph.NodeSet;
@@ -64,10 +63,11 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 	/**
 	 * Algorithm loop of the median joining algorithm
 	 */
-	private void computeMedianJoiningMainLoop(ProgressListener progress, Set<String> input, double[] weights, int epsilon, Set<String> outputSequences) throws CanceledException {
+	private void computeMedianJoiningMainLoop(ProgressListener progress, Set<String> input,
+											  double[] weights, int epsilon, Set<String> outputSequences) throws CanceledException {
 		outputSequences.addAll(input);
 
-		boolean changed = true;
+		var changed = true;
 		while (changed) {
 			System.err.println("Median joining: " + outputSequences.size() + " sequences");
 			progress.incrementProgress();
@@ -76,61 +76,71 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 			var graph = new PhyloGraph();
 			var feasibleLinks = new EdgeSet(graph);
 
+			// Build MSN + compute feasible links
 			computeMinimumSpanningNetwork(outputSequences, weights, epsilon, graph, feasibleLinks);
 
-			if (removeObsoleteNodes(graph, input, outputSequences, feasibleLinks)) {
-				changed = true;   // sequences have been changed, recompute graph
-			} else {
-				// determine min connection cost:
-				double minConnectionCost = Double.POSITIVE_INFINITY;
-
-				for (var u : graph.nodes()) {
-					var seqU = (String) u.getInfo();
-					for (Edge e = u.getFirstAdjacentEdge(); e != null; e = u.getNextAdjacentEdge(e)) {
-						Node v = e.getOpposite(u);
-						String seqV = (String) v.getInfo();
-						for (Edge f = u.getNextAdjacentEdge(e); f != null; f = u.getNextAdjacentEdge(f)) {
-							Node w = f.getOpposite(u);
-							String seqW = (String) w.getInfo();
-							String[] qm = computeQuasiMedian(seqU, seqV, seqW);
-							for (String aQm : qm) {
-								if (!outputSequences.contains(aQm)) {
-									double cost = computeConnectionCost(seqU, seqV, seqW, aQm, weights);
-									if (cost < minConnectionCost)
-										minConnectionCost = cost;
-								}
-							}
-						}
-						progress.checkForCancel();
-					}
+			// --- NEW: prune graph to feasible links before removing obsolete nodes ---
+			for (var e : graph.getEdgesAsList()) {
+				if (!feasibleLinks.contains(e)) {
+					graph.deleteEdge(e);
 				}
-				for (var e : feasibleLinks) {
-					final var u = e.getSource();
-					final var v = e.getTarget();
-					final var seqU = (String) u.getInfo();
-					final var seqV = (String) v.getInfo();
-					for (var f : feasibleLinks.successors(e)) {
-						Node w;
-						if (f.getSource() == u || f.getSource() == v)
-							w = f.getTarget();
-						else if (f.getTarget() == u || f.getTarget() == v)
-							w = f.getSource();
-						else
-							continue;
+			}
+
+			// Now the degree test considers exactly the edges we keep:
+			if (removeObsoleteNodes(graph, input, outputSequences, feasibleLinks)) {
+				changed = true;   // sequences changed, recompute graph
+				continue;
+			}
+
+			// determine min connection cost:
+			var minConnectionCost = Double.POSITIVE_INFINITY;
+
+			for (var u : graph.nodes()) {
+				var seqU = (String) u.getInfo();
+				for (var e = u.getFirstAdjacentEdge(); e != null; e = u.getNextAdjacentEdge(e)) {
+					var v = e.getOpposite(u);
+					var seqV = (String) v.getInfo();
+					for (var f = u.getNextAdjacentEdge(e); f != null; f = u.getNextAdjacentEdge(f)) {
+						var w = f.getOpposite(u);
 						var seqW = (String) w.getInfo();
-						String[] qm = computeQuasiMedian(seqU, seqV, seqW);
+						var qm = computeQuasiMedian(seqU, seqV, seqW);
 						for (var aQm : qm) {
 							if (!outputSequences.contains(aQm)) {
-								double cost = computeConnectionCost(seqU, seqV, seqW, aQm, weights);
-								if (cost <= minConnectionCost + epsilon) {
-									outputSequences.add(aQm);
-									changed = true;
-								}
+								var cost = computeConnectionCost(seqU, seqV, seqW, aQm, weights);
+								if (cost < minConnectionCost)
+									minConnectionCost = cost;
 							}
 						}
 					}
 					progress.checkForCancel();
 				}
+			}
+			for (var e : feasibleLinks) {
+				var u = e.getSource();
+				var v = e.getTarget();
+				var seqU = (String) u.getInfo();
+				var seqV = (String) v.getInfo();
+				for (var f : feasibleLinks.successors(e)) {
+					Node w;
+					if (f.getSource() == u || f.getSource() == v)
+						w = f.getTarget();
+					else if (f.getTarget() == u || f.getTarget() == v)
+						w = f.getSource();
+					else
+						continue;
+					var seqW = (String) w.getInfo();
+					var qm = computeQuasiMedian(seqU, seqV, seqW);
+					for (var aQm : qm) {
+						if (!outputSequences.contains(aQm)) {
+							var cost = computeConnectionCost(seqU, seqV, seqW, aQm, weights);
+							if (cost <= minConnectionCost + epsilon) {
+								outputSequences.add(aQm);
+								changed = true;
+							}
+						}
+					}
+				}
+				progress.checkForCancel();
 			}
 		}
 	}
@@ -138,11 +148,12 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 	/**
 	 * computes the minimum spanning network upto a tolerance of epsilon
 	 */
-	private void computeMinimumSpanningNetwork(Set<String> sequences, double[] weights, int epsilon, PhyloGraph graph, EdgeSet feasibleLinks) {
+	private void computeMinimumSpanningNetwork(Set<String> sequences, double[] weights, int epsilon,
+											   PhyloGraph graph, EdgeSet feasibleLinks) {
 		var array = sequences.toArray(new String[0]);
-		// compute a distance matrix between all sequences:
-		var matrix = new double[array.length][array.length];
 
+		// distances upper triangle + buckets
+		var matrix = new double[array.length][array.length];
 		var value2pairs = new TreeMap<Double, List<Pair<Integer, Integer>>>();
 
 		for (var i = 0; i < array.length; i++) {
@@ -155,73 +166,80 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 		}
 
 		var nodes = new Node[array.length];
-		var componentsOfMSN = new int[array.length];
-		var componentsOfThresholdGraph = new int[array.length];
+		var compMSN = new int[array.length];             // components for the true MSN
+		var compThresh = new int[array.length];          // components for threshold graph (uses < (value - ε))
 
 		for (var i = 0; i < array.length; i++) {
 			nodes[i] = graph.newNode(array[i]);
 			graph.setLabel(nodes[i], array[i]);
-			componentsOfMSN[i] = i;
-			componentsOfThresholdGraph[i] = i;
+			compMSN[i] = i;
+			compThresh[i] = i;
 		}
 
-		var numComponentsMSN = array.length;
+		var numMSN = array.length;
+		var maxValue = Double.POSITIVE_INFINITY; // once MSN connected, allow edges up to this value (value+ε)
 
-		// TODO: This implementation of the minimum spanning network is wrong, add only edges between different connected connectedComponents
-
-		var maxValue = Double.POSITIVE_INFINITY;
-		// all sets of edges in ascending order of lengths
 		for (var value : value2pairs.keySet()) {
 			if (value > maxValue)
 				break;
-			var ijPairs = value2pairs.get(value);
 
-			// update threshold graph connectedComponents:
-			for (int i = 0; i < array.length; i++) {
-				for (int j = i + 1; j < array.length; j++) {
-					if (componentsOfThresholdGraph[i] != componentsOfThresholdGraph[j] && matrix[i][j] < value - epsilon) {
-						int oldComponent = componentsOfThresholdGraph[i];
-						int newComponent = componentsOfThresholdGraph[j];
-						for (int k = 0; k < array.length; k++) {
-							if (componentsOfThresholdGraph[k] == oldComponent)
-								componentsOfThresholdGraph[k] = newComponent;
-						}
+			// Update threshold components for all pairs strictly less than (value - ε)
+			for (var i = 0; i < array.length; i++) {
+				for (var j = i + 1; j < array.length; j++) {
+					if (compThresh[i] != compThresh[j] && matrix[i][j] < value - epsilon) {
+						var oldC = compThresh[i];
+						var newC = compThresh[j];
+						for (var k = 0; k < array.length; k++)
+							if (compThresh[k] == oldC)
+								compThresh[k] = newC;
 					}
 				}
 			}
 
-			// determine new edges for minimum spanning network and determine feasible links
-			var newPairs = new ArrayList<Pair<Integer, Integer>>();
-			for (var ijPair : ijPairs) {
-				var i = ijPair.getFirst();
-				var j = ijPair.getSecond();
+			var ijPairs = value2pairs.get(value);
 
-				var e = graph.newEdge(nodes[i], nodes[j]);
-				graph.setWeight(e, matrix[i][j]);
-
-				if (feasibleLinks != null && componentsOfThresholdGraph[i] != componentsOfThresholdGraph[j]) {
-					feasibleLinks.add(e);
-					if (false)
-						System.err.println("ERROR nodes are connected: " + i + ", " + j);
+			// First pass: decide feasible links (w.r.t. threshold graph) at this level
+			if (feasibleLinks != null) {
+				for (var ij : ijPairs) {
+					var i = ij.getFirst();
+					var j = ij.getSecond();
+					if (compThresh[i] != compThresh[j]) {
+						var e = graph.newEdge(nodes[i], nodes[j]);
+						graph.setWeight(e, matrix[i][j]);
+						feasibleLinks.add(e);
+					}
 				}
-				newPairs.add(new Pair<>(i, j));
 			}
 
-			// update MSN connectedComponents
-			for (var pair : newPairs) {
-				var i = pair.getFirst();
-				var j = pair.getSecond();
-				if (componentsOfMSN[i] != componentsOfMSN[j]) {
-					numComponentsMSN--;
-					var oldComponent = componentsOfMSN[i];
-					var newComponent = componentsOfMSN[j];
+			// Second pass: actually add MSN edges:
+			for (var ij : ijPairs) {
+				var i = ij.getFirst();
+				var j = ij.getSecond();
+
+				// Before connected: only connect different components
+				if (numMSN > 1) {
+					if (compMSN[i] == compMSN[j]) continue; // skip intra-component edge
+					var e = graph.newEdge(nodes[i], nodes[j]);
+					graph.setWeight(e, matrix[i][j]);
+
+					// union
+					var oldC = compMSN[i];
+					var newC = compMSN[j];
 					for (var k = 0; k < array.length; k++)
-						if (componentsOfMSN[k] == oldComponent)
-							componentsOfMSN[k] = newComponent;
+						if (compMSN[k] == oldC)
+							compMSN[k] = newC;
+
+					numMSN--;
+					if (numMSN == 1 && maxValue == Double.POSITIVE_INFINITY) {
+						maxValue = value + epsilon; // once connected, allow extra edges up to value+ε
+					}
+				}
+				// After connected: allow extra edges whose length is within ε of the connection level
+				else if (value <= maxValue) {
+					var e = graph.newEdge(nodes[i], nodes[j]);
+					graph.setWeight(e, matrix[i][j]);
 				}
 			}
-			if (numComponentsMSN == 1 && maxValue == Double.POSITIVE_INFINITY)
-				maxValue = value + epsilon; // once network is connected, add all edges upto threshold+epsilon
 		}
 	}
 
@@ -248,11 +266,6 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 		return false;
 	}
 
-	/**
-	 * iteratively removes all nodes that are connected to only two other and are not part of the original input
-	 *
-	 * @return true, if anything was removed
-	 */
 	private boolean removeObsoleteNodes(PhyloGraph graph, Set<String> input, Set<String> sequences, EdgeSet feasibleLinks) {
 		var removed = 0;
 		var changed = true;
@@ -263,16 +276,16 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 			for (var v : graph.nodes()) {
 				var seqV = (String) v.getInfo();
 				if (!input.contains(seqV)) {
-					int count = 0;
-					for (Edge e = v.getFirstAdjacentEdge(); count <= 2 && e != null; e = v.getNextAdjacentEdge(e)) {
-						if (feasibleLinks.contains(e))
-							count++;
+					var count = 0;
+					for (var e = v.getFirstAdjacentEdge(); count <= 2 && e != null; e = v.getNextAdjacentEdge(e)) {
+						// graph is already pruned to feasible links
+						count++;
 					}
 					if (count <= 2)
 						toDelete.add(v);
 				}
 			}
-			if (toDelete.size() > 0) {
+			if (!toDelete.isEmpty()) {
 				changed = true;
 				removed += toDelete.size();
 				for (var v : toDelete) {
@@ -283,7 +296,6 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 		}
 		return removed > 0;
 	}
-
 
 	/**
 	 * compute the cost of connecting seqM to the other three sequences

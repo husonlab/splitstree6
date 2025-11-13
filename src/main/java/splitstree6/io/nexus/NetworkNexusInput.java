@@ -172,7 +172,8 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 							taxonNamesFound.add(value);
 							graph.addTaxon(v, taxonNamesFound.size());
 						} else {
-							graph.addTaxon(v, taxaBlock.indexOf(value));
+							if (taxaBlock.indexOf(value) != -1)
+								graph.addTaxon(v, taxaBlock.indexOf(value));
 						}
 					}
 				}

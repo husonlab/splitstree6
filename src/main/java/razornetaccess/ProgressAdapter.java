@@ -48,4 +48,9 @@ public class ProgressAdapter extends razornet.utils.Progress {
 			throw new CanceledException();
 		}
 	}
+
+	@Override
+	public void setSubTask(String name) {
+		progressListener.setSubtask(name);
+	}
 }

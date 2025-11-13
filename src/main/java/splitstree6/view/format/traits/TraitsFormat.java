@@ -211,7 +211,7 @@ public class TraitsFormat extends Pane {
 								nodeShape.getChildren().removeAll(BasicFX.getAllRecursively(nodeShape, BasicPieChart.class));
 								var updated = false;
 
-								if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1) {
+								if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1 && graph.getTaxon(v) != -1) {
 									var taxonId = graph.getTaxon(v);
 
 									{

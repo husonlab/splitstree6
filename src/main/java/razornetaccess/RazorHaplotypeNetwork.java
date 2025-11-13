@@ -21,7 +21,8 @@ import java.util.function.ToIntFunction;
  * Daniel Huson, 10.2025
  */
 public class RazorHaplotypeNetwork extends Characters2Network {
-	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, CactusRealizer}
+	public enum Algorithm {Tighten1Polish1, CactusRealizer}
+
 	public enum AmbiguousOptions {Wildcard, State}
 
 	public enum DistanceMethods {Hamming, TN93}
@@ -29,14 +30,14 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 	private final ObjectProperty<AmbiguousOptions> optionAmbiguityHandling = new SimpleObjectProperty<>(this, "optionAmbiguityHandling", AmbiguousOptions.Wildcard);
 	private final ObjectProperty<DistanceMethods> optionDistanceMethod = new SimpleObjectProperty<>(this, "optionDistanceMethod", DistanceMethods.Hamming);
 
-	private final BooleanProperty optionContractEdges = new SimpleBooleanProperty(this, "optionContractEdges", false);
-	private final BooleanProperty optionRemoveEdges = new SimpleBooleanProperty(this, "optionRemoveEdges", false);
+	private final BooleanProperty optionContractUnlabeled = new SimpleBooleanProperty(this, "optionContractUnlabeled", false);
+	private final BooleanProperty optionRemoveSuperfluous = new SimpleBooleanProperty(this, "optionRemoveSuperfluous", false);
 
-	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Algorithm.Tighten2Polish1);
+	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Algorithm.Tighten1Polish1);
 	private final IntegerProperty optionSignificantDigits = new SimpleIntegerProperty(this, "optionSignificantDigits", 6);
 
 	private final BooleanProperty optionPolish = new SimpleBooleanProperty(this, "optionPolish", true);
-	private final BooleanProperty optionLocalPruning = new SimpleBooleanProperty(this, "optionLocalPruning", true);
+	private final BooleanProperty optionRemoveRedundant = new SimpleBooleanProperty(this, "optionRemoveRedundant", true);
 
 	private final IntegerProperty optionMaxRounds = new SimpleIntegerProperty(this, "optionMaxRounds", 100);
 
@@ -47,7 +48,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 		this.razorNet = new RazorNet();
 		try {
 			optionPolish.set(razorNet.isOptionPolish());
-			optionLocalPruning.set(razorNet.isOptionLocalPruning());
+			optionRemoveRedundant.set(razorNet.getOptionRemoveRedundant());
 			optionMaxRounds.set(razorNet.getOptionMaxRounds());
 			optionAlgorithm.set(Algorithm.valueOf(razorNet.getOptionAlgorithm().name()));
 			optionSignificantDigits.set(razorNet.getOptionSignificantDigits());
@@ -57,13 +58,14 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionDistanceMethod.getName(), optionRemoveEdges.getName(), optionContractEdges.getName(), optionAlgorithm.getName(), optionSignificantDigits.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
+		return List.of(optionDistanceMethod.getName(), optionAlgorithm.getName(), /* optionSignificantDigits.getName(), */ optionPolish.getName(), optionMaxRounds.getName(), optionRemoveRedundant.getName(), optionRemoveSuperfluous.getName(), optionContractUnlabeled.getName());
 	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, NetworkBlock networkBlock) throws IOException {
 		var hammingOptions = new ComparisonOptions(charactersBlock.getGapCharacter(), charactersBlock.getMissingCharacter(), (getOptionAmbiguityHandling() == AmbiguousOptions.Wildcard && charactersBlock.isHasAmbiguityCodes()), getOptionAmbiguityHandling());
 
+		progress.setTasks("RazorHapNet", "Initializing");
 		var distancesBlock = new DistancesBlock();
 		distancesBlock.setNtax(taxaBlock.getNtax());
 
@@ -78,7 +80,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 
 		try {
 			razorNet.optionPolishProperty().set(isOptionPolish());
-			razorNet.optionLocalPruningProperty().set(isOptionLocalPruning());
+			razorNet.optionRemoveRedundantProperty().set(getOptionRemoveRedundant());
 			razorNet.optionMaxRoundsProperty().set(getOptionMaxRounds());
 			razorNet.optionSignificantDigitsProperty().set(getOptionSignificantDigits());
 			razorNet.optionAlgorithmProperty().set(RazorNet.Algorithm.valueOf(getOptionAlgorithm().name()));
@@ -89,7 +91,7 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 
 		var graph = networkBlock.getGraph();
 
-		progress.setSubtask("parsimony labeling");
+		progress.setSubtask("Parsimony labeling");
 
 		var parsimonyLabeler = new ParsimonyLabeler<>(graph.nodes(), graph.edges(), Edge::getSource, Edge::getTarget);
 		var inputSequences = new HashMap<Node, String>();
@@ -105,10 +107,17 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 			networkBlock.getNodeData(entry.getKey()).put(NetworkBlock.NODE_STATES_KEY, entry.getValue());
 		}
 
-		if (isOptionRemoveEdges()) {
-			progress.setSubtask("removing superfluous edges");
+		if (outputSequences.size() != graph.getNumberOfNodes())
+			System.err.println("Some nodes unlabeled");
+
+		if (getOptionRemoveSuperfluous()) {
+			progress.setSubtask("Removing superfluous edges");
+			System.err.println("----------- Superfluous Edge Removal  -----------");
+			var initialEdges = graph.getNumberOfEdges();
 
 			var changes = new HashMap<Edge, Integer>();
+			progress.setMaximum(3L * graph.getNumberOfEdges());
+			progress.setProgress(0);
 			for (var h : graph.edges()) {
 				var v = h.getSource();
 				var w = h.getTarget();
@@ -116,15 +125,18 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 				var b = networkBlock.getNodeData(w).get(NetworkBlock.NODE_STATES_KEY);
 				var diff = compareSequences(a, b, hammingOptions);
 				changes.put(h, diff);
+				progress.incrementProgress();
 			}
 			var edgesDeleted = 0;
 			var edges = graph.getEdgesAsList();
 			edges.sort((a, b) -> -Double.compare(graph.getWeight(a), graph.getWeight(b)));
+			progress.setMaximum(2L * graph.getNumberOfEdges() + edges.size());
 			for (var f : edges) {
 				if (isSuperfluous(f.getSource(), f.getTarget(), f, changes::get)) {
 					graph.deleteEdge(f);
 					edgesDeleted++;
 				}
+				progress.incrementProgress();
 			}
 
 			while (true) {
@@ -157,21 +169,37 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 				}
 				if (!changed)
 					break;
+				progress.incrementProgress();
 			}
-			System.err.println("Superfluous edges removed: " + edgesDeleted);
+			System.err.printf("E removal: n=%4d e=%4d -> n=%4d e= %4d%n", graph.getNumberOfNodes(), initialEdges, graph.getNumberOfNodes(), graph.getNumberOfEdges());
 		}
 
-		if (isOptionContractEdges()) {
-			progress.setSubtask("contracting empty edges");
+		/* label all edges: */
+		for (var e : graph.edges()) {
+			var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
+			var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
+			if (sequence1 != null && sequence2 != null) {
+				var label = computeEdgeLabel(sequence1, sequence2, hammingOptions);
+				networkBlock.getEdgeData(e).put(NetworkBlock.EDGE_SITES_KEY, label);
+			} else {
+				throw new IllegalStateException("Unlabeled node");
+			}
+		}
 
-			var edgesContracted = 0;
+		if (getOptionContractUnlabeled()) {
+			System.err.println("----------- Contracting Unlabeled Edges  -----------");
+			var initialEdges = graph.getNumberOfEdges();
+
+			progress.setSubtask("Contracting unlabeled edges");
+			progress.setMaximum(2L * graph.getNumberOfEdges());
+			progress.setProgress(0);
+
 			for (var i = 0; i < 10000; i++) {
 				var contracted = false;
 				for (var e : graph.edges()) {
-					var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
-					var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
-
-					if ((!graph.hasTaxa(e.getSource()) || !graph.hasTaxa(e.getTarget())) && (compareSequences(sequence1, sequence2, hammingOptions) == 0)) {
+					if (!graph.hasTaxa(e.getSource()) || !graph.hasTaxa(e.getTarget())) {
+						var label = networkBlock.getEdgeData(e).get(NetworkBlock.EDGE_SITES_KEY);
+						if (label == null || label.isBlank()) {
 							var keep = (graph.hasTaxa(e.getSource()) ? e.getSource() : e.getTarget());
 							var other = e.getOpposite(keep);
 							for (var f : other.adjacentEdges()) {
@@ -189,25 +217,18 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 							}
 							networkBlock.removeNodeData(other);
 							graph.deleteNode(other);
-
-							edgesContracted++;
 							contracted = true;
 							break;
 						}
+					}
 				}
 				if (!contracted)
 					break;
+				progress.incrementProgress();
 			}
-			System.err.println("Empty edges contracted: " + edgesContracted);
+			System.err.printf("Contracted:  n=%4d e=%4d -> n=%4d e= %4d%n", graph.getNumberOfNodes(), initialEdges, graph.getNumberOfNodes(), graph.getNumberOfEdges());
 		}
 
-		for (var e : graph.edges()) {
-			var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
-			var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
-			if (sequence1 != null && sequence2 != null) {
-				networkBlock.getEdgeData(e).put(NetworkBlock.EDGE_SITES_KEY, computeEdgeLabel(sequence1, sequence2, hammingOptions));
-			}
-		}
 		networkBlock.setNetworkType(NetworkBlock.Type.HaplotypeNetwork);
 	}
 
@@ -267,20 +288,20 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 									 AmbiguousOptions ambiguousOptions) {
 	}
 
-	public boolean isOptionContractEdges() {
-		return optionContractEdges.get();
+	public boolean getOptionContractUnlabeled() {
+		return optionContractUnlabeled.get();
 	}
 
-	public BooleanProperty optionContractEdgesProperty() {
-		return optionContractEdges;
+	public BooleanProperty optionContractUnlabeledProperty() {
+		return optionContractUnlabeled;
 	}
 
-	public boolean isOptionRemoveEdges() {
-		return optionRemoveEdges.get();
+	public boolean getOptionRemoveSuperfluous() {
+		return optionRemoveSuperfluous.get();
 	}
 
-	public BooleanProperty optionRemoveEdgesProperty() {
-		return optionRemoveEdges;
+	public BooleanProperty optionRemoveSuperfluousProperty() {
+		return optionRemoveSuperfluous;
 	}
 
 	public AmbiguousOptions getOptionAmbiguityHandling() {
@@ -298,14 +319,6 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 
 	public BooleanProperty optionPolishProperty() {
 		return optionPolish;
-	}
-
-	public boolean isOptionLocalPruning() {
-		return optionLocalPruning.get();
-	}
-
-	public BooleanProperty optionLocalPruningProperty() {
-		return optionLocalPruning;
 	}
 
 	public DistanceMethods getOptionDistanceMethod() {
@@ -338,6 +351,14 @@ public class RazorHaplotypeNetwork extends Characters2Network {
 
 	public IntegerProperty optionSignificantDigitsProperty() {
 		return optionSignificantDigits;
+	}
+
+	public boolean getOptionRemoveRedundant() {
+		return optionRemoveRedundant.get();
+	}
+
+	public BooleanProperty optionRemoveRedundantProperty() {
+		return optionRemoveRedundant;
 	}
 
 	/**

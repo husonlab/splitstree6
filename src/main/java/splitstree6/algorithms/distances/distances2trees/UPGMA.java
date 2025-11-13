@@ -159,7 +159,7 @@ public class UPGMA extends Distances2Trees implements IToSingleTree {
 		final var left = tree.newEdge(root, subtrees[brother]);
 		final var right = tree.newEdge(root, subtrees[sister]);
 
-		final var halfTotal = 0.5 * (d[brother][sister] + heights[brother] + heights[sister]);
+		final var halfTotal = 0.5 * (d[brother][sister]); // fixed
 		tree.setWeight(left, halfTotal - heights[brother]);
 		tree.setWeight(right, halfTotal - heights[sister]);
 

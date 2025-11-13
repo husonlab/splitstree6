@@ -19,6 +19,7 @@
 
 package splitstree6.io.readers.network;
 
+import jloda.fx.control.RichTextLabel;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.io.GraphGML;
@@ -60,16 +61,18 @@ public class GMLReader extends NetworkReader {
 			if (labelNodeValueMap.containsKey("label")) {
 				for (var entry : labelNodeValueMap.get("label").entrySet()) {
 					var v = entry.getKey();
-					var name = entry.getValue();
-					var count = 0;
-					while (labelTaxonMap.containsKey(name)) {
-						name = entry.getValue() + (++count);
+					var name = RichTextLabel.getRawText(entry.getValue());
+					if (!name.isBlank()) {
+						var count = 0;
+						while (labelTaxonMap.containsKey(name)) {
+							name = entry.getValue() + (++count);
+						}
+						var t = labelTaxonMap.size() + 1;
+						labelTaxonMap.put(name, t);
+						taxonLabelMap.put(t, name);
+						graph.setLabel(v, name);
+						graph.addTaxon(v, t);
 					}
-					var t = labelTaxonMap.size() + 1;
-					labelTaxonMap.put(name, t);
-					taxonLabelMap.put(t, name);
-					graph.setLabel(v, name);
-					graph.addTaxon(v, t);
 				}
 			} else throw new IOException("No labeled nodes found");
 			taxaBlock.addTaxaByNames(taxonLabelMap.values());

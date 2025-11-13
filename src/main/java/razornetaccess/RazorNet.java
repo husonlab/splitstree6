@@ -25,7 +25,6 @@ import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import razornet.cactusrealizer.RunCactusRealizer;
 import razornet.razor_int.RunRazorNetIntGraph;
 import razornet.utils.CanceledException;
 import razornet.utils.Quantization;
@@ -47,13 +46,13 @@ import java.util.function.IntConsumer;
  * Momomoko Hayamizu and Daniel Huson, 10.2025
  */
 public class RazorNet extends Distances2Network {
-	public enum Algorithm {Tighten1Polish1, Tighten2Polish1, CactusRealizer}
+	public enum Algorithm {Tighten1Polish1, CactusRealizer}
 
 	private final ObjectProperty<Algorithm> optionAlgorithm = new SimpleObjectProperty<>(this, "optionAlgorithm", Algorithm.Tighten1Polish1);
 	private final IntegerProperty optionSignificantDigits = new SimpleIntegerProperty(this, "optionSignificantDigits", 6);
 
 	private final BooleanProperty optionPolish = new SimpleBooleanProperty(this, "optionPolish", true);
-	private final BooleanProperty optionLocalPruning = new SimpleBooleanProperty(this, "optionLocalPruning", true);
+	private final BooleanProperty optionRemoveRedundant = new SimpleBooleanProperty(this, "optionRemoveRedundant", true);
 	private final IntegerProperty optionMaxRounds = new SimpleIntegerProperty(this, "optionMaxRounds", 100);
 
 	{
@@ -65,7 +64,7 @@ public class RazorNet extends Distances2Network {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionAlgorithm.getName(), optionSignificantDigits.getName(), optionPolish.getName(), optionLocalPruning.getName(), optionMaxRounds.getName());
+		return List.of(optionAlgorithm.getName(), optionPolish.getName(), optionMaxRounds.getName(), optionRemoveRedundant.getName(), optionSignificantDigits.getName());
 	}
 
 	@Override
@@ -73,17 +72,18 @@ public class RazorNet extends Distances2Network {
 		if (!optionName.startsWith("option"))
 			optionName = "option" + optionName;
 		if (optionPolish.getName().equals(optionName))
-			return "perform polishing";
-		else if (optionLocalPruning.getName().equals(optionName))
-			return "perform local pruning";
+			return "run polishing algorithm";
+		else if (optionRemoveRedundant.getName().equals(optionName))
+			return "remove superfluous edges";
 		else if (optionMaxRounds.getName().equals(optionName))
-			return "maximum number of rounds of polishing and/or pruning";
+			return "maximum number of rounds of polishing";
 		else return super.getToolTip(optionName);
 	}
 
 	@Override
 	public void compute(ProgressListener progressListener, TaxaBlock taxaBlock, DistancesBlock distancesBlock, NetworkBlock networkBlock) throws IOException {
 		System.err.println("Running " + getOptionAlgorithm());
+		progressListener.setTasks("RazorNet", "Initialization");
 		var progress = new ProgressAdapter(progressListener);
 		var distances = distancesBlock.getDistances();
 		var n = distances.length;
@@ -102,9 +102,19 @@ public class RazorNet extends Distances2Network {
 				var v = graph.newNode();
 				nodeMap.put(id, v);
 				if (id < n) {
-					var t = id + 1;
-					graph.addTaxon(v, t);
-					graph.setLabel(v, taxaBlock.getLabel(t));
+					var taxa = quantization.mapNodeBack().apply(id);
+					if (taxa.size() == 1) {
+						var t = taxa.iterator().next();
+						graph.addTaxon(v, t);
+						graph.setLabel(v, taxaBlock.getLabel(t));
+					} else if (taxa.size() > 1) {
+						for (var t : taxa) {
+							var w = graph.newNode();
+							graph.addTaxon(w, t);
+							graph.setLabel(w, taxaBlock.getLabel(t));
+							graph.setWeight(graph.newEdge(w, v), 0);
+						}
+					}
 				}
 			}
 		};
@@ -120,15 +130,7 @@ public class RazorNet extends Distances2Network {
 		var verbose = true;
 
 		try {
-			switch (optionAlgorithm.get()) {
-				case Tighten1Polish1 ->
-						RunRazorNetIntGraph.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 1, 1, verbose, progress, NotificationManager::showWarning);
-				case Tighten2Polish1 ->
-						RunRazorNetIntGraph.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), isOptionLocalPruning(), getOptionMaxRounds(), 2, 1, verbose, progress, NotificationManager::showWarning);
-				case CactusRealizer -> {
-					RunCactusRealizer.run(ensureNode, newEdgeDouble, quantization.createDoubleMatrix(), progress);
-				}
-			}
+			RunRazorNetIntGraph.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), getOptionRemoveRedundant(), getOptionMaxRounds(), verbose, progress, NotificationManager::showWarning);
 		} catch (CanceledException ex) {
 			System.err.println("RazorNet canceled");
 			throw ex;
@@ -148,14 +150,6 @@ public class RazorNet extends Distances2Network {
 
 	public BooleanProperty optionPolishProperty() {
 		return optionPolish;
-	}
-
-	public boolean isOptionLocalPruning() {
-		return optionLocalPruning.get();
-	}
-
-	public BooleanProperty optionLocalPruningProperty() {
-		return optionLocalPruning;
 	}
 
 	public int getOptionMaxRounds() {
@@ -180,5 +174,13 @@ public class RazorNet extends Distances2Network {
 
 	public IntegerProperty optionSignificantDigitsProperty() {
 		return optionSignificantDigits;
+	}
+
+	public boolean getOptionRemoveRedundant() {
+		return optionRemoveRedundant.get();
+	}
+
+	public BooleanProperty optionRemoveRedundantProperty() {
+		return optionRemoveRedundant;
 	}
 }
