@@ -25,16 +25,17 @@ import jloda.fx.util.AService;
 import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.phylogeny.dolayout.DoTanglegram;
 import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
-import phylogeny_algorithms.layout.ODTanglegramAlgorithm;
 import splitstree6.tools.RunWorkflow;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-import static phylogeny_algorithms.layout.Common.computeNodeHeightMap;
+import static jloda.phylogeny.dolayout.Common.computeNodeHeightMap;
+
 
 /**
  * optimize the LSAchildren of phylogenies for a tanglegram drawing
@@ -197,7 +198,7 @@ public class ODTanglegram {
 			}
 		}
 
-		var resultAndScore = ODTanglegramAlgorithm.apply(network1.getRoot(), v -> (network1.hasTaxa(v) ? network1.getTaxon(v) : null), childrenMap1::get,
+		var resultAndScore = DoTanglegram.apply(network1.getRoot(), v -> (network1.hasTaxa(v) ? network1.getTaxon(v) : null), childrenMap1::get,
 				network2.getRoot(), v -> (network2.hasTaxa(v) ? network2.getTaxon(v) : null), childrenMap2::get, reticulateEdges2,
 				optimizeTaxonDisplacement, optimizeReticulateDisplacement, random, progress::isUserCancelled);
 		childrenMap2.clear();

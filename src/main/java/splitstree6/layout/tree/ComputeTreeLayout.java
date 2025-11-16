@@ -34,8 +34,8 @@ import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.phylogeny.dolayout.DoNetworkLayout;
 import jloda.util.IteratorUtils;
-import phylogeny_algorithms.layout.ODNetworkLayoutAlgorithm;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -91,7 +91,7 @@ public class ComputeTreeLayout {
 					reticulateMap.computeIfAbsent(e.getTarget(), k -> new ArrayList<>()).add(e.getSource());
 				}
 			}
-			var result = ODNetworkLayoutAlgorithm.apply(tree.getRoot(), childrenMap::get, reticulateMap::get, diagram.isRadialOrCircular(), () -> false);
+			var result = DoNetworkLayout.apply(tree.getRoot(), childrenMap::get, reticulateMap::get, diagram.isRadialOrCircular(), () -> false);
 			tree.getLSAChildrenMap().clear();
 			tree.getLSAChildrenMap().putAll(result);
 			optimizeReticulationEdges = false;

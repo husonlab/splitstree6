@@ -316,11 +316,11 @@ public class TanglegramViewController {
 		return reticulateDisplacementFirstCBox;
 	}
 
-	public CheckBox getTanglegramCrossingsSecondCBox() {
+	public CheckBox getTaxonDisplacementSecondCBox() {
 		return taxonDisplacementSecondCBox;
 	}
 
-	public CheckBox getTaxonDisplacementSecondCBox() {
+	public CheckBox getReticulateDisplacementSecondCBox() {
 		return reticulateDisplacementSecondCBox;
 	}
 

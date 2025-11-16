@@ -2,6 +2,8 @@ module splitstreesix {
 	requires transitive jloda_core;
 	requires transitive jloda_fx;
 	requires jloda_connect;
+	requires jloda_phylogeny;
+
 	requires transitive javafx.controls;
 	requires transitive javafx.graphics;
 	requires transitive javafx.fxml;
@@ -25,8 +27,6 @@ module splitstreesix {
 	requires jdk.compiler;
 
 	// requires razornet;
-
-	requires phylogeny_algorithms;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;

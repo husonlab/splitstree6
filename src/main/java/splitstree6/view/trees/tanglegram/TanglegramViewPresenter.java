@@ -170,9 +170,17 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		controller.getTaxonDisplacementFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings1Property());
 		controller.getReticulateDisplacementFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings1Property());
-		controller.getTanglegramCrossingsSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings2Property());
-		controller.getTaxonDisplacementSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings2Property());
+		controller.getTaxonDisplacementSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings2Property());
+		controller.getReticulateDisplacementSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings2Property());
 		controller.getUsePQTreeCBox().selectedProperty().bindBidirectional(view.optionUsePQTreeProperty());
+		tree1.addListener((v, o, n) -> {
+			controller.getTaxonDisplacementFirstCBox().setDisable(n == null || n == tree2.get());
+			controller.getReticulateDisplacementFirstCBox().setDisable(n == null || n == tree2.get() || !n.hasReticulateEdges());
+		});
+		tree2.addListener((v, o, n) -> {
+			controller.getTaxonDisplacementSecondCBox().setDisable(n == null || n == tree1.get());
+			controller.getReticulateDisplacementSecondCBox().setDisable(n == null || n == tree1.get() || !n.hasReticulateEdges());
+		});
 
 		// todo: don't run optimization when opening a previously saved file
 
