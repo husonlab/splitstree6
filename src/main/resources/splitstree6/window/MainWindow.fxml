@@ -405,7 +405,7 @@
                         <CheckMenuItem fx:id="f84MenuItem" text="F84"
                                        userData="Compute distances using the Felsenstein-1984 model"/>
                         <CheckMenuItem fx:id="tn93MenuItem" text="TN93"
-                                       userData="Compute distances using the Tamura–Nei 1993 model"/>
+                                       userData="Compute distances using the Tamura-Nei 1993 model"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="proteinMLDistanceMenuItem" text="Protein ML Dist"
                                        userData="Compute distances for proteins using maximum-likelihood estimation"/>

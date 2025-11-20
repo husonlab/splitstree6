@@ -31,11 +31,13 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Shape;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.dialog.InlineTextPrompt;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.qr.QRViewUtils;
 import jloda.fx.undo.UndoManager;
@@ -218,23 +220,49 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		controller.getSetScaleRatioButton().setOnAction(e -> {
 			var currentValue = 100.0 / (controller.getScaleBar().getUnitLengthX() * view.getOptionZoomFactor());
-			var dialog = new TextInputDialog(StringUtils.removeTrailingZerosAfterDot(currentValue));
-			dialog.setTitle("Set Scale Ratio - SplitsTree App");
-			dialog.setHeaderText("Define the length representation per 100 pixels");
-			dialog.setContentText("Length per 100 pixels:");
-			dialog.initOwner(mainWindow.getStage());
-			dialog.initModality(Modality.APPLICATION_MODAL);
-			dialog.showAndWait().ifPresent(resultString -> {
-				if (NumberUtils.isDouble(resultString)) {
-					var result = NumberUtils.parseDouble(resultString);
-					if (result > 0) {
-						Platform.runLater(() -> {
-							var newValue = 100.0 / (result * controller.getScaleBar().getUnitLengthX());
-							view.setOptionZoomFactor(newValue);
-						});
+
+			if (SplitsTree6.isDesktop()) {
+				var dialog = new TextInputDialog(StringUtils.removeTrailingZerosAfterDot(currentValue));
+				dialog.setTitle("Set Scale Ratio - SplitsTree App");
+				dialog.setHeaderText("Define the length representation per 100 pixels");
+				dialog.setContentText("Length per 100 pixels:");
+				dialog.initOwner(mainWindow.getStage());
+				dialog.initModality(Modality.APPLICATION_MODAL);
+				dialog.showAndWait().ifPresent(resultString -> {
+					if (NumberUtils.isDouble(resultString)) {
+						var result = NumberUtils.parseDouble(resultString);
+						if (result > 0) {
+							Platform.runLater(() -> {
+								var newValue = 100.0 / (result * controller.getScaleBar().getUnitLengthX());
+								view.setOptionZoomFactor(newValue);
+							});
+						}
 					}
-				}
-			});
+				});
+			} else {
+				var overlayPane = controller.getInnerAnchorPane();
+				var prompt = new InlineTextPrompt("Enter the length represented by 100 pixels:",
+						StringUtils.removeTrailingZerosAfterDot(currentValue));
+				AnchorPane.setTopAnchor(prompt, 100.0);
+				AnchorPane.setLeftAnchor(prompt, 100.0);
+
+				prompt.showAndWait(overlayPane).thenAccept(optionalValue -> {
+					// Remove from the UI once finished
+					Platform.runLater(() -> overlayPane.getChildren().remove(prompt));
+
+					optionalValue.ifPresent(resultString -> {
+						if (NumberUtils.isDouble(resultString)) {
+							var result = NumberUtils.parseDouble(resultString);
+							if (result > 0) {
+								Platform.runLater(() -> {
+									var newValue = 100.0 / (result * controller.getScaleBar().getUnitLengthX());
+									view.setOptionZoomFactor(newValue);
+								});
+							}
+						}
+					});
+				});
+			}
 		});
 
 		if (false) {

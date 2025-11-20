@@ -55,7 +55,9 @@ import splitstree6.workflow.Workflow;
 import splitstree6.workflowtree.WorkflowTreeView;
 import splitstree6.xtra.latex.MenusToLaTeX;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Objects;
 
 public class MainWindow implements IMainWindow {
@@ -96,6 +98,17 @@ public class MainWindow implements IMainWindow {
 				controller = fxmlLoader.getController();
 			} catch (IOException ex) {
 				throw new RuntimeException(ex);
+			}
+
+			if (false) { // print out the filtered fxml file
+				try (var r = new BufferedReader(new InputStreamReader(StatementFilter.applyMobileFXML(Objects.requireNonNull(MainWindowController.class.getResource("MainWindow.fxml")).openStream(), false)))) {
+					String line;
+					while ((line = r.readLine()) != null) {
+						System.err.println(line);
+					}
+				} catch (IOException ex) {
+					throw new RuntimeException(ex);
+				}
 			}
 		}
 		workflow.setServiceConfigurator(s -> s.setProgressParentPane(controller.getBottomFlowPane()));
