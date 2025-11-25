@@ -1,0 +1,902 @@
+n=100_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=100	TD=1418	CX=1008	TM=0
+n=100_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=100	r1=0	r2=0	RD1=0	RD2=0	TD=1128	CX=933	TM=0
+n=100_r=0.1_m=0_c=0.tre	MD=cophylo	n=100	TD=790	CX=474	TM=0
+n=100_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=100	r1=0	r2=0	RD1=0	RD2=0	TD=756	CX=577	TM=0
+n=100_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=80	TD=832	CX=607	TM=0
+n=100_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=522	CX=381	TM=0
+n=100_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=80	TD=502	CX=340	TM=0
+n=100_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=496	CX=353	TM=0
+n=100_r=0.15_m=0_c=0.tre	MD=cophylo	n=100	TD=1678	CX=1206	TM=0
+n=100_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=100	r1=0	r2=0	RD1=0	RD2=0	TD=892	CX=679	TM=0
+n=100_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=80	TD=1126	CX=708	TM=0
+n=100_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=542	CX=426	TM=0
+n=100_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=80	TD=560	CX=405	TM=0
+n=100_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=558	CX=441	TM=0
+n=100_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=100	TD=1988	CX=1412	TM=0
+n=100_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=100	r1=0	r2=0	RD1=0	RD2=0	TD=1282	CX=1026	TM=0
+n=100_r=0.2_m=0_c=0.tre	MD=cophylo	n=100	TD=1740	CX=1196	TM=0
+n=100_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=100	r1=0	r2=0	RD1=0	RD2=0	TD=1640	CX=1316	TM=0
+n=100_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=80	TD=1234	CX=846	TM=0
+n=100_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=924	CX=717	TM=0
+n=100_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=80	TD=1074	CX=802	TM=0
+n=100_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=972	CX=751	TM=0
+n=110_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=110	TD=1214	CX=821	TM=0
+n=110_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=110	r1=0	r2=0	RD1=0	RD2=0	TD=1016	CX=804	TM=0
+n=110_r=0.1_m=0_c=0.tre	MD=cophylo	n=110	TD=1430	CX=850	TM=0
+n=110_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=110	r1=0	r2=0	RD1=0	RD2=0	TD=734	CX=578	TM=0
+n=110_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=88	TD=816	CX=622	TM=0
+n=110_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=88	r1=0	r2=0	RD1=0	RD2=0	TD=600	CX=509	TM=0
+n=110_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=88	TD=972	CX=671	TM=0
+n=110_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=88	r1=0	r2=0	RD1=0	RD2=0	TD=888	CX=710	TM=0
+n=110_r=0.15_m=0_c=0.tre	MD=cophylo	n=110	TD=1042	CX=718	TM=0
+n=110_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=110	r1=0	r2=0	RD1=0	RD2=0	TD=876	CX=726	TM=0
+n=110_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=88	TD=930	CX=576	TM=0
+n=110_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=88	r1=0	r2=0	RD1=0	RD2=0	TD=660	CX=507	TM=0
+n=110_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=88	TD=1290	CX=943	TM=0
+n=110_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=88	r1=0	r2=0	RD1=0	RD2=0	TD=980	CX=727	TM=0
+n=110_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=110	TD=2420	CX=1505	TM=0
+n=110_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=110	r1=0	r2=0	RD1=0	RD2=0	TD=1602	CX=1302	TM=0
+n=110_r=0.2_m=0_c=0.tre	MD=cophylo	n=110	TD=1614	CX=1137	TM=0
+n=110_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=110	r1=0	r2=0	RD1=0	RD2=0	TD=1562	CX=1171	TM=0
+n=110_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=88	TD=1546	CX=931	TM=0
+n=110_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=88	r1=0	r2=0	RD1=0	RD2=0	TD=1234	CX=958	TM=0
+n=110_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=88	TD=1094	CX=827	TM=0
+n=110_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=88	r1=0	r2=0	RD1=0	RD2=0	TD=804	CX=677	TM=0
+n=120_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=120	TD=1734	CX=1187	TM=0
+n=120_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=120	r1=0	r2=0	RD1=0	RD2=0	TD=1290	CX=1026	TM=0
+n=120_r=0.1_m=0_c=0.tre	MD=cophylo	n=120	TD=1660	CX=1173	TM=0
+n=120_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=120	r1=0	r2=0	RD1=0	RD2=0	TD=1350	CX=1144	TM=0
+n=120_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=98	TD=1550	CX=1061	TM=0
+n=120_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=98	r1=0	r2=0	RD1=0	RD2=0	TD=752	CX=605	TM=0
+n=120_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=98	TD=1754	CX=1166	TM=0
+n=120_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=98	r1=0	r2=0	RD1=0	RD2=0	TD=1176	CX=950	TM=0
+n=120_r=0.15_m=0_c=0.tre	MD=cophylo	n=120	TD=1808	CX=1295	TM=0
+n=120_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=120	r1=0	r2=0	RD1=0	RD2=0	TD=1428	CX=1171	TM=0
+n=120_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=98	TD=1436	CX=958	TM=0
+n=120_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=98	r1=0	r2=0	RD1=0	RD2=0	TD=1000	CX=773	TM=0
+n=120_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=98	TD=1256	CX=909	TM=0
+n=120_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=98	r1=0	r2=0	RD1=0	RD2=0	TD=1082	CX=869	TM=0
+n=120_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=120	TD=2948	CX=2019	TM=0
+n=120_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=120	r1=0	r2=0	RD1=0	RD2=0	TD=2118	CX=1652	TM=0
+n=120_r=0.2_m=0_c=0.tre	MD=cophylo	n=120	TD=2324	CX=1799	TM=0
+n=120_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=120	r1=0	r2=0	RD1=0	RD2=0	TD=1698	CX=1408	TM=0
+n=120_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=98	TD=2242	CX=1603	TM=0
+n=120_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=98	r1=0	r2=0	RD1=0	RD2=0	TD=1562	CX=1218	TM=0
+n=120_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=98	TD=1772	CX=1218	TM=0
+n=120_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=98	r1=0	r2=0	RD1=0	RD2=0	TD=1702	CX=1373	TM=0
+n=130_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=130	TD=1512	CX=1134	TM=0
+n=130_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=130	r1=0	r2=0	RD1=0	RD2=0	TD=1198	CX=941	TM=0
+n=130_r=0.1_m=0_c=0.tre	MD=cophylo	n=130	TD=1450	CX=979	TM=0
+n=130_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=130	r1=0	r2=0	RD1=0	RD2=0	TD=1400	CX=1087	TM=0
+n=130_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=106	TD=1478	CX=1037	TM=0
+n=130_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=106	r1=0	r2=0	RD1=0	RD2=0	TD=1020	CX=834	TM=0
+n=130_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=106	TD=1502	CX=1063	TM=0
+n=130_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=106	r1=0	r2=0	RD1=0	RD2=0	TD=762	CX=581	TM=0
+n=130_r=0.15_m=0_c=0.tre	MD=cophylo	n=130	TD=2430	CX=1865	TM=1
+n=130_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=130	r1=0	r2=0	RD1=0	RD2=0	TD=2284	CX=1809	TM=0
+n=130_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=106	TD=2226	CX=1577	TM=0
+n=130_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=106	r1=0	r2=0	RD1=0	RD2=0	TD=1394	CX=1097	TM=0
+n=130_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=106	TD=1514	CX=1014	TM=0
+n=130_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=106	r1=0	r2=0	RD1=0	RD2=0	TD=1348	CX=1010	TM=0
+n=130_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=130	TD=2466	CX=1660	TM=0
+n=130_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=130	r1=0	r2=0	RD1=0	RD2=0	TD=2096	CX=1548	TM=0
+n=130_r=0.2_m=0_c=0.tre	MD=cophylo	n=130	TD=2880	CX=2193	TM=1
+n=130_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=130	r1=0	r2=0	RD1=0	RD2=0	TD=2034	CX=1539	TM=0
+n=130_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=106	TD=1856	CX=1319	TM=0
+n=130_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=106	r1=0	r2=0	RD1=0	RD2=0	TD=1562	CX=1224	TM=0
+n=130_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=106	TD=1796	CX=1243	TM=0
+n=130_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=106	r1=0	r2=0	RD1=0	RD2=0	TD=1644	CX=1225	TM=0
+n=140_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=140	TD=2552	CX=1690	TM=0
+n=140_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=140	r1=0	r2=0	RD1=0	RD2=0	TD=2226	CX=1568	TM=0
+n=140_r=0.1_m=0_c=0.tre	MD=cophylo	n=140	TD=1774	CX=1252	TM=1
+n=140_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=140	r1=0	r2=0	RD1=0	RD2=0	TD=1664	CX=1397	TM=0
+n=140_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=113	TD=1914	CX=1318	TM=0
+n=140_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=113	r1=0	r2=0	RD1=0	RD2=0	TD=1202	CX=934	TM=0
+n=140_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=113	TD=1426	CX=976	TM=0
+n=140_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=113	r1=0	r2=0	RD1=0	RD2=0	TD=1120	CX=943	TM=0
+n=140_r=0.15_m=0_c=0.tre	MD=cophylo	n=140	TD=2838	CX=2046	TM=1
+n=140_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=140	r1=0	r2=0	RD1=0	RD2=0	TD=2058	CX=1654	TM=0
+n=140_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=113	TD=1148	CX=867	TM=0
+n=140_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=113	r1=0	r2=0	RD1=0	RD2=0	TD=918	CX=747	TM=0
+n=140_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=113	TD=1908	CX=1308	TM=0
+n=140_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=113	r1=0	r2=0	RD1=0	RD2=0	TD=1310	CX=1112	TM=0
+n=140_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=140	TD=3670	CX=2638	TM=0
+n=140_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=140	r1=0	r2=0	RD1=0	RD2=0	TD=2558	CX=2160	TM=0
+n=140_r=0.2_m=0_c=0.tre	MD=cophylo	n=140	TD=3262	CX=2233	TM=0
+n=140_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=140	r1=0	r2=0	RD1=0	RD2=0	TD=2886	CX=2186	TM=0
+n=140_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=113	TD=2028	CX=1506	TM=0
+n=140_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=113	r1=0	r2=0	RD1=0	RD2=0	TD=1546	CX=1289	TM=0
+n=140_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=113	TD=1794	CX=1245	TM=0
+n=140_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=113	r1=0	r2=0	RD1=0	RD2=0	TD=1646	CX=1297	TM=0
+n=150_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=150	TD=3902	CX=2361	TM=1
+n=150_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=150	r1=0	r2=0	RD1=0	RD2=0	TD=2408	CX=1763	TM=0
+n=150_r=0.1_m=0_c=0.tre	MD=cophylo	n=150	TD=3220	CX=2272	TM=1
+n=150_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=150	r1=0	r2=0	RD1=0	RD2=0	TD=2016	CX=1467	TM=0
+n=150_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=123	TD=1684	CX=1203	TM=0
+n=150_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=123	r1=0	r2=0	RD1=0	RD2=0	TD=1394	CX=1157	TM=0
+n=150_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=123	TD=1200	CX=915	TM=0
+n=150_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=123	r1=0	r2=0	RD1=0	RD2=0	TD=1200	CX=909	TM=0
+n=150_r=0.15_m=0_c=0.tre	MD=cophylo	n=150	TD=3508	CX=2491	TM=1
+n=150_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=150	r1=0	r2=0	RD1=0	RD2=0	TD=3350	CX=2656	TM=0
+n=150_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=123	TD=3420	CX=2159	TM=0
+n=150_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=123	r1=0	r2=0	RD1=0	RD2=0	TD=2512	CX=1936	TM=0
+n=150_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=123	TD=2594	CX=1753	TM=1
+n=150_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=123	r1=0	r2=0	RD1=0	RD2=0	TD=2110	CX=1649	TM=0
+n=150_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=150	TD=5368	CX=3918	TM=1
+n=150_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=150	r1=0	r2=0	RD1=0	RD2=0	TD=3338	CX=2669	TM=0
+n=150_r=0.2_m=0_c=0.tre	MD=cophylo	n=150	TD=3628	CX=2624	TM=1
+n=150_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=150	r1=0	r2=0	RD1=0	RD2=0	TD=3378	CX=2699	TM=0
+n=150_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=123	TD=2128	CX=1581	TM=0
+n=150_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=123	r1=0	r2=0	RD1=0	RD2=0	TD=1832	CX=1535	TM=0
+n=150_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=123	TD=3074	CX=2156	TM=0
+n=150_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=123	r1=0	r2=0	RD1=0	RD2=0	TD=2804	CX=2355	TM=0
+n=160_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=160	TD=3658	CX=2766	TM=1
+n=160_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=160	r1=0	r2=0	RD1=0	RD2=0	TD=2268	CX=1697	TM=0
+n=160_r=0.1_m=0_c=0.tre	MD=cophylo	n=160	TD=2968	CX=2263	TM=1
+n=160_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=160	r1=0	r2=0	RD1=0	RD2=0	TD=2318	CX=1891	TM=0
+n=160_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=129	TD=2516	CX=1697	TM=0
+n=160_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=129	r1=0	r2=0	RD1=0	RD2=0	TD=1498	CX=1124	TM=0
+n=160_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=129	TD=2210	CX=1482	TM=0
+n=160_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=129	r1=0	r2=0	RD1=0	RD2=0	TD=1848	CX=1447	TM=0
+n=160_r=0.15_m=0_c=0.tre	MD=cophylo	n=160	TD=3398	CX=2390	TM=1
+n=160_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=160	r1=0	r2=0	RD1=0	RD2=0	TD=2308	CX=1837	TM=0
+n=160_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=129	TD=3674	CX=2543	TM=0
+n=160_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=129	r1=0	r2=0	RD1=0	RD2=0	TD=2424	CX=1864	TM=0
+n=160_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=129	TD=2722	CX=1998	TM=0
+n=160_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=129	r1=0	r2=0	RD1=0	RD2=0	TD=2472	CX=2026	TM=0
+n=160_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=160	TD=3530	CX=2625	TM=0
+n=160_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=160	r1=0	r2=0	RD1=0	RD2=0	TD=3264	CX=2635	TM=0
+n=160_r=0.2_m=0_c=0.tre	MD=cophylo	n=160	TD=4104	CX=2983	TM=1
+n=160_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=160	r1=0	r2=0	RD1=0	RD2=0	TD=3340	CX=2722	TM=0
+n=160_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=129	TD=3276	CX=2403	TM=0
+n=160_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=129	r1=0	r2=0	RD1=0	RD2=0	TD=2482	CX=1980	TM=0
+n=160_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=129	TD=2690	CX=1974	TM=0
+n=160_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=129	r1=0	r2=0	RD1=0	RD2=0	TD=2280	CX=1814	TM=0
+n=170_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=170	TD=3946	CX=2806	TM=1
+n=170_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=170	r1=0	r2=0	RD1=0	RD2=0	TD=2578	CX=2090	TM=0
+n=170_r=0.1_m=0_c=0.tre	MD=cophylo	n=170	TD=3086	CX=2302	TM=1
+n=170_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=170	r1=0	r2=0	RD1=0	RD2=0	TD=3300	CX=2690	TM=0
+n=170_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=137	TD=2534	CX=1858	TM=0
+n=170_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=137	r1=0	r2=0	RD1=0	RD2=0	TD=1284	CX=999	TM=0
+n=170_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=137	TD=2528	CX=1836	TM=1
+n=170_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=137	r1=0	r2=0	RD1=0	RD2=0	TD=2410	CX=1865	TM=0
+n=170_r=0.15_m=0_c=0.tre	MD=cophylo	n=170	TD=5022	CX=3293	TM=1
+n=170_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=170	r1=0	r2=0	RD1=0	RD2=0	TD=3348	CX=2547	TM=0
+n=170_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=137	TD=2678	CX=1963	TM=0
+n=170_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=137	r1=0	r2=0	RD1=0	RD2=0	TD=2332	CX=1899	TM=0
+n=170_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=137	TD=3646	CX=2674	TM=0
+n=170_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=137	r1=0	r2=0	RD1=0	RD2=0	TD=3190	CX=2511	TM=0
+n=170_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=170	TD=6376	CX=4470	TM=1
+n=170_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=170	r1=0	r2=0	RD1=0	RD2=0	TD=4510	CX=3481	TM=0
+n=170_r=0.2_m=0_c=0.tre	MD=cophylo	n=170	TD=5644	CX=3848	TM=1
+n=170_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=170	r1=0	r2=0	RD1=0	RD2=0	TD=4336	CX=3463	TM=0
+n=170_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=137	TD=3454	CX=2345	TM=0
+n=170_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=137	r1=0	r2=0	RD1=0	RD2=0	TD=2762	CX=2269	TM=0
+n=170_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=137	TD=3676	CX=2639	TM=1
+n=170_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=137	r1=0	r2=0	RD1=0	RD2=0	TD=3256	CX=2624	TM=0
+n=180_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=180	TD=6218	CX=4165	TM=1
+n=180_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=180	r1=0	r2=0	RD1=0	RD2=0	TD=4242	CX=3262	TM=0
+n=180_r=0.1_m=0_c=0.tre	MD=cophylo	n=180	TD=3226	CX=2344	TM=1
+n=180_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=180	r1=0	r2=0	RD1=0	RD2=0	TD=2754	CX=2254	TM=0
+n=180_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=146	TD=2900	CX=2081	TM=0
+n=180_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=146	r1=0	r2=0	RD1=0	RD2=0	TD=2062	CX=1637	TM=0
+n=180_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=146	TD=2414	CX=1514	TM=1
+n=180_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=146	r1=0	r2=0	RD1=0	RD2=0	TD=2074	CX=1719	TM=0
+n=180_r=0.15_m=0_c=0.tre	MD=cophylo	n=180	TD=5222	CX=3401	TM=1
+n=180_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=180	r1=0	r2=0	RD1=0	RD2=0	TD=3448	CX=2870	TM=0
+n=180_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=146	TD=2166	CX=1658	TM=1
+n=180_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=146	r1=0	r2=0	RD1=0	RD2=0	TD=1914	CX=1553	TM=0
+n=180_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=146	TD=2978	CX=1943	TM=1
+n=180_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=146	r1=0	r2=0	RD1=0	RD2=0	TD=2072	CX=1595	TM=0
+n=180_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=180	TD=5546	CX=3875	TM=1
+n=180_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=180	r1=0	r2=0	RD1=0	RD2=0	TD=4870	CX=3772	TM=0
+n=180_r=0.2_m=0_c=0.tre	MD=cophylo	n=180	TD=5892	CX=4241	TM=2
+n=180_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=180	r1=0	r2=0	RD1=0	RD2=0	TD=4624	CX=3691	TM=0
+n=180_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=146	TD=3938	CX=2762	TM=1
+n=180_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=146	r1=0	r2=0	RD1=0	RD2=0	TD=3576	CX=2927	TM=0
+n=180_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=146	TD=4296	CX=3113	TM=1
+n=180_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=146	r1=0	r2=0	RD1=0	RD2=0	TD=3826	CX=3041	TM=0
+n=190_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=190	TD=3876	CX=2903	TM=1
+n=190_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=190	r1=0	r2=0	RD1=0	RD2=0	TD=3040	CX=2376	TM=0
+n=190_r=0.1_m=0_c=0.tre	MD=cophylo	n=190	TD=4864	CX=3506	TM=2
+n=190_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=190	r1=0	r2=0	RD1=0	RD2=0	TD=3676	CX=3030	TM=0
+n=190_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=154	TD=3032	CX=2236	TM=1
+n=190_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=154	r1=0	r2=0	RD1=0	RD2=0	TD=2498	CX=2082	TM=0
+n=190_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=154	TD=3664	CX=2606	TM=1
+n=190_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=154	r1=0	r2=0	RD1=0	RD2=0	TD=2722	CX=2189	TM=0
+n=190_r=0.15_m=0_c=0.tre	MD=cophylo	n=190	TD=6758	CX=4466	TM=2
+n=190_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=190	r1=0	r2=0	RD1=0	RD2=0	TD=4916	CX=3933	TM=0
+n=190_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=154	TD=4824	CX=3514	TM=1
+n=190_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=154	r1=0	r2=0	RD1=0	RD2=0	TD=3202	CX=2634	TM=0
+n=190_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=154	TD=3876	CX=2722	TM=1
+n=190_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=154	r1=0	r2=0	RD1=0	RD2=0	TD=3162	CX=2502	TM=0
+n=190_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=190	TD=5174	CX=3876	TM=1
+n=190_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=190	r1=0	r2=0	RD1=0	RD2=0	TD=4494	CX=3588	TM=0
+n=190_r=0.2_m=0_c=0.tre	MD=cophylo	n=190	TD=6574	CX=4745	TM=2
+n=190_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=190	r1=0	r2=0	RD1=0	RD2=0	TD=5994	CX=4547	TM=0
+n=190_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=154	TD=4544	CX=3440	TM=1
+n=190_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=154	r1=0	r2=0	RD1=0	RD2=0	TD=3792	CX=3136	TM=0
+n=190_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=154	TD=4656	CX=3241	TM=1
+n=190_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=154	r1=0	r2=0	RD1=0	RD2=0	TD=4396	CX=3456	TM=0
+n=200_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=200	TD=4612	CX=3348	TM=1
+n=200_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=200	r1=0	r2=0	RD1=0	RD2=0	TD=3738	CX=2957	TM=0
+n=200_r=0.1_m=0_c=0.tre	MD=cophylo	n=200	TD=5090	CX=3316	TM=2
+n=200_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=200	r1=0	r2=0	RD1=0	RD2=0	TD=4960	CX=3578	TM=0
+n=200_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=163	TD=4522	CX=3501	TM=1
+n=200_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=163	r1=0	r2=0	RD1=0	RD2=0	TD=2400	CX=2023	TM=0
+n=200_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=163	TD=3580	CX=2697	TM=1
+n=200_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=163	r1=0	r2=0	RD1=0	RD2=0	TD=2214	CX=1808	TM=0
+n=200_r=0.15_m=0_c=0.tre	MD=cophylo	n=200	TD=6994	CX=4707	TM=2
+n=200_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=200	r1=0	r2=0	RD1=0	RD2=0	TD=6680	CX=4991	TM=0
+n=200_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=163	TD=5112	CX=3607	TM=1
+n=200_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=163	r1=0	r2=0	RD1=0	RD2=0	TD=4214	CX=3302	TM=0
+n=200_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=163	TD=4340	CX=2946	TM=1
+n=200_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=163	r1=0	r2=0	RD1=0	RD2=0	TD=4228	CX=3286	TM=0
+n=200_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=200	TD=7966	CX=5873	TM=2
+n=200_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=200	r1=0	r2=0	RD1=0	RD2=0	TD=5248	CX=3985	TM=0
+n=200_r=0.2_m=0_c=0.tre	MD=cophylo	n=200	TD=7314	CX=5171	TM=2
+n=200_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=200	r1=0	r2=0	RD1=0	RD2=0	TD=7134	CX=5406	TM=0
+n=200_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=163	TD=5436	CX=3896	TM=1
+n=200_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=163	r1=0	r2=0	RD1=0	RD2=0	TD=3984	CX=3167	TM=0
+n=200_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=163	TD=4724	CX=3120	TM=1
+n=200_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=163	r1=0	r2=0	RD1=0	RD2=0	TD=4428	CX=3402	TM=0
+n=210_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=210	TD=6454	CX=4188	TM=2
+n=210_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=210	r1=0	r2=0	RD1=0	RD2=0	TD=4690	CX=3668	TM=0
+n=210_r=0.1_m=0_c=0.tre	MD=cophylo	n=210	TD=3884	CX=2791	TM=2
+n=210_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=210	r1=0	r2=0	RD1=0	RD2=0	TD=3518	CX=2911	TM=0
+n=210_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=171	TD=5390	CX=3986	TM=1
+n=210_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=171	r1=0	r2=0	RD1=0	RD2=0	TD=3398	CX=2885	TM=0
+n=210_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=171	TD=3158	CX=2385	TM=1
+n=210_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=171	r1=0	r2=0	RD1=0	RD2=0	TD=2590	CX=2123	TM=0
+n=210_r=0.15_m=0_c=0.tre	MD=cophylo	n=210	TD=6364	CX=4381	TM=2
+n=210_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=210	r1=0	r2=0	RD1=0	RD2=0	TD=5866	CX=4456	TM=0
+n=210_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=171	TD=5036	CX=3651	TM=1
+n=210_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=171	r1=0	r2=0	RD1=0	RD2=0	TD=3934	CX=3197	TM=0
+n=210_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=171	TD=4708	CX=3162	TM=1
+n=210_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=171	r1=0	r2=0	RD1=0	RD2=0	TD=3818	CX=2890	TM=0
+n=210_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=210	TD=7006	CX=5338	TM=2
+n=210_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=210	r1=0	r2=0	RD1=0	RD2=0	TD=6144	CX=5019	TM=0
+n=210_r=0.2_m=0_c=0.tre	MD=cophylo	n=210	TD=9128	CX=6504	TM=2
+n=210_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=210	r1=0	r2=0	RD1=0	RD2=0	TD=7706	CX=5678	TM=0
+n=210_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=171	TD=5644	CX=4192	TM=1
+n=210_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=171	r1=0	r2=0	RD1=0	RD2=0	TD=4956	CX=3772	TM=0
+n=210_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=171	TD=6004	CX=4306	TM=2
+n=210_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=171	r1=0	r2=0	RD1=0	RD2=0	TD=4954	CX=3954	TM=0
+n=220_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=220	TD=9360	CX=7150	TM=2
+n=220_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=220	r1=0	r2=0	RD1=0	RD2=0	TD=5136	CX=4301	TM=0
+n=220_r=0.1_m=0_c=0.tre	MD=cophylo	n=220	TD=4890	CX=3068	TM=2
+n=220_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=220	r1=0	r2=0	RD1=0	RD2=0	TD=4552	CX=3625	TM=0
+n=220_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=179	TD=5566	CX=3749	TM=1
+n=220_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=179	r1=0	r2=0	RD1=0	RD2=0	TD=3746	CX=2763	TM=0
+n=220_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=179	TD=3984	CX=2708	TM=1
+n=220_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=179	r1=0	r2=0	RD1=0	RD2=0	TD=3772	CX=2930	TM=0
+n=220_r=0.15_m=0_c=0.tre	MD=cophylo	n=220	TD=7878	CX=5530	TM=2
+n=220_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=220	r1=0	r2=0	RD1=0	RD2=0	TD=7062	CX=5661	TM=0
+n=220_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=179	TD=5552	CX=4134	TM=1
+n=220_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=179	r1=0	r2=0	RD1=0	RD2=0	TD=4884	CX=3787	TM=0
+n=220_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=179	TD=4190	CX=3043	TM=2
+n=220_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=179	r1=0	r2=0	RD1=0	RD2=0	TD=3780	CX=2950	TM=0
+n=220_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=220	TD=8878	CX=6956	TM=2
+n=220_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=220	r1=0	r2=0	RD1=0	RD2=0	TD=8078	CX=6590	TM=0
+n=220_r=0.2_m=0_c=0.tre	MD=cophylo	n=220	TD=8468	CX=5961	TM=3
+n=220_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=220	r1=0	r2=0	RD1=0	RD2=0	TD=8172	CX=6093	TM=0
+n=220_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=179	TD=6446	CX=4617	TM=1
+n=220_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=179	r1=0	r2=0	RD1=0	RD2=0	TD=5218	CX=4135	TM=0
+n=220_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=179	TD=5454	CX=4106	TM=2
+n=220_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=179	r1=0	r2=0	RD1=0	RD2=0	TD=4554	CX=3734	TM=0
+n=230_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=230	TD=9600	CX=6759	TM=2
+n=230_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=230	r1=0	r2=0	RD1=0	RD2=0	TD=4928	CX=4018	TM=0
+n=230_r=0.1_m=0_c=0.tre	MD=cophylo	n=230	TD=5798	CX=4076	TM=3
+n=230_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=230	r1=0	r2=0	RD1=0	RD2=0	TD=5176	CX=4057	TM=0
+n=230_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=185	TD=6304	CX=4187	TM=1
+n=230_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=185	r1=0	r2=0	RD1=0	RD2=0	TD=4504	CX=3804	TM=0
+n=230_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=185	TD=3866	CX=2880	TM=1
+n=230_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=185	r1=0	r2=0	RD1=0	RD2=0	TD=3602	CX=3045	TM=0
+n=230_r=0.15_m=0_c=0.tre	MD=cophylo	n=230	TD=7924	CX=5771	TM=3
+n=230_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=230	r1=0	r2=0	RD1=0	RD2=0	TD=7444	CX=5963	TM=0
+n=230_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=185	TD=7396	CX=5054	TM=2
+n=230_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=185	r1=0	r2=0	RD1=0	RD2=0	TD=5252	CX=4282	TM=0
+n=230_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=185	TD=6102	CX=4620	TM=1
+n=230_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=185	r1=0	r2=0	RD1=0	RD2=0	TD=5600	CX=4554	TM=0
+n=230_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=230	TD=11426	CX=7863	TM=3
+n=230_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=230	r1=0	r2=0	RD1=0	RD2=0	TD=9960	CX=7558	TM=0
+n=230_r=0.2_m=0_c=0.tre	MD=cophylo	n=230	TD=10534	CX=7690	TM=3
+n=230_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=230	r1=0	r2=0	RD1=0	RD2=0	TD=7812	CX=6094	TM=0
+n=230_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=185	TD=8628	CX=6184	TM=1
+n=230_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=185	r1=0	r2=0	RD1=0	RD2=0	TD=7612	CX=5975	TM=0
+n=230_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=185	TD=6882	CX=4925	TM=2
+n=230_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=185	r1=0	r2=0	RD1=0	RD2=0	TD=5758	CX=4397	TM=0
+n=240_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=240	TD=7202	CX=5672	TM=2
+n=240_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=240	r1=0	r2=0	RD1=0	RD2=0	TD=5272	CX=4209	TM=0
+n=240_r=0.1_m=0_c=0.tre	MD=cophylo	n=240	TD=8236	CX=5564	TM=3
+n=240_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=240	r1=0	r2=0	RD1=0	RD2=0	TD=7604	CX=6143	TM=0
+n=240_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=195	TD=5814	CX=3925	TM=1
+n=240_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=195	r1=0	r2=0	RD1=0	RD2=0	TD=3646	CX=2857	TM=0
+n=240_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=195	TD=5944	CX=4080	TM=2
+n=240_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=195	r1=0	r2=0	RD1=0	RD2=0	TD=4706	CX=3626	TM=0
+n=240_r=0.15_m=0_c=0.tre	MD=cophylo	n=240	TD=12046	CX=8546	TM=3
+n=240_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=240	r1=0	r2=0	RD1=0	RD2=0	TD=10906	CX=8680	TM=0
+n=240_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=195	TD=6546	CX=4820	TM=1
+n=240_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=195	r1=0	r2=0	RD1=0	RD2=0	TD=6198	CX=4871	TM=0
+n=240_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=195	TD=7748	CX=5419	TM=2
+n=240_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=195	r1=0	r2=0	RD1=0	RD2=0	TD=5608	CX=4196	TM=0
+n=240_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=240	TD=10448	CX=7602	TM=2
+n=240_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=240	r1=0	r2=0	RD1=0	RD2=0	TD=7926	CX=6435	TM=0
+n=240_r=0.2_m=0_c=0.tre	MD=cophylo	n=240	TD=12744	CX=8602	TM=3
+n=240_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=240	r1=0	r2=0	RD1=0	RD2=0	TD=9412	CX=7200	TM=0
+n=240_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=195	TD=8768	CX=6295	TM=2
+n=240_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=195	r1=0	r2=0	RD1=0	RD2=0	TD=7658	CX=6171	TM=0
+n=240_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=195	TD=7050	CX=5125	TM=2
+n=240_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=195	r1=0	r2=0	RD1=0	RD2=0	TD=6520	CX=5220	TM=0
+n=250_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=250	TD=7482	CX=5405	TM=2
+n=250_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=250	r1=0	r2=0	RD1=0	RD2=0	TD=5914	CX=4611	TM=0
+n=250_r=0.1_m=0_c=0.tre	MD=cophylo	n=250	TD=6066	CX=4485	TM=3
+n=250_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=250	r1=0	r2=0	RD1=0	RD2=0	TD=4098	CX=3467	TM=0
+n=250_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=202	TD=7646	CX=5212	TM=2
+n=250_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=202	r1=0	r2=0	RD1=0	RD2=0	TD=5990	CX=4777	TM=0
+n=250_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=202	TD=4736	CX=3457	TM=2
+n=250_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=202	r1=0	r2=0	RD1=0	RD2=0	TD=4084	CX=3385	TM=0
+n=250_r=0.15_m=0_c=0.tre	MD=cophylo	n=250	TD=9006	CX=6721	TM=3
+n=250_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=250	r1=0	r2=0	RD1=0	RD2=0	TD=8082	CX=6873	TM=0
+n=250_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=202	TD=6820	CX=4934	TM=1
+n=250_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=202	r1=0	r2=0	RD1=0	RD2=0	TD=6094	CX=4672	TM=0
+n=250_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=202	TD=7016	CX=4957	TM=2
+n=250_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=202	r1=0	r2=0	RD1=0	RD2=0	TD=6632	CX=5049	TM=0
+n=250_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=250	TD=16816	CX=12291	TM=2
+n=250_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=250	r1=0	r2=0	RD1=0	RD2=0	TD=12438	CX=9773	TM=0
+n=250_r=0.2_m=0_c=0.tre	MD=cophylo	n=250	TD=12466	CX=8942	TM=3
+n=250_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=250	r1=0	r2=0	RD1=0	RD2=0	TD=11434	CX=8897	TM=0
+n=250_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=202	TD=6472	CX=4774	TM=2
+n=250_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=202	r1=0	r2=0	RD1=0	RD2=0	TD=5906	CX=4673	TM=0
+n=250_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=202	TD=8576	CX=6076	TM=2
+n=250_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=202	r1=0	r2=0	RD1=0	RD2=0	TD=6544	CX=5204	TM=0
+n=260_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=260	TD=11918	CX=8445	TM=3
+n=260_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=260	r1=0	r2=0	RD1=0	RD2=0	TD=7190	CX=5629	TM=0
+n=260_r=0.1_m=0_c=0.tre	MD=cophylo	n=260	TD=7974	CX=5845	TM=3
+n=260_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=260	r1=0	r2=0	RD1=0	RD2=0	TD=7728	CX=5960	TM=0
+n=260_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=212	TD=9108	CX=6007	TM=2
+n=260_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=212	r1=0	r2=0	RD1=0	RD2=0	TD=6210	CX=4906	TM=0
+n=260_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=212	TD=6998	CX=4884	TM=2
+n=260_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=212	r1=0	r2=0	RD1=0	RD2=0	TD=5164	CX=4350	TM=0
+n=260_r=0.15_m=0_c=0.tre	MD=cophylo	n=260	TD=10822	CX=7794	TM=3
+n=260_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=260	r1=0	r2=0	RD1=0	RD2=0	TD=10414	CX=8246	TM=0
+n=260_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=212	TD=9356	CX=6604	TM=2
+n=260_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=212	r1=0	r2=0	RD1=0	RD2=0	TD=5474	CX=4420	TM=0
+n=260_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=212	TD=7350	CX=5196	TM=2
+n=260_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=212	r1=0	r2=0	RD1=0	RD2=0	TD=6228	CX=5031	TM=0
+n=260_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=260	TD=14192	CX=10562	TM=4
+n=260_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=260	r1=0	r2=0	RD1=0	RD2=0	TD=9426	CX=7911	TM=0
+n=260_r=0.2_m=0_c=0.tre	MD=cophylo	n=260	TD=10084	CX=7530	TM=3
+n=260_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=260	r1=0	r2=0	RD1=0	RD2=0	TD=9690	CX=7916	TM=0
+n=260_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=212	TD=10950	CX=7885	TM=2
+n=260_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=212	r1=0	r2=0	RD1=0	RD2=0	TD=8098	CX=6529	TM=0
+n=260_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=212	TD=9162	CX=6509	TM=2
+n=260_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=212	r1=0	r2=0	RD1=0	RD2=0	TD=7936	CX=6365	TM=0
+n=270_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=270	TD=14364	CX=10105	TM=3
+n=270_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=270	r1=0	r2=0	RD1=0	RD2=0	TD=10518	CX=8507	TM=0
+n=270_r=0.1_m=0_c=0.tre	MD=cophylo	n=270	TD=7928	CX=5927	TM=3
+n=270_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=270	r1=0	r2=0	RD1=0	RD2=0	TD=5424	CX=4563	TM=0
+n=270_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=221	TD=5778	CX=3910	TM=3
+n=270_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=221	r1=0	r2=0	RD1=0	RD2=0	TD=4896	CX=3803	TM=0
+n=270_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=221	TD=7332	CX=5223	TM=2
+n=270_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=221	r1=0	r2=0	RD1=0	RD2=0	TD=6948	CX=5588	TM=0
+n=270_r=0.15_m=0_c=0.tre	MD=cophylo	n=270	TD=11768	CX=8349	TM=4
+n=270_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=270	r1=0	r2=0	RD1=0	RD2=0	TD=11400	CX=8831	TM=0
+n=270_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=221	TD=9782	CX=7239	TM=2
+n=270_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=221	r1=0	r2=0	RD1=0	RD2=0	TD=8650	CX=6904	TM=0
+n=270_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=221	TD=8626	CX=6301	TM=3
+n=270_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=221	r1=0	r2=0	RD1=0	RD2=0	TD=7008	CX=5457	TM=0
+n=270_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=270	TD=15406	CX=10820	TM=3
+n=270_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=270	r1=0	r2=0	RD1=0	RD2=0	TD=12516	CX=9896	TM=0
+n=270_r=0.2_m=0_c=0.tre	MD=cophylo	n=270	TD=15508	CX=11166	TM=4
+n=270_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=270	r1=0	r2=0	RD1=0	RD2=0	TD=13136	CX=11001	TM=0
+n=270_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=221	TD=11164	CX=7956	TM=2
+n=270_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=221	r1=0	r2=0	RD1=0	RD2=0	TD=8938	CX=7137	TM=0
+n=270_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=221	TD=8994	CX=6324	TM=2
+n=270_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=221	r1=0	r2=0	RD1=0	RD2=0	TD=8282	CX=6398	TM=0
+n=280_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=280	TD=17794	CX=11302	TM=4
+n=280_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=280	r1=0	r2=0	RD1=0	RD2=0	TD=9976	CX=8346	TM=0
+n=280_r=0.1_m=0_c=0.tre	MD=cophylo	n=280	TD=11270	CX=7255	TM=4
+n=280_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=280	r1=0	r2=0	RD1=0	RD2=0	TD=10434	CX=7630	TM=0
+n=280_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=225	TD=8682	CX=6214	TM=2
+n=280_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=225	r1=0	r2=0	RD1=0	RD2=0	TD=6288	CX=5281	TM=0
+n=280_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=225	TD=6130	CX=4222	TM=2
+n=280_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=225	r1=0	r2=0	RD1=0	RD2=0	TD=5164	CX=4308	TM=0
+n=280_r=0.15_m=0_c=0.tre	MD=cophylo	n=280	TD=17022	CX=11548	TM=4
+n=280_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=280	r1=0	r2=0	RD1=0	RD2=0	TD=12732	CX=10005	TM=0
+n=280_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=225	TD=9734	CX=6996	TM=2
+n=280_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=225	r1=0	r2=0	RD1=0	RD2=0	TD=7796	CX=6162	TM=0
+n=280_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=225	TD=6644	CX=4971	TM=2
+n=280_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=225	r1=0	r2=0	RD1=0	RD2=0	TD=6106	CX=4878	TM=0
+n=280_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=280	TD=16314	CX=11816	TM=5
+n=280_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=280	r1=0	r2=0	RD1=0	RD2=0	TD=13416	CX=10654	TM=0
+n=280_r=0.2_m=0_c=0.tre	MD=cophylo	n=280	TD=17050	CX=11838	TM=4
+n=280_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=280	r1=0	r2=0	RD1=0	RD2=0	TD=12742	CX=10443	TM=0
+n=280_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=225	TD=10712	CX=7537	TM=2
+n=280_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=225	r1=0	r2=0	RD1=0	RD2=0	TD=8062	CX=6535	TM=0
+n=280_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=225	TD=10860	CX=7803	TM=2
+n=280_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=225	r1=0	r2=0	RD1=0	RD2=0	TD=10290	CX=8251	TM=0
+n=290_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=290	TD=20632	CX=13904	TM=3
+n=290_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=11686	CX=9651	TM=0
+n=290_r=0.1_m=0_c=0.tre	MD=cophylo	n=290	TD=10398	CX=7343	TM=4
+n=290_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=10070	CX=7724	TM=0
+n=290_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=234	TD=10288	CX=7153	TM=3
+n=290_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=234	r1=0	r2=0	RD1=0	RD2=0	TD=7070	CX=5329	TM=0
+n=290_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=234	TD=9274	CX=6169	TM=2
+n=290_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=234	r1=0	r2=0	RD1=0	RD2=0	TD=8974	CX=6668	TM=0
+n=290_r=0.15_m=0_c=0.tre	MD=cophylo	n=290	TD=18760	CX=13373	TM=4
+n=290_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=16602	CX=12889	TM=0
+n=290_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=234	TD=10688	CX=7916	TM=2
+n=290_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=234	r1=0	r2=0	RD1=0	RD2=0	TD=7378	CX=5924	TM=0
+n=290_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=234	TD=6540	CX=4793	TM=2
+n=290_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=234	r1=0	r2=0	RD1=0	RD2=0	TD=6338	CX=4974	TM=0
+n=290_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=290	TD=23950	CX=16284	TM=4
+n=290_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=13322	CX=10647	TM=0
+n=290_r=0.2_m=0_c=0.tre	MD=cophylo	n=290	TD=15548	CX=10986	TM=7
+n=290_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=14588	CX=11551	TM=0
+n=290_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=234	TD=9216	CX=6506	TM=2
+n=290_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=234	r1=0	r2=0	RD1=0	RD2=0	TD=8034	CX=6504	TM=0
+n=290_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=234	TD=9948	CX=7524	TM=3
+n=290_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=234	r1=0	r2=0	RD1=0	RD2=0	TD=8138	CX=6652	TM=0
+n=300_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=300	TD=19038	CX=12213	TM=4
+n=300_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=300	r1=0	r2=0	RD1=0	RD2=0	TD=11626	CX=9166	TM=0
+n=300_r=0.1_m=0_c=0.tre	MD=cophylo	n=300	TD=10772	CX=8023	TM=6
+n=300_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=300	r1=0	r2=0	RD1=0	RD2=0	TD=9642	CX=7670	TM=0
+n=300_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=246	TD=10126	CX=7115	TM=2
+n=300_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=246	r1=0	r2=0	RD1=0	RD2=0	TD=7442	CX=6085	TM=0
+n=300_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=246	TD=7506	CX=5484	TM=3
+n=300_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=246	r1=0	r2=0	RD1=0	RD2=0	TD=6706	CX=5380	TM=0
+n=300_r=0.15_m=0_c=0.tre	MD=cophylo	n=300	TD=20704	CX=13711	TM=4
+n=300_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=300	r1=0	r2=0	RD1=0	RD2=0	TD=18122	CX=13709	TM=0
+n=300_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=246	TD=10756	CX=7909	TM=2
+n=300_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=246	r1=0	r2=0	RD1=0	RD2=0	TD=8958	CX=7323	TM=0
+n=300_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=246	TD=9856	CX=7205	TM=4
+n=300_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=246	r1=0	r2=0	RD1=0	RD2=0	TD=8632	CX=6890	TM=0
+n=300_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=300	TD=19684	CX=14546	TM=4
+n=300_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=300	r1=0	r2=0	RD1=0	RD2=0	TD=14022	CX=11297	TM=0
+n=300_r=0.2_m=0_c=0.tre	MD=cophylo	n=300	TD=18504	CX=12920	TM=5
+n=300_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=300	r1=0	r2=0	RD1=0	RD2=0	TD=17240	CX=13526	TM=0
+n=300_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=246	TD=13104	CX=9218	TM=2
+n=300_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=246	r1=0	r2=0	RD1=0	RD2=0	TD=11202	CX=8367	TM=0
+n=300_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=246	TD=11934	CX=8860	TM=3
+n=300_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=246	r1=0	r2=0	RD1=0	RD2=0	TD=11572	CX=9363	TM=0
+n=310_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=310	TD=16748	CX=11740	TM=4
+n=310_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=310	r1=0	r2=0	RD1=0	RD2=0	TD=10722	CX=8590	TM=0
+n=310_r=0.1_m=0_c=0.tre	MD=cophylo	n=310	TD=18456	CX=11628	TM=5
+n=310_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=310	r1=0	r2=0	RD1=0	RD2=0	TD=13312	CX=9870	TM=0
+n=310_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=249	TD=11846	CX=8015	TM=3
+n=310_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=249	r1=0	r2=0	RD1=0	RD2=0	TD=6666	CX=5222	TM=0
+n=310_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=249	TD=10506	CX=7527	TM=3
+n=310_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=249	r1=0	r2=0	RD1=0	RD2=0	TD=8152	CX=6508	TM=0
+n=310_r=0.15_m=0_c=0.tre	MD=cophylo	n=310	TD=17696	CX=12717	TM=5
+n=310_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=310	r1=0	r2=0	RD1=0	RD2=0	TD=12768	CX=10170	TM=0
+n=310_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=249	TD=13896	CX=9625	TM=3
+n=310_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=249	r1=0	r2=0	RD1=0	RD2=0	TD=10586	CX=8180	TM=0
+n=310_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=249	TD=11328	CX=7933	TM=3
+n=310_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=249	r1=0	r2=0	RD1=0	RD2=0	TD=10700	CX=8218	TM=0
+n=310_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=310	TD=21102	CX=15567	TM=4
+n=310_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=310	r1=0	r2=0	RD1=0	RD2=0	TD=18102	CX=14537	TM=0
+n=310_r=0.2_m=0_c=0.tre	MD=cophylo	n=310	TD=18920	CX=13684	TM=5
+n=310_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=310	r1=0	r2=0	RD1=0	RD2=0	TD=17202	CX=14032	TM=0
+n=310_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=249	TD=12850	CX=9481	TM=3
+n=310_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=249	r1=0	r2=0	RD1=0	RD2=0	TD=11716	CX=9150	TM=0
+n=310_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=249	TD=10266	CX=7350	TM=4
+n=310_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=249	r1=0	r2=0	RD1=0	RD2=0	TD=8746	CX=7005	TM=0
+n=320_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=320	TD=18154	CX=13398	TM=3
+n=320_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=13526	CX=10981	TM=0
+n=320_r=0.1_m=0_c=0.tre	MD=cophylo	n=320	TD=15142	CX=11217	TM=6
+n=320_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=14120	CX=11713	TM=0
+n=320_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=258	TD=7504	CX=5543	TM=3
+n=320_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=258	r1=0	r2=0	RD1=0	RD2=0	TD=6836	CX=5650	TM=0
+n=320_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=258	TD=11598	CX=8358	TM=3
+n=320_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=258	r1=0	r2=0	RD1=0	RD2=0	TD=10396	CX=8369	TM=0
+n=320_r=0.15_m=0_c=0.tre	MD=cophylo	n=320	TD=16070	CX=11497	TM=6
+n=320_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=15306	CX=12474	TM=0
+n=320_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=258	TD=15756	CX=11573	TM=3
+n=320_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=258	r1=0	r2=0	RD1=0	RD2=0	TD=8714	CX=7083	TM=0
+n=320_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=258	TD=12972	CX=9106	TM=3
+n=320_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=258	r1=0	r2=0	RD1=0	RD2=0	TD=11720	CX=9339	TM=0
+n=320_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=320	TD=26060	CX=18546	TM=4
+n=320_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=19932	CX=15844	TM=0
+n=320_r=0.2_m=0_c=0.tre	MD=cophylo	n=320	TD=19348	CX=14458	TM=5
+n=320_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=17702	CX=14441	TM=0
+n=320_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=258	TD=12992	CX=9104	TM=4
+n=320_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=258	r1=0	r2=0	RD1=0	RD2=0	TD=11164	CX=8911	TM=0
+n=320_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=258	TD=14376	CX=10218	TM=4
+n=320_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=258	r1=0	r2=0	RD1=0	RD2=0	TD=13776	CX=10635	TM=0
+n=330_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=330	TD=14974	CX=10571	TM=4
+n=330_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=330	r1=0	r2=0	RD1=0	RD2=0	TD=9338	CX=7771	TM=0
+n=330_r=0.1_m=0_c=0.tre	MD=cophylo	n=330	TD=17622	CX=13057	TM=5
+n=330_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=330	r1=0	r2=0	RD1=0	RD2=0	TD=13772	CX=11481	TM=0
+n=330_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=268	TD=13732	CX=9420	TM=3
+n=330_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=268	r1=0	r2=0	RD1=0	RD2=0	TD=12602	CX=10232	TM=0
+n=330_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=268	TD=9050	CX=6846	TM=4
+n=330_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=268	r1=0	r2=0	RD1=0	RD2=0	TD=8160	CX=6721	TM=0
+n=330_r=0.15_m=0_c=0.tre	MD=cophylo	n=330	TD=19980	CX=14168	TM=8
+n=330_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=330	r1=0	r2=0	RD1=0	RD2=0	TD=18556	CX=15182	TM=0
+n=330_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=268	TD=11616	CX=8304	TM=3
+n=330_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=268	r1=0	r2=0	RD1=0	RD2=0	TD=9336	CX=7569	TM=0
+n=330_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=268	TD=17360	CX=11629	TM=3
+n=330_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=268	r1=0	r2=0	RD1=0	RD2=0	TD=13050	CX=9701	TM=0
+n=330_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=330	TD=20300	CX=15143	TM=6
+n=330_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=330	r1=0	r2=0	RD1=0	RD2=0	TD=18270	CX=15088	TM=0
+n=330_r=0.2_m=0_c=0.tre	MD=cophylo	n=330	TD=22692	CX=16994	TM=6
+n=330_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=330	r1=0	r2=0	RD1=0	RD2=0	TD=19918	CX=15589	TM=0
+n=330_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=268	TD=15352	CX=10422	TM=3
+n=330_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=268	r1=0	r2=0	RD1=0	RD2=0	TD=13004	CX=10060	TM=0
+n=330_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=268	TD=15516	CX=11227	TM=3
+n=330_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=268	r1=0	r2=0	RD1=0	RD2=0	TD=14528	CX=11385	TM=0
+n=340_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=340	TD=16368	CX=11959	TM=5
+n=340_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=340	r1=0	r2=0	RD1=0	RD2=0	TD=14888	CX=11355	TM=0
+n=340_r=0.1_m=0_c=0.tre	MD=cophylo	n=340	TD=15968	CX=11440	TM=8
+n=340_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=340	r1=0	r2=0	RD1=0	RD2=0	TD=13782	CX=11109	TM=0
+n=340_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=273	TD=12954	CX=9086	TM=3
+n=340_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=273	r1=0	r2=0	RD1=0	RD2=0	TD=7194	CX=6148	TM=0
+n=340_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=273	TD=11826	CX=8840	TM=3
+n=340_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=273	r1=0	r2=0	RD1=0	RD2=0	TD=9442	CX=8015	TM=0
+n=340_r=0.15_m=0_c=0.tre	MD=cophylo	n=340	TD=19750	CX=14496	TM=8
+n=340_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=340	r1=0	r2=0	RD1=0	RD2=0	TD=18992	CX=14844	TM=0
+n=340_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=273	TD=15780	CX=11706	TM=3
+n=340_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=273	r1=0	r2=0	RD1=0	RD2=0	TD=11184	CX=9285	TM=0
+n=340_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=273	TD=16838	CX=11726	TM=4
+n=340_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=273	r1=0	r2=0	RD1=0	RD2=0	TD=14688	CX=11243	TM=0
+n=340_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=340	TD=21508	CX=15846	TM=5
+n=340_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=340	r1=0	r2=0	RD1=0	RD2=0	TD=18106	CX=14550	TM=0
+n=340_r=0.2_m=0_c=0.tre	MD=cophylo	n=340	TD=21182	CX=15307	TM=7
+n=340_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=340	r1=0	r2=0	RD1=0	RD2=0	TD=20662	CX=16124	TM=0
+n=340_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=273	TD=14084	CX=10293	TM=3
+n=340_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=273	r1=0	r2=0	RD1=0	RD2=0	TD=12516	CX=9477	TM=0
+n=340_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=273	TD=15834	CX=10925	TM=5
+n=340_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=273	r1=0	r2=0	RD1=0	RD2=0	TD=14624	CX=11343	TM=0
+n=350_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=350	TD=24482	CX=16388	TM=5
+n=350_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=350	r1=0	r2=0	RD1=0	RD2=0	TD=20694	CX=16250	TM=0
+n=350_r=0.1_m=0_c=0.tre	MD=cophylo	n=350	TD=22992	CX=15731	TM=6
+n=350_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=350	r1=0	r2=0	RD1=0	RD2=0	TD=18474	CX=14979	TM=0
+n=350_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=283	TD=11236	CX=7619	TM=3
+n=350_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=283	r1=0	r2=0	RD1=0	RD2=0	TD=8876	CX=7110	TM=0
+n=350_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=283	TD=17468	CX=11546	TM=4
+n=350_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=283	r1=0	r2=0	RD1=0	RD2=0	TD=12654	CX=9941	TM=0
+n=350_r=0.15_m=0_c=0.tre	MD=cophylo	n=350	TD=25746	CX=18155	TM=8
+n=350_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=350	r1=0	r2=0	RD1=0	RD2=0	TD=21512	CX=18053	TM=0
+n=350_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=283	TD=19356	CX=13441	TM=4
+n=350_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=283	r1=0	r2=0	RD1=0	RD2=0	TD=16070	CX=12414	TM=0
+n=350_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=283	TD=17598	CX=12438	TM=4
+n=350_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=283	r1=0	r2=0	RD1=0	RD2=0	TD=14930	CX=11956	TM=0
+n=350_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=350	TD=26518	CX=19570	TM=6
+n=350_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=350	r1=0	r2=0	RD1=0	RD2=0	TD=22204	CX=17619	TM=0
+n=350_r=0.2_m=0_c=0.tre	MD=cophylo	n=350	TD=24486	CX=17064	TM=8
+n=350_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=350	r1=0	r2=0	RD1=0	RD2=0	TD=23472	CX=18592	TM=0
+n=350_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=283	TD=18880	CX=13908	TM=4
+n=350_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=283	r1=0	r2=0	RD1=0	RD2=0	TD=14902	CX=11771	TM=0
+n=350_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=283	TD=15556	CX=11921	TM=4
+n=350_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=283	r1=0	r2=0	RD1=0	RD2=0	TD=15210	CX=12370	TM=0
+n=360_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=360	TD=21822	CX=15163	TM=7
+n=360_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=360	r1=0	r2=0	RD1=0	RD2=0	TD=15144	CX=12151	TM=0
+n=360_r=0.1_m=0_c=0.tre	MD=cophylo	n=360	TD=28004	CX=17800	TM=6
+n=360_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=360	r1=0	r2=0	RD1=0	RD2=0	TD=22798	CX=19165	TM=0
+n=360_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=290	TD=11710	CX=8664	TM=3
+n=360_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=8854	CX=7111	TM=0
+n=360_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=290	TD=11748	CX=8546	TM=4
+n=360_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=10264	CX=8320	TM=0
+n=360_r=0.15_m=0_c=0.tre	MD=cophylo	n=360	TD=25774	CX=19546	TM=6
+n=360_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=360	r1=0	r2=0	RD1=0	RD2=0	TD=24586	CX=20627	TM=0
+n=360_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=290	TD=15330	CX=11852	TM=4
+n=360_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=13712	CX=11434	TM=0
+n=360_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=290	TD=15176	CX=10312	TM=4
+n=360_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=11720	CX=9479	TM=0
+n=360_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=360	TD=35252	CX=24611	TM=5
+n=360_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=360	r1=0	r2=0	RD1=0	RD2=0	TD=23996	CX=18736	TM=0
+n=360_r=0.2_m=0_c=0.tre	MD=cophylo	n=360	TD=27886	CX=20403	TM=10
+n=360_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=360	r1=0	r2=0	RD1=0	RD2=0	TD=21464	CX=16750	TM=0
+n=360_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=290	TD=17636	CX=12507	TM=4
+n=360_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=15532	CX=12373	TM=0
+n=360_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=290	TD=21216	CX=14856	TM=6
+n=360_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=290	r1=0	r2=0	RD1=0	RD2=0	TD=17042	CX=13472	TM=0
+n=370_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=370	TD=20574	CX=14828	TM=6
+n=370_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=370	r1=0	r2=0	RD1=0	RD2=0	TD=16768	CX=13492	TM=0
+n=370_r=0.1_m=0_c=0.tre	MD=cophylo	n=370	TD=24062	CX=17193	TM=6
+n=370_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=370	r1=0	r2=0	RD1=0	RD2=0	TD=20838	CX=16480	TM=0
+n=370_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=298	TD=14948	CX=10547	TM=5
+n=370_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=298	r1=0	r2=0	RD1=0	RD2=0	TD=14070	CX=11279	TM=0
+n=370_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=298	TD=14872	CX=9914	TM=7
+n=370_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=298	r1=0	r2=0	RD1=0	RD2=0	TD=12126	CX=9820	TM=0
+n=370_r=0.15_m=0_c=0.tre	MD=cophylo	n=370	TD=27486	CX=20094	TM=7
+n=370_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=370	r1=0	r2=0	RD1=0	RD2=0	TD=23498	CX=18544	TM=0
+n=370_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=298	TD=15912	CX=11617	TM=4
+n=370_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=298	r1=0	r2=0	RD1=0	RD2=0	TD=13512	CX=11068	TM=0
+n=370_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=298	TD=21426	CX=15125	TM=4
+n=370_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=298	r1=0	r2=0	RD1=0	RD2=0	TD=15722	CX=12465	TM=0
+n=370_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=370	TD=30978	CX=21484	TM=7
+n=370_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=370	r1=0	r2=0	RD1=0	RD2=0	TD=24898	CX=19983	TM=0
+n=370_r=0.2_m=0_c=0.tre	MD=cophylo	n=370	TD=31900	CX=23807	TM=7
+n=370_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=370	r1=0	r2=0	RD1=0	RD2=0	TD=27560	CX=21563	TM=0
+n=370_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=298	TD=19142	CX=14780	TM=5
+n=370_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=298	r1=0	r2=0	RD1=0	RD2=0	TD=15134	CX=12378	TM=0
+n=370_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=298	TD=18754	CX=13846	TM=5
+n=370_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=298	r1=0	r2=0	RD1=0	RD2=0	TD=16102	CX=12414	TM=0
+n=380_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=380	TD=18338	CX=14871	TM=6
+n=380_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=380	r1=0	r2=0	RD1=0	RD2=0	TD=14834	CX=12696	TM=0
+n=380_r=0.1_m=0_c=0.tre	MD=cophylo	n=380	TD=26236	CX=17820	TM=7
+n=380_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=380	r1=0	r2=0	RD1=0	RD2=0	TD=19776	CX=15857	TM=0
+n=380_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=309	TD=22258	CX=14576	TM=5
+n=380_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=309	r1=0	r2=0	RD1=0	RD2=0	TD=10574	CX=8919	TM=0
+n=380_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=309	TD=16184	CX=11886	TM=6
+n=380_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=309	r1=0	r2=0	RD1=0	RD2=0	TD=14688	CX=11373	TM=0
+n=380_r=0.15_m=0_c=0.tre	MD=cophylo	n=380	TD=26888	CX=18350	TM=7
+n=380_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=380	r1=0	r2=0	RD1=0	RD2=0	TD=23270	CX=17990	TM=0
+n=380_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=309	TD=24264	CX=16505	TM=4
+n=380_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=309	r1=0	r2=0	RD1=0	RD2=0	TD=17470	CX=14073	TM=0
+n=380_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=309	TD=16182	CX=11781	TM=5
+n=380_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=309	r1=0	r2=0	RD1=0	RD2=0	TD=15446	CX=12037	TM=0
+n=380_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=380	TD=37548	CX=25721	TM=8
+n=380_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=380	r1=0	r2=0	RD1=0	RD2=0	TD=32466	CX=25251	TM=0
+n=380_r=0.2_m=0_c=0.tre	MD=cophylo	n=380	TD=27246	CX=19507	TM=8
+n=380_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=380	r1=0	r2=0	RD1=0	RD2=0	TD=24670	CX=19874	TM=0
+n=380_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=309	TD=26068	CX=17952	TM=4
+n=380_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=309	r1=0	r2=0	RD1=0	RD2=0	TD=19384	CX=15596	TM=0
+n=380_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=309	TD=16526	CX=12079	TM=6
+n=380_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=309	r1=0	r2=0	RD1=0	RD2=0	TD=15866	CX=12529	TM=0
+n=390_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=390	TD=34830	CX=24238	TM=6
+n=390_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=390	r1=0	r2=0	RD1=0	RD2=0	TD=22238	CX=18242	TM=0
+n=390_r=0.1_m=0_c=0.tre	MD=cophylo	n=390	TD=27340	CX=19732	TM=7
+n=390_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=390	r1=0	r2=0	RD1=0	RD2=0	TD=21896	CX=16995	TM=0
+n=390_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=320	TD=20706	CX=14777	TM=4
+n=390_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=13138	CX=10391	TM=0
+n=390_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=320	TD=19482	CX=14447	TM=5
+n=390_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=16552	CX=12833	TM=0
+n=390_r=0.15_m=0_c=0.tre	MD=cophylo	n=390	TD=27566	CX=19463	TM=10
+n=390_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=390	r1=0	r2=0	RD1=0	RD2=0	TD=24074	CX=19391	TM=0
+n=390_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=320	TD=23096	CX=16299	TM=4
+n=390_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=16094	CX=12819	TM=0
+n=390_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=320	TD=19268	CX=13567	TM=7
+n=390_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=18026	CX=14864	TM=0
+n=390_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=390	TD=31660	CX=22126	TM=9
+n=390_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=390	r1=0	r2=0	RD1=0	RD2=0	TD=27496	CX=21614	TM=0
+n=390_r=0.2_m=0_c=0.tre	MD=cophylo	n=390	TD=31512	CX=23220	TM=8
+n=390_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=390	r1=0	r2=0	RD1=0	RD2=0	TD=30440	CX=23024	TM=0
+n=390_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=320	TD=22158	CX=15625	TM=5
+n=390_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=18866	CX=14950	TM=0
+n=390_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=320	TD=25260	CX=16635	TM=6
+n=390_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=320	r1=0	r2=0	RD1=0	RD2=0	TD=18216	CX=14060	TM=0
+n=400_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=400	TD=26008	CX=17253	TM=7
+n=400_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=400	r1=0	r2=0	RD1=0	RD2=0	TD=21072	CX=16142	TM=0
+n=400_r=0.1_m=0_c=0.tre	MD=cophylo	n=400	TD=29120	CX=21002	TM=10
+n=400_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=400	r1=0	r2=0	RD1=0	RD2=0	TD=25772	CX=20259	TM=0
+n=400_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=324	TD=15532	CX=10873	TM=7
+n=400_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=324	r1=0	r2=0	RD1=0	RD2=0	TD=13686	CX=11040	TM=0
+n=400_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=324	TD=17160	CX=11516	TM=7
+n=400_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=324	r1=0	r2=0	RD1=0	RD2=0	TD=15936	CX=12426	TM=0
+n=400_r=0.15_m=0_c=0.tre	MD=cophylo	n=400	TD=21774	CX=16973	TM=8
+n=400_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=400	r1=0	r2=0	RD1=0	RD2=0	TD=20686	CX=17064	TM=0
+n=400_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=324	TD=25530	CX=17950	TM=4
+n=400_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=324	r1=0	r2=0	RD1=0	RD2=0	TD=20470	CX=16068	TM=0
+n=400_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=324	TD=16948	CX=12799	TM=8
+n=400_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=324	r1=0	r2=0	RD1=0	RD2=0	TD=15312	CX=12936	TM=0
+n=400_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=400	TD=35344	CX=24881	TM=9
+n=400_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=400	r1=0	r2=0	RD1=0	RD2=0	TD=34376	CX=26372	TM=0
+n=400_r=0.2_m=0_c=0.tre	MD=cophylo	n=400	TD=35558	CX=25047	TM=8
+n=400_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=400	r1=0	r2=0	RD1=0	RD2=0	TD=33316	CX=26166	TM=0
+n=400_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=324	TD=28052	CX=20502	TM=4
+n=400_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=324	r1=0	r2=0	RD1=0	RD2=0	TD=21768	CX=17044	TM=0
+n=400_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=324	TD=23482	CX=16429	TM=7
+n=400_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=324	r1=0	r2=0	RD1=0	RD2=0	TD=19948	CX=15151	TM=0
+n=410_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=410	TD=30616	CX=20481	TM=7
+n=410_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=410	r1=0	r2=0	RD1=0	RD2=0	TD=25590	CX=19758	TM=0
+n=410_r=0.1_m=0_c=0.tre	MD=cophylo	n=410	TD=30440	CX=21107	TM=9
+n=410_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=410	r1=0	r2=0	RD1=0	RD2=0	TD=29998	CX=23008	TM=0
+n=410_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=333	TD=18208	CX=13650	TM=5
+n=410_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=333	r1=0	r2=0	RD1=0	RD2=0	TD=13706	CX=10890	TM=0
+n=410_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=333	TD=22550	CX=15055	TM=7
+n=410_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=333	r1=0	r2=0	RD1=0	RD2=0	TD=21314	CX=16343	TM=0
+n=410_r=0.15_m=0_c=0.tre	MD=cophylo	n=410	TD=37390	CX=26372	TM=10
+n=410_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=410	r1=0	r2=0	RD1=0	RD2=0	TD=28936	CX=23377	TM=0
+n=410_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=333	TD=26524	CX=18400	TM=6
+n=410_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=333	r1=0	r2=0	RD1=0	RD2=0	TD=21116	CX=16294	TM=0
+n=410_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=333	TD=29608	CX=19595	TM=6
+n=410_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=333	r1=0	r2=0	RD1=0	RD2=0	TD=19074	CX=15000	TM=0
+n=410_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=410	TD=41026	CX=29705	TM=8
+n=410_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=410	r1=0	r2=0	RD1=0	RD2=0	TD=35382	CX=27550	TM=0
+n=410_r=0.2_m=0_c=0.tre	MD=cophylo	n=410	TD=39680	CX=27708	TM=9
+n=410_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=410	r1=0	r2=0	RD1=0	RD2=0	TD=37318	CX=29829	TM=0
+n=410_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=333	TD=24650	CX=17828	TM=5
+n=410_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=333	r1=0	r2=0	RD1=0	RD2=0	TD=21382	CX=16996	TM=0
+n=410_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=333	TD=23120	CX=16763	TM=7
+n=410_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=333	r1=0	r2=0	RD1=0	RD2=0	TD=18856	CX=15006	TM=0
+n=420_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=420	TD=25260	CX=18774	TM=7
+n=420_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=420	r1=0	r2=0	RD1=0	RD2=0	TD=21960	CX=18312	TM=0
+n=420_r=0.1_m=0_c=0.tre	MD=cophylo	n=420	TD=27946	CX=19181	TM=10
+n=420_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=420	r1=0	r2=0	RD1=0	RD2=0	TD=27204	CX=21080	TM=0
+n=420_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=341	TD=21352	CX=15639	TM=6
+n=420_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=341	r1=0	r2=0	RD1=0	RD2=0	TD=13968	CX=11183	TM=0
+n=420_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=341	TD=14894	CX=11962	TM=8
+n=420_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=341	r1=0	r2=0	RD1=0	RD2=0	TD=12284	CX=10635	TM=0
+n=420_r=0.15_m=0_c=0.tre	MD=cophylo	n=420	TD=33744	CX=25017	TM=10
+n=420_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=420	r1=0	r2=0	RD1=0	RD2=0	TD=33068	CX=26112	TM=0
+n=420_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=341	TD=23032	CX=16919	TM=5
+n=420_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=341	r1=0	r2=0	RD1=0	RD2=0	TD=19102	CX=16052	TM=0
+n=420_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=341	TD=21654	CX=15279	TM=9
+n=420_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=341	r1=0	r2=0	RD1=0	RD2=0	TD=19854	CX=15303	TM=0
+n=420_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=420	TD=39616	CX=28453	TM=12
+n=420_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=420	r1=0	r2=0	RD1=0	RD2=0	TD=31380	CX=23943	TM=0
+n=420_r=0.2_m=0_c=0.tre	MD=cophylo	n=420	TD=38646	CX=27152	TM=10
+n=420_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=420	r1=0	r2=0	RD1=0	RD2=0	TD=32922	CX=26244	TM=0
+n=420_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=341	TD=29112	CX=21634	TM=7
+n=420_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=341	r1=0	r2=0	RD1=0	RD2=0	TD=24176	CX=18331	TM=0
+n=420_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=341	TD=25702	CX=18364	TM=8
+n=420_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=341	r1=0	r2=0	RD1=0	RD2=0	TD=22666	CX=17894	TM=0
+n=430_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=430	TD=39182	CX=28702	TM=8
+n=430_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=430	r1=0	r2=0	RD1=0	RD2=0	TD=28034	CX=21918	TM=0
+n=430_r=0.1_m=0_c=0.tre	MD=cophylo	n=430	TD=28800	CX=21028	TM=9
+n=430_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=430	r1=0	r2=0	RD1=0	RD2=0	TD=22616	CX=18586	TM=0
+n=430_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=348	TD=24294	CX=17010	TM=6
+n=430_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=348	r1=0	r2=0	RD1=0	RD2=0	TD=17318	CX=13916	TM=0
+n=430_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=348	TD=23280	CX=16737	TM=6
+n=430_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=348	r1=0	r2=0	RD1=0	RD2=0	TD=20774	CX=15170	TM=0
+n=430_r=0.15_m=0_c=0.tre	MD=cophylo	n=430	TD=37030	CX=26912	TM=10
+n=430_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=430	r1=0	r2=0	RD1=0	RD2=0	TD=35760	CX=27856	TM=0
+n=430_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=348	TD=20306	CX=15203	TM=7
+n=430_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=348	r1=0	r2=0	RD1=0	RD2=0	TD=17772	CX=14163	TM=0
+n=430_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=348	TD=22712	CX=15900	TM=7
+n=430_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=348	r1=0	r2=0	RD1=0	RD2=0	TD=20356	CX=16029	TM=0
+n=430_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=430	TD=41528	CX=29227	TM=8
+n=430_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=430	r1=0	r2=0	RD1=0	RD2=0	TD=29894	CX=23911	TM=0
+n=430_r=0.2_m=0_c=0.tre	MD=cophylo	n=430	TD=37558	CX=27405	TM=10
+n=430_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=430	r1=0	r2=0	RD1=0	RD2=0	TD=35546	CX=28724	TM=0
+n=430_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=348	TD=29192	CX=20534	TM=5
+n=430_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=348	r1=0	r2=0	RD1=0	RD2=0	TD=24420	CX=18668	TM=0
+n=430_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=348	TD=26394	CX=18512	TM=7
+n=430_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=348	r1=0	r2=0	RD1=0	RD2=0	TD=23948	CX=18762	TM=0
+n=440_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=440	TD=37228	CX=26491	TM=10
+n=440_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=440	r1=0	r2=0	RD1=0	RD2=0	TD=27280	CX=22186	TM=0
+n=440_r=0.1_m=0_c=0.tre	MD=cophylo	n=440	TD=30020	CX=22573	TM=10
+n=440_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=440	r1=0	r2=0	RD1=0	RD2=0	TD=23836	CX=19612	TM=0
+n=440_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=358	TD=22854	CX=16496	TM=7
+n=440_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=358	r1=0	r2=0	RD1=0	RD2=0	TD=18768	CX=15407	TM=0
+n=440_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=358	TD=21136	CX=13904	TM=7
+n=440_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=358	r1=0	r2=0	RD1=0	RD2=0	TD=17192	CX=13568	TM=0
+n=440_r=0.15_m=0_c=0.tre	MD=cophylo	n=440	TD=37532	CX=26831	TM=11
+n=440_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=440	r1=0	r2=0	RD1=0	RD2=0	TD=32908	CX=27051	TM=0
+n=440_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=358	TD=31188	CX=22350	TM=6
+n=440_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=358	r1=0	r2=0	RD1=0	RD2=0	TD=20986	CX=16709	TM=0
+n=440_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=358	TD=27174	CX=18444	TM=11
+n=440_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=358	r1=0	r2=0	RD1=0	RD2=0	TD=23448	CX=18268	TM=0
+n=440_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=440	TD=49346	CX=35726	TM=11
+n=440_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=440	r1=0	r2=0	RD1=0	RD2=0	TD=44104	CX=31534	TM=0
+n=440_r=0.2_m=0_c=0.tre	MD=cophylo	n=440	TD=40138	CX=28457	TM=10
+n=440_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=440	r1=0	r2=0	RD1=0	RD2=0	TD=34600	CX=27505	TM=0
+n=440_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=358	TD=28726	CX=21168	TM=7
+n=440_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=358	r1=0	r2=0	RD1=0	RD2=0	TD=23884	CX=18458	TM=0
+n=440_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=358	TD=24192	CX=18037	TM=7
+n=440_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=358	r1=0	r2=0	RD1=0	RD2=0	TD=23116	CX=18404	TM=0
+n=450_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=450	TD=39424	CX=29413	TM=11
+n=450_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=450	r1=0	r2=0	RD1=0	RD2=0	TD=23532	CX=18690	TM=0
+n=450_r=0.1_m=0_c=0.tre	MD=cophylo	n=450	TD=33988	CX=22626	TM=14
+n=450_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=450	r1=0	r2=0	RD1=0	RD2=0	TD=29940	CX=23633	TM=0
+n=450_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=365	TD=20694	CX=15921	TM=9
+n=450_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=365	r1=0	r2=0	RD1=0	RD2=0	TD=16950	CX=14045	TM=0
+n=450_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=365	TD=24618	CX=18000	TM=8
+n=450_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=365	r1=0	r2=0	RD1=0	RD2=0	TD=18980	CX=15670	TM=0
+n=450_r=0.15_m=0_c=0.tre	MD=cophylo	n=450	TD=42516	CX=32045	TM=13
+n=450_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=450	r1=0	r2=0	RD1=0	RD2=0	TD=39854	CX=31837	TM=0
+n=450_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=365	TD=25862	CX=19439	TM=6
+n=450_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=365	r1=0	r2=0	RD1=0	RD2=0	TD=23636	CX=19260	TM=0
+n=450_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=365	TD=24718	CX=18138	TM=7
+n=450_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=365	r1=0	r2=0	RD1=0	RD2=0	TD=22388	CX=17708	TM=0
+n=450_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=450	TD=51892	CX=37621	TM=12
+n=450_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=450	r1=0	r2=0	RD1=0	RD2=0	TD=35454	CX=29276	TM=0
+n=450_r=0.2_m=0_c=0.tre	MD=cophylo	n=450	TD=44438	CX=31611	TM=12
+n=450_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=450	r1=0	r2=0	RD1=0	RD2=0	TD=36462	CX=28927	TM=0
+n=450_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=365	TD=33386	CX=23334	TM=6
+n=450_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=365	r1=0	r2=0	RD1=0	RD2=0	TD=26998	CX=21227	TM=0
+n=450_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=365	TD=30478	CX=22734	TM=7
+n=450_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=365	r1=0	r2=0	RD1=0	RD2=0	TD=27800	CX=22320	TM=0
+n=50_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=50	TD=536	CX=307	TM=0
+n=50_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=50	r1=0	r2=0	RD1=0	RD2=0	TD=220	CX=170	TM=0
+n=50_r=0.1_m=0_c=0.tre	MD=cophylo	n=50	TD=208	CX=155	TM=0
+n=50_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=50	r1=0	r2=0	RD1=0	RD2=0	TD=176	CX=142	TM=0
+n=50_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=40	TD=156	CX=95	TM=0
+n=50_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=40	r1=0	r2=0	RD1=0	RD2=0	TD=90	CX=66	TM=0
+n=50_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=40	TD=122	CX=81	TM=0
+n=50_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=40	r1=0	r2=0	RD1=0	RD2=0	TD=92	CX=66	TM=0
+n=50_r=0.15_m=0_c=0.tre	MD=cophylo	n=50	TD=310	CX=217	TM=0
+n=50_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=50	r1=0	r2=0	RD1=0	RD2=0	TD=276	CX=221	TM=0
+n=50_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=40	TD=162	CX=115	TM=0
+n=50_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=40	r1=0	r2=0	RD1=0	RD2=0	TD=158	CX=121	TM=0
+n=50_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=40	TD=120	CX=85	TM=0
+n=50_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=40	r1=0	r2=0	RD1=0	RD2=0	TD=104	CX=76	TM=0
+n=50_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=50	TD=390	CX=269	TM=0
+n=50_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=50	r1=0	r2=0	RD1=0	RD2=0	TD=214	CX=153	TM=0
+n=50_r=0.2_m=0_c=0.tre	MD=cophylo	n=50	TD=170	CX=103	TM=0
+n=50_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=50	r1=0	r2=0	RD1=0	RD2=0	TD=180	CX=125	TM=0
+n=50_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=40	TD=242	CX=162	TM=0
+n=50_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=40	r1=0	r2=0	RD1=0	RD2=0	TD=136	CX=97	TM=0
+n=50_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=40	TD=232	CX=134	TM=0
+n=50_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=40	r1=0	r2=0	RD1=0	RD2=0	TD=188	CX=139	TM=0
+n=60_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=60	TD=272	CX=194	TM=0
+n=60_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=60	r1=0	r2=0	RD1=0	RD2=0	TD=222	CX=169	TM=0
+n=60_r=0.1_m=0_c=0.tre	MD=cophylo	n=60	TD=206	CX=149	TM=0
+n=60_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=60	r1=0	r2=0	RD1=0	RD2=0	TD=204	CX=157	TM=0
+n=60_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=48	TD=302	CX=196	TM=0
+n=60_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=48	r1=0	r2=0	RD1=0	RD2=0	TD=182	CX=156	TM=0
+n=60_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=48	TD=198	CX=135	TM=0
+n=60_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=48	r1=0	r2=0	RD1=0	RD2=0	TD=150	CX=95	TM=0
+n=60_r=0.15_m=0_c=0.tre	MD=cophylo	n=60	TD=380	CX=243	TM=0
+n=60_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=60	r1=0	r2=0	RD1=0	RD2=0	TD=322	CX=252	TM=0
+n=60_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=48	TD=258	CX=174	TM=0
+n=60_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=48	r1=0	r2=0	RD1=0	RD2=0	TD=192	CX=162	TM=0
+n=60_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=48	TD=312	CX=185	TM=0
+n=60_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=48	r1=0	r2=0	RD1=0	RD2=0	TD=216	CX=152	TM=0
+n=60_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=60	TD=412	CX=292	TM=0
+n=60_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=60	r1=0	r2=0	RD1=0	RD2=0	TD=368	CX=283	TM=0
+n=60_r=0.2_m=0_c=0.tre	MD=cophylo	n=60	TD=706	CX=475	TM=0
+n=60_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=60	r1=0	r2=0	RD1=0	RD2=0	TD=474	CX=373	TM=0
+n=60_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=48	TD=372	CX=270	TM=0
+n=60_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=48	r1=0	r2=0	RD1=0	RD2=0	TD=304	CX=251	TM=0
+n=60_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=48	TD=306	CX=192	TM=0
+n=60_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=48	r1=0	r2=0	RD1=0	RD2=0	TD=232	CX=177	TM=0
+n=70_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=70	TD=654	CX=430	TM=0
+n=70_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=70	r1=0	r2=0	RD1=0	RD2=0	TD=320	CX=240	TM=0
+n=70_r=0.1_m=0_c=0.tre	MD=cophylo	n=70	TD=488	CX=344	TM=0
+n=70_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=70	r1=0	r2=0	RD1=0	RD2=0	TD=464	CX=343	TM=0
+n=70_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=57	TD=260	CX=171	TM=0
+n=70_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=57	r1=0	r2=0	RD1=0	RD2=0	TD=208	CX=145	TM=0
+n=70_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=57	TD=376	CX=247	TM=0
+n=70_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=57	r1=0	r2=0	RD1=0	RD2=0	TD=286	CX=234	TM=0
+n=70_r=0.15_m=0_c=0.tre	MD=cophylo	n=70	TD=638	CX=462	TM=0
+n=70_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=70	r1=0	r2=0	RD1=0	RD2=0	TD=636	CX=514	TM=0
+n=70_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=57	TD=416	CX=282	TM=0
+n=70_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=57	r1=0	r2=0	RD1=0	RD2=0	TD=226	CX=177	TM=0
+n=70_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=57	TD=596	CX=373	TM=0
+n=70_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=57	r1=0	r2=0	RD1=0	RD2=0	TD=370	CX=263	TM=0
+n=70_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=70	TD=826	CX=573	TM=0
+n=70_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=70	r1=0	r2=0	RD1=0	RD2=0	TD=658	CX=496	TM=0
+n=70_r=0.2_m=0_c=0.tre	MD=cophylo	n=70	TD=878	CX=619	TM=0
+n=70_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=70	r1=0	r2=0	RD1=0	RD2=0	TD=746	CX=589	TM=0
+n=70_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=57	TD=500	CX=318	TM=0
+n=70_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=57	r1=0	r2=0	RD1=0	RD2=0	TD=374	CX=279	TM=0
+n=70_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=57	TD=592	CX=384	TM=0
+n=70_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=57	r1=0	r2=0	RD1=0	RD2=0	TD=366	CX=290	TM=0
+n=80_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=80	TD=1610	CX=1013	TM=0
+n=80_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=406	CX=328	TM=0
+n=80_r=0.1_m=0_c=0.tre	MD=cophylo	n=80	TD=724	CX=471	TM=0
+n=80_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=728	CX=544	TM=0
+n=80_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=64	TD=656	CX=442	TM=0
+n=80_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=64	r1=0	r2=0	RD1=0	RD2=0	TD=454	CX=360	TM=0
+n=80_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=64	TD=790	CX=520	TM=0
+n=80_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=64	r1=0	r2=0	RD1=0	RD2=0	TD=342	CX=268	TM=0
+n=80_r=0.15_m=0_c=0.tre	MD=cophylo	n=80	TD=1110	CX=728	TM=0
+n=80_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=808	CX=622	TM=0
+n=80_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=64	TD=556	CX=353	TM=0
+n=80_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=64	r1=0	r2=0	RD1=0	RD2=0	TD=492	CX=350	TM=0
+n=80_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=64	TD=514	CX=316	TM=0
+n=80_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=64	r1=0	r2=0	RD1=0	RD2=0	TD=422	CX=314	TM=0
+n=80_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=80	TD=1790	CX=1287	TM=0
+n=80_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=588	CX=473	TM=0
+n=80_r=0.2_m=0_c=0.tre	MD=cophylo	n=80	TD=1110	CX=748	TM=0
+n=80_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=80	r1=0	r2=0	RD1=0	RD2=0	TD=974	CX=757	TM=0
+n=80_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=64	TD=654	CX=411	TM=0
+n=80_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=64	r1=0	r2=0	RD1=0	RD2=0	TD=426	CX=337	TM=0
+n=80_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=64	TD=484	CX=330	TM=0
+n=80_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=64	r1=0	r2=0	RD1=0	RD2=0	TD=424	CX=329	TM=0
+n=90_r=0.1_m=0_c=0.1.tre	MD=cophylo	n=90	TD=1294	CX=789	TM=0
+n=90_r=0.1_m=0_c=0.1.tre	MD=DO-Tanglegram	n=90	r1=0	r2=0	RD1=0	RD2=0	TD=722	CX=551	TM=0
+n=90_r=0.1_m=0_c=0.tre	MD=cophylo	n=90	TD=752	CX=490	TM=0
+n=90_r=0.1_m=0_c=0.tre	MD=DO-Tanglegram	n=90	r1=0	r2=0	RD1=0	RD2=0	TD=648	CX=468	TM=0
+n=90_r=0.1_m=0.1_c=0.1.tre	MD=cophylo	n=74	TD=800	CX=490	TM=0
+n=90_r=0.1_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=74	r1=0	r2=0	RD1=0	RD2=0	TD=414	CX=330	TM=0
+n=90_r=0.1_m=0.1_c=0.tre	MD=cophylo	n=74	TD=648	CX=444	TM=0
+n=90_r=0.1_m=0.1_c=0.tre	MD=DO-Tanglegram	n=74	r1=0	r2=0	RD1=0	RD2=0	TD=514	CX=403	TM=0
+n=90_r=0.15_m=0_c=0.tre	MD=cophylo	n=90	TD=1532	CX=1006	TM=0
+n=90_r=0.15_m=0_c=0.tre	MD=DO-Tanglegram	n=90	r1=0	r2=0	RD1=0	RD2=0	TD=1208	CX=927	TM=0
+n=90_r=0.15_m=0.1_c=0.1.tre	MD=cophylo	n=74	TD=966	CX=652	TM=0
+n=90_r=0.15_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=74	r1=0	r2=0	RD1=0	RD2=0	TD=676	CX=532	TM=0
+n=90_r=0.15_m=0.1_c=0.tre	MD=cophylo	n=74	TD=818	CX=525	TM=0
+n=90_r=0.15_m=0.1_c=0.tre	MD=DO-Tanglegram	n=74	r1=0	r2=0	RD1=0	RD2=0	TD=532	CX=401	TM=0
+n=90_r=0.2_m=0_c=0.1.tre	MD=cophylo	n=90	TD=1358	CX=966	TM=0
+n=90_r=0.2_m=0_c=0.1.tre	MD=DO-Tanglegram	n=90	r1=0	r2=0	RD1=0	RD2=0	TD=1096	CX=893	TM=0
+n=90_r=0.2_m=0_c=0.tre	MD=cophylo	n=90	TD=1554	CX=1175	TM=0
+n=90_r=0.2_m=0_c=0.tre	MD=DO-Tanglegram	n=90	r1=0	r2=0	RD1=0	RD2=0	TD=784	CX=632	TM=0
+n=90_r=0.2_m=0.1_c=0.1.tre	MD=cophylo	n=74	TD=1078	CX=682	TM=0
+n=90_r=0.2_m=0.1_c=0.1.tre	MD=DO-Tanglegram	n=74	r1=0	r2=0	RD1=0	RD2=0	TD=688	CX=495	TM=0
+n=90_r=0.2_m=0.1_c=0.tre	MD=cophylo	n=74	TD=716	CX=496	TM=0
+n=90_r=0.2_m=0.1_c=0.tre	MD=DO-Tanglegram	n=74	r1=0	r2=0	RD1=0	RD2=0	TD=534	CX=410	TM=0

@@ -1,0 +1,20 @@
+Data Figure 1:
+
+('B. elizabethae 4601',('B. maroccanus 16678',('B. tunetanus 14847',(((((('B. serrano 19767',('B. manchego 19524',('B. pedrosousai 19537',('B. pedrosousai 19533')#H1))),('B. alacanti 19744')#H2),('B. aff. occitanus 19734')#H3),((('B. halius 18040',(('B. castellano 19498',('B. ajax 19493')#H5),('B. lusitanus 19515')#H6)),#H1))#H4),(((('B. iaspis 19756','B. montanus 19769'),#H2),(((('B. occitanus 19717',('B. balmensis 19715')#H8),('B. pyrenaeus 19725',#H8)),#H3))#H7),(((((('B. gabani 18063',#H4),((('B. delafuentei 19816',#H5),#H6),'B. gonzalezdelavegai 20690')),'B. baeticus 19801'#H9),(('B. ibericus 19795',('B. ibericus 19784',('B. elongatus 19791')#H10)),'B. baeticus 19801'#H9)),(('B. garcialorcai 19780',#H10))#H11),#H7))),#H11))));
+(('B. elizabethae 4601':20,('B. maroccanus 16678':200,('B. tunetanus 14847':130,('B. garcialorcai 19780':26,(('B. elongatus 19791':104,(('B. ibericus 19801':32,('B. ibericus 19795':24,'B. ibericus 19784':21):48):150,((('B. delafuentei 19804':32,'B. delafuentei 6092':24):21,('B. delafuentei 20690':28,('B. delafuentei 19809':27,'B. delafuentei 19816':27):22):21):86,((('B. halius 6947':27,'B. halius 6946':27):22,('B. halius 18069':27,'B. halius 18063':27):22):21,(('B. halius 19493':27,'B. halius 19488':27):22,(('B. halius 19515':24,'B. halius 19507':24):21,(('B. halius 18047':28,'B. halius 18040':29):21,('B. halius 19817':25,('B. halius 19504':27,'B. halius 19498':27):22):21):21):22):21):86):60):73):31,(('B. montanus 19775':24,'B. montanus 19769':28):73,('B. iaspis 19764':24,('B. iaspis 19760':24,('B. iaspis 12387':24,'B. iaspis 19756':25):21):22):34):91):38):73):98):58):85);
+
+Data Figure 2:
+
+(t6,((P._spec._nov._1,((t7,t8),((t3,t4),((t1,t2),(P._nigriventris,(((t9,P._rigisamos),t13),(((t11,t14),t10),t12))))))),((P._near_blandus,t5),t15)));
+((((t1,t2),(t3,(t4,t5))),((t6,(t7,t8)),(((t9,t10),(t11,t12)),(t13,t14)))),t15);
+
+Data Figure 4:
+
+(((((virginiana,filiformis),(amphibia.p1,amphibia.p2)))#H1:0,((((maackiana,arifolia),(meisneriana,sagittata)):1)#H2:0,(((((japonica,((((pubescens,hydropiper.p1,hydropiper.p2,punctata.p1,punctata.p2),(kawagoeana,(maculosa,tinctoria),longiseta.p1,longiseta.p2,macrantha,posumbu)),(foliosa,taquetii)),((minor.p1,minor.p2),((opelousana,hydropiperoides.p1,hydropiperoides.p3,puritanorum,hydropiperoides.p2),densiflora)))),((robustior,((hirsuta.p2,hirsuta.p1),setacea)),(barbata,((mexicana,segetum),(bicornis,pensylvanica))))),(((viscofera,nodosa):1)#H3:0,viscosa,(careyi:1)#H4:0),((glabra.p2,(hispida,paraguayensis)),(orientalis,(limbata,accuminata),#H4:0))),((tomentosa,(((ferruginea,glabra.p1),(senegalensis,lapathifolia.p3),lapathifolia.p1),lapathifolia.p2)):1)#H5:0),(#H3:0,#H5:0))),(#H1:0,#H2:0)):0.95,(nepalensis,(capitata,runcinata)):0.05);
+(((((maackiana,arifolia),meisneriana),sagittata),((virginiana,filiformis),((amphibia.p1,amphibia.p2),((japonica,(((pubescens,hydropiper.p1),hydropiper.p2),(minor.p1,minor.p2)),(kawagoeana,barbata),(maculosa,((tinctoria,(longiseta.p1,longiseta.p2)),((macrantha,posumbu),foliosa,taquetii)))),(((punctata.p1,opelousana,hydropiperoides.p1,(punctata.p2,hydropiperoides.p3,puritanorum),robustior),(hirsuta.p2,hirsuta.p1,(hydropiperoides.p2,setacea))),viscofera),((mexicana,bicornis),(densiflora,(segetum,pensylvanica,((ferruginea,glabra.p1,(tomentosa,senegalensis)),viscosa,orientalis),lapathifolia.p3,lapathifolia.p1,(lapathifolia.p2,nodosa))),(glabra.p2,hispida),paraguayensis),((limbata,accuminata),careyi))))):0.95,(nepalensis:1,(capitata:1,runcinata:1):1):0.05);
+
+
+
+
+
+
