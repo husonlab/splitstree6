@@ -91,8 +91,8 @@
                                     <SeparatorMenuItem mnemonicParsing="false"/>
                                     <MenuItem mnemonicParsing="false">
                                         <graphic>
-                                            <CheckBox fx:id="usePQTreeCBox" mnemonicParsing="false"
-                                                      selected="true" text="Use PQ-Tree Preprocessing for Two Sided"/>
+                                            <CheckBox fx:id="useNNPresortingCBox" mnemonicParsing="false"
+                                                      selected="true" text="Use NN-Presorting for Two Sided"/>
                                         </graphic>
                                     </MenuItem>
                                 </items>

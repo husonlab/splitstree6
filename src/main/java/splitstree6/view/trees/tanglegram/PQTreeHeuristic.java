@@ -32,6 +32,7 @@ import splitstree6.utils.TreesUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class PQTreeHeuristic {
 	public static boolean reorderUsingPQTree(PhyloTree network1, Map<Node, List<Node>> childMap1, PhyloTree network2, Map<Node, List<Node>> childMap2) {
 		var taxaOnLeaves1 = new BitSet();

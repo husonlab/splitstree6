@@ -172,7 +172,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		controller.getReticulateDisplacementFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings1Property());
 		controller.getTaxonDisplacementSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings2Property());
 		controller.getReticulateDisplacementSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings2Property());
-		controller.getUsePQTreeCBox().selectedProperty().bindBidirectional(view.optionUsePQTreeProperty());
+		controller.getUseNNPresortingCBox().selectedProperty().bindBidirectional(view.optionUsePQTreeProperty());
 		tree1.addListener((v, o, n) -> {
 			controller.getTaxonDisplacementFirstCBox().setDisable(n == null || n == tree2.get());
 			controller.getReticulateDisplacementFirstCBox().setDisable(n == null || n == tree2.get() || !n.hasReticulateEdges());
@@ -239,7 +239,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			view.optionOptimizeReticulateCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
 			view.optionOptimizeTanglegramCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
 			view.optionUsePQTreeProperty().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
-			controller.getUsePQTreeCBox().disableProperty().bind((view.optionOptimizeReticulateCrossings1Property().not().and(view.optionOptimizeTanglegramCrossings1Property().not())).or(view.optionOptimizeReticulateCrossings2Property().not().and(view.optionOptimizeTanglegramCrossings2Property().not())));
+			controller.getUseNNPresortingCBox().disableProperty().bind((view.optionOptimizeReticulateCrossings1Property().not().and(view.optionOptimizeTanglegramCrossings1Property().not())).or(view.optionOptimizeReticulateCrossings2Property().not().and(view.optionOptimizeTanglegramCrossings2Property().not())));
 
 			view.optionOptimizeReticulateCrossings1Property().addListener((v, o, n) -> view.getUndoManager().add("reticulate crossings", view.optionOptimizeReticulateCrossings1Property(), o, n));
 			view.optionOptimizeTanglegramCrossings1Property().addListener((v, o, n) -> view.getUndoManager().add("tanglegram crossings", view.optionOptimizeTanglegramCrossings1Property(), o, n));

@@ -38,8 +38,8 @@ import java.util.function.Function;
  */
 public class ReportTanglegramStats {
 
-	public static Stats apply(PhyloTree network1, Function<Node, Double> yFunction1, Function<Node, String> labelFunction1,
-							  PhyloTree network2, Function<Node, Double> yFunction2, Function<Node, String> labelFunction2) {
+	public static Stats apply(PhyloTree network1, Map<Node, List<Node>> childrenMap1, Function<Node, Double> yFunction1, Function<Node, String> labelFunction1,
+							  PhyloTree network2, Map<Node, List<Node>> childrenMap2, Function<Node, Double> yFunction2, Function<Node, String> labelFunction2) {
 		if (IteratorUtils.size(network1.getTaxa()) == 0 && IteratorUtils.size(network2.getTaxa()) == 0) {
 			addTaxa(network1, labelFunction1, network2, labelFunction2);
 		}
@@ -47,8 +47,8 @@ public class ReportTanglegramStats {
 		var reticulateDisplacement1 = computeReticulateDisplacement(network1, yFunction1);
 		var reticulateDisplacement2 = computeReticulateDisplacement(network2, yFunction2);
 
-		var taxonDisplacement2 = computeTaxonDisplacement(network1, network2);
-		var crossings = computeNumberOfCrossings(network1, network2);
+		var taxonDisplacement2 = computeTaxonDisplacement(network1, childrenMap1, network2, childrenMap2);
+		var crossings = computeNumberOfCrossings(network1, childrenMap1, network2, childrenMap2);
 
 		var numTaxa = getCommonTaxa(network1, network2).cardinality();
 		var r1 = (int) network1.edgeStream().filter(e -> e.getTarget().getInDegree() > 1 && !network1.isTransferAcceptorEdge(e)).count();
@@ -92,9 +92,7 @@ public class ReportTanglegramStats {
 		return displacement;
 	}
 
-	private static double computeTaxonDisplacement(PhyloTree network1, PhyloTree network2) {
-		Function<Node, List<Node>> childrenMap1 = v -> network1.hasLSAChildrenMap() && network1.getLSAChildrenMap().get(v) != null ? network1.getLSAChildrenMap().get(v) : IteratorUtils.asList(v.children());
-		Function<Node, List<Node>> childrenMap2 = v -> network2.hasLSAChildrenMap() && network2.getLSAChildrenMap().get(v) != null ? network2.getLSAChildrenMap().get(v) : IteratorUtils.asList(v.children());
+	private static double computeTaxonDisplacement(PhyloTree network1, Map<Node, List<Node>> childrenMap1, PhyloTree network2, Map<Node, List<Node>> childrenMap2) {
 		var commonTaxa = getCommonTaxa(network1, network2);
 
 		var taxonRankMap1 = computeTaxonRankMap(network1, childrenMap1, commonTaxa);
@@ -113,9 +111,7 @@ public class ReportTanglegramStats {
 		}
 	}
 
-	private static int computeNumberOfCrossings(PhyloTree network1, PhyloTree network2) {
-		Function<Node, List<Node>> childrenMap1 = v -> network1.hasLSAChildrenMap() && network1.getLSAChildrenMap().get(v) != null ? network1.getLSAChildrenMap().get(v) : IteratorUtils.asList(v.children());
-		Function<Node, List<Node>> childrenMap2 = v -> network2.hasLSAChildrenMap() && network2.getLSAChildrenMap().get(v) != null ? network2.getLSAChildrenMap().get(v) : IteratorUtils.asList(v.children());
+	private static int computeNumberOfCrossings(PhyloTree network1, Map<Node, List<Node>> childrenMap1, PhyloTree network2, Map<Node, List<Node>> childrenMap2) {
 		var commonTaxa = getCommonTaxa(network1, network2);
 
 		var taxonRankMap1 = computeTaxonRankMap(network1, childrenMap1, commonTaxa);
@@ -175,7 +171,7 @@ public class ReportTanglegramStats {
 		return count >= 2 ? (max - min) / (count - 1) : 1;
 	}
 
-	private static NodeIntArray computeLeafRankMap(PhyloTree network, Function<Node, List<Node>> childrenMap, BitSet taxa) {
+	private static NodeIntArray computeLeafRankMap(PhyloTree network, Map<Node, List<Node>> childrenMap, BitSet taxa) {
 		var counter = new Counter(0);
 		var rankMap = network.newNodeIntArray();
 		preOrderTraversal(network.getRoot(), childrenMap, v -> {
@@ -185,13 +181,13 @@ public class ReportTanglegramStats {
 		return rankMap;
 	}
 
-	private static double computeCostBelow(Function<Node, List<Node>> childrenMap, Node v, Function<Node, Double> costFunction) {
+	private static double computeCostBelow(Map<Node, List<Node>> childrenMap, Node v, Function<Node, Double> costFunction) {
 		var cost = new DoubleAdder();
 		postOrderTraversal(v, childrenMap, u -> cost.add(costFunction.apply(u)));
 		return cost.doubleValue();
 	}
 
-	private static Map<Integer, Integer> computeTaxonRankMap(PhyloTree network, Function<Node, List<Node>> childrenMap, BitSet taxa) {
+	private static Map<Integer, Integer> computeTaxonRankMap(PhyloTree network, Map<Node, List<Node>> childrenMap, BitSet taxa) {
 		var counter = new Counter(0);
 		var rankMap = new HashMap<Integer, Integer>();
 		preOrderTraversal(network.getRoot(), childrenMap, v -> {
@@ -205,15 +201,15 @@ public class ReportTanglegramStats {
 		return rankMap;
 	}
 
-	public static void preOrderTraversal(Node v, Function<Node, List<Node>> children, Consumer<Node> consumer) {
+	public static void preOrderTraversal(Node v, Map<Node, List<Node>> children, Consumer<Node> consumer) {
 		consumer.accept(v);
-		for (var w : children.apply(v)) {
+		for (var w : children.get(v)) {
 			preOrderTraversal(w, children, consumer);
 		}
 	}
 
-	public static void postOrderTraversal(Node v, Function<Node, List<Node>> children, Consumer<Node> consumer) {
-		for (var w : children.apply(v)) {
+	public static void postOrderTraversal(Node v, Map<Node, List<Node>> children, Consumer<Node> consumer) {
+		for (var w : children.get(v)) {
 			preOrderTraversal(w, children, consumer);
 		}
 		consumer.accept(v);

@@ -1,13 +1,104 @@
 #nexus [SplitsTree6]
 
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=6 nAlgorithms=4;
+PROGRAM version='SplitsTree App (version 6.6.4, built 21 Nov 2025)';
+WORKFLOW creationDate='1764066590288'; [Tue Nov 25 11:29:50 CET 2025]
+END; [SPLITSTREE6]
+
 [!
 Network copied from Figure 4 of
 Koblmueller, S., Duftner, N., Sefc, K. M., Aibara, M., Stipacek, M., Blanc, M., Egger, B., & Sturmbauer, C. (2007).
 Reticulate phylogeny of gastropod-shell-breeding cichlids from Lake Tanganyika- the result of repeated introgressive hybridization.
+BMC evolutionary biology, 7, 7. https://doi.org/10.1186/1471-2148-7-7]
+
+[
+Input:
+Network copied from Figure 4 of
+Koblmueller, S., Duftner, N., Sefc, K. M., Aibara, M., Stipacek, M., Blanc, M., Egger, B., & Sturmbauer, C. (2007).
+Reticulate phylogeny of gastropod-shell-breeding cichlids from Lake Tanganyika- the result of repeated introgressive hybridization.
 BMC evolutionary biology, 7, 7. https://doi.org/10.1186/1471-2148-7-7
+
+Methods:
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2024).
+The original input consisted of 20 taxa and one rooted network.
+The Show Trees method was used (default options) so as to obtain a Tree View visualization.
+
+References:
+Huson and Bryant 2024: D.H. Huson and D. Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024.
 ]
 
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=20;
+TAXLABELS
+	[1] 'J.ornatus'
+	[2] 'V.moorii'
+	[3] 'T.vittatus'
+	[4] 'L.ornatipinnis'
+	[5] 'unnamed'
+	[6] 'N.calliurus'
+	[7] 'N.caudopunctatus'
+	[8] 'N.leloupi'
+	[9] 'L.lemairii'
+	[10] 'Lepidiolamprologus'
+	[11] 'N.multifasciatus'
+	[12] 'N.similis'
+	[13] 'N.fasciatus'
+	[14] 'N.brevis'
+	[15] 'Altolamprologus'
+	[16] 'L.speciosus'
+	[17] 'L.callipterus'
+	[18] 'L.ocellatus'
+	[19] 'N.wauthioni'
+	[20] 'L.meleagris'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=20;
+TAXLABELS
+	[1] 'J.ornatus'
+	[2] 'V.moorii'
+	[3] 'T.vittatus'
+	[4] 'L.ornatipinnis'
+	[5] 'unnamed'
+	[6] 'N.calliurus'
+	[7] 'N.caudopunctatus'
+	[8] 'N.leloupi'
+	[9] 'L.lemairii'
+	[10] 'Lepidiolamprologus'
+	[11] 'N.multifasciatus'
+	[12] 'N.similis'
+	[13] 'N.fasciatus'
+	[14] 'N.brevis'
+	[15] 'Altolamprologus'
+	[16] 'L.speciosus'
+	[17] 'L.callipterus'
+	[18] 'L.ocellatus'
+	[19] 'N.wauthioni'
+	[20] 'L.meleagris'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
 BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
 [Number of trees: 1]
 PROPERTIES partialTrees=no rooted=yes reticulated=yes;
 TRANSLATE
@@ -35,3 +126,65 @@ TRANSLATE
 [TREES]
 		[1] tree 'tree-1'=[&R] ((2,3,((5,(11)#H1),((12,#H1),(13)#H2),(6,(14,(16)#H3)),(7,8,9,10,(((17,(19)#H4),#H2),15,((#H3,#H4),(18,(20)#H5))),(#H5)),4)),1);
 END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 1]
+PROPERTIES partialTrees=no rooted=yes reticulated=yes;
+TRANSLATE
+	1 'J.ornatus',
+	2 'V.moorii',
+	3 'T.vittatus',
+	4 'L.ornatipinnis',
+	5 'unnamed',
+	6 'N.calliurus',
+	7 'N.caudopunctatus',
+	8 'N.leloupi',
+	9 'L.lemairii',
+	10 'Lepidiolamprologus',
+	11 'N.multifasciatus',
+	12 'N.similis',
+	13 'N.fasciatus',
+	14 'N.brevis',
+	15 'Altolamprologus',
+	16 'L.speciosus',
+	17 'L.callipterus',
+	18 'L.ocellatus',
+	19 'N.wauthioni',
+	20 'L.meleagris',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] ((2,3,((5,(11)#H1),((12,#H1),(13)#H2),(6,(14,(16)#H3)),(7,8,9,10,(((17,(19)#H4),#H2),15,((#H3,#H4),(18,(20)#H5))),(#H5)),4)),1);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreeView';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreeView';
+LINK ALGORITHM = 'Show Trees';
+NAME 'TreeViewView';
+INPUT 'TREES';
+OPTIONS
+	Tree = 1,
+	Diagram = 'RectangularPhylogram',
+	Averaging = 'ChildAverage',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 1,
+	VerticalZoomFactor = 1,
+	FontScaleFactor = 1,
+	LabelEdgesBy = 'None',
+	ShowQRCode = 'false';
+END; [VIEW]

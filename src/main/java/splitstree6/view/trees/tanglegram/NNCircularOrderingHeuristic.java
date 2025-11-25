@@ -30,7 +30,7 @@ import java.util.*;
 import static splitstree6.view.trees.tanglegram.PQTreeHeuristic.sortByRank;
 
 /**
- * reimplementation of NN heuristic for tanglegrams
+ * NNet-presorting heuristic for tanglegrams
  * Daniel Huson, 11.2025
  */
 public class NNCircularOrderingHeuristic {
@@ -53,7 +53,7 @@ public class NNCircularOrderingHeuristic {
 
 		var ntax = Math.max(BitSetUtils.max(taxaOnLeaves1), BitSetUtils.max(taxaOnLeaves2));
 
-		// todo: map to taxa 1...count, run NNet and then map back to original numbers
+		// todo: map to taxa 1...count, run NNet and then map back to original numbers?
 		var distances = setupDistances(ntax, clusters);
 		var ordering = NeighborNetCycleSplitsTree4.compute(ntax, distances);
 
@@ -76,7 +76,6 @@ public class NNCircularOrderingHeuristic {
 			if (ordering[r] != 0)
 				taxonRankMap.put(ordering[r], r);
 		}
-
 		sortByRank(network1, childMap1, commonTaxa, taxonRankMap);
 		sortByRank(network2, childMap2, commonTaxa, taxonRankMap);
 	}

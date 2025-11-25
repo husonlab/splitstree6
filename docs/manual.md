@@ -285,9 +285,9 @@ flipping and zooming.
 There is a menu that allows one to select precisely what the target of
 displacement optimization should be, namely taxa or reticulate edges in
 which of the two phylogenies. In addition, if one of the two input
-phylogenies has a very unresolved node, that using the PQ-tree cluster
-heuristic may help to untangle that situation (but only when both sides
-are being untangled.)
+phylogenies has a very unresolved node, that using the
+NeighborNet-presorting heuristic may help to untangle that situation
+(but only when both sides are being untangled.)
 
 The side panel contains items for styling the taxon labels and for
 adding marks to the taxa.

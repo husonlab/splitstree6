@@ -129,7 +129,7 @@ public class TanglegramViewController {
 	private CheckBox reticulateDisplacementSecondCBox;
 
 	@FXML
-	private CheckBox usePQTreeCBox;
+	private CheckBox useNNPresortingCBox;
 
 	@FXML
 	private MenuButton optimizeMenuButton;
@@ -324,7 +324,7 @@ public class TanglegramViewController {
 		return reticulateDisplacementSecondCBox;
 	}
 
-	public CheckBox getUsePQTreeCBox() {
-		return usePQTreeCBox;
+	public CheckBox getUseNNPresortingCBox() {
+		return useNNPresortingCBox;
 	}
 }

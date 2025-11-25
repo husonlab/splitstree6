@@ -138,7 +138,7 @@ public class SplitsTree6 extends Application {
 		SimulatedAnnealingMinLA.DEFAULT_END_TEMPERATURE = ProgramProperties.get("SA_DEFAULT_END_TEMPERATURE", SimulatedAnnealingMinLA.DEFAULT_END_TEMPERATURE);
 		SimulatedAnnealingMinLA.DEFAULT_ITERATIONS_PER_TEMPERATURE = ProgramProperties.get("SA_DEFAULT_ITERATIONS_PER_TEMPERATURE", SimulatedAnnealingMinLA.DEFAULT_ITERATIONS_PER_TEMPERATURE);
 		SimulatedAnnealingMinLA.DEFAULT_COOLING_RATE = ProgramProperties.get("SA_DEFAULT_COOLING_RATE", SimulatedAnnealingMinLA.DEFAULT_COOLING_RATE);
-		DoTanglegram.TANGLEGRAM_PARALLEL_JOBS = ProgramProperties.get("TANGLEGRAM_PARALLEL_JOBS", DoTanglegram.TANGLEGRAM_PARALLEL_JOBS_DEFAULT);
+		DoTanglegram.PARALLEL_JOBS = ProgramProperties.get("TANGLEGRAM_PARALLEL_JOBS", DoTanglegram.PARALLEL_JOBS);
 
 		Icebergs.setEnabled(true);
 
