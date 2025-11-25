@@ -75,7 +75,7 @@ public class TanglegramView implements IView {
 	private final BooleanProperty optionOptimizeReticulateCrossings1 = new SimpleBooleanProperty(this, "optionOptimizeReticulateCrossings1", true);
 	private final BooleanProperty optionOptimizeTanglegramCrossings2 = new SimpleBooleanProperty(this, "optionOptimizeTanglegramCrossings2", true);
 	private final BooleanProperty optionOptimizeReticulateCrossings2 = new SimpleBooleanProperty(this, "optionOptimizeReticulateCrossings2", true);
-	private final BooleanProperty optionUsePQTree = new SimpleBooleanProperty(this, "optionUsePQTree", false);
+	private final BooleanProperty optionUsePQTree = new SimpleBooleanProperty(this, "optionUsePQTree", true);
 
 	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", LayoutOrientation.Rotate0Deg.toString());
 

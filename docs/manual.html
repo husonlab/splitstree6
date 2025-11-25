@@ -7,7 +7,7 @@
      <meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)">
      <!-- html -->
      <meta name="src" content="manual.tex">
-     <meta name="date" content="2025-10-16 12:19:00">
+     <meta name="date" content="2025-11-25 09:47:00">
      <link rel="stylesheet" type="text/css" href="manual.css">
      <style> body {
           font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
              class="cmss-12">Daniel H. Huson and David Bryant</span></div>
      <br/>
      <div class="date"><span
-             class="cmss-12">SplitsTree App (version 6.6.0, built 16 Oct 2025)  </span></div>
+             class="cmss-12">SplitsTree App (version 6.6.5, built 25 Nov 2025)  </span></div>
 
 
 </div>
@@ -242,20 +242,22 @@
         href="#x1-182000E.4" id="QQ2-1-211">Running a workflow on multiple datasets</a></span>
      <br/><span class="appendixToc">F <a
         href="#x1-183000F" id="QQ2-1-212">Styling labels</a></span>
+     <br/><span class="appendixToc">G <a
+        href="#x1-184000G" id="QQ2-1-214">Additional parameters</a></span>
 </div>
-<!--l. 52--><p class="noindent">
+<!--l. 54--><p class="noindent">
 
 
 <h3 class="likesectionHead"><a
         id="x1-2000"></a>Introduction</h3>
-<!--l. 58--><p class="noindent">The SplitsTree App is new software for exploring and analyzing phylogenetic data, with
+<!--l. 60--><p class="noindent">The SplitsTree App is new software for exploring and analyzing phylogenetic data, with
      an emphasis on phylogenetic
      networks. Offering a comprehensive set of features, the software provides over 100 algorithms for computing
      distances,
      phylogenetic trees, split networks, haplotype networks, rooted phylogenetic networks, tanglegrams, consensus trees
      and
      consensus networks.
-     <!--l. 64-->
+     <!--l. 66-->
 <p class="noindent">This new software [<a
         href="#XHusonBryant2024">Huson and Bryant</a>,&#x00A0;<a
         href="#XHusonBryant2024">2024</a>] is designed to accommodate the increasing scale and intricacy of modern
@@ -268,15 +270,15 @@
              href="#XLeighBryant2015">Leigh
           and Bryant</a>,&#x00A0;<a
              href="#XLeighBryant2015">2015</a>] for haplotype analysis.
-     <!--l. 67-->
-<p class="noindent">If you use this program, the please cite:
      <!--l. 69-->
+<p class="noindent">If you use this program, the please cite:
+     <!--l. 71-->
 <p class="noindent">Daniel H. Huson and David Bryant. The SplitsTree App: interactive analysis and visualization using
      phylogenetic trees and
      networks. Nature Methods (2024) <a
              href="https://doi.org/10.1038/s41592-024-02406-3" class="url"><span
              class="cmtt-10">https://doi.org/10.1038/s41592-024-02406-3</span></a>.
-     <!--l. 72-->
+     <!--l. 74-->
 <p class="noindent">
 <hr class="figure">
 <div class="figure"
@@ -287,7 +289,7 @@
              id="x1-20011"></a>
 
 
-     <!--l. 73--><p class="noindent"><img
+     <!--l. 75--><p class="noindent"><img
         src="figs/opening-example.png" alt="PIC"
 >
      <br/>
@@ -297,7 +299,7 @@
      <!--tex4ht:label?: x1-20011 -->
 
 
-     <!--l. 77--><p class="noindent"></div>
+     <!--l. 79--><p class="noindent"></div>
 <hr class="endfigure">
 
 
@@ -3278,8 +3280,8 @@ on the left and the outline consensus on the right (rooted by the three taxa at 
         class="cmss-8">- use maximum likelihood estimation of distances (rather than exact distances)</span>
      <!--l. 151-->
 <p class="noindent">Reference: [<a
-        href="#XTavaré1986">Tavar</a>,&#x00A0;<a
-        href="#XTavaré1986">1986</a>]
+        href="#XTavarÃ©1986">Tavar</a>,&#x00A0;<a
+        href="#XTavarÃ©1986">1986</a>]
 
 
      <!--l. 153-->
@@ -5277,92 +5279,101 @@ on the left and the outline consensus on the right (rooted by the three taxa at 
         id="x1-165001"></a>
 <!--l. 32--><p class="noindent">Can import network data in the following formats: Nexus. <a
         id="x1-165002"></a>
+     <a
+             id="x1-165003"></a>
 
 
-     <!--l. 35-->
+     <!--l. 36-->
+<p class="noindent">The program also import a network given in GML format, if the network was previously exported in the
+     format from
+     SplitsTree. To import GML from other sources, please note that some of the nodes must have taxon names given using
+     the key &#8220;label&#8221; and edges can be given lengths using the key &#8220;weight&#8221;. The graph must be
+     connected otherwise it cause
+     an exception.
+     <!--l. 40-->
 <p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.1.6   </span> <a
         id="x1-166000D.1.6"></a>Importers for a genomes block</h4>
 <a
         id="x1-166001"></a>
-<!--l. 37--><p class="noindent">Can import genomes data in the following formats: Nexus. <a
+<!--l. 42--><p class="noindent">Can import genomes data in the following formats: Nexus. <a
         id="x1-166002"></a>
-     <!--l. 41-->
+     <!--l. 46-->
 <p class="noindent">
 <h3 class="sectionHead"><span class="titlemark">D.2   </span> <a
         id="x1-167000D.2"></a>Supported output formats</h3>
-<!--l. 43--><p class="noindent">
+<!--l. 48--><p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.2.1   </span> <a
         id="x1-168000D.2.1"></a>Exporters for a taxa block</h4>
 <a
         id="x1-168001"></a>
-<!--l. 44--><p class="noindent">Can export taxa data in the following formats: Nexus. <a
+<!--l. 49--><p class="noindent">Can export taxa data in the following formats: Nexus. <a
         id="x1-168002"></a>
-     <!--l. 47-->
+     <!--l. 52-->
 <p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.2.2   </span> <a
         id="x1-169000D.2.2"></a>Exporters for a characters block</h4>
 <a
         id="x1-169001"></a>
-<!--l. 48--><p class="noindent">Can export characters data in the following formats: Clustal, FastA, Nexus, Phylip. <a
+<!--l. 53--><p class="noindent">Can export characters data in the following formats: Clustal, FastA, Nexus, Phylip. <a
         id="x1-169002"></a><a
         id="x1-169003"></a> <a
         id="x1-169004"></a><a
         id="x1-169005"></a>
-     <!--l. 51-->
+     <!--l. 56-->
 <p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.2.3   </span> <a
         id="x1-170000D.2.3"></a>Exporters for a distances block</h4>
 <a
         id="x1-170001"></a>
-<!--l. 52--><p class="noindent">Can export distances data in the following formats: Nexus, Phylip. <a
+<!--l. 57--><p class="noindent">Can export distances data in the following formats: Nexus, Phylip. <a
         id="x1-170002"></a><a
         id="x1-170003"></a>
-     <!--l. 55-->
+
+
+     <!--l. 60-->
 <p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.2.4   </span> <a
         id="x1-171000D.2.4"></a>Exporters for a trees block</h4>
 <a
         id="x1-171001"></a>
-<!--l. 56--><p class="noindent">Can export trees data in the following formats: NeXML, Newick, Nexus. <a
+<!--l. 61--><p class="noindent">Can export trees data in the following formats: NeXML, Newick, Nexus. <a
         id="x1-171002"></a><a
         id="x1-171003"></a> <a
         id="x1-171004"></a>
-
-
-     <!--l. 59-->
+     <!--l. 64-->
 <p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.2.5   </span> <a
         id="x1-172000D.2.5"></a>Exporters for a splits block</h4>
 <a
         id="x1-172001"></a>
-<!--l. 60--><p class="noindent">Can export splits data in the following formats: FastA, Newick, Nexus. <a
+<!--l. 65--><p class="noindent">Can export splits data in the following formats: FastA, Newick, Nexus. <a
         id="x1-172002"></a><a
         id="x1-172003"></a> <a
         id="x1-172004"></a>
-     <!--l. 63-->
+     <!--l. 68-->
 <p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.2.6   </span> <a
         id="x1-173000D.2.6"></a>Exporters for a network block</h4>
 <a
         id="x1-173001"></a>
-<!--l. 64--><p class="noindent">Can export network data in the following formats: Nexus. <a
+<!--l. 69--><p class="noindent">Can export network data in the following formats: Nexus. <a
         id="x1-173002"></a>
-     <!--l. 67-->
+     <!--l. 72-->
 <p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.2.7   </span> <a
         id="x1-174000D.2.7"></a>Exporters for a genomes block</h4>
 <a
         id="x1-174001"></a>
-<!--l. 68--><p class="noindent">Can export genomes data in the following formats: Nexus. <a
+<!--l. 73--><p class="noindent">Can export genomes data in the following formats: Nexus. <a
         id="x1-174002"></a>
-     <!--l. 71-->
+     <!--l. 76-->
 <p class="noindent">
 <h4 class="subsectionHead"><span class="titlemark">D.2.8   </span> <a
         id="x1-175000D.2.8"></a>Exporters for a view block</h4>
 <a
         id="x1-175001"></a>
-<!--l. 72--><p class="noindent">Can export view data in the following formats: GML, Nexus. <a
+<!--l. 77--><p class="noindent">Can export view data in the following formats: GML, Nexus. <a
         id="x1-175002"></a><a
         id="x1-175003"></a>
 
@@ -6340,12 +6351,60 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
 <hr class="endfigure">
 
 
-<!--l. 111--><p class="noindent">
+<!--l. 1--><p class="noindent">
+
+
+     <a
+             id="x1-183002r63"></a>
+<h2 class="appendixHead"><span class="titlemark">Appendix&#x00A0;G</span><br/><a
+        id="x1-184000G"></a>Additional parameters</h2>
+<!--l. 4--><p class="noindent">The layout algorithm for rooted phylogenetic networks and for tanglegrams uses simulated
+     annealing for nodes of large
+     outdegree. The default parameters are: start temperature = 1000, end temperature = 0.01, 1000 iterations per
+     temperature step, cooling rate = 0.95.
+     <!--l. 8-->
+<p class="noindent">We do not expose these parameters in the UI, however, if you really want to change these, then edit
+     the properties file
+     <span class="obeylines-h"><span class="verb"><span
+             class="cmtt-10">SplitsTree6.def</span></span></span> (its location is system specific, either <span
+             class="obeylines-h"><span class="verb"><span
+             class="cmtt-10">~/Library/Preferences/SplitsTree6.def</span></span></span> or
+     <span class="obeylines-h"><span class="verb"><span
+             class="cmtt-10">~/.SplitsTree6.def</span></span></span>) and write statements like this:
+<ul class="itemize1">
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span
+             class="cmtt-10">SA_DEFAULT_START_TEMPERATURE=2000</span></span></span>,
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span
+             class="cmtt-10">SA_DEFAULT_END_TEMPERATURE=1</span></span></span>,
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span
+             class="cmtt-10">SA_DEFAULT_ITERATIONS_PER_TEMPERATURE=100</span></span></span> and
+     </li>
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span
+             class="cmtt-10">SA_DEFAULT_COOLING_RATE=0.80</span></span></span>,
+     </li>
+</ul>
+<!--l. 18--><p class="noindent">to change the values to 2000, 1, 100 and 0.8, say, respectively.
+     <!--l. 20-->
+<p class="noindent">Additionally, the computation of tanglegrams for rooted networks use 32 different random starting
+     configurations, by
+     default. This number can be changed by adding this:
+<ul class="itemize1">
+     <li class="itemize"><span class="obeylines-h"><span class="verb"><span
+             class="cmtt-10">TANGLEGRAM_PARALLEL_JOBS=1024</span></span></span>,
+     </li>
+</ul>
+<!--l. 26--><p class="noindent">to use 1024 random starting configurations, say.
+
+
+     <!--l. 116-->
+<p class="noindent">
 
 
 <h3 class="likesectionHead"><a
-        id="x1-184000F"></a>Acknowledgments</h3>
-<!--l. 115--><p class="noindent">We thank Daria Evseeva for working on the code with us. This program uses the JAMA
+        id="x1-185000G"></a>Acknowledgments</h3>
+<!--l. 120--><p class="noindent">We thank Daria Evseeva for working on the code with us. This program uses the JAMA
      library in the neighbor-net
      algorithm.
 
@@ -6355,7 +6414,7 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
 
 
 <h2 class="likechapterHead"><a
-        id="x1-185000F"></a>Bibliography</h2>
+        id="x1-186000G"></a>Bibliography</h2>
 <div class="thebibliography">
      <p class="bibitem"><span class="biblabel">
 <a
@@ -6772,7 +6831,7 @@ label. </span></div><!--tex4ht:label?: x1-1830011 -->
      </p>
      <p class="bibitem"><span class="biblabel">
 <a
-        id="XTavaré1986"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>S.&#x00A0;Tavar. Some
+        id="XTavarÃ©1986"></a><span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>S.&#x00A0;Tavar. Some
           probabilistic and statistical problems in the analysis of dna sequences. <span
                   class="cmssi-10">Lectures on Mathematics</span>
           <span

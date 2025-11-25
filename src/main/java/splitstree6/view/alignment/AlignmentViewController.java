@@ -481,4 +481,8 @@ public class AlignmentViewController {
 	public MenuItem getSelectRangeMenuItem() {
 		return selectRangeMenuItem;
 	}
+
+	public StackPane getStackPane() {
+		return stackPane;
+	}
 }

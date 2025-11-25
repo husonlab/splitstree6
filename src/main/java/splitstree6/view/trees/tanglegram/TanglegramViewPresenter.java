@@ -191,7 +191,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				if (first != null && second != null && first != second) {
 					first.getLSAChildrenMap().clear();
 					second.getLSAChildrenMap().clear();
-					ODTanglegram.apply(mainWindow.getController().getBottomFlowPane(), first, second,
+					DoTanglegram.apply(mainWindow.getController().getBottomFlowPane(), first, second,
 							view.getOptionOptimizeTanglegramCrossings1(),
 							view.getOptionOptimizeReticulateCrossings1(),
 							view.getOptionOptimizeTanglegramCrossings2(),

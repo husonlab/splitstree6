@@ -478,7 +478,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		});
 		controller.getSelectRangeMenuItem().disableProperty().bind(view.emptyProperty());
 
-
 		controller.getEnableAllTaxaMenuItem().setOnAction(e -> {
 			var inputTaxa = view.getInputTaxa();
 			if (inputTaxa != null) {
@@ -567,21 +566,38 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getCanvas().setOnSwipeLeft(e -> {
-			if (e.getTouchCount() == 1) {
-				var sbar = controller.getHorizontalScrollBar();
-				sbar.setValue(Math.max(sbar.getMin(), sbar.getValue() - 0.25 * sbar.getVisibleAmount()));
-				e.consume();
-			}
-		});
+
 
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
 		Platform.runLater(() -> updateCanvasListener.invalidated(null));
 
-		SwipeUtils.setOnSwipeLeft(controller.getRoot(), controller.getHorizontalScrollBar());
-		SwipeUtils.setOnSwipeRight(controller.getRoot(), controller.getHorizontalScrollBar());
-		SwipeUtils.setOnSwipeUp(controller.getRoot(), controller.getVerticalScrollBar());
-		SwipeUtils.setOnSwipeDown(controller.getRoot(), controller.getVerticalScrollBar());
+		if (false) {
+			SwipeUtils.setOnSwipeLeft(controller.getStackPane(), controller.getHorizontalScrollBar());
+			SwipeUtils.setOnSwipeRight(controller.getStackPane(), controller.getHorizontalScrollBar());
+			SwipeUtils.setOnSwipeUp(controller.getStackPane(), controller.getVerticalScrollBar());
+			SwipeUtils.setOnSwipeDown(controller.getStackPane(), controller.getVerticalScrollBar());
+		} else {
+			SwipeUtils.setConsumeSwipes(controller.getRoot());
+			SwipeUtils.setConsumeSwipes(controller.getStackPane());
+			// scroll by dragging mouse
+			var hBar = controller.getHorizontalScrollBar();
+			final var pressX = new double[1];
+			final var pressValue = new double[1];
+			controller.getStackPane().setOnMousePressed(e -> {
+				pressX[0] = e.getX();
+				pressValue[0] = hBar.getValue();
+			});
+			controller.getStackPane().setOnMouseDragged(e -> {
+				var dx = e.getX() - pressX[0];
+				if (dx != 0) {
+					var newValue = Math.max(hBar.getMin(), Math.min(hBar.getMax(), pressValue[0] - dx));
+					hBar.setValue(newValue);
+					pressX[0] = e.getX();
+					pressValue[0] = hBar.getValue();
+				}
+				;
+			});
+		}
 
 		mainWindow.getWorkflow().runningProperty().addListener(e -> updateCharSetSelection(mainWindow, view, controller.getSetsMenu().getItems()));
 	}

@@ -136,10 +136,10 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		mainController.getCutMenuItem().setOnAction(null);
 		mainController.getCopyMenuItem().setOnAction(null);
+		mainController.getPasteMenuItem().setOnAction(null);
 
 		mainController.getCopyImageMenuItem().setOnAction(null);
 
-		mainController.getPasteMenuItem().setOnAction(null);
 
 		mainController.getDuplicateMenuItem().setOnAction(e -> controller.getDuplicateButton().getOnAction().handle(e));
 		mainController.getDuplicateMenuItem().disableProperty().bind(controller.getDuplicateButton().disableProperty());

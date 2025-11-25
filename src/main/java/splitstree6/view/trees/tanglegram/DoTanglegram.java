@@ -1,5 +1,5 @@
 /*
- * ODTanglegramAlgorithm.java Copyright (C) 2025 Daniel H. Huson
+ * DoTanglegram.java Copyright (C) 2025 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -23,12 +23,11 @@ package splitstree6.view.trees.tanglegram;
 import javafx.scene.layout.Pane;
 import jloda.fx.util.AService;
 import jloda.graph.Node;
+import jloda.graph.NodeArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
-import jloda.phylogeny.dolayout.DoTanglegram;
-import jloda.util.Single;
+import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import jloda.util.progress.ProgressPercentage;
 import splitstree6.tools.RunWorkflow;
 
 import java.util.*;
@@ -41,8 +40,9 @@ import static jloda.phylogeny.dolayout.Common.computeNodeHeightMap;
  * optimize the LSAchildren of phylogenies for a tanglegram drawing
  * Daniel Huson, 8.2025
  */
-public class ODTanglegram {
-	private static boolean verbose = false;
+public class DoTanglegram {
+	public static final int TANGLEGRAM_PARALLEL_JOBS_DEFAULT = 32;
+	public static int TANGLEGRAM_PARALLEL_JOBS = TANGLEGRAM_PARALLEL_JOBS_DEFAULT;
 
 	/**
 	 * optimize the tanglegram layout by updating the LSA children map
@@ -76,18 +76,6 @@ public class ODTanglegram {
 		var finalOptimizeReticulateDisplacement1 = optimizeReticulateDisplacement1 && network1.hasReticulateEdges();
 		var finalOptimizeReticulateDisplacement2 = optimizeReticulateDisplacement2 && network2.hasReticulateEdges();
 
-		if (false) {
-			runningConsumer.accept(true);
-			var random = new Random(666);
-			apply(network2, childrenMap2, network1, childrenMap1, optimizeTaxonDisplacement1, optimizeReticulateDisplacement1, random, new ProgressPercentage());
-			network1.getLSAChildrenMap().clear();
-			network1.getLSAChildrenMap().putAll(childrenMap1);
-			network2.getLSAChildrenMap().clear();
-			network2.getLSAChildrenMap().putAll(childrenMap2);
-			runningConsumer.accept(false);
-			successRunnable.run();
-			return;
-		}
 
 		if (optimizeTaxonDisplacement1 || finalOptimizeReticulateDisplacement1 || optimizeTaxonDisplacement2 || finalOptimizeReticulateDisplacement2) {
 			int rounds;
@@ -101,19 +89,27 @@ public class ODTanglegram {
 				rounds = 2;
 			else rounds = 5;
 
-			var random = new Random(666);
 			var service = new AService<Boolean>();
 			service.setProgressParentPane(statusPane);
 			service.setCallable(() -> {
 				var progress = service.getProgressListener();
 
 				bestScore.set(computeScore(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2));
+				bestChildrenMap1.get().clear();
+				bestChildrenMap1.get().putAll(childrenMap1);
+				bestChildrenMap2.get().clear();
+				bestChildrenMap2.get().putAll(childrenMap2);
 
 				if (usePQTree && optimizeSide1 && optimizeSide2) {
 					progress.setTasks("Tanglegram", "PQ-tree sorting");
 					progress.setMaximum(-1);
-					if (PQTreeHeuristic.reorderUsingPQTree(network1, childrenMap1, network2, childrenMap2) && !finalOptimizeReticulateDisplacement1 && !finalOptimizeReticulateDisplacement2)
-						return true; // both reordered to accommodate all
+
+					if (true) {
+						NNCircularOrderingHeuristic.apply(network1, childrenMap1, network2, childrenMap2);
+					} else { // this doesn't seem to perform as well
+						if (PQTreeHeuristic.reorderUsingPQTree(network1, childrenMap1, network2, childrenMap2) && !finalOptimizeReticulateDisplacement1 && !finalOptimizeReticulateDisplacement2)
+							return true; // both reordered to accommodate all
+					}
 					var score = computeScore(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2);
 					if (score < bestScore.get()) {
 						bestChildrenMap1.get().clear();
@@ -124,23 +120,104 @@ public class ODTanglegram {
 				}
 
 				progress.setTasks("Tanglegram", "optimizing");
-				progress.setMaximum(2 * rounds);
 
-				for (var i = 0; i < rounds; i++) {
-					if (optimizeSide1) {
-						progress.setProgress(2 * i);
-						var score = apply(network2, childrenMap2, network1, childrenMap1, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, random, progress);
-						if (score < bestScore.get()) {
-							bestChildrenMap1.get().clear();
-							bestChildrenMap1.get().putAll(childrenMap1);
+				if (true) {
+					var nJobs = ((!network1.hasReticulateEdges() && !network2.hasReticulateEdges()) ? 1 : TANGLEGRAM_PARALLEL_JOBS);
+					var jobs = new ArrayList<>(IteratorUtils.asList(BitSetUtils.range(0, nJobs)));
+
+					progress.setMaximum(jobs.size());
+					ExecuteInParallel.apply(jobs, job -> {
+						var jobRandom = new Random(13L * job);
+						var jobNetwork1 = new PhyloTree();
+						var jobChildrenMap1 = new HashMap<Node, List<Node>>();
+						var jobBackMap1 = new HashMap<Node, Node>();
+						try (NodeArray<Node> srcTarMap1 = network1.newNodeArray()) {
+							jobNetwork1.copy(network1, srcTarMap1, null);
+							jobBackMap1 = invert(srcTarMap1);
+							jobChildrenMap1 = copyAndPermuteLSAChildren(childrenMap1, srcTarMap1, job > 0, jobRandom);
 						}
-					}
-					if (optimizeSide2) {
-						progress.setProgress(2 * i + 1);
-						var score = apply(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2, random, progress);
-						if (score < bestScore.get()) {
-							bestChildrenMap2.get().clear();
-							bestChildrenMap2.get().putAll(childrenMap2);
+						var jobNetwork2 = new PhyloTree();
+						var jobChildrenMap2 = new HashMap<Node, List<Node>>();
+						var jobBackMap2 = new HashMap<Node, Node>();
+						try (NodeArray<Node> srcTarMap2 = network2.newNodeArray()) {
+							jobNetwork2.copy(network2, srcTarMap2, null);
+							jobBackMap2 = invert(srcTarMap2);
+							jobChildrenMap2 = copyAndPermuteLSAChildren(childrenMap2, srcTarMap2, job > 0, jobRandom);
+						}
+
+						final var jobBestChildrenMap1 = new HashMap<>(jobChildrenMap1);
+						final var jobBestChildrenMap2 = new HashMap<>(jobChildrenMap2);
+						var jobBestScore = Double.MAX_VALUE;
+
+						for (var i = 0; i < rounds; i++) {
+							var leftScore = 0.0;
+							if (optimizeSide1) {
+								leftScore = apply(jobNetwork2, jobChildrenMap2, jobNetwork1, jobChildrenMap1, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, jobRandom, progress);
+							}
+							var rightScore = 0.0;
+							if (optimizeSide2) {
+								rightScore = apply(jobNetwork1, jobChildrenMap1, jobNetwork2, jobChildrenMap2, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2, jobRandom, progress);
+							}
+							if (leftScore + rightScore < jobBestScore) {
+								jobBestScore = leftScore + rightScore;
+								jobBestChildrenMap1.clear();
+								jobBestChildrenMap1.putAll(jobChildrenMap1);
+								jobBestChildrenMap2.clear();
+								jobBestChildrenMap2.putAll(jobChildrenMap2);
+							}
+						}
+
+						//need to map back to original networks:
+						if (jobBestScore < bestScore.get()) {
+							var entries1 = new ArrayList<>(jobBestChildrenMap1.entrySet());
+							jobBestChildrenMap1.clear();
+							for (var entry : entries1) {
+								var key = jobBackMap1.get(entry.getKey());
+								var value = new ArrayList<>(entry.getValue().stream().map(jobBackMap1::get).toList());
+								jobBestChildrenMap1.put(key, value);
+							}
+
+							var entries2 = new ArrayList<>(jobBestChildrenMap2.entrySet());
+							jobBestChildrenMap2.clear();
+							for (var entry : entries2) {
+								var key = jobBackMap2.get(entry.getKey());
+								var value = new ArrayList<>(entry.getValue().stream().map(jobBackMap2::get).toList());
+								jobBestChildrenMap2.put(key, value);
+							}
+
+							synchronized (bestScore) {
+								if (jobBestScore < bestScore.get()) {
+									//System.err.println(bestScore.get()+" -> "+jobBestScore);
+									bestScore.set(jobBestScore);
+									bestChildrenMap1.get().clear();
+									bestChildrenMap1.get().putAll(jobBestChildrenMap1);
+									bestChildrenMap2.get().clear();
+									bestChildrenMap2.get().putAll(jobBestChildrenMap2);
+								}
+							}
+						}
+					}, Math.min(jobs.size(), ProgramExecutorService.getNumberOfCoresToUse()), progress);
+					return true;
+				} else {
+					progress.setMaximum(2L * rounds);
+					var random = new Random(666);
+
+					for (var i = 0; i < rounds; i++) {
+						if (optimizeSide1) {
+							progress.setProgress(2L * i);
+							var score = apply(network2, childrenMap2, network1, childrenMap1, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, random, progress);
+							if (score < bestScore.get()) {
+								bestChildrenMap1.get().clear();
+								bestChildrenMap1.get().putAll(childrenMap1);
+							}
+						}
+						if (optimizeSide2) {
+							progress.setProgress(2L * i + 1);
+							var score = apply(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2, random, progress);
+							if (score < bestScore.get()) {
+								bestChildrenMap2.get().clear();
+								bestChildrenMap2.get().putAll(childrenMap2);
+							}
 						}
 					}
 				}
@@ -170,7 +247,7 @@ public class ODTanglegram {
 					network2.getLSAChildrenMap().putAll(bestChildrenMap2.get());
 				}
 				if (true) {
-					System.err.println("DO-Tanglegram\t" + computeInfoString(network1, childrenMap1, network2, childrenMap2));
+					System.err.println("DO-Tanglegram\t" + computeInfoString(network1, network1.getLSAChildrenMap(), network2, network2.getLSAChildrenMap()));
 				}
 				runningConsumer.accept(false);
 				successRunnable.run();
@@ -180,6 +257,28 @@ public class ODTanglegram {
 		} else {
 			successRunnable.run();
 		}
+	}
+
+	private static HashMap<Node, Node> invert(Map<Node, Node> one2oneMap) {
+		var invertedMap = new HashMap<Node, Node>();
+		for (var entry : one2oneMap.entrySet()) {
+			invertedMap.put(entry.getValue(), entry.getKey());
+		}
+		return invertedMap;
+	}
+
+	private static HashMap<Node, List<Node>> copyAndPermuteLSAChildren(HashMap<Node, List<Node>> childrenMap, Map<Node, Node> srcTarMap, boolean doRandomize, Random random) {
+		var copyChildrenMap = new HashMap<Node, List<Node>>();
+		for (var entry : childrenMap.entrySet()) {
+			var key = srcTarMap.get(entry.getKey());
+			var values = new ArrayList<>(entry.getValue().stream().map(srcTarMap::get).toList());
+			var networkChildren = IteratorUtils.asSet(key.children());
+			if (doRandomize && !networkChildren.containsAll(values)) {
+				Collections.shuffle(values, random);
+			}
+			copyChildrenMap.put(key, values);
+		}
+		return copyChildrenMap;
 	}
 
 	/**
@@ -198,7 +297,7 @@ public class ODTanglegram {
 			}
 		}
 
-		var resultAndScore = DoTanglegram.apply(network1.getRoot(), v -> (network1.hasTaxa(v) ? network1.getTaxon(v) : null), childrenMap1::get,
+		var resultAndScore = jloda.phylogeny.dolayout.DoTanglegram.apply(network1.getRoot(), v -> (network1.hasTaxa(v) ? network1.getTaxon(v) : null), childrenMap1::get,
 				network2.getRoot(), v -> (network2.hasTaxa(v) ? network2.getTaxon(v) : null), childrenMap2::get, reticulateEdges2,
 				optimizeTaxonDisplacement, optimizeReticulateDisplacement, random, progress::isUserCancelled);
 		childrenMap2.clear();

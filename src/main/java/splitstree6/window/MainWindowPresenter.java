@@ -433,11 +433,17 @@ public class MainWindowPresenter {
 
 		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
 			controller.getCopyImageMenuItem().setOnAction(e -> {
+				var dark = MainWindowManager.isUseDarkTheme();
 				try {
+					if (dark)
+						MainWindowManager.setUseDarkTheme(false);
 					var snapshot = focusedDisplayTab.get().getMainNode().snapshot(null, null);
 					ClipboardUtils.putImage(snapshot);
 				} catch (Exception ex) {
 					Basic.caught(ex);
+				} finally {
+					if (dark)
+						MainWindowManager.setUseDarkTheme(true);
 				}
 			});
 		}

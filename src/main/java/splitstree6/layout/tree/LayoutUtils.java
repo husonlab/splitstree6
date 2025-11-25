@@ -53,6 +53,7 @@ public class LayoutUtils {
 			fontHeight = Math.min(MAX_FONT_SIZE, 0.5 * Math.min(width, height) * Math.PI / (nTaxa + 1));
 		else
 			fontHeight = Math.min(MAX_FONT_SIZE, height / (nTaxa + 1));
+		var fontHeight0 = fontHeight;
 
 		var maxLabelWidth = 0.0;
 		NodeArray<RichTextLabel> nodeLabelMap = graph.newNodeArray();
@@ -101,10 +102,10 @@ public class LayoutUtils {
 			normalizeHeight = height - fontHeight;
 		}
 
-		return new FontHeightGraphWidthHeight(fontHeight, normalizeWidth, normalizeHeight);
+		return new FontHeightGraphWidthHeight(fontHeight0, normalizeWidth, normalizeHeight);
 	}
 
-	public static record FontHeightGraphWidthHeight(double fontHeight, double width, double height) {
+	public record FontHeightGraphWidthHeight(double fontHeight, double width, double height) {
 	}
 
 	public static double normalize(double width, double height, NodeArray<Point2D> nodePointMap, boolean maintainAspectRatio) {
@@ -155,8 +156,9 @@ public class LayoutUtils {
 			while (!queue.isEmpty()) {
 				var node = queue.pop();
 				if (node instanceof RichTextLabel richTextLabel) {
-					if (!"edge-label".equals(richTextLabel.getId()))
+					if (!"edge-label".equals(richTextLabel.getId())) {
 						richTextLabel.setScale(factor * richTextLabel.getScale());
+					}
 				} else if (node instanceof Parent parent)
 					queue.addAll(parent.getChildrenUnmodifiable());
 			}

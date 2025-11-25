@@ -32,11 +32,13 @@ import jloda.fx.window.NotificationManager;
 import jloda.fx.window.SplashScreen;
 import jloda.fx.window.WindowGeometry;
 import jloda.phylo.PhyloTree;
+import jloda.phylogeny.dolayout.SimulatedAnnealingMinLA;
 import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.ProgramExecutorService;
 import jloda.util.UsageException;
 import splitstree6.io.FileLoader;
+import splitstree6.view.trees.tanglegram.DoTanglegram;
 import splitstree6.window.MainWindow;
 
 import java.io.File;
@@ -131,6 +133,12 @@ public class SplitsTree6 extends Application {
 		System.err.println("Java version: " + System.getProperty("java.version"));
 
 		ProgramProperties.load(propertiesFile);
+
+		SimulatedAnnealingMinLA.DEFAULT_START_TEMPERATURE = ProgramProperties.get("SA_DEFAULT_START_TEMPERATURE", SimulatedAnnealingMinLA.DEFAULT_START_TEMPERATURE);
+		SimulatedAnnealingMinLA.DEFAULT_END_TEMPERATURE = ProgramProperties.get("SA_DEFAULT_END_TEMPERATURE", SimulatedAnnealingMinLA.DEFAULT_END_TEMPERATURE);
+		SimulatedAnnealingMinLA.DEFAULT_ITERATIONS_PER_TEMPERATURE = ProgramProperties.get("SA_DEFAULT_ITERATIONS_PER_TEMPERATURE", SimulatedAnnealingMinLA.DEFAULT_ITERATIONS_PER_TEMPERATURE);
+		SimulatedAnnealingMinLA.DEFAULT_COOLING_RATE = ProgramProperties.get("SA_DEFAULT_COOLING_RATE", SimulatedAnnealingMinLA.DEFAULT_COOLING_RATE);
+		DoTanglegram.TANGLEGRAM_PARALLEL_JOBS = ProgramProperties.get("TANGLEGRAM_PARALLEL_JOBS", DoTanglegram.TANGLEGRAM_PARALLEL_JOBS_DEFAULT);
 
 		Icebergs.setEnabled(true);
 

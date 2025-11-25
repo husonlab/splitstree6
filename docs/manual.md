@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.6.0, built 16 Oct 2025)
+SplitsTree App (version 6.6.5, built 25 Nov 2025)
 
 ---
 author:
@@ -2615,6 +2615,13 @@ Can import splits data in the following formats: Newick, Nexus.
 
 Can import network data in the following formats: Nexus.
 
+The program also import a network given in GML format, if the network
+was previously exported in the format from SplitsTree. To import GML
+from other sources, please note that some of the nodes must have taxon
+names given using the key "label" and edges can be given lengths using
+the key "weight". The graph must be connected otherwise it cause an
+exception.
+
 ### Importers for a genomes block
 
 Can import genomes data in the following formats: Nexus.
@@ -3003,6 +3010,37 @@ includes a Wikipedia image of the represented species of bees. By
 right-clicking on the *A. Koschev* label, the display-label editor was
 opened for this label. ](figs/bees-with-images.png)
 
+# Additional parameters
+
+The layout algorithm for rooted phylogenetic networks and for
+tanglegrams uses simulated annealing for nodes of large outdegree. The
+default parameters are: start temperature = 1000, end temperature =
+0.01, 1000 iterations per temperature step, cooling rate = 0.95.
+
+We do not expose these parameters in the UI, however, if you really want
+to change these, then edit the properties file `SplitsTree6.def` (its
+location is system specific, either
+`~/Library/Preferences/SplitsTree6.def` or `~/.SplitsTree6.def`) and
+write statements like this:
+
+- `SA_DEFAULT_START_TEMPERATURE=2000`,
+
+- `SA_DEFAULT_END_TEMPERATURE=1`,
+
+- `SA_DEFAULT_ITERATIONS_PER_TEMPERATURE=100` and
+
+- `SA_DEFAULT_COOLING_RATE=0.80`,
+
+to change the values to 2000, 1, 100 and 0.8, say, respectively.
+
+Additionally, the computation of tanglegrams for rooted networks use 32
+different random starting configurations, by default. This number can be
+changed by adding this:
+
+- `TANGLEGRAM_PARALLEL_JOBS=1024`,
+
+to use 1024 random starting configurations, say.
+
 ## Acknowledgments
 
 We thank Daria Evseeva for working on the code with us. This program
@@ -3136,7 +3174,6 @@ Transactions on Computational Biology and Bioinformatics* 15: 398–420.
 
 Huson, DH, and R. Rupp. 2008. “Summarizing Multiple Gene Trees Using
 Cluster Networks.” In *Algorithms in Bioinformatics. WABI 2008*. Vol.
-
 5251. Lecture Notes in Computer Science.
 
 Huson, DH, R. Rupp, and C. Scornavacca. 2012. *Phylogenetic Networks*.

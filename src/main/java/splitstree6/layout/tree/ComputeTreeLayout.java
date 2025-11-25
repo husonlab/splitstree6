@@ -80,7 +80,7 @@ public class ComputeTreeLayout {
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
-		if (true && optimizeReticulationEdges) { // use the new code in phylogeny-algorithms
+		if (optimizeReticulationEdges) {
 			var childrenMap = new HashMap<Node, List<Node>>();
 			LSAUtils.computeLSAChildrenMap(tree, childrenMap);
 
