@@ -216,17 +216,17 @@ public class ReportTanglegramStats {
 	}
 
 	public record Stats(int numTaxa, int r1, int r2, double reticulateDisplacement1, double reticulateDisplacement2,
-						double taxonDisplacement2, int crossings) {
+						double taxonDisplacement, int crossings) {
 		public String toString() {
-			return "n=%d\tr1=%d\tr2=%d\tRD1=%.0f\tRD2=%.0f\tTD=%.0f\tCX=%d%n".formatted(numTaxa, r1, r2, reticulateDisplacement1, reticulateDisplacement2, taxonDisplacement2, crossings);
+			return "n=%d\tr1=%d\tr2=%d\tRD1=%.0f\tRD2=%.0f\tTD=%.0f\tCX=%d%n".formatted(numTaxa, r1, r2, reticulateDisplacement1, reticulateDisplacement2, taxonDisplacement, crossings);
 		}
 
 		public double score(boolean useTaxonDisplacement1, boolean useTaxonDisplacement2, boolean useReticulateDisplacement1, boolean useReticulateDisplacement2) {
 			var score = 0.0;
 			if (useTaxonDisplacement1)
-				score += taxonDisplacement2; // yes, is the same as taxonDisplacement2
+				score += taxonDisplacement; // yes, is the same as taxonDisplacement2
 			if (useTaxonDisplacement2)
-				score += taxonDisplacement2;
+				score += taxonDisplacement;
 			if (useReticulateDisplacement1)
 				score += reticulateDisplacement1;
 			if (useReticulateDisplacement2)
