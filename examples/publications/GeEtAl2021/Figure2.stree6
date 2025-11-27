@@ -1,0 +1,191 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=6 nAlgorithms=3;
+PROGRAM version='SplitsTree App (version 6.6.4, built 21 Nov 2025)';
+WORKFLOW creationDate='1764234000448'; [Thu Nov 27 10:00:00 CET 2025]
+END; [SPLITSTREE6]
+
+[!
+Source: Ge et al, MBE 38(5): 1905-1923 (2021)]
+
+[
+Input:
+Source: Ge et al, MBE 38(5): 1905-1923 (2021)
+
+Methods:
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2024).
+The original input consisted of 17 taxa and 6 rooted networks.
+The Show Trees method was used (View=Tanglegram) so as to obtain a Tanglegram visualization (Huson 2025).
+
+References:
+Huson 2025: D.H. Huson. Displacement-Optimized Tanglegrams for Trees and Networks. Manuscript in preparation (2025).
+Huson and Bryant 2024: D.H. Huson and D. Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+DIMENSIONS ntax=17;
+TAXLABELS
+	[1] 'N. fengi'
+	[2] 'N. fulvescens'
+	[3] 'N. mekongis'
+	[4] 'N. huang'
+	[5] 'N. eha'
+	[6] 'N. brahma'
+	[7] 'N. andersoni'
+	[8] 'N. excelsior'
+	[9] 'N. niviventer'
+	[10] 'N. pianmaensis'
+	[11] 'N. tenaster'
+	[12] 'N. gladiusmaculus'
+	[13] 'N. bukit'
+	[14] 'N. lotipes'
+	[15] 'N. confucianus'
+	[16] 'C. langbianis'
+	[17] 'C. thomasi'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=17;
+TAXLABELS
+	[1] 'N. fengi'
+	[2] 'N. fulvescens'
+	[3] 'N. mekongis'
+	[4] 'N. huang'
+	[5] 'N. eha'
+	[6] 'N. brahma'
+	[7] 'N. andersoni'
+	[8] 'N. excelsior'
+	[9] 'N. niviventer'
+	[10] 'N. pianmaensis'
+	[11] 'N. tenaster'
+	[12] 'N. gladiusmaculus'
+	[13] 'N. bukit'
+	[14] 'N. lotipes'
+	[15] 'N. confucianus'
+	[16] 'C. langbianis'
+	[17] 'C. thomasi'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Taxa Filter';
+[Number of trees: 6]
+PROPERTIES partialTrees=no rooted=yes reticulated=yes;
+TRANSLATE
+	1 'N. fengi',
+	2 'N. fulvescens',
+	3 'N. mekongis',
+	4 'N. huang',
+	5 'N. eha',
+	6 'N. brahma',
+	7 'N. andersoni',
+	8 'N. excelsior',
+	9 'N. niviventer',
+	10 'N. pianmaensis',
+	11 'N. tenaster',
+	12 'N. gladiusmaculus',
+	13 'N. bukit',
+	14 'N. lotipes',
+	15 'N. confucianus',
+	16 'C. langbianis',
+	17 'C. thomasi',
+;
+[TREES]
+		[1] tree 'Autumn-1'=[&R] (((((((((1,(2,((3,4))#H2)),#H2))#H1,((5,6),((7,8))#H3)),((((9,(10)),11),#H3),(12,(13,(14,15))))),16),17),#H1));
+		[2] tree 'Autumn-2'=[&R] (((((((((1,(2)#H2),((3,4),#H2)))#H1,((5,6),((7,8))#H3)),((((9,10),11),#H3),(((15,14),13),12))),16),17),#H1));
+		[3] tree 'Autumn-3'=[&R] (((((((((((1)#H2,2),(3,4)),#H2))#H1,(((8,7))#H3,(6,5))),((((15,14),13),12),(((9,10),11),#H3))),16),17),#H1));
+		[4] tree 'Phylonet-MPL'=[&R] (((((((((((13,(14,15)),12),(11,(10,9))),(8,(7,((6,5))#H2))),#H2),((1,(2,(3,4))))#H3))#H1,(16)#H4),#H3),(#H1,#H4)),17);
+		[5] tree 'Phylonet-GT'=[&R] (17,(((16)#H1,(((((((13,(14,15)),12),(11,(10,9))),((8,((5,6))#H3),7)),#H3),(((2,(3,4)),1))#H4))#H2),((#H1,#H2),#H4)));
+		[6] tree 'Phylonetworks'=[&R] ((17,(16,((((5,6),((7,8))#H1:::0.075),#H1:::0.925),(((((9,10),(11)#H3:::0.857),((12,(13,(15,(14)#H4:::0.965))),#H4:::0.035)),#H3:::0.143))#H2:::0.969))),((((3,4),#H2:::0.031),2),1));
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 6]
+PROPERTIES partialTrees=no rooted=yes reticulated=yes;
+TRANSLATE
+	1 'N. fengi',
+	2 'N. fulvescens',
+	3 'N. mekongis',
+	4 'N. huang',
+	5 'N. eha',
+	6 'N. brahma',
+	7 'N. andersoni',
+	8 'N. excelsior',
+	9 'N. niviventer',
+	10 'N. pianmaensis',
+	11 'N. tenaster',
+	12 'N. gladiusmaculus',
+	13 'N. bukit',
+	14 'N. lotipes',
+	15 'N. confucianus',
+	16 'C. langbianis',
+	17 'C. thomasi',
+;
+[TREES]
+		[1] tree 'Autumn-1'=[&R] (((((((((1,(2,((3,4))#H2)),#H2))#H1,((5,6),((7,8))#H3)),((((9,(10)),11),#H3),(12,(13,(14,15))))),16),17),#H1));
+		[2] tree 'Autumn-2'=[&R] (((((((((1,(2)#H2),((3,4),#H2)))#H1,((5,6),((7,8))#H3)),((((9,10),11),#H3),(((15,14),13),12))),16),17),#H1));
+		[3] tree 'Autumn-3'=[&R] (((((((((((1)#H2,2),(3,4)),#H2))#H1,(((8,7))#H3,(6,5))),((((15,14),13),12),(((9,10),11),#H3))),16),17),#H1));
+		[4] tree 'Phylonet-MPL'=[&R] (((((((((((13,(14,15)),12),(11,(10,9))),(8,(7,((6,5))#H2))),#H2),((1,(2,(3,4))))#H3))#H1,(16)#H4),#H3),(#H1,#H4)),17);
+		[5] tree 'Phylonet-GT'=[&R] (17,(((16)#H1,(((((((13,(14,15)),12),(11,(10,9))),((8,((5,6))#H3),7)),#H3),(((2,(3,4)),1))#H4))#H2),((#H1,#H2),#H4)));
+		[6] tree 'Phylonetworks'=[&R] ((17,(16,((((5,6),((7,8))#H1:::0.075),#H1:::0.925),(((((9,10),(11)#H3:::0.857),((12,(13,(15,(14)#H4:::0.965))),#H4:::0.035)),#H3:::0.143))#H2:::0.969))),((((3,4),#H2:::0.031),2),1));
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'Tanglegram';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Tanglegram';
+LINK ALGORITHM = 'Show Trees';
+NAME 'TanglegramView';
+INPUT 'TREES';
+OPTIONS
+	Tree1 = 3,
+	Diagram1 = 'RectangularPhylogram',
+	Averaging1 = 'LeafAverage',
+	Tree2 = 6,
+	Diagram2 = 'RectangularPhylogram',
+	Averaging2 = 'LeafAverage',
+	OptimizeTanglegramCrossings1 = 'true',
+	OptimizeReticulateCrossings1 = 'true',
+	OptimizeTanglegramCrossings2 = 'true',
+	OptimizeReticulateCrossings2 = 'true',
+	UsePQTree = 'true',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 1,
+	VerticalZoomFactor = 1,
+	FontScaleFactor = 1,
+	ShowTreeNames = 'true',
+	ShowTreeInfo = 'true',
+	ShowInternalLabels = 'false',
+	LabelEdgesBy = 'Confidence';
+END; [VIEW]

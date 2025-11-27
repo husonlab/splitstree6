@@ -1,0 +1,187 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=6 nAlgorithms=4;
+PROGRAM version='SplitsTree App (version 6.6.4, built 21 Nov 2025)';
+WORKFLOW creationDate='1764232677164'; [Thu Nov 27 09:37:57 CET 2025]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2024).
+The original input consisted of 19 taxa and 2 trees.
+The Show Trees method was used (View=Tanglegram) so as to obtain a Tanglegram visualization (Huson 2025).
+
+References:
+Huson 2025: D.H. Huson. Displacement-Optimized Tanglegrams for Trees and Networks. Manuscript in preparation (2025).
+Huson and Bryant 2024: D.H. Huson and D. Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=19;
+TAXLABELS
+	[1] 'N. lotipes'
+	[2] 'N. confucianus'
+	[3] 'N. bukit'
+	[4] 'N. gladiusmaculus'
+	[5] 'N. niviventer'
+	[6] 'N. pianmaensis'
+	[7] 'N. tenaster'
+	[8] 'N. eha'
+	[9] 'N. brahma'
+	[10] 'N. andersoni'
+	[11] 'N. excelsior'
+	[12] 'N. huang'
+	[13] 'N. mekongis'
+	[14] 'N. fulvescens'
+	[15] 'N. fengi'
+	[16] 'C.langbianis'
+	[17] 'C.thomasi'
+	[18] 'R. andamanesis'
+	[19] 'R. norvegicus'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=19;
+TAXLABELS
+	[1] 'N. lotipes'
+	[2] 'N. confucianus'
+	[3] 'N. bukit'
+	[4] 'N. gladiusmaculus'
+	[5] 'N. niviventer'
+	[6] 'N. pianmaensis'
+	[7] 'N. tenaster'
+	[8] 'N. eha'
+	[9] 'N. brahma'
+	[10] 'N. andersoni'
+	[11] 'N. excelsior'
+	[12] 'N. huang'
+	[13] 'N. mekongis'
+	[14] 'N. fulvescens'
+	[15] 'N. fengi'
+	[16] 'C.langbianis'
+	[17] 'C.thomasi'
+	[18] 'R. andamanesis'
+	[19] 'R. norvegicus'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
+[Number of trees: 2]
+PROPERTIES partialTrees=no rooted=yes;
+TRANSLATE
+	1 'N. lotipes',
+	2 'N. confucianus',
+	3 'N. bukit',
+	4 'N. gladiusmaculus',
+	5 'N. niviventer',
+	6 'N. pianmaensis',
+	7 'N. tenaster',
+	8 'N. eha',
+	9 'N. brahma',
+	10 'N. andersoni',
+	11 'N. excelsior',
+	12 'N. huang',
+	13 'N. mekongis',
+	14 'N. fulvescens',
+	15 'N. fengi',
+	16 'C.langbianis',
+	17 'C.thomasi',
+	18 'R. andamanesis',
+	19 'R. norvegicus',
+;
+[TREES]
+		[1] tree 'Concatenated'=[&R] ((((((((((1:53,2:50):73:95,3:77):89:100,4:89):159:100,((5:50,6:51):76:100,7:76):158:100):244,((8:51,9:51):105:100,(10:51,11:51):98):247:89):353:100,(((12:51,13:50):73:100,14:80):91:100,15:89):359:100):276:100,16:273):187,17:187):170:100,(18:49,19:51):169:100):25:100);
+		[2] tree 'Astral'=[&R] ((((((((((1:51,2:52):58:100,3:122):47:100,4:172):52:100,((5:51,6:56):55:100,7:120):102:100):52:100,((8:52,9:50):55:100,(10:54,11:53):52:100):154:100):51:100,(((12:51,13:51):52:100,14:103):55:100,15:158):153:100):53:100,16:368):52:100,17:415):55:100,(18:62,19:53):417:100):26:100);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 2]
+PROPERTIES partialTrees=no rooted=yes;
+TRANSLATE
+	1 'N. lotipes',
+	2 'N. confucianus',
+	3 'N. bukit',
+	4 'N. gladiusmaculus',
+	5 'N. niviventer',
+	6 'N. pianmaensis',
+	7 'N. tenaster',
+	8 'N. eha',
+	9 'N. brahma',
+	10 'N. andersoni',
+	11 'N. excelsior',
+	12 'N. huang',
+	13 'N. mekongis',
+	14 'N. fulvescens',
+	15 'N. fengi',
+	16 'C.langbianis',
+	17 'C.thomasi',
+	18 'R. andamanesis',
+	19 'R. norvegicus',
+;
+[TREES]
+		[1] tree 'Concatenated'=[&R] ((((((((((1:53,2:50):73:95,3:77):89:100,4:89):159:100,((5:50,6:51):76:100,7:76):158:100):244,((8:51,9:51):105:100,(10:51,11:51):98):247:89):353:100,(((12:51,13:50):73:100,14:80):91:100,15:89):359:100):276:100,16:273):187,17:187):170:100,(18:49,19:51):169:100):25:100);
+		[2] tree 'Astral'=[&R] ((((((((((1:51,2:52):58:100,3:122):47:100,4:172):52:100,((5:51,6:56):55:100,7:120):102:100):52:100,((8:52,9:50):55:100,(10:54,11:53):52:100):154:100):51:100,(((12:51,13:51):52:100,14:103):55:100,15:158):153:100):53:100,16:368):52:100,17:415):55:100,(18:62,19:53):417:100):26:100);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'Tanglegram';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Tanglegram';
+LINK ALGORITHM = 'Show Trees';
+NAME 'TanglegramView';
+INPUT 'TREES';
+OPTIONS
+	Tree1 = 1,
+	Diagram1 = 'RectangularPhylogram',
+	Averaging1 = 'LeafAverage',
+	Tree2 = 2,
+	Diagram2 = 'RectangularPhylogram',
+	Averaging2 = 'LeafAverage',
+	OptimizeTanglegramCrossings1 = 'true',
+	OptimizeReticulateCrossings1 = 'true',
+	OptimizeTanglegramCrossings2 = 'true',
+	OptimizeReticulateCrossings2 = 'true',
+	UsePQTree = 'true',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 1,
+	VerticalZoomFactor = 1,
+	FontScaleFactor = 1,
+	ShowTreeNames = 'true',
+	ShowTreeInfo = 'true',
+	ShowInternalLabels = 'false',
+	LabelEdgesBy = 'Confidence';
+END; [VIEW]
