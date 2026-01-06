@@ -33,7 +33,7 @@ import java.util.function.ToDoubleFunction;
  * Generic over node type N and edge type E.
  * <p>
  * Assumptions:
- * - Graph is undirected (or interpreted as such).
+ * - IntGraph is undirected (or interpreted as such).
  * - You can iterate nodes via graph.nodes().
  * - For a node u, you can iterate incident edges via graph.getAdjacentEdges(u).
  * - Given (u, e), you can obtain the opposite endpoint v via otherEndpoint.apply(u, e).

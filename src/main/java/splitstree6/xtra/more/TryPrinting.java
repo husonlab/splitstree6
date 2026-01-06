@@ -26,7 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import jloda.fx.util.Print;
+import jloda.fx.print.Print;
 
 public class TryPrinting extends Application {
 

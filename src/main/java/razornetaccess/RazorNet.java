@@ -23,6 +23,7 @@ package razornetaccess;
 import javafx.beans.property.*;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
+import jloda.util.ProgramExecutorService;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import razornet.razor_int.RunRazorNetIntGraph;
@@ -122,15 +123,12 @@ public class RazorNet extends Distances2Network {
 			var e = graph.newEdge(nodeMap.get(u), nodeMap.get(v));
 			graph.setWeight(e, quantization.mapDistanceBack().applyAsDouble(w));
 		};
-		TriConsumer<Integer, Integer, Double> newEdgeDouble = (u, v, w) -> {
-			var e = graph.newEdge(nodeMap.get(u), nodeMap.get(v));
-			graph.setWeight(e, w);
-		};
 
 		var verbose = true;
 
 		try {
-			RunRazorNetIntGraph.run(ensureNode, newEdgeInteger, quantization.matrix(), isOptionPolish(), getOptionRemoveRedundant(), getOptionMaxRounds(), verbose, progress, NotificationManager::showWarning);
+			RunRazorNetIntGraph.NUMBER_OF_PARALLEL_PROCESSES = ProgramExecutorService.getNumberOfCoresToUse();
+			RunRazorNetIntGraph.run(ensureNode, quantization.mapDistanceBack(), newEdgeInteger, quantization.matrix(), isOptionPolish(), getOptionRemoveRedundant(), getOptionMaxRounds(), verbose, progress, NotificationManager::showWarning);
 		} catch (CanceledException ex) {
 			System.err.println("RazorNet canceled");
 			throw ex;

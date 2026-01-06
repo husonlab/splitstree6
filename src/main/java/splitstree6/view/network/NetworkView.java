@@ -51,6 +51,7 @@ import splitstree6.window.MainWindow;
 import java.util.List;
 
 public class NetworkView implements IView {
+	private final MainWindow mainWindow;
 
 	private final UndoManager undoManager = new UndoManager();
 
@@ -82,7 +83,6 @@ public class NetworkView implements IView {
 	private final IntegerProperty optionLayoutSeed = new SimpleIntegerProperty(this, "optionLayoutSeed", 1);
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
-
 	private final ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
 	private final ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap = FXCollections.observableHashMap();
 
@@ -98,13 +98,14 @@ public class NetworkView implements IView {
 	}
 
 	public NetworkView(MainWindow mainWindow, String name, ViewTab viewTab) {
+		this.mainWindow = mainWindow;
 		this.name.set(name);
 		var loader = new ExtendedFXMLLoader<NetworkViewController>(NetworkViewController.class);
 		controller = loader.getController();
 
 		final ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
 
-		presenter = new NetworkViewPresenter(mainWindow, this, targetBounds, networkBlock, taxonLabelMap, nodeShapeMap, edgeShapeMap);
+		presenter = new NetworkViewPresenter(this, targetBounds, networkBlock, taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -133,6 +134,7 @@ public class NetworkView implements IView {
 			sitesFormat.getEdgeShapeMap().putAll(edgeShapeMap);
 		});
 		presenter.updateCounterProperty().addListener(e -> sitesFormat.updateEdges());
+
 		networkBlockProperty().addListener((v, o, n) -> {
 			sitesFormat.setDisable(n == null || n.getGraph().getNumberOfEdges() == 0);
 		});
@@ -215,6 +217,10 @@ public class NetworkView implements IView {
 	@Override
 	public Node getMainNode() {
 		return controller.getInnerAnchorPane();
+	}
+
+	public MainWindow getMainWindow() {
+		return mainWindow;
 	}
 
 	public ViewTab getViewTab() {

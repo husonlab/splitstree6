@@ -31,7 +31,7 @@ import splitstree6.data.TaxaBlock;
 import java.util.*;
 
 /**
- * Root of a rooted tree or network inside a larger Graph
+ * Root of a rooted tree or network inside a larger IntGraph
  * Daniel Huson, 4.2011
  */
 public class Root extends Node {

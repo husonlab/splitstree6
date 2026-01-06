@@ -19,7 +19,6 @@
 
 package splitstree6.window;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.Property;
 import javafx.fxml.FXML;
@@ -28,12 +27,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCharacterCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.SwipeUtils;
-import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.Single;
 import splitstree6.main.SplitsTree6;
@@ -556,33 +553,28 @@ public class MainWindowController {
 
 		final InvalidationListener invalidationListener = observable -> {
 			windowMenu.getItems().setAll(originalWindowMenuItems);
-			int count = 0;
-			for (IMainWindow mainWindow : MainWindowManager.getInstance().getMainWindows()) {
+			var count = 0;
+			for (var mainWindow : MainWindowManager.getInstance().getMainWindows()) {
 				if (mainWindow.getStage() != null) {
-					final String title = mainWindow.getStage().getTitle();
+					var title = mainWindow.getStage().getTitle();
 					if (title != null) {
-						final var menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
+						var menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
 						menuItem.setOnAction((e) -> mainWindow.getStage().toFront());
 						menuItem.setAccelerator(new KeyCharacterCombination("" + (++count), KeyCombination.SHORTCUT_DOWN));
-
-						try {
-							windowMenu.getItems().add(menuItem);
-						} catch (IndexOutOfBoundsException ignored) {
-						}
+						var items = new ArrayList<>(windowMenu.getItems());
+						items.add(menuItem);
+						windowMenu.getItems().setAll(items);
 					}
 				}
 				if (MainWindowManager.getInstance().getAuxiliaryWindows(mainWindow) != null) {
-					for (Stage auxStage : MainWindowManager.getInstance().getAuxiliaryWindows(mainWindow)) {
-						final String title = auxStage.getTitle();
+					for (var auxStage : MainWindowManager.getInstance().getAuxiliaryWindows(mainWindow)) {
+						var title = auxStage.getTitle();
 						if (title != null) {
-							final MenuItem menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
+							var menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
 							menuItem.setOnAction((e) -> auxStage.toFront());
-							Platform.runLater(() -> {
-								try {
-									windowMenu.getItems().add(menuItem);
-								} catch (Exception ignored) {
-								}
-							});
+							var items = new ArrayList<>(windowMenu.getItems());
+							items.add(menuItem);
+							windowMenu.getItems().setAll(items);
 						}
 					}
 				}

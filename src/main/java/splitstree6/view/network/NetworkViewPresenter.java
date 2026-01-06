@@ -69,7 +69,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	/**
 	 * the network view presenter
 	 *
-	 * @param mainWindow
 	 * @param view
 	 * @param targetBounds
 	 * @param networkBlock
@@ -77,15 +76,15 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	 * @param nodeShapeMap
 	 * @param edgeShapeMap
 	 */
-	public NetworkViewPresenter(MainWindow mainWindow, NetworkView view, ObjectProperty<Bounds> targetBounds, ObjectProperty<NetworkBlock> networkBlock, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
+	public NetworkViewPresenter(NetworkView view, ObjectProperty<Bounds> targetBounds, ObjectProperty<NetworkBlock> networkBlock, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 								ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap) {
-		this.mainWindow = mainWindow;
+		this.mainWindow = view.getMainWindow();
 		this.view = view;
 		this.controller = view.getController();
 
-		targetBounds.addListener((InvalidationListener) e -> {
-			if (false) System.err.println("target bounds: " + targetBounds.get());
-		});
+		if (false) {
+			targetBounds.addListener(e -> System.err.println("target bounds: " + targetBounds.get()));
+		}
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
@@ -113,7 +112,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			paneWidth.set(n.getWidth() - 40);
 			paneHeight.set(n.getHeight() - 80);
 		});
-
 
 		networkPane = new NetworkPane(mainWindow, mainWindow.workingTaxaProperty(), networkBlock,
 				paneWidth, paneHeight, view.optionDiagramProperty(), view.optionOrientationProperty(),
@@ -220,6 +218,8 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				view.optionActiveTraitsProperty().set(mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().getTraitLabels().toArray(new String[0]));
 			}
 		});
+
+		AdditionalConsoleOutput.setup(view);
 	}
 
 	@Override

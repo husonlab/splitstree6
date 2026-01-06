@@ -17,7 +17,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package razornetaccess;
 
 import java.util.*;
@@ -25,23 +24,21 @@ import java.util.function.Function;
 
 /**
  * Small-parsimony labeling on a general connected, undirected graph with some nodes pre-labeled by DNA sequences.
- * <p>
- * Objective (per site): assign one symbol to each node to minimize the number of edges whose endpoints differ.
- * For |Σ| <= 2 (binary site), we solve exactly via a single s-t min-cut.
- * For |Σ| >= 3, we use α-expansion (Boykov-Kolmogorov style move-making) with graph cuts (2-approx for Potts/Hamming).
- * <p>
- * Assumptions about host PhyloGraph API (adapt or shim to your classes):
- * - PhyloGraph#nodes: Collection<Node>
- * - PhyloGraph#edges: Collection<Edge>
- * - PhyloGraph#getAdjacentNodes(Node v): Collection<Node>
- * - PhyloGraph#getAdjacentEdges(Node v): Collection<Edge>
- * - Edge#u(), Edge#v(): Node endpoints (order arbitrary)
- * <p>
- * Integration notes:
- * - Replace Node with your concrete node type, or make this class generic <N> and pass lambdas to accessors.
- * - Known sequences provided for a subset of nodes must all have identical length L.
- * - Terminals are pinned to their known symbols at each site.
- * - Per-edge cost is 1 if symbols differ, 0 otherwise (Hamming / Potts with unit weights).
+ *
+ * Standard interpretation with IUPAC ambiguity codes:
+ * - At each site, each labeled character constrains the node to a set of allowed bases (A,C,G,T).
+ *   Example: 'R' => {A,G}, 'N' => {A,C,G,T}.
+ * - We still assign a single concrete base (A/C/G/T) to every node per site.
+ * - Objective (per site): minimize number of edges whose endpoints differ (unit Potts/Hamming).
+ *
+ * Solvers:
+ * - If the feasible alphabet size at a site is <= 2: exact s-t min-cut.
+ * - Else: α-expansion (move-making) using graph cuts (standard for Potts metric).
+ *
+ * Host graph API assumptions (adapt if needed):
+ * - nodes: Iterable<Node>
+ * - edges: Iterable<Edge>
+ * - u(edge), v(edge): return the two endpoints (undirected)
  */
 public class ParsimonyLabeler<Node, Edge> {
 	private final Iterable<Node> nodes;
@@ -49,8 +46,8 @@ public class ParsimonyLabeler<Node, Edge> {
 	private final Function<Edge, Node> u;
 	private final Function<Edge, Node> v;
 
-
-	public ParsimonyLabeler(Iterable<Node> nodes, Iterable<Edge> edges, Function<Edge, Node> u, Function<Edge, Node> v) {
+	public ParsimonyLabeler(Iterable<Node> nodes, Iterable<Edge> edges,
+							Function<Edge, Node> u, Function<Edge, Node> v) {
 		this.nodes = nodes;
 		this.edges = edges;
 		this.u = u;
@@ -60,148 +57,253 @@ public class ParsimonyLabeler<Node, Edge> {
 	/**
 	 * Main entry: label all nodes for all sites.
 	 *
-	 * @param knownSeqs map of pre-labeled nodes to their DNA sequences (all equal length)
-	 * @return map of every node to its deduced DNA sequence
+	 * @param knownSeqs map of pre-labeled nodes to their DNA sequences (all equal length).
+	 *                  Sequences may contain IUPAC ambiguity codes (R,Y,S,W,K,M,B,D,H,V,N),
+	 *                  also '?' and '-' which are treated as unconstrained (N).
+	 * @return map of every node to its deduced DNA sequence (A/C/G/T per site)
 	 */
 	public Map<Node, String> labelAllSites(Map<Node, String> knownSeqs) {
-		if (knownSeqs.isEmpty()) throw new IllegalArgumentException("At least one labeled node required");
+		if (knownSeqs.isEmpty())
+			throw new IllegalArgumentException("At least one labeled node required");
+
 		int L = knownSeqs.values().iterator().next().length();
 		for (String s : knownSeqs.values())
-			if (s.length() != L) throw new IllegalArgumentException("All sequences must have equal length");
+			if (s.length() != L)
+				throw new IllegalArgumentException("All sequences must have equal length");
 
-		// Prepare per-site terminal symbols
-		List<Map<Node, Character>> siteTerminals = new ArrayList<>(L);
+		// Build per-site allowed masks for labeled nodes (unlabeled nodes default to ALL)
+		List<Map<Node, Integer>> siteAllowed = new ArrayList<>(L);
 		for (int j = 0; j < L; j++) {
-			Map<Node, Character> m = new HashMap<>();
-			for (Map.Entry<Node, String> e : knownSeqs.entrySet()) m.put(e.getKey(), e.getValue().charAt(j));
-			siteTerminals.add(m);
+			Map<Node, Integer> m = new HashMap<>();
+			for (Map.Entry<Node, String> e : knownSeqs.entrySet()) {
+				char c = e.getValue().charAt(j);
+				m.put(e.getKey(), iupacMask(c));
+			}
+			siteAllowed.add(m);
 		}
 
 		// Solve each site independently
 		List<Map<Node, Character>> siteLabels = new ArrayList<>(L);
 		for (int j = 0; j < L; j++) {
-			Map<Node, Character> terminals = siteTerminals.get(j);
-			Set<Character> sigma = new HashSet<>(terminals.values());
+			Map<Node, Integer> allowedMasks = siteAllowed.get(j);
+
+			// Determine feasible alphabet (restricting to bases that appear in any constraint)
+			int union = 0;
+			for (int m : allowedMasks.values()) union |= m;
+			if (union == 0) throw new IllegalArgumentException("No allowed bases at site " + j);
+
+			Set<Character> sigma = new LinkedHashSet<>();
+			for (int i = 0; i < 4; i++) if ((union & BASE_MASKS[i]) != 0) sigma.add(BASES[i]);
+
 			Map<Node, Character> labels;
 			if (sigma.size() <= 1) {
-				// Trivial: everyone takes the single symbol
-				char a = terminals.values().iterator().next();
+				char a = sigma.iterator().next();
 				labels = new HashMap<>();
-				for (Node v : nodes) labels.put(v, a);
+				for (Node x : nodes) labels.put(x, a);
 			} else if (sigma.size() == 2) {
-				labels = solveBinarySite(terminals);
+				labels = solveBinarySiteWithAmbiguity(allowedMasks, sigma);
 			} else {
-				labels = solveSiteAlphaExpansion(terminals, sigma);
+				labels = solveSiteAlphaExpansionWithAmbiguity(allowedMasks, sigma);
 			}
+
+			// Final feasibility check: ensure labels respect allowed masks (defensive)
+			for (Node x : nodes) {
+				int mask = allowedMasks.getOrDefault(x, ALL_MASK);
+				char bx = labels.get(x);
+				if (!allowed(mask, bx)) labels.put(x, firstAllowedBase(mask));
+			}
+
 			siteLabels.add(labels);
 		}
 
 		// Concatenate per-site
 		Map<Node, StringBuilder> agg = new HashMap<>();
-		for (Node v : nodes) agg.put(v, new StringBuilder(L));
+		for (Node x : nodes) agg.put(x, new StringBuilder(L));
 		for (int j = 0; j < L; j++) {
 			Map<Node, Character> lab = siteLabels.get(j);
-			for (Node v : nodes) agg.get(v).append(lab.get(v));
+			for (Node x : nodes) agg.get(x).append(lab.get(x));
 		}
 		Map<Node, String> out = new HashMap<>();
-		for (Map.Entry<Node, StringBuilder> e : agg.entrySet()) out.put(e.getKey(), e.getValue().toString());
+		for (Map.Entry<Node, StringBuilder> e : agg.entrySet())
+			out.put(e.getKey(), e.getValue().toString());
 		return out;
+	}
+
+	// ------------------------ IUPAC ambiguity handling ------------------------
+
+	// 4-bit mask over A,C,G,T in that order
+	private static final int A_MASK = 1 << 0;
+	private static final int C_MASK = 1 << 1;
+	private static final int G_MASK = 1 << 2;
+	private static final int T_MASK = 1 << 3;
+	private static final int ALL_MASK = A_MASK | C_MASK | G_MASK | T_MASK;
+
+	private static final char[] BASES = {'A', 'C', 'G', 'T'};
+	private static final int[] BASE_MASKS = {A_MASK, C_MASK, G_MASK, T_MASK};
+
+	private static int iupacMask(char c) {
+		c = Character.toUpperCase(c);
+		return switch (c) {
+			// unambiguous
+			case 'A' -> A_MASK;
+			case 'C' -> C_MASK;
+			case 'G' -> G_MASK;
+			case 'T', 'U' -> T_MASK;
+
+			// IUPAC ambiguity codes
+			case 'R' -> A_MASK | G_MASK;                 // A or G
+			case 'Y' -> C_MASK | T_MASK;                 // C or T
+			case 'S' -> G_MASK | C_MASK;                 // G or C
+			case 'W' -> A_MASK | T_MASK;                 // A or T
+			case 'K' -> G_MASK | T_MASK;                 // G or T
+			case 'M' -> A_MASK | C_MASK;                 // A or C
+
+			case 'B' -> C_MASK | G_MASK | T_MASK;        // not A
+			case 'D' -> A_MASK | G_MASK | T_MASK;        // not C
+			case 'H' -> A_MASK | C_MASK | T_MASK;        // not G
+			case 'V' -> A_MASK | C_MASK | G_MASK;        // not T
+
+			// unknown/gap treated as unconstrained (adjust if you want gaps handled differently)
+			case 'N', '?', '-' -> ALL_MASK;
+
+			default -> throw new IllegalArgumentException("Unsupported IUPAC base: '" + c + "'");
+		};
+	}
+
+	private static boolean allowed(int mask, char base) {
+		int bm = switch (base) {
+			case 'A' -> A_MASK;
+			case 'C' -> C_MASK;
+			case 'G' -> G_MASK;
+			case 'T' -> T_MASK;
+			default -> 0;
+		};
+		return (mask & bm) != 0;
+	}
+
+	private static char firstAllowedBase(int mask) {
+		for (int i = 0; i < 4; i++)
+			if ((mask & BASE_MASKS[i]) != 0) return BASES[i];
+		throw new IllegalArgumentException("Empty allowed mask");
 	}
 
 	// ------------------------ Binary (|Σ|=2) exact via min-cut ------------------------
 
-	private Map<Node, Character> solveBinarySite(Map<Node, Character> terminals) {
-		// Identify the two symbols
-		Iterator<Character> it = new HashSet<>(terminals.values()).iterator();
+	/**
+	 * Binary site with domain restrictions encoded as infinite unary penalties.
+	 * Convention: nodes on S-side are labeled sA; on T-side labeled sB.
+	 * <p>
+	 * Cut unary semantics in this implementation:
+	 * - If node is placed on S-side, cost includes cap(node -> T).
+	 * - If node is placed on T-side, cost includes cap(S -> node).
+	 * <p>
+	 * Therefore:
+	 * - To forbid S-side (forbid sA), set cap(node -> T) = INF.
+	 * - To forbid T-side (forbid sB), set cap(S -> node) = INF.
+	 */
+	private Map<Node, Character> solveBinarySiteWithAmbiguity(Map<Node, Integer> allowedMasks, Set<Character> sigma) {
+		Iterator<Character> it = sigma.iterator();
 		char sA = it.next();
 		char sB = it.next();
 
-		// Build flow network: nodes + S + T
 		FlowNetwork<Node> FN = new FlowNetwork<>();
-		for (Node v : nodes) FN.addNode(v);
+		for (Node x : nodes) FN.addNode(x);
 		FN.addSourceSink();
 
 		final double INF = 1e12;
 
-		// Pin terminals
-		for (Map.Entry<Node, Character> e : terminals.entrySet()) {
-			Node v = e.getKey();
-			if (e.getValue() == sA) FN.addCapacity(FN.S, v, INF); // S->v infinite: v must be on S side (label sA)
-			else FN.addCapacity(v, FN.T, INF);                    // v->T infinite: v must be on T side (label sB)
+		for (Node x : nodes) {
+			int mask = allowedMasks.getOrDefault(x, ALL_MASK);
+			boolean allowA = allowed(mask, sA);
+			boolean allowB = allowed(mask, sB);
+			if (!allowA && !allowB) {
+				throw new IllegalArgumentException("Node has no allowed base among {" + sA + "," + sB + "}");
+			}
+			if (!allowA) FN.addCapacity(x, FN.T, INF); // forbid S-side (sA)
+			if (!allowB) FN.addCapacity(FN.S, x, INF); // forbid T-side (sB)
 		}
 
-		// Original edges cost 1 if endpoints differ -> capacity 1 on undirected edge
-		for (var e : edges) {
+		for (Edge e : edges) {
 			FN.addUndirectedCapacity(u.apply(e), v.apply(e), 1.0);
 		}
 
 		FN.maxFlow();
 		Set<Node> Sside = FN.minCutSourceSide();
+
 		Map<Node, Character> lab = new HashMap<>();
-		for (Node v : nodes) lab.put(v, Sside.contains(v) ? sA : sB);
+		for (Node x : nodes) lab.put(x, Sside.contains(x) ? sA : sB);
 		return lab;
 	}
 
 	// ------------------------ Multi-label (|Σ|>=3) via α-expansion ------------------------
 
-	private Map<Node, Character> solveSiteAlphaExpansion(Map<Node, Character> terminals, Set<Character> sigma) {
-		// Initialize labeling: multi-source BFS from terminals by symbol
-		Map<Node, Character> label = initByNearestTerminal(terminals);
+	/**
+	 * α-expansion with per-node domain restrictions (IUPAC masks) via unary INF penalties.
+	 * <p>
+	 * Convention for each α-move:
+	 * - Binary variable y_v: 0 = keep current label; 1 = switch to α.
+	 * - We interpret "v in S-side" as y_v = 1 (switch to α), matching the update rule below.
+	 * <p>
+	 * Unary term encoding (standard s-t cut):
+	 * - cost(y=0) is paid when node is on T-side, i.e. cap(S -> v).
+	 * - cost(y=1) is paid when node is on S-side, i.e. cap(v -> T).
+	 */
+	private Map<Node, Character> solveSiteAlphaExpansionWithAmbiguity(Map<Node, Integer> allowedMasks, Set<Character> sigma) {
+		final double INF = 1e12;
 
-		// Fix terminals permanently
-		Set<Node> terminalSet = terminals.keySet();
+		// Initialize with any feasible label per node (choose first allowed base; unconstrained choose first sigma)
+		Map<Node, Character> label = new HashMap<>();
+		char defaultBase = sigma.iterator().next();
+		for (Node x : nodes) {
+			int mask = allowedMasks.getOrDefault(x, ALL_MASK);
+			label.put(x, (mask == ALL_MASK) ? defaultBase : firstAllowedBase(mask));
+		}
 
 		boolean improved;
 		int iter = 0;
 		do {
 			improved = false;
+
 			for (char alpha : sigma) {
-				// Build binary energy for the α-expansion move and solve by min-cut
 				FlowNetwork<Node> FN = new FlowNetwork<>();
-				for (Node v : nodes) FN.addNode(v);
+				for (Node x : nodes) FN.addNode(x);
 				FN.addSourceSink();
 
-				// Pin terminals
-				final double INF = 1e12;
-				for (Node v : terminalSet) {
-					char tv = terminals.get(v);
-					// Terminals cannot change from tv
-					if (tv == alpha) {
-						// force v to choose "switch to α" (y=1) by INF to Source
-						FN.addCapacity(FN.S, v, INF);
-					} else {
-						// force v to keep current (y=0) by INF to Sink
-						FN.addCapacity(v, FN.T, INF);
-					}
+				// Unary feasibility constraints for this move
+				for (Node x : nodes) {
+					int mask = allowedMasks.getOrDefault(x, ALL_MASK);
+					char cur = label.get(x);
+
+					double D0 = allowed(mask, cur) ? 0.0 : INF;      // keep current must be allowed
+					double D1 = allowed(mask, alpha) ? 0.0 : INF;    // switching to alpha must be allowed
+
+					if (D0 > 0) FN.addCapacity(FN.S, x, D0); // cost if y=0 (T-side)
+					if (D1 > 0) FN.addCapacity(x, FN.T, D1); // cost if y=1 (S-side)
 				}
 
-				// Add pairwise Potts terms converted to s-t graph for submodular binary energy
+				// Pairwise Potts terms for α-expansion
 				for (Edge e : edges) {
 					Node p = u.apply(e), q = v.apply(e);
-					// current labels
-					char Lp = label.getOrDefault(p, terminals.getOrDefault(p, alpha));
-					char Lq = label.getOrDefault(q, terminals.getOrDefault(q, alpha));
+					char Lp = label.get(p);
+					char Lq = label.get(q);
 
-					// Define binary pairwise costs V(y_p, y_q) as per Potts α-expansion move
-					// y=0: keep current label; y=1: switch to α
-					double a = (Lp != Lq) ? 1 : 0;              // V(0,0)
-					double b = (Lp != alpha) ? 1 : 0;           // V(0,1)
-					double c = (Lq != alpha) ? 1 : 0;           // V(1,0)
-					double d = 0;                               // V(1,1)
+					// y=0 keep, y=1 switch to alpha
+					double a = (Lp != Lq) ? 1 : 0;        // V(0,0)
+					double b = (Lp != alpha) ? 1 : 0;     // V(0,1)
+					double c = (Lq != alpha) ? 1 : 0;     // V(1,0)
+					double d = 0;                         // V(1,1)
 
 					addSubmodularPairwise(FN, p, q, a, b, c, d);
 				}
 
-				// Solve move
 				double before = energyPotts(label);
 				FN.maxFlow();
 				Set<Node> Sside = FN.minCutSourceSide();
 
-				// Apply move: nodes on S side take y=1 (switch to α), T side keep y=0
+				// Apply move: nodes on S-side take alpha (y=1), others keep (y=0)
 				Map<Node, Character> candidate = new HashMap<>(label);
-				for (Node v : nodes) {
-					if (terminalSet.contains(v)) continue; // already accounted by pins; keep fixed
-					if (Sside.contains(v)) candidate.put(v, alpha);
+				for (Node x : nodes) {
+					if (Sside.contains(x)) candidate.put(x, alpha);
 				}
 
 				double after = energyPotts(candidate);
@@ -210,77 +312,50 @@ public class ParsimonyLabeler<Node, Edge> {
 					improved = true;
 				}
 			}
+
 			iter++;
 		} while (improved && iter < 50);
 
-		// Ensure terminals are exact
-		for (Node v : terminals.keySet()) label.put(v, terminals.get(v));
+		// Defensive feasibility cleanup
+		for (Node x : nodes) {
+			int mask = allowedMasks.getOrDefault(x, ALL_MASK);
+			if (!allowed(mask, label.get(x))) label.put(x, firstAllowedBase(mask));
+		}
 		return label;
-	}
-
-	private Map<Node, Character> initByNearestTerminal(Map<Node, Character> terminals) {
-		// Multi-source BFS by symbol: assign each node the symbol of the nearest terminal (ties broken by order)
-		Map<Node, Character> lab = new HashMap<>();
-		Map<Node, Integer> dist = new HashMap<>();
-		Deque<Node> dq = new ArrayDeque<>();
-		for (Map.Entry<Node, Character> e : terminals.entrySet()) {
-			Node v = e.getKey();
-			lab.put(v, e.getValue());
-			dist.put(v, 0);
-			dq.add(v);
-		}
-		while (!dq.isEmpty()) {
-			Node z = dq.removeFirst();
-			int dz = dist.get(z);
-			// Need adjacency; we approximate via edges
-			for (Edge e : edges) {
-				Node u = this.u.apply(e), v = this.v.apply(e);
-				if (u.equals(z)) {
-					if (!dist.containsKey(v)) {
-						dist.put(v, dz + 1);
-						lab.put(v, lab.get(z));
-						dq.addLast(v);
-					}
-				} else if (v.equals(z)) {
-					if (!dist.containsKey(u)) {
-						dist.put(u, dz + 1);
-						lab.put(u, lab.get(z));
-						dq.addLast(u);
-					}
-				}
-			}
-		}
-		return lab;
 	}
 
 	private double energyPotts(Map<Node, Character> lab) {
 		double E = 0;
 		for (Edge e : edges) {
-			Node u = this.u.apply(e), v = this.v.apply(e);
-			if (!Objects.equals(lab.get(u), lab.get(v))) E += 1.0;
+			Node a = u.apply(e), b = v.apply(e);
+			if (!Objects.equals(lab.get(a), lab.get(b))) E += 1.0;
 		}
 		return E;
 	}
 
 	// Add a submodular binary pairwise term V with values a=V(0,0), b=V(0,1), c=V(1,0), d=V(1,1)
-	private void addSubmodularPairwise(FlowNetwork<Node> FN, Node p, Node q, double a, double b, double c, double d) {
-		// Submodularity check (allow small epsilon)
+	private void addSubmodularPairwise(FlowNetwork<Node> FN, Node p, Node q,
+									   double a, double b, double c, double d) {
 		if (a + d > b + c + 1e-9) throw new IllegalArgumentException("Pairwise term not submodular");
-		// Edge capacity
+
 		double w = b + c - a - d; // >= 0
 		if (w < -1e-12) throw new IllegalStateException("Negative edge capacity computed");
 		if (w > 1e-12) FN.addUndirectedCapacity(p, q, w);
-		// T-link adjustments
+
 		double sp = c - d;
 		double tp = a - b;
 		double sq = b - d;
 		double tq = a - c;
+
 		if (sp > 0) FN.addCapacity(FN.S, p, sp);
 		else if (sp < 0) FN.addCapacity(p, FN.T, -sp);
+
 		if (tp > 0) FN.addCapacity(p, FN.T, tp);
 		else if (tp < 0) FN.addCapacity(FN.S, p, -tp);
+
 		if (sq > 0) FN.addCapacity(FN.S, q, sq);
 		else if (sq < 0) FN.addCapacity(q, FN.T, -sq);
+
 		if (tq > 0) FN.addCapacity(q, FN.T, tq);
 		else if (tq < 0) FN.addCapacity(FN.S, q, -tq);
 	}
@@ -303,10 +378,11 @@ public class ParsimonyLabeler<Node, Edge> {
 		private final Map<N, List<EdgeRec<N>>> adj = new HashMap<>();
 		N S, T;
 
-		void addNode(N v) {
-			adj.computeIfAbsent(v, k -> new ArrayList<>());
+		void addNode(N x) {
+			adj.computeIfAbsent(x, k -> new ArrayList<>());
 		}
 
+		@SuppressWarnings("unchecked")
 		void addSourceSink() {
 			this.S = (N) new Object();
 			this.T = (N) new Object();
@@ -331,9 +407,10 @@ public class ParsimonyLabeler<Node, Edge> {
 			double flow = 0;
 			Map<N, Integer> level = new HashMap<>();
 			Map<N, Integer> it = new HashMap<>();
+
 			while (bfs(level)) {
 				it.clear();
-				for (N v : adj.keySet()) it.put(v, 0);
+				for (N x : adj.keySet()) it.put(x, 0);
 				double f;
 				while ((f = dfs(S, T, Double.POSITIVE_INFINITY, level, it)) > 1e-12) flow += f;
 			}
@@ -345,24 +422,28 @@ public class ParsimonyLabeler<Node, Edge> {
 			Deque<N> dq = new ArrayDeque<>();
 			level.put(S, 0);
 			dq.add(S);
+
 			while (!dq.isEmpty()) {
-				N u = dq.removeFirst();
-				for (EdgeRec<N> e : adj.get(u))
+				N x = dq.removeFirst();
+				for (EdgeRec<N> e : adj.get(x)) {
 					if (e.cap > 1e-12 && !level.containsKey(e.to)) {
-						level.put(e.to, level.get(u) + 1);
+						level.put(e.to, level.get(x) + 1);
 						dq.addLast(e.to);
 					}
+				}
 			}
 			return level.containsKey(T);
 		}
 
-		private double dfs(N u, N t, double f, Map<N, Integer> level, Map<N, Integer> it) {
-			if (u.equals(t)) return f;
-			List<EdgeRec<N>> L = adj.get(u);
-			for (int i = it.merge(u, 0, Integer::sum); i < L.size(); i = it.merge(u, 1, Integer::sum)) {
+		private double dfs(N x, N t, double f, Map<N, Integer> level, Map<N, Integer> it) {
+			if (x.equals(t)) return f;
+
+			List<EdgeRec<N>> L = adj.get(x);
+			for (int i = it.get(x); i < L.size(); i++, it.put(x, i)) {
 				EdgeRec<N> e = L.get(i);
 				if (e.cap <= 1e-12) continue;
-				if (!level.containsKey(e.to) || level.get(e.to) != level.get(u) + 1) continue;
+				if (!level.containsKey(e.to) || level.get(e.to) != level.get(x) + 1) continue;
+
 				double pushed = dfs(e.to, t, Math.min(f, e.cap), level, it);
 				if (pushed > 1e-12) {
 					e.cap -= pushed;
@@ -375,18 +456,19 @@ public class ParsimonyLabeler<Node, Edge> {
 		}
 
 		Set<N> minCutSourceSide() {
-			// After maxflow, BFS from S in residual graph
 			Set<N> vis = new HashSet<>();
 			Deque<N> dq = new ArrayDeque<>();
 			dq.add(S);
 			vis.add(S);
+
 			while (!dq.isEmpty()) {
-				N u = dq.removeFirst();
-				for (EdgeRec<N> e : adj.get(u))
+				N x = dq.removeFirst();
+				for (EdgeRec<N> e : adj.get(x)) {
 					if (e.cap > 1e-12 && !vis.contains(e.to)) {
 						vis.add(e.to);
 						dq.addLast(e.to);
 					}
+				}
 			}
 			return vis;
 		}

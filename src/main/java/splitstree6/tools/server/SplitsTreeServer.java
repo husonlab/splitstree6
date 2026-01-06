@@ -50,7 +50,7 @@ public class SplitsTreeServer extends Application {
 			ProgramProperties.setProgramVersion(splitstree6.main.Version.SHORT_DESCRIPTION);
 
 			ProgramProperties.setProgramLicence("""
-					Copyright (C) 2025. This program comes with ABSOLUTELY NO WARRANTY.
+					Copyright (C) 2026. This program comes with ABSOLUTELY NO WARRANTY.
 					This is free software, licensed under the terms of the GNU General Public License, Version 3.
 					Sources available at: https://github.com/husonlab/splitstree6
 					""");

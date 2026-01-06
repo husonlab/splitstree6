@@ -37,12 +37,13 @@ import javafx.stage.Stage;
 import jloda.fx.dialog.ExportImageDialog;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
+import jloda.fx.print.Print;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.*;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.window.SplashScreen;
 import jloda.fx.workflow.WorkflowNode;
-import jloda.util.ProgramProperties;
 import jloda.util.*;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
@@ -431,23 +432,18 @@ public class MainWindowPresenter {
 		if (!controller.getCopyMenuItem().disableProperty().isBound())
 			controller.getCopyMenuItem().setDisable(false);
 
-		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
-			controller.getCopyImageMenuItem().setOnAction(e -> {
-				var dark = MainWindowManager.isUseDarkTheme();
-				try {
-					if (dark)
-						MainWindowManager.setUseDarkTheme(false);
-					var snapshot = focusedDisplayTab.get().getMainNode().snapshot(null, null);
-					ClipboardUtils.putImage(snapshot);
-				} catch (Exception ex) {
-					Basic.caught(ex);
-				} finally {
-					if (dark)
-						MainWindowManager.setUseDarkTheme(true);
-				}
-			});
-		}
+		controller.getCopyImageMenuItem().setOnAction(e -> {
+			if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
+				ClipboardUtils.putImage(focusedDisplayTab.get().getMainNode());
+			}
+		});
+		controller.getPrintMenuItem().setOnAction(e -> {
+			if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
+				Print.printNode(mainWindow.getStage(), focusedDisplayTab.get().getMainNode());
+			}
+		});
 		controller.getCopyImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
+		controller.getPrintMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
 
 		controller.getCopyNewickMenuItem().setDisable(true);
 
@@ -704,20 +700,20 @@ public class MainWindowPresenter {
 				controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
 						controller.getNewMenuItem(), controller.getEditInputMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
 						controller.getCloseMenuItem(), new SeparatorMenuItem(),
-						controller.getSaveAsMenuItem(), new SeparatorMenuItem())));
+						controller.getSaveAsMenuItem(), new SeparatorMenuItem()), false));
 			} else { // mobile
 				controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
 						controller.getEditInputMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
 						controller.getCloseMenuItem(), new SeparatorMenuItem(),
-						controller.getSaveMenuItem(), new SeparatorMenuItem())));
+						controller.getSaveMenuItem(), new SeparatorMenuItem()), false));
 				controller.getFileMenuButton().getItems().get(0).setText("Edit");
 			}
 
 			var recentFilesFirstIndex = controller.getFileMenuButton().getItems().size();
-			controller.getFileMenuButton().getItems().addAll(BasicFX.copyMenu(controller.getOpenRecentMenu().getItems()));
+			controller.getFileMenuButton().getItems().addAll(BasicFX.copyMenu(controller.getOpenRecentMenu().getItems(), false));
 			controller.getOpenRecentMenu().getItems().addListener((InvalidationListener) e -> {
 				controller.getFileMenuButton().getItems().remove(recentFilesFirstIndex, controller.getFileMenuButton().getItems().size());
-				controller.getFileMenuButton().getItems().addAll(BasicFX.copyMenu(controller.getOpenRecentMenu().getItems()));
+				controller.getFileMenuButton().getItems().addAll(BasicFX.copyMenu(controller.getOpenRecentMenu().getItems(), false));
 			});
 		}
 

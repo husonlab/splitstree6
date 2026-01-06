@@ -101,7 +101,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				view.optionDiagram1Property(), view.optionLabelEdgesByProperty(), view.optionAveraging1Property(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(),
 				nodeShapeMap1, updateRequested1);
 
-
 		controller.getLeftPane().getChildren().add(tree1Pane);
 
 		tree2.addListener((v, o, n) -> {
@@ -111,13 +110,15 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		var orientation2Property = new SimpleStringProperty(this, "orientation2Property");
 		view.optionOrientationProperty().addListener((v, o, n) -> {
-			if (n.equals("Rotate0Deg"))
+			if (n.equals("Rotate0Deg")) {
 				orientation2Property.set("FlipRotate0Deg");
-			else
+			} else {
 				orientation2Property.set("Rotate180Deg");
+			}
 		});
 		orientation2Property.set(view.getOptionOrientation().equals("Rotate0Deg") ? "FlipRotate0Deg" : "Rotate180Deg");
-		orientation2Property.addListener((v, o, n) -> {
+		if (false)
+			orientation2Property.addListener((v, o, n) -> {
 			System.err.println("orientation2Property " + o + " -> " + n);
 		});
 
@@ -167,6 +168,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 			});
 		}
+
 
 		controller.getTaxonDisplacementFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings1Property());
 		controller.getReticulateDisplacementFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings1Property());
@@ -284,7 +286,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			controller.getDiagram1CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
 			controller.getDiagram1CBox().setValue(view.getOptionDiagram1());
 			view.optionDiagram1Property().addListener((v, o, n) -> controller.getDiagram1CBox().setValue(n));
-			controller.getDiagram1CBox().valueProperty().addListener((v, o, n) -> view.optionDiagram1Property().set(n));
+			controller.getDiagram1CBox().valueProperty().addListener((v, o, n) -> {
+				view.setOptionOrientation("Rotate0Deg");
+				view.optionDiagram1Property().set(n);
+			});
 		}
 		{
 			final ObservableSet<TreeDiagramType> disabledDiagrams2 = FXCollections.observableSet();
@@ -302,7 +307,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			controller.getDiagram2CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
 			controller.getDiagram2CBox().setValue(view.getOptionDiagram2());
 			view.optionDiagram2Property().addListener((v, o, n) -> controller.getDiagram2CBox().setValue(n));
-			controller.getDiagram2CBox().valueProperty().addListener((v, o, n) -> view.optionDiagram2Property().set(n));
+			controller.getDiagram2CBox().valueProperty().addListener((v, o, n) -> {
+				view.setOptionOrientation("Rotate0Deg");
+				view.optionDiagram2Property().set(n);
+			});
 		}
 
 		controller.getFlipButton().setOnAction(e -> {
