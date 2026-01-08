@@ -24,9 +24,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import jloda.fx.control.RichTextLabel;
-import jloda.fx.phylo.embed.Averaging;
-import jloda.fx.phylo.embed.LayoutRootedPhylogeny;
-import jloda.fx.phylo.embed.TriangularTreeLayout;
 import jloda.fx.util.DraggableUtils;
 import jloda.graph.Edge;
 import jloda.graph.Node;
@@ -34,7 +31,9 @@ import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
-import jloda.phylogeny.dolayout.DoNetworkLayout;
+import jloda.phylogeny.dolayout.NetworkDisplacementOptimization;
+import jloda.phylogeny.layout.Averaging;
+import jloda.phylogeny.layout.LayoutRootedPhylogeny;
 import jloda.util.IteratorUtils;
 
 import java.util.*;
@@ -91,26 +90,52 @@ public class ComputeTreeLayout {
 					reticulateMap.computeIfAbsent(e.getTarget(), k -> new ArrayList<>()).add(e.getSource());
 				}
 			}
-			var result = DoNetworkLayout.apply(tree.getRoot(), childrenMap::get, reticulateMap::get, diagram.isRadialOrCircular(), () -> false);
+			var result = NetworkDisplacementOptimization.apply(tree.getRoot(), childrenMap::get, reticulateMap::get, diagram.isRadialOrCircular(), () -> false);
 			tree.getLSAChildrenMap().clear();
 			tree.getLSAChildrenMap().putAll(result);
 			optimizeReticulationEdges = false;
 		}
 
+
+		LayoutRootedPhylogeny.Layout layout = null;
+		LayoutRootedPhylogeny.Scaling scaling = null;
+		boolean triangular = false;
+
 		switch (diagram) {
-			case RectangularPhylogram ->
-					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Rectangular, LayoutRootedPhylogeny.Scaling.ToScale, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
-			case RectangularCladogram ->
-					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Rectangular, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
-			case TriangularCladogram -> TriangularTreeLayout.apply(tree, nodePointMap);
-			case RadialPhylogram ->
-					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Radial, LayoutRootedPhylogeny.Scaling.ToScale, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
-			case RadialCladogram ->
-					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Radial, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
-			case CircularCladogram ->
-					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Circular, LayoutRootedPhylogeny.Scaling.LateBranching, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
-			case CircularPhylogram ->
-					LayoutRootedPhylogeny.apply(tree, LayoutRootedPhylogeny.Layout.Circular, LayoutRootedPhylogeny.Scaling.ToScale, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
+			case RectangularPhylogram -> {
+				layout = LayoutRootedPhylogeny.Layout.Rectangular;
+				scaling = LayoutRootedPhylogeny.Scaling.ToScale;
+			}
+			case RectangularCladogram -> {
+				layout = LayoutRootedPhylogeny.Layout.Rectangular;
+				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+
+			}
+			case TriangularCladogram -> {
+				triangular = true;
+				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+			}
+			case RadialPhylogram -> {
+				layout = LayoutRootedPhylogeny.Layout.Radial;
+				scaling = LayoutRootedPhylogeny.Scaling.ToScale;
+			}
+			case RadialCladogram -> {
+				layout = LayoutRootedPhylogeny.Layout.Radial;
+				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+			}
+			case CircularCladogram -> {
+				layout = LayoutRootedPhylogeny.Layout.Circular;
+				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+			}
+			case CircularPhylogram -> {
+				layout = LayoutRootedPhylogeny.Layout.Circular;
+				scaling = LayoutRootedPhylogeny.Scaling.ToScale;
+			}
+		}
+		if (triangular) {
+			splitstree6.layout.tree.LayoutRootedPhylogeny.applyTriangular(tree, averaging, nodePointMap);
+		} else {
+			splitstree6.layout.tree.LayoutRootedPhylogeny.apply(tree, layout, scaling, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
 		}
 
 		var unitLengthX = LayoutUtils.normalize(dimensions.width(), dimensions.height(), nodePointMap, diagram.isRadialOrCircular());

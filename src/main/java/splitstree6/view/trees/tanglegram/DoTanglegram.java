@@ -26,6 +26,7 @@ import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.phylogeny.dolayout.TanglegramDisplacementOptimization;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.tools.RunWorkflow;
@@ -33,11 +34,11 @@ import splitstree6.tools.RunWorkflow;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static jloda.phylogeny.dolayout.Common.computeNodeHeightMap;
+import static jloda.phylogeny.utils.GraphUtils.computeNodeHeightMap;
 
 
 /**
- * optimize the LSAchildren of phylogenies for a tanglegram drawing
+ * optimize the children of phylogenies for a tanglegram drawing
  * Daniel Huson, 8.2025
  */
 public class DoTanglegram {
@@ -73,7 +74,6 @@ public class DoTanglegram {
 		bestChildrenMap2.get().putAll(childrenMap2);
 
 		var bestScore = new Single<>(Double.MAX_VALUE);
-
 
 		var finalOptimizeReticulateDisplacement1 = optimizeReticulateDisplacement1 && network1.hasReticulateEdges();
 		var finalOptimizeReticulateDisplacement2 = optimizeReticulateDisplacement2 && network2.hasReticulateEdges();
@@ -293,7 +293,7 @@ public class DoTanglegram {
 			}
 		}
 
-		var resultAndScore = jloda.phylogeny.dolayout.DoTanglegram.apply(network1.getRoot(), v -> (network1.hasTaxa(v) ? network1.getTaxon(v) : null), childrenMap1::get,
+		var resultAndScore = TanglegramDisplacementOptimization.apply(network1.getRoot(), v -> (network1.hasTaxa(v) ? network1.getTaxon(v) : null), childrenMap1::get,
 				network2.getRoot(), v -> (network2.hasTaxa(v) ? network2.getTaxon(v) : null), childrenMap2::get, reticulateEdges2,
 				optimizeTaxonDisplacement, optimizeReticulateDisplacement, random, progress::isUserCancelled);
 		childrenMap2.clear();

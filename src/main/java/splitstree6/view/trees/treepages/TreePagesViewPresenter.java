@@ -28,14 +28,15 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.SwipeUtils;
 import jloda.phylo.PhyloTree;
+import jloda.phylogeny.layout.Averaging;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.LayoutOrientation;
@@ -118,8 +119,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, Averaging::createLabel));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, Averaging::createLabel));
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
 		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 

@@ -26,7 +26,7 @@ module splitstreesix {
 	requires org.apache.commons.numbers.gamma;
 	requires jdk.compiler;
 
-	// requires razornet;
+	requires razornet;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;

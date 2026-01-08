@@ -29,10 +29,10 @@ import javafx.scene.layout.VBox;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.icons.MaterialIcons;
-import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
+import jloda.phylogeny.layout.Averaging;
 import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreeViewController {

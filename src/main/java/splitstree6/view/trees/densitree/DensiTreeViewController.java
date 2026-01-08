@@ -25,9 +25,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import jloda.fx.icons.MaterialIcons;
-import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
+import jloda.phylogeny.layout.Averaging;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.main.SplitsTree6;
 

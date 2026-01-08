@@ -152,7 +152,7 @@
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="cutMenuItem" text="Cut"
-                                  userData="Copy selected text in a text tab or nodes in a workflow tab">
+                                  userData="Cut selected text in a text tab or nodes in a workflow tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="X" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>

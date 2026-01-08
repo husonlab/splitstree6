@@ -203,9 +203,10 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 	 * @param np the nexus parser
 	 */
 	private static void readMatrix(NexusStreamParser np, TaxaBlock taxaBlock, int nsplits, SplitsBlock splitsBlock, SplitsFormat splitsFormat) throws IOException {
-		for (int i = 1; i <= nsplits; i++) {
-			double weight = 1;
-			double confidence = -1;
+		var changeToBothSidesFormat = false;
+		for (var i = 1; i <= nsplits; i++) {
+			var weight = 1.0;
+			var confidence = -1.0;
 			String label = null;
 
 			if (splitsFormat.isOptionLabels()) {
@@ -219,18 +220,17 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 			if (splitsFormat.isOptionConfidences())
 				confidence = Math.max(0.0, np.getDouble());
 
-
 			final ASplit split;
 
 			if (splitsFormat.isOptionShowBothSides()) {
-				final BitSet setA = new BitSet();
+				var setA = new BitSet();
 				while (!np.peekMatchIgnoreCase("|")) {
 					setA.set(Integer.parseInt(np.getWordRespectCase()));
 					if (setA.cardinality() == 0 || setA.cardinality() == taxaBlock.getNtax())
 						throw new IOExceptionWithLineNumber(np.lineno(), "non-split of size " + setA.cardinality());
 				}
 				np.matchIgnoreCase("|");
-				final BitSet setB = new BitSet();
+				var setB = new BitSet();
 				while (!np.peekMatchIgnoreCase(",") && !(i == nsplits && np.peekMatchIgnoreCase(";"))) {
 					setB.set(Integer.parseInt(np.getWordRespectCase()));
 					if (setB.cardinality() == 0 || setB.cardinality() == taxaBlock.getNtax())
@@ -244,13 +244,29 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 				split = new ASplit(setA, setB, weight);
 			} else {
 				final BitSet setA = new BitSet();
-				while (!np.peekMatchIgnoreCase(",") && !(i == nsplits && np.peekMatchIgnoreCase(";"))) {
+				while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase("|") && !(i == nsplits && np.peekMatchIgnoreCase(";"))) {
 					setA.set(Integer.parseInt(np.getWordRespectCase()));
 					if (setA.cardinality() == 0 || setA.cardinality() == taxaBlock.getNtax() || !BitSetUtils.contains(taxaBlock.getTaxaSet(), setA))
 						throw new IOExceptionWithLineNumber(np.lineno(), "Illegal split part of size" + setA.cardinality());
 				}
-				final BitSet setB = BitSetUtils.minus(taxaBlock.getTaxaSet(), setA);
-				split = new ASplit(setA, setB, weight);
+				if (np.peekMatchIgnoreCase("|")) { // is actually "both sides" format
+					np.matchIgnoreCase("|");
+					var setB = new BitSet();
+					while (!np.peekMatchIgnoreCase(",") && !(i == nsplits && np.peekMatchIgnoreCase(";"))) {
+						setB.set(Integer.parseInt(np.getWordRespectCase()));
+						if (setB.cardinality() == 0 || setB.cardinality() == taxaBlock.getNtax())
+							throw new IOExceptionWithLineNumber(np.lineno(), "non-split of size " + setB.cardinality());
+					}
+					if (BitSetUtils.intersection(setA, setB).cardinality() > 0)
+						throw new IOExceptionWithLineNumber(np.lineno(), "Split sides not disjoint");
+					if (BitSetUtils.compare(BitSetUtils.union(setA, setB), taxaBlock.getTaxaSet()) != 0)
+						throw new IOExceptionWithLineNumber(np.lineno(), "Union of split doesn't equals complete taxon set");
+					split = new ASplit(setA, setB, weight);
+					changeToBothSidesFormat = true;
+				} else {
+					var setB = BitSetUtils.minus(taxaBlock.getTaxaSet(), setA);
+					split = new ASplit(setA, setB, weight);
+				}
 			}
 			if (np.peekMatchIgnoreCase(","))
 				np.matchIgnoreCase(",");
@@ -261,5 +277,7 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 				split.setLabel(label);
 			splitsBlock.getSplits().add(split);
 		}
+		if (changeToBothSidesFormat)
+			splitsFormat.setOptionShowBothSides(true);
 	}
 }

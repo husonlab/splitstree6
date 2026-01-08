@@ -26,10 +26,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.icons.MaterialIcons;
-import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.phylo.PhyloTree;
+import jloda.phylogeny.layout.Averaging;
 import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreePagesViewController {

@@ -30,12 +30,12 @@ import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.phylo.embed.Averaging;
 import jloda.fx.qr.QRViewUtils;
 import jloda.fx.qr.TreeNewickQR;
 import jloda.fx.undo.UndoManager;
@@ -45,6 +45,7 @@ import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SwipeUtils;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
+import jloda.phylogeny.layout.Averaging;
 import jloda.util.Basic;
 import jloda.util.Single;
 import jloda.util.StringUtils;
@@ -326,8 +327,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, Averaging::createLabel));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, Averaging::createLabel));
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
 		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 		view.optionAveragingProperty().addListener(e -> update.accept(false));
