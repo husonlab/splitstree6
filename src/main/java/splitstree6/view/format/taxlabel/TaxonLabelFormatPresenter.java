@@ -49,7 +49,7 @@ public class TaxonLabelFormatPresenter {
 		controller.getFontFamilyCbox().setItems(fontFamilies);
 		AutoCompleteComboBox.install(controller.getFontFamilyCbox());
 
-		controller.getFontFamilyCbox().setValue((new RichTextLabel()).getFontFamily());
+		controller.getFontFamilyCbox().setValue(RichTextLabel.getDefaultFont().getFamily());
 		controller.getFontFamilyCbox().valueProperty().addListener((v, o, n) -> {
 			if (!inUpdatingDefaults && n != null && !n.isBlank() && controller.getFontFamilyCbox().getItems().contains(n)) {
 				var undoList = new UndoableRedoableCommandList(" font");

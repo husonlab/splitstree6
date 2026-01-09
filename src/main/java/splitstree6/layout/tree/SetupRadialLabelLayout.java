@@ -24,8 +24,10 @@ import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
+import jloda.util.StringUtils;
 
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 /**
@@ -43,41 +45,46 @@ public class SetupRadialLabelLayout implements Consumer<LayoutOrientation> {
 		labelLayout = new RadialLabelLayout();
 		labelLayout.setGap(labelGap);
 
+		var values = new TreeSet<>(nodeAngleMap.values());
+		System.err.println("angles: " + StringUtils.toString(values, " "));
+
 		for (var v : tree.nodes()) {
-			var shape = nodeShapeMap.get(v);
-			var label = shape.getLabel();
+			var labeledNodeShape = nodeShapeMap.get(v);
+			var label = labeledNodeShape.getLabel();
 			if (label != null) {
 				var angle = nodeAngleMap.get(v);
 				if (angle == null) {
 					if (v.getParent() != null) {
-						var vPoint = new Point2D(shape.getTranslateX(), shape.getTranslateY());
+						var vPoint = new Point2D(labeledNodeShape.getTranslateX(), labeledNodeShape.getTranslateY());
 						var w = v.getParent();
 						var wPoint = new Point2D(nodeShapeMap.get(w).getTranslateX(), nodeShapeMap.get(w).getTranslateY());
 						while (vPoint.distance(wPoint) == 0 && w.getParent() != null) {
 							w = w.getParent();
 							wPoint = new Point2D(nodeShapeMap.get(w).getTranslateX(), nodeShapeMap.get(w).getTranslateY());
 						}
-						angle = GeometryUtilsFX.computeAngle(shape.getTranslateX() - wPoint.getX(), shape.getTranslateY() - wPoint.getY());
+						angle = GeometryUtilsFX.computeAngle(labeledNodeShape.getTranslateX() - wPoint.getX(), labeledNodeShape.getTranslateY() - wPoint.getY());
 					} else
 						angle = 0.0;
 				}
 				label.setVisible(false);
 				label.setLayoutX(0);
 				label.setLayoutY(0);
-				label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
-				label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+				label.translateXProperty().bind(labeledNodeShape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
+				label.translateYProperty().bind(labeledNodeShape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
 
-				labelLayout.addItem(shape.translateXProperty(), shape.translateYProperty(), angle, label.widthProperty(), label.heightProperty(),
+				labelLayout.addItem(labeledNodeShape.translateXProperty(), labeledNodeShape.translateYProperty(), angle, label.widthProperty(), label.heightProperty(),
 						xOffset -> {
 							label.setLayoutX(0);
-							label.translateXProperty().bind(shape.translateXProperty().add(xOffset));
+							label.translateXProperty().bind(labeledNodeShape.translateXProperty().add(xOffset));
 						},
 						yOffset -> {
 							label.setLayoutY(0);
-							label.translateYProperty().bind(shape.translateYProperty().add(yOffset));
+							label.translateYProperty().bind(labeledNodeShape.translateYProperty().add(yOffset));
 							label.setVisible(true);
 						});
-				labelLayout.addAvoidable(() -> shape.getTranslateX() - 0.5 * shape.prefWidth(0), () -> shape.getTranslateY() - 0.5 * shape.prefHeight(0), () -> shape.prefWidth(0), () -> shape.prefHeight(0));
+
+
+				labelLayout.addAvoidable(() -> labeledNodeShape.getTranslateX() - 0.5 * labeledNodeShape.prefWidth(0), () -> labeledNodeShape.getTranslateY() - 0.5 * labeledNodeShape.prefHeight(0), () -> labeledNodeShape.prefWidth(0), () -> labeledNodeShape.prefHeight(0));
 			}
 		}
 	}

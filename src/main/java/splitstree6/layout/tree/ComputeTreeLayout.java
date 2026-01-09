@@ -99,7 +99,6 @@ public class ComputeTreeLayout {
 
 		LayoutRootedPhylogeny.Layout layout = null;
 		LayoutRootedPhylogeny.Scaling scaling = null;
-		boolean triangular = false;
 
 		switch (diagram) {
 			case RectangularPhylogram -> {
@@ -109,10 +108,9 @@ public class ComputeTreeLayout {
 			case RectangularCladogram -> {
 				layout = LayoutRootedPhylogeny.Layout.Rectangular;
 				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
-
 			}
 			case TriangularCladogram -> {
-				triangular = true;
+				layout = LayoutRootedPhylogeny.Layout.Triangular;
 				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
 			}
 			case RadialPhylogram -> {
@@ -132,11 +130,8 @@ public class ComputeTreeLayout {
 				scaling = LayoutRootedPhylogeny.Scaling.ToScale;
 			}
 		}
-		if (triangular) {
-			splitstree6.layout.tree.LayoutRootedPhylogeny.applyTriangular(tree, averaging, nodePointMap);
-		} else {
-			splitstree6.layout.tree.LayoutRootedPhylogeny.apply(tree, layout, scaling, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
-		}
+
+		splitstree6.layout.tree.LayoutRootedPhylogeny.apply(tree, layout, scaling, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
 
 		var unitLengthX = LayoutUtils.normalize(dimensions.width(), dimensions.height(), nodePointMap, diagram.isRadialOrCircular());
 

@@ -114,6 +114,9 @@ public class LayoutUtils {
 		var minY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).min().orElse(0);
 		var maxY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).max().orElse(0);
 
+		var dx = (minX + maxX) / 2;
+		var dy = (minY + maxY) / 2;
+
 		var scaleX = (maxX > minX ? width / (maxX - minX) : 1);
 		var scaleY = (maxY > minY ? height / (maxY - minY) : 1);
 		if (maintainAspectRatio) {
@@ -121,7 +124,7 @@ public class LayoutUtils {
 		}
 		if (scaleX != 1 || scaleY != 1) {
 			for (var v : nodePointMap.keySet()) {
-				var point = nodePointMap.get(v);
+				var point = nodePointMap.get(v).subtract(dx, dy);
 				nodePointMap.put(v, new Point2D(point.getX() * scaleX, point.getY() * scaleY));
 			}
 		}
@@ -205,7 +208,7 @@ public class LayoutUtils {
 					node.setRotate(node.getRotate() + angle0);
 
 					for (var label : BasicFX.getAllRecursively(node, RichTextLabel.class)) {
-						if (keepLabelUnrotated.test(label))
+						if (true || keepLabelUnrotated.test(label)) // this needs to be on
 							label.setRotate(label.getRotate() + angle0);
 					}
 					ensureRichTextLabelsUpright(node);
@@ -222,7 +225,6 @@ public class LayoutUtils {
 					angle = 90;
 				else
 					angle = angle0;
-
 
 				if (animate) {
 					var rotateTransition = new RotateTransition(Duration.seconds(1));

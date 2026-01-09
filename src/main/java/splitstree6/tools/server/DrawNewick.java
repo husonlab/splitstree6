@@ -108,7 +108,8 @@ public class DrawNewick {
 		var averaging = Averaging.ChildAverage;
 
 		LayoutRootedPhylogeny.Layout layout = null;
-		LayoutRootedPhylogeny.Scaling scaling = null;
+		var scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+
 		boolean triangular = false;
 
 		switch (layoutName) {
@@ -118,11 +119,9 @@ public class DrawNewick {
 			}
 			case "cladogram" -> {
 				layout = LayoutRootedPhylogeny.Layout.Rectangular;
-				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
-
 			}
 			case "triangular" -> {
-				triangular = true;
+				layout = LayoutRootedPhylogeny.Layout.Triangular;
 			}
 			case "radial" -> {
 				layout = LayoutRootedPhylogeny.Layout.Radial;
@@ -130,22 +129,17 @@ public class DrawNewick {
 			}
 			case "radial_cladogram" -> {
 				layout = LayoutRootedPhylogeny.Layout.Radial;
-				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
 			}
 			case "circular_cladogram" -> {
 				layout = LayoutRootedPhylogeny.Layout.Circular;
-				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
 			}
 			case "circular_phylogram" -> {
 				layout = LayoutRootedPhylogeny.Layout.Circular;
 				scaling = LayoutRootedPhylogeny.Scaling.ToScale;
 			}
 		}
-		if (triangular) {
-			splitstree6.layout.tree.LayoutRootedPhylogeny.applyTriangular(tree, averaging, nodePointMap);
-		} else {
-			splitstree6.layout.tree.LayoutRootedPhylogeny.apply(tree, layout, scaling, averaging, true, new Random(666), nodeAngleMap, nodePointMap);
-		}
+
+		splitstree6.layout.tree.LayoutRootedPhylogeny.apply(tree, layout, scaling, averaging, true, new Random(666), nodeAngleMap, nodePointMap);
 
 		scaleCoordinates(nodePointMap, width, height, (layoutName.contains("circular") || layoutName.contains("radial")));
 

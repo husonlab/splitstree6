@@ -7,7 +7,6 @@ import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
 import jloda.phylogeny.layout.Averaging;
 import jloda.phylogeny.layout.EdgeType;
-import jloda.phylogeny.layout.LayoutRadialPhylogram;
 import jloda.util.IteratorUtils;
 
 import java.util.HashMap;
@@ -59,32 +58,6 @@ public class LayoutRootedPhylogeny {
 				inEdges, outEdges, source, target, weight, edgeType,
 				layout, scaling, averaging, optimizeReticulateEdges, random,
 				nodeAngleMap, nodePointAdaptor, tree.getLSAChildrenMap());
-
-		for (var v : nodePointAdaptor.keySet()) {
-			var p = nodePointAdaptor.get(v);
-			nodePointMap.put(v, new Point2D(p.x(), p.y()));
-		}
-	}
-
-	public static void applyTriangular(PhyloTree phylogeny, Averaging averaging, Map<Node, Point2D> nodePointMap) {
-		Function<Edge, Node> source = Edge::getSource;
-		Function<Edge, Node> target = Edge::getTarget;
-		ToDoubleFunction<Edge> weight = phylogeny::getWeight;
-		Function<Edge, EdgeType> edgeType = e -> {
-			if (phylogeny.isTransferAcceptorEdge(e))
-				return EdgeType.transferAcceptor;
-			else if (phylogeny.isTransferEdge(e))
-				return EdgeType.transfer;
-			else if (phylogeny.isReticulateEdge(e))
-				return EdgeType.combining;
-			else return EdgeType.tree;
-		};
-
-		var nodePointAdaptor = new HashMap<Node, jloda.phylogeny.layout.Point2D>();
-
-		LayoutRadialPhylogram.apply(phylogeny.getRoot(), phylogeny.getNodesAsList(), phylogeny.getEdgesAsList(),
-				v -> IteratorUtils.asList(v.outEdges()), phylogeny.getLSAChildrenMap(), source, target,
-				weight, edgeType, averaging, nodePointAdaptor);
 
 		for (var v : nodePointAdaptor.keySet()) {
 			var p = nodePointAdaptor.get(v);
