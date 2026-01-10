@@ -80,10 +80,14 @@ public class LayoutLabelsCircular {
 						//label.setTranslateX(shape.getTranslateX() - 0.5 * label.getWidth() + offset.getX());
 						//label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight() + offset.getY())
 
-						if (alignLabels && add > 1.1 * labelGap) {
-							var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
-							var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
-							labelConnector.update(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY());
+						if (alignLabels) {
+							if (add > labelGap) {
+								labelConnector.setVisible(true);
+								var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
+								var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
+								labelConnector.update(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY());
+							} else
+								labelConnector.setVisible(false);
 						}
 						label.setAnchor(shape);
 						label.setRotate(angle);

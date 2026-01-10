@@ -22,19 +22,22 @@ package splitstree6.view.splits.viewer;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
+import jloda.fx.control.MultiTouchGestureMonitor;
 import jloda.fx.control.RichTextLabel;
-import jloda.fx.label.EditLabelDialog;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommand;
@@ -81,16 +84,30 @@ public class InteractionSetup {
 	private static EventHandler<MouseEvent> mouseDraggedHandler;
 	private static EventHandler<MouseEvent> mouseReleasedHandler;
 
-
+	private final BooleanProperty multiTouchGestureInProgress;
 
 	/**
 	 * constructor
 	 */
-	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel) {
+	public InteractionSetup(Stage stage, ScrollPane scrollPane, Pane pane, UndoManager undoManager, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel) {
 		this.stage = stage;
 		this.undoManager = undoManager;
 		this.taxonSelectionModel = taxonSelectionModel;
 		this.splitSelectionModel = splitSelectionModel;
+
+		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(pane);
+
+		if (scrollPane != null && !SplitsTree6.isDesktop()) {
+			scrollPane.setPannable(false);
+			scrollPane.addEventFilter(ScrollEvent.ANY, e -> {
+				if (e.getTouchCount() < 2)
+					e.consume();
+			});
+			multiTouchGestureInProgress.addListener((v, o, n) -> {
+				scrollPane.setPannable(n);
+				System.err.println("Pannable: " + n);
+			});
+		}
 
 		pane.setOnMouseClicked(e -> {
 			if (e.isStillSincePress() && !e.isShiftDown()) {
@@ -168,8 +185,15 @@ public class InteractionSetup {
 					var nodeShape = nodeShapeMap.get(v);
 					var taxon = idTaxonMap.apply(id);
 					if (taxon != null && nodeShape != null) {
-						nodeShape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
-						label.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
+
+						nodeShape.setOnContextMenuRequested(m -> {
+							if (!multiTouchGestureInProgress.get())
+								showContextMenu(m, stage, undoManager, label);
+						});
+						label.setOnContextMenuRequested(m -> {
+							if (!multiTouchGestureInProgress.get())
+								showContextMenu(m, stage, undoManager, label);
+						});
 
 						if (SplitsTree6.nodeZoomOnMouseOver) {
 							nodeShape.setOnMouseEntered(e -> {

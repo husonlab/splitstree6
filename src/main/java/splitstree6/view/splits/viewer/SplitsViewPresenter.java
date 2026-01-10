@@ -291,7 +291,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				view.optionLabelSplitsByProperty(), controller.getScaleBar().unitLengthXProperty(),
 				taxonLabelMap, nodeLabeledShapeMap, splitShapeMap, loopViews);
 
-		var mouseInteraction = new InteractionSetup(mainWindow.getStage(), splitNetworkPane, view.getUndoManager(), mainWindow.getTaxonSelectionModel(), view.getSplitSelectionModel());
+		var mouseInteraction = new InteractionSetup(mainWindow.getStage(), controller.getScrollPane(), splitNetworkPane, view.getUndoManager(), mainWindow.getTaxonSelectionModel(), view.getSplitSelectionModel());
 
 		// todo: before update: reset zoom???
 

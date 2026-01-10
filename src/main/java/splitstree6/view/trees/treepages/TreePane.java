@@ -27,6 +27,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -83,7 +84,7 @@ public class TreePane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public TreePane(MainWindow mainWindow, UndoManager undoManager, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
+	public TreePane(MainWindow mainWindow, ScrollPane scrollPane, UndoManager undoManager, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, Averaging averaging, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<PaneLabel> showTreeLabels, DoubleProperty unitLengthX,
 					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges) {
@@ -97,7 +98,7 @@ public class TreePane extends StackPane {
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
-		interactionSetup = new InteractionSetup(mainWindow.getStage(), this, undoManager, taxaBlock, diagram, orientationLabel, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
+		interactionSetup = new InteractionSetup(mainWindow.getStage(), scrollPane, this, undoManager, taxaBlock, diagram, orientationLabel, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
 
 		fontScaleChangeListener = (v, o, n) -> {
 			if (result != null) {

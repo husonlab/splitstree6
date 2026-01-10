@@ -28,6 +28,22 @@
             fx:controller="splitstree6.view.trees.treepages.TreePagesViewController">
     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                 AnchorPane.topAnchor="0.0">
+        <center>
+            <AnchorPane fx:id="innerAnchorPane" BorderPane.alignment="CENTER">
+                <BorderPane.margin>
+                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                </BorderPane.margin>
+                <children>
+                    <Pane fx:id="pane" style="-fx-border-color: grey;" AnchorPane.bottomAnchor="0.0"
+                          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"
+                                AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0"
+                                AnchorPane.topAnchor="3.0"/>
+                    <VBox fx:id="formatVBox" prefWidth="200.0" styleClass="context-menu" AnchorPane.rightAnchor="16.0"
+                          AnchorPane.topAnchor="2.0"/>
+                </children>
+            </AnchorPane>
+        </center>
         <top>
             <VBox fx:id="vBox" BorderPane.alignment="CENTER">
                 <AnchorPane>
@@ -83,22 +99,6 @@
                 </AnchorPane>
             </VBox>
         </top>
-        <center>
-            <AnchorPane fx:id="innerAnchorPane" BorderPane.alignment="CENTER">
-                <BorderPane.margin>
-                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
-                </BorderPane.margin>
-                <children>
-                    <Pane fx:id="pane" style="-fx-border-color: grey;" AnchorPane.bottomAnchor="0.0"
-                          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                    <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"
-                                AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0"
-                                AnchorPane.topAnchor="3.0"/>
-                    <VBox fx:id="formatVBox" prefWidth="200.0" styleClass="context-menu" AnchorPane.rightAnchor="16.0"
-                          AnchorPane.topAnchor="2.0"/>
-                </children>
-            </AnchorPane>
-        </center>
     </BorderPane>
     <HBox alignment="BOTTOM_CENTER" prefHeight="30.0" spacing="5.0"
           style="-fx-background-color: derive(-fx-base, 20%) derive(-fx-base, 20%);" AnchorPane.rightAnchor="10.0"

@@ -267,7 +267,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						var box = new Dimension2D(view.getOptionHorizontalZoomFactor() * width - 100, view.getOptionVerticalZoomFactor() * height - 150);
 
 						if (!view.emptyProperty().get()) {
-							var pane = new TreePane(mainWindow, view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
+							var pane = new TreePane(mainWindow, controller.getScrollPane(), view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
 									view.getOptionDiagram(), view.getOptionLabelEdgesBy(), view.getOptionAveraging(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(), null,
 									controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap(), optimize);
 							view.setEdgeSelectionModel(pane.getEdgeSelectionModel());

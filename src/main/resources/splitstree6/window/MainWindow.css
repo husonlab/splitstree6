@@ -101,5 +101,13 @@ viewer-background {
     -fx-stroke-width: 20;
 }
 
+.titled-pane > .title {
+    -fx-padding: 1 6 1 6;
+}
+
+.titled-pane > .title > .text {
+    -fx-font-size: 13px;
+}
+
 
 

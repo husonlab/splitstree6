@@ -47,6 +47,21 @@ public class WorkflowTreeViewController {
 		MaterialIcons.setIcon(addMenuButton, "add");
 		MaterialIcons.setIcon(deleteButton, "delete");
 		MaterialIcons.setIcon(copyButton, "copy");
+
+		workflowTreeView.addEventFilter(javafx.scene.input.TouchEvent.TOUCH_PRESSED, e -> {
+			var target = e.getTouchPoint().getPickResult().getIntersectedNode();
+			while (target != null && !(target instanceof javafx.scene.control.TreeCell)) {
+				target = target.getParent();
+			}
+			if (target instanceof javafx.scene.control.TreeCell<?> cell) {
+				int index = cell.getIndex();
+				if (index >= 0) {
+					workflowTreeView.getSelectionModel().select(index);
+					workflowTreeView.getFocusModel().focus(index);
+					e.consume();
+				}
+			}
+		});
 	}
 
 	public TreeView<String> getWorkflowTreeView() {

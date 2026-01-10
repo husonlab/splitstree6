@@ -27,6 +27,20 @@
             fx:controller="splitstree6.view.trees.treeview.TreeViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <center>
+            <AnchorPane fx:id="outerAnchorPane">
+                <children>
+                    <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
+                                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                AnchorPane.topAnchor="0.0">
+                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0"
+                                   AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0"/>
+                    </AnchorPane>
+                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
+                          AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
+                </children>
+            </AnchorPane>
+        </center>
         <top>
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="34.0">
@@ -95,20 +109,6 @@
                 </ToolBar>
             </VBox>
         </top>
-        <center>
-            <AnchorPane fx:id="outerAnchorPane">
-                <children>
-                    <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
-                                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                AnchorPane.topAnchor="0.0">
-                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0"
-                                   AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0"/>
-                    </AnchorPane>
-                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
-                          AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
-                </children>
-            </AnchorPane>
-        </center>
     </BorderPane>
     <HBox alignment="BOTTOM_CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="5.0"
           style="-fx-background-color: derive(-fx-base, 20%);" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">

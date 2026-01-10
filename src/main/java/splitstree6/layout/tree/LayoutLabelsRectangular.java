@@ -58,8 +58,12 @@ public class LayoutLabelsRectangular {
 
 							var add = (max0 > Double.MIN_VALUE ? max0 - shape.getTranslateX() : 0) + labelGap;
 							label.translateXProperty().bind(shape.translateXProperty().add(add));
-							if (alignLabels && add > 1.1 * labelGap) {
-								labelConnector.update(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY());
+							if (alignLabels) {
+								if (add > labelGap) {
+									labelConnector.setVisible(true);
+									labelConnector.update(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY());
+								} else
+									labelConnector.setVisible(false);
 							}
 						} else {
 							label.translateXProperty().bind(shape.translateXProperty().add(labelGap));

@@ -27,7 +27,21 @@
        <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0"
                   AnchorPane.topAnchor="0.0">
-         <top>
+          <center>
+             <AnchorPane fx:id="outerAnchorPane">
+                <children>
+                   <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
+                               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                               AnchorPane.topAnchor="0.0">
+                      <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                   </AnchorPane>
+                   <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
+                         AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
+                </children>
+             </AnchorPane>
+          </center>
+          <top>
             <VBox fx:id="vbox" BorderPane.alignment="CENTER">
                <children>
                   <ToolBar prefHeight="40.0" prefWidth="200.0">
@@ -77,21 +91,7 @@
                </children>
             </VBox>
          </top>
-         <center>
-            <AnchorPane fx:id="outerAnchorPane">
-               <children>
-                  <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
-                              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                              AnchorPane.topAnchor="0.0">
-                     <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                  </AnchorPane>
-                  <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
-                        AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
-               </children>
-            </AnchorPane>
-         </center>
-      </BorderPane>
+       </BorderPane>
 
       <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" spacing="5.0"
             style="-fx-background-color: derive(-fx-base, 20%);" AnchorPane.rightAnchor="10.0"

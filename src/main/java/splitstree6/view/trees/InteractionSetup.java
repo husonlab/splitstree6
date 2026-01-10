@@ -20,6 +20,8 @@
 package splitstree6.view.trees;
 
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanExpression;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -29,13 +31,16 @@ import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
+import jloda.fx.control.MultiTouchGestureMonitor;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -73,13 +78,27 @@ public class InteractionSetup {
 
 	private final AService<Collection<Edge>> computeEdgeSelectionService = new AService<>();
 
+	private final BooleanProperty multiTouchGestureInProgress;
+
 	private double mouseDownX;
 	private double mouseDownY;
 
-	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, TaxaBlock taxaBlock, TreeDiagramType diagram, StringProperty orientation,
+	public InteractionSetup(Stage stage, ScrollPane scrollPane, Pane pane, UndoManager undoManager, TaxaBlock taxaBlock, TreeDiagramType diagram, StringProperty orientation,
 							SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel,
 							ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 		this.undoManager = undoManager;
+
+		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(pane);
+		if (scrollPane != null && !SplitsTree6.isDesktop()) {
+			scrollPane.setPannable(false);
+			scrollPane.addEventFilter(ScrollEvent.ANY, e -> {
+				if (e.getTouchCount() < 2)
+					e.consume();
+			});
+			multiTouchGestureInProgress.addListener((v, o, n) -> {
+				scrollPane.setPannable(n);
+			});
+		}
 
 		pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 			if (e.isStillSincePress()) {
@@ -168,7 +187,7 @@ public class InteractionSetup {
 					var labeledShape = nodeShapeMap.get(v);
 					if (labeledShape.hasLabel()) {
 						var handler = createMouseClickedOnNodeHandler(taxaBlock, taxonSelectionModel, v);
-						var contextMenuHander = createNodeContextMenuHandler(stage, undoManager, labeledShape.getLabel());
+						var contextMenuHander = createNodeContextMenuHandler(stage, undoManager, labeledShape.getLabel(), multiTouchGestureInProgress.not());
 
 						for (var node : labeledShape.all()) {
 							node.setOnMouseClicked(handler);
@@ -209,7 +228,7 @@ public class InteractionSetup {
 	}
 
 	public void initializeSelection(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel, ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
-		if (taxonSelectionModel.size() > 0 && nodeShapeMap.size() > 0) {
+		if (taxonSelectionModel.size() > 0 && !nodeShapeMap.isEmpty()) {
 			if (nodeShapeMap.keySet().iterator().next().getOwner() instanceof PhyloTree tree) {
 				for (var v : tree.nodes()) {
 					for (var t : tree.getTaxa(v)) {
@@ -433,19 +452,21 @@ public class InteractionSetup {
 		};
 	}
 
-	public static EventHandler<? super ContextMenuEvent> createNodeContextMenuHandler(Stage stage, UndoManager undoManager, RichTextLabel label) {
+	public static EventHandler<? super ContextMenuEvent> createNodeContextMenuHandler(Stage stage, UndoManager undoManager, RichTextLabel label, BooleanExpression allow) {
 		return event -> {
-			var editLabelMenuItem = new MenuItem("Edit Label...");
-			editLabelMenuItem.setOnAction(e -> {
-				if (SplitsTree6.isDesktop()) {
-					NodeLabelDialog.apply(undoManager, stage, label);
-				} else {
-					NodeLabelDialog.apply(undoManager, label, null);
-				}
-			});
-			var menu = new ContextMenu();
-			menu.getItems().add(editLabelMenuItem);
-			menu.show(label, event.getScreenX(), event.getScreenY());
+			if (allow == null || allow.get()) {
+				var editLabelMenuItem = new MenuItem("Edit Label...");
+				editLabelMenuItem.setOnAction(e -> {
+					if (SplitsTree6.isDesktop()) {
+						NodeLabelDialog.apply(undoManager, stage, label);
+					} else {
+						NodeLabelDialog.apply(undoManager, label, null);
+					}
+				});
+				var menu = new ContextMenu();
+				menu.getItems().add(editLabelMenuItem);
+				menu.show(label, event.getScreenX(), event.getScreenY());
+			}
 		};
 	}
 }

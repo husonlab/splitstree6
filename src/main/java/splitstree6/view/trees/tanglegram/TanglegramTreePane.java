@@ -27,6 +27,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
+import javafx.scene.control.ScrollPane;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.RunAfterAWhile;
@@ -54,7 +55,7 @@ public class TanglegramTreePane extends Group {
 
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
-	public TanglegramTreePane(MainWindow mainWindow, UndoManager undoManager, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
+	public TanglegramTreePane(MainWindow mainWindow, ScrollPane scrollPane, UndoManager undoManager, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
 							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LabelEdgesBy> labelByEdges, ObjectProperty<Averaging> optionAveraging, StringProperty optionOrientation,
 							  ReadOnlyDoubleProperty fontScaleFactor, ObservableMap<Node, LabeledNodeShape> nodeShapeMap, LongProperty updateRequested) {
@@ -63,7 +64,7 @@ public class TanglegramTreePane extends Group {
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
-						treePane = new TreePane(mainWindow, undoManager, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+						treePane = new TreePane(mainWindow, scrollPane, undoManager, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 								optionDiagram.get(), labelByEdges.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
 								null, nodeShapeMap, FXCollections.observableHashMap(), false);
 
