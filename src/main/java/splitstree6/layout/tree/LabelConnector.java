@@ -19,7 +19,7 @@
 
 package splitstree6.layout.tree;
 
-import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.DoubleExpression;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -27,16 +27,27 @@ import javafx.scene.shape.Line;
  * connects a label to the corresponding node
  */
 public class LabelConnector extends Line {
-	public LabelConnector(double x1, double y1, double x2, double y2) {
-		setStartX(x1);
-		setStartY(y1);
-		setEndX(x2);
-		setEndY(y2);
+	public LabelConnector() {
 		setStroke(Color.DARKGRAY);
 		getStrokeDashArray().addAll(2.0, 5.0);
 	}
 
-	public LabelConnector(DoubleBinding x1, DoubleBinding y1, DoubleBinding x2, DoubleBinding y2) {
+	public LabelConnector(double x1, double y1, double x2, double y2) {
+		this();
+		setStartX(x1);
+		setStartY(y1);
+		setEndX(x2);
+		setEndY(y2);
+	}
+
+	public void update(double x1, double y1, double x2, double y2) {
+		setStartX(x1);
+		setStartY(y1);
+		setEndX(x2);
+		setEndY(y2);
+	}
+
+	public LabelConnector(DoubleExpression x1, DoubleExpression y1, DoubleExpression x2, DoubleExpression y2) {
 		startXProperty().bind(x1);
 		startYProperty().bind(y1);
 		endXProperty().bind(x2);

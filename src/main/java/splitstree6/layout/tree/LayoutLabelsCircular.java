@@ -38,18 +38,25 @@ public class LayoutLabelsCircular {
 							 double labelGap, Group labelConnectors) {
 
 		var alignLabels = (labelConnectors != null);
-		final double maxRadius;
-		if (alignLabels) {
-			maxRadius = tree.nodeStream().map(nodeShapeMap::get).mapToDouble(s -> GeometryUtilsFX.magnitude(s.getTranslateX(), s.getTranslateY())).max().orElse(0);
-		} else
-			maxRadius = Double.MIN_VALUE;
 
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = shape.getLabel();
 			if (label != null) {
-				InvalidationListener changeListener = a -> {
+				LabelConnector labelConnector;
+				if (alignLabels) {
+					labelConnector = new LabelConnector();
+					labelConnectors.getChildren().add(labelConnector);
+				} else labelConnector = null;
+
+				InvalidationListener invalidationListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
+						final double maxRadius;
+						if (alignLabels) {
+							maxRadius = tree.nodeStream().map(nodeShapeMap::get).mapToDouble(s -> GeometryUtilsFX.magnitude(s.getTranslateX(), s.getTranslateY())).max().orElse(0);
+						} else
+							maxRadius = Double.MIN_VALUE;
+
 						var angle = nodeAngleMap.get(v);
 						if (angle == null) {
 							if (v.getParent() != null) {
@@ -67,21 +74,27 @@ public class LayoutLabelsCircular {
 						var add = v.isLeaf() ? (maxRadius > Double.MIN_VALUE ? maxRadius - GeometryUtilsFX.magnitude(shape.getTranslateX(), shape.getTranslateY()) : 0) : -10;
 
 						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, add + labelGap + 0.5 * label.getWidth());
-						label.setTranslateX(shape.getTranslateX() - 0.5 * label.getWidth() + offset.getX());
-						label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight() + offset.getY());
+						label.translateXProperty().bind(shape.translateXProperty().add(-0.5 * label.getWidth() + offset.getX()));
+						label.translateYProperty().bind(shape.translateYProperty().add(-0.5 * label.getHeight() + offset.getY()));
+
+						//label.setTranslateX(shape.getTranslateX() - 0.5 * label.getWidth() + offset.getX());
+						//label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight() + offset.getY())
 
 						if (alignLabels && add > 1.1 * labelGap) {
 							var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
 							var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
-							labelConnectors.getChildren().add(new LabelConnector(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY()));
+							labelConnector.update(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY());
 						}
 						label.setAnchor(shape);
 						label.setRotate(angle);
 						label.ensureUpright();
 					}
 				};
-				label.widthProperty().addListener(changeListener);
-				label.heightProperty().addListener(changeListener);
+				label.widthProperty().addListener(invalidationListener);
+				label.heightProperty().addListener(invalidationListener);
+				shape.translateXProperty().addListener(invalidationListener);
+				shape.translateYProperty().addListener(invalidationListener);
+
 			}
 		}
 	}

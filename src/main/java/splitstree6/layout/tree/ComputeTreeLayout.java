@@ -25,6 +25,7 @@ import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.DraggableUtils;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -150,7 +151,6 @@ public class ComputeTreeLayout {
 
 			var nodeShape = new LabeledNodeShape(label, shape);
 			nodeGroup.getChildren().add(nodeShape);
-
 			nodeShapeMap.put(v, nodeShape);
 
 			var point = nodePointMap.get(v);
@@ -175,11 +175,11 @@ public class ComputeTreeLayout {
 		}
 
 		if (diagram == TreeDiagramType.CircularCladogram || diagram == TreeDiagramType.CircularPhylogram) {
-			CreateEdgesCircular.apply(diagram, tree, nodePointMap, nodeAngleMap, edgeShapeMap);
+			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Circular);
 		} else if (diagram == TreeDiagramType.TriangularCladogram || diagram == TreeDiagramType.RadialPhylogram || diagram == TreeDiagramType.RadialCladogram) {
-			CreateEdgesStraight.apply(tree, nodeShapeMap, diagram == TreeDiagramType.RadialPhylogram, edgeShapeMap);
+			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Straight);
 		} else { // if (diagram == TreePane.TreeDiagramType.Rectangular) {
-			CreateEdgesRectangular.apply(tree, nodeShapeMap, edgeShapeMap);
+			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Rectangular);
 		}
 		edgeGroup.getChildren().addAll(edgeShapeMap.values());
 
@@ -192,8 +192,11 @@ public class ComputeTreeLayout {
 		switch (diagram) {
 			case CircularPhylogram, CircularCladogram ->
 					LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeAngleMap, labelGap, labelConnectorGroup);
-			case RadialPhylogram, RadialCladogram ->
-					layoutLabelsRadialPhylogram = new SetupRadialLabelLayout(tree, nodeShapeMap, nodeAngleMap, labelGap);
+			case RadialPhylogram, RadialCladogram -> {
+				var layouter = new SetupRadialLabelLayout(tree, nodeShapeMap, nodeAngleMap, labelGap);
+				layoutLabelsRadialPhylogram = layouter;
+				RunAfterAWhile.applyInFXThread(layouter, () -> layouter.accept(LayoutOrientation.Rotate0Deg));
+			}
 			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, labelGap, labelConnectorGroup);
 		}
 		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, otherLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram, unitLengthX);

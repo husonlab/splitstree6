@@ -24,10 +24,8 @@ import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.StringUtils;
 
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 
 /**
@@ -44,9 +42,6 @@ public class SetupRadialLabelLayout implements Consumer<LayoutOrientation> {
 
 		labelLayout = new RadialLabelLayout();
 		labelLayout.setGap(labelGap);
-
-		var values = new TreeSet<>(nodeAngleMap.values());
-		System.err.println("angles: " + StringUtils.toString(values, " "));
 
 		for (var v : tree.nodes()) {
 			var labeledNodeShape = nodeShapeMap.get(v);

@@ -340,7 +340,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		});
 
 		controller.getScrollPane().setContent(splitNetworkPane);
-		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(view.getOptionZoomFactor() * controller.getScrollPane().getZoomFactorY()));
 
 		updateListener = e -> RunAfterAWhile.apply(splitNetworkPane, () -> Platform.runLater(splitNetworkPane::drawNetwork));
 

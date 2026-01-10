@@ -34,38 +34,43 @@ public class LayoutLabelsRectangular {
 
 	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, double labelGap, Group labelConnectors) {
 		var alignLabels = (labelConnectors != null);
-		double max;
-		if (alignLabels) {
-			max = tree.nodeStream().mapToDouble(v -> nodeShapeMap.get(v).getTranslateX()).max().orElse(0);
-		} else
-			max = Double.MIN_VALUE;
 
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = shape.getLabel();
 			if (label != null) {
 				label.setAnchor(shape);
+				LabelConnector labelConnector;
+				if (alignLabels) {
+					labelConnector = new LabelConnector();
+					labelConnectors.getChildren().add(labelConnector);
+				} else labelConnector = null;
 
 				InvalidationListener invalidationListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
 						if (tree.isLsaLeaf(v)) {
-							var add = (max > Double.MIN_VALUE ? max - shape.getTranslateX() : 0) + labelGap;
-							label.setTranslateX(shape.getTranslateX() + add);
+							double max0;
+							if (alignLabels) {
+								max0 = tree.nodeStream().mapToDouble(u -> nodeShapeMap.get(u).getTranslateX()).max().orElse(0);
+							} else {
+								max0 = Double.MIN_VALUE;
+							}
+
+							var add = (max0 > Double.MIN_VALUE ? max0 - shape.getTranslateX() : 0) + labelGap;
+							label.translateXProperty().bind(shape.translateXProperty().add(add));
 							if (alignLabels && add > 1.1 * labelGap) {
-								if (label.getUserData() instanceof LabelConnector labelConnector)
-									labelConnectors.getChildren().remove(labelConnector);
-								var labelConnector = new LabelConnector(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY());
-								labelConnectors.getChildren().add(labelConnector);
-								label.setUserData(labelConnector);
+								labelConnector.update(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY());
 							}
 						} else {
-							label.setTranslateX(shape.getTranslateX() + labelGap);
+							label.translateXProperty().bind(shape.translateXProperty().add(labelGap));
 						}
-						label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight());
+						label.translateYProperty().bind(shape.translateYProperty().subtract(0.5 * label.getHeight()));
 					}
 				};
 				label.widthProperty().addListener(invalidationListener);
 				label.heightProperty().addListener(invalidationListener);
+				shape.translateXProperty().addListener(invalidationListener);
+				shape.translateYProperty().addListener(invalidationListener);
 			}
 		}
 	}

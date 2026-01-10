@@ -114,9 +114,6 @@ public class LayoutUtils {
 		var minY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).min().orElse(0);
 		var maxY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).max().orElse(0);
 
-		var dx = (minX + maxX) / 2;
-		var dy = (minY + maxY) / 2;
-
 		var scaleX = (maxX > minX ? width / (maxX - minX) : 1);
 		var scaleY = (maxY > minY ? height / (maxY - minY) : 1);
 		if (maintainAspectRatio) {
@@ -124,7 +121,9 @@ public class LayoutUtils {
 		}
 		if (scaleX != 1 || scaleY != 1) {
 			for (var v : nodePointMap.keySet()) {
-				var point = nodePointMap.get(v).subtract(dx, dy);
+				var point = nodePointMap.get(v);
+				if (!maintainAspectRatio)
+					point = point.subtract(minX, minY);
 				nodePointMap.put(v, new Point2D(point.getX() * scaleX, point.getY() * scaleY));
 			}
 		}

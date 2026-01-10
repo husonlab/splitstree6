@@ -34,11 +34,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
-import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.qr.QRViewUtils;
 import jloda.fx.qr.TreeNewickQR;
-import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.RunAfterAWhile;
@@ -50,7 +48,7 @@ import jloda.util.Basic;
 import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.ScaleUtils;
+import splitstree6.layout.Zoom;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -242,9 +240,18 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				TreeViewEdits.clearEdits(view.optionEditsProperty());
 		});
 
+		final Single<Double> hZoomOld = new Single<>(1.0);
+		final Single<Double> vZoomOld = new Single<>(1.0);
 
 		update = optimize -> {
 			if (tree.get() != null) {
+				scrollPane.setContent(new Pane());
+				view.setOptionOrientation(LayoutOrientation.Rotate0DegString);
+
+				scrollPane.resetZoom();
+				hZoomOld.set(scrollPane.getZoomFactorX());
+				vZoomOld.set(scrollPane.getZoomFactorY());
+
 				if (tree.get().hasReticulateEdges() && view.getOptionDiagram() == TreeDiagramType.TriangularCladogram) {
 					view.setOptionDiagram(TreeDiagramType.RectangularCladogram);
 				}
@@ -293,20 +300,26 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			});
 		});
 
-		view.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> {
-			if (treePane.get() != null) {
-				treePane.get().setScaleX(treePane.get().getScaleX() / o.doubleValue() * n.doubleValue());
-				if (!lockAspectRatio.get())
-					update.accept(false);
-			}
-		});
+		InvalidationListener zoomChangedListener = e -> {
+			var hZoomFactor = view.getOptionHorizontalZoomFactor();
+			var vZoomFactor = view.getOptionVerticalZoomFactor();
 
-		view.optionVerticalZoomFactorProperty().addListener((v, o, n) -> {
-			if (treePane.get() != null) {
-				treePane.get().setScaleY(treePane.get().getScaleY() / o.doubleValue() * n.doubleValue());
-				update.accept(false);
+
+			if (scrollPane.isLockAspectRatio()) {
+				hZoomFactor = vZoomFactor;
 			}
-		});
+
+			if (hZoomOld.get() != hZoomFactor || vZoomOld.get() != vZoomFactor) {
+				Zoom.apply(hZoomFactor / hZoomOld.get(), vZoomFactor / vZoomOld.get(), view.getNodeShapeMap(), view.getEdgeShapeMap());
+				hZoomOld.set(hZoomFactor);
+				vZoomOld.set(vZoomFactor);
+			}
+		};
+
+
+		view.optionHorizontalZoomFactorProperty().addListener(zoomChangedListener);
+		view.optionVerticalZoomFactorProperty().addListener(zoomChangedListener);
+
 
 		if (false)
 			view.optionFontScaleFactorProperty().addListener(e -> {
@@ -400,30 +413,21 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		view.optionAveragingProperty().addListener((v, o, n) -> undoManager.add("node averaging", view.optionAveragingProperty(), o, n));
 		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", view.optionOrientationProperty(), o, n));
 
-		view.optionOrientationProperty().addListener((v, o, n) -> {
-			System.err.println("optionOrientationProperty " + o + " -> " + n);
-		});
-
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
 
-		//view.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("horizontal zoom", view.optionHorizontalZoomFactorProperty(), o, n));
-		//view.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("vertical zoom", view.optionVerticalZoomFactorProperty(), o, n));
-
-		// treeView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("show tree names", treeView.optionShowTreeNamesProperty(), o, n));
-		// treeView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("show tree info", treeView.optionShowTreeInfoProperty(), o, n));
-
-		var object = new Object();
-		selectionChangeListener = e -> {
-			if (e.wasAdded()) {
-				RunAfterAWhile.applyInFXThreadOrClearIfAlreadyWaiting(object, () -> {
-					var taxon = e.getElementAdded();
-					var v = tree.get().getTaxon2Node(mainWindow.getWorkingTaxa().indexOf(taxon));
-					var node = view.getNodeShapeMap().get(v);
-					controller.getScrollPane().ensureVisible(node);
-				});
-			}
-
-		};
+		{
+			var sync = new Object();
+			selectionChangeListener = e -> {
+				if (e.wasAdded()) {
+					RunAfterAWhile.applyInFXThreadOrClearIfAlreadyWaiting(sync, () -> {
+						var taxon = e.getElementAdded();
+						var v = tree.get().getTaxon2Node(mainWindow.getWorkingTaxa().indexOf(taxon));
+						var node = view.getNodeShapeMap().get(v);
+						controller.getScrollPane().ensureVisible(node);
+					});
+				}
+			};
+		}
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
 		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
@@ -527,48 +531,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 	public LongProperty updateCounterProperty() {
 		return updateCounter;
-	}
-
-	private static void setupZoomTracking(UndoManager undoManager, ZoomableScrollPane scrollPane, ReadOnlyDoubleProperty zoomX, ReadOnlyDoubleProperty zoomY) {
-		var oldZoomX = new Single<Double>(null);
-
-		zoomX.addListener((v, o, n) -> {
-			var zoomFactor = n.doubleValue() / o.doubleValue();
-			if (zoomFactor > 0 && zoomFactor != 1.0) {
-				if (oldZoomX.get() == null) {
-					oldZoomX.set(o.doubleValue());
-				}
-				RunAfterAWhile.applyInFXThread(oldZoomX, () -> {
-					var factor = n.doubleValue() / oldZoomX.get();
-					if (factor > 0 && factor != 1.0) {
-						undoManager.add("Zoom horizontally",
-								() -> ScaleUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / factor, 1.0),
-								() -> ScaleUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), factor, 1.0));
-						oldZoomX.set(null);
-					}
-				});
-			}
-		});
-
-		var oldZoomY = new Single<Double>(null);
-
-		zoomY.addListener((v, o, n) -> {
-			var zoomFactor = n.doubleValue() / o.doubleValue();
-			if (zoomFactor > 0 && zoomFactor != 1.0) {
-				if (oldZoomY.get() == null) {
-					oldZoomY.set(o.doubleValue());
-				}
-				RunAfterAWhile.applyInFXThread(oldZoomY, () -> {
-					var factor = n.doubleValue() / oldZoomY.get();
-					if (factor > 0 && factor != 1.0) {
-						undoManager.add("Zoom vertically",
-								() -> ScaleUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0, 1.0 / factor),
-								() -> ScaleUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0, factor));
-						oldZoomY.set(null);
-					}
-				});
-			}
-		});
 	}
 
 	public FindToolBar getFindToolBar() {
