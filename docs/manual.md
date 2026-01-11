@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.6.5, built 25 Nov 2025)
+SplitsTree App (version 6.7.0, built 11 Jan 2026)
 
 ---
 author:
@@ -1468,7 +1468,7 @@ purposes.
       [Threshold=non-negative-number;]
       [PROPERTIES
         [Fit=non-negative-number]
-        [{Compatible|Cyclic|Weakly Compatible|Incompatible]
+        [{Compatible|Circular|Weakly Compatible|Incompatible}]
       ;]
       [CYCLE [taxon_i_1 taxon_i_2 ... taxon_i_ntax];]
       [SPLITSLABELS label_1 label_2 ... label_nsplits;]
@@ -1975,7 +1975,7 @@ Reference: [@SokalMichener1958]
 #### Neighbor Net
 
 The *Neighbor Net* algorithm takes a Distances block as input and
-produces a Splits block as output. It computes a set of cyclic splits
+produces a Splits block as output. It computes a set of circular splits
 using the neighbor-net method. The algorithm has the following options:
 
 `InferenceAlgorithm = {GradientProjection | ActiveSet | APGD | SplitsTree4}` -
