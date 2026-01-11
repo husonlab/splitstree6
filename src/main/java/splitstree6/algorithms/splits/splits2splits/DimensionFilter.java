@@ -79,7 +79,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock parent, SplitsBlock child) {
 		active = false;
 
-		if (parent.getCompatibility() != Compatibility.compatible && parent.getCompatibility() != Compatibility.cyclic && parent.getCompatibility() != Compatibility.weaklyCompatible) {
+		if (parent.getCompatibility() != Compatibility.compatible && parent.getCompatibility() != Compatibility.circular && parent.getCompatibility() != Compatibility.weaklyCompatible) {
 			apply(progress, getOptionMaxDimension(), parent.getSplits(), child.getSplits());
 			if (parent.getNsplits() == child.getNsplits()) {
 				child.setCycle(parent.getCycle().clone());

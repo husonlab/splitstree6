@@ -27,7 +27,7 @@ import java.util.List;
  * Daniel Huson, 12/31/16.
  */
 public enum Compatibility {
-	compatible, cyclic, weaklyCompatible, incompatible, unknown;
+	compatible, circular, weaklyCompatible, incompatible, unknown;
 
 	/**
 	 * computes the compatiblity of a set of splits
@@ -38,7 +38,7 @@ public enum Compatibility {
 		if (isCompatible(splits))
 			return compatible;
 		else if (isCyclic(ntax, splits, cycle))
-			return cyclic;
+			return circular;
 		else if (ntax < 100 && isWeaklyCompatible(splits))
 			return weaklyCompatible;
 		else

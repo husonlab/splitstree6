@@ -55,7 +55,6 @@ import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.splits.algorithms.ConvexHull;
 import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.splits.algorithms.PhylogeneticOutline;
@@ -190,7 +189,7 @@ public class SplitNetworkLayout {
 			try {
 				var usedSplits = new BitSet();
 				PhylogeneticOutline.apply(progress, diagram.isUsingWeights(), taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
-				if (splitsBlock.getCompatibility() != Compatibility.compatible && splitsBlock.getCompatibility() != Compatibility.cyclic && usedSplits.cardinality() < splitsBlock.getNsplits())
+				if (splitsBlock.getCompatibility() != Compatibility.compatible && splitsBlock.getCompatibility() != Compatibility.circular && usedSplits.cardinality() < splitsBlock.getNsplits())
 					NotificationManager.showWarning(String.format("Outline algorithm: Showing only %d of %d splits", usedSplits.cardinality(), splitsBlock.getNsplits()));
 			} catch (CanceledException e) {
 				NotificationManager.showWarning("User CANCELED 'outline' computation");

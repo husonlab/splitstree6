@@ -140,7 +140,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			if (n == null) {
 				disabledDiagramTypes.addAll(List.of(SplitsDiagramType.values()));
 			} else {
-				if (n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic) {
+				if (n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.circular) {
 					disabledDiagramTypes.add(SplitsDiagramType.Outline);
 					disabledDiagramTypes.add(SplitsDiagramType.OutlineTopology);
 					if (view.getOptionDiagram() == SplitsDiagramType.Outline)

@@ -37,6 +37,7 @@ public class SplitsLoader extends DataLoader<SourceBlock, SplitsBlock> {
 	public void load(ProgressListener progress, SourceBlock inputData, TaxaBlock outputTaxa, SplitsBlock outputBlock) throws IOException {
 		var file = inputData.getSources().get(0);
 		var ok = false;
+		var buf = new StringBuilder();
 		for (var reader : getReaders()) {
 			try {
 				if (reader.getToClass().equals(SplitsBlock.class)) {
@@ -45,11 +46,15 @@ public class SplitsLoader extends DataLoader<SourceBlock, SplitsBlock> {
 					ok = true;
 					break;
 				}
-			} catch (IOException ignored) {
+			} catch (IOException ex) {
+				buf.append(ex.getMessage()).append("\n");
 			}
 		}
-		if (!ok)
-			throw new IOException("Failed to parse: " + file);
+		if (!ok) {
+			if (buf.isEmpty())
+				buf.append("No suitable reader");
+			throw new IOException("Parse failed: " + buf.toString());
+		}
 	}
 
 	@Override

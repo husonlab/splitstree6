@@ -53,7 +53,7 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 				[Threshold=non-negative-number;]
 				[PROPERTIES
 					[Fit=non-negative-number]
-					[{Compatible|Cyclic|Weakly Compatible|Incompatible]
+					[{Compatible|Circular|Weakly Compatible|Incompatible]}
 				;]
 				[CYCLE [taxon_i_1 taxon_i_2 ... taxon_i_ntax];]
 				[SPLITSLABELS label_1 label_2 ... label_nsplits;]
@@ -93,8 +93,10 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 		np.matchBeginBlock("SPLITS");
 		parseTitleAndLink(np);
 
+		np.matchIgnoreCase("dimensions");
 		final int ntax = taxaBlock.getNtax();
-		np.matchIgnoreCase("dimensions nTax=" + ntax);
+		if (np.peekMatchIgnoreCase("nTax"))
+			np.matchIgnoreCase("nTax=" + ntax);
 		int nsplits = 0;
 		if (np.peekMatchIgnoreCase("nSplits=")) {
 			np.matchIgnoreCase("nSplits=");
@@ -156,8 +158,11 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 			if (np.findIgnoreCase(p, "compatible", true, splitsBlock.getCompatibility() == Compatibility.compatible))
 				splitsBlock.setCompatibility(Compatibility.compatible);
 
-			if (np.findIgnoreCase(p, "cyclic", true, splitsBlock.getCompatibility() == Compatibility.cyclic))
-				splitsBlock.setCompatibility(Compatibility.cyclic);
+			// used to use the key word cyclic, now use circular
+			if (np.findIgnoreCase(p, "cyclic", true, splitsBlock.getCompatibility() == Compatibility.circular))
+				splitsBlock.setCompatibility(Compatibility.circular);
+			if (np.findIgnoreCase(p, "circular", true, splitsBlock.getCompatibility() == Compatibility.circular))
+				splitsBlock.setCompatibility(Compatibility.circular);
 
 			if (np.findIgnoreCase(p, "incompatible", true, splitsBlock.getCompatibility() == Compatibility.incompatible))
 				splitsBlock.setCompatibility(Compatibility.incompatible);

@@ -71,8 +71,8 @@ public class SplitsNexusOutput extends NexusIOBase implements INexusOutput<Split
 			case compatible:
 				w.write(" compatible");
 				break;
-			case cyclic:
-				w.write(" cyclic");
+			case circular:
+				w.write(" circular");
 				break;
 			case weaklyCompatible:
 				w.write(" weakly compatible");
@@ -92,7 +92,7 @@ public class SplitsNexusOutput extends NexusIOBase implements INexusOutput<Split
 			w.write(";\n");
 		}
 
-		if (splitsBlock.getSplitLabels().size() > 0) {
+		if (!splitsBlock.getSplitLabels().isEmpty()) {
 			w.write("SPLITSLABELS");
 			for (var label : splitsBlock.getSplitLabels().values()) {
 				if (label == null)

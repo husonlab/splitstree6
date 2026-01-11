@@ -97,7 +97,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		if (false) {
 			var newSplits = new SplitsBlock();
 			newSplits.setCycle(cycle);
-			newSplits.setCompatibility(Compatibility.cyclic);
+			newSplits.setCompatibility(Compatibility.circular);
 			for (var p = 2; p < cycle.length; p++) {
 				for (var q = p; q < cycle.length; q++) {
 					var bitsetA = new BitSet();
@@ -155,7 +155,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		if (Compatibility.isCompatible(splits))
 			splitsBlock.setCompatibility(Compatibility.compatible);
 		else
-			splitsBlock.setCompatibility(Compatibility.cyclic);
+			splitsBlock.setCompatibility(Compatibility.circular);
 		splitsBlock.setCycle(cycle);
 		splitsBlock.setFit(SplitsBlockUtilities.computeLeastSquaresFit(distancesBlock, splits));
 
