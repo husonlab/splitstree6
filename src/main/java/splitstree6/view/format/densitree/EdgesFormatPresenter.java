@@ -58,8 +58,7 @@ public class EdgesFormatPresenter {
 			var newColor = MainWindowManager.isUseDarkTheme() ? DEFAULT_DARKMODE_EDGE_COLOR : DEFAULT_LIGHTMODE_EDGE_COLOR;
 			undoManager.doAndAdd("Color", view.optionEdgeColorProperty(), view.getOptionEdgeColor(), newColor);
 		});
-		controller.getResetColorButton().disableProperty().bind(
-				(MainWindowManager.useDarkThemeProperty().and(view.optionEdgeColorProperty().isEqualTo(DEFAULT_DARKMODE_EDGE_COLOR)))
+		controller.getResetColorButton().disableProperty().bind((MainWindowManager.useDarkThemeProperty().and(view.optionEdgeColorProperty().isEqualTo(DEFAULT_DARKMODE_EDGE_COLOR)))
 						.or(MainWindowManager.useDarkThemeProperty().not().and(view.optionEdgeColorProperty().isEqualTo(DEFAULT_LIGHTMODE_EDGE_COLOR))));
 
 		controller.getResetOtherColorButton().setOnAction(a -> undoManager.doAndAdd("Other color", view.optionOtherColorProperty(), view.getOptionOtherColor(), DEFAULT_OTHER_COLOR));

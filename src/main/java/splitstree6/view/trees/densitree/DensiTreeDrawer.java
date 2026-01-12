@@ -123,13 +123,14 @@ public class DensiTreeDrawer {
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					  ReadOnlyBooleanProperty showTrees, boolean hideFirst10PercentTrees, ReadOnlyBooleanProperty showConsensus,
 					  double lineWidth, Color edgeColor, Color otherColor) {
-
 		RunAfterAWhile.applyInFXThread(parent, () -> {
 			radialLabelLayout.getItems().clear();
 
-			var trees = new ArrayList<>(hideFirst10PercentTrees ? new ArrayList<>(trees0).subList(trees0.size() / 10, trees0.size()) : trees0);
-
 			parent.getChildren().clear();
+
+			if (trees0.isEmpty())
+				return;
+			var trees = new ArrayList<>(hideFirst10PercentTrees ? new ArrayList<>(trees0).subList(trees0.size() / 10, trees0.size()) : trees0);
 
 			var canvas0 = new Canvas(targetBounds.getWidth(), targetBounds.getHeight());
 			var canvas1 = (colorIncompatibleEdges ? new Canvas(targetBounds.getWidth(), targetBounds.getHeight()) : null);
@@ -269,6 +270,9 @@ public class DensiTreeDrawer {
 	private static void drawConsensus(MainWindow mainWindow, PhyloTree consensusTree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap,
 									  DensiTreeDiagramType diagramType, RadialLabelLayout radialLabelLayout, ReadOnlyBooleanProperty showConsensus, Pane labelPane) {
 
+		if (consensusTree.getRoot() == null)
+			return;
+
 		var taxaBlock = mainWindow.getWorkingTaxa();
 
 		var edgesGroup = new Group();
@@ -395,8 +399,7 @@ public class DensiTreeDrawer {
 
 		gc.setLineWidth(lineWidth);
 
-		var treeClusters = (round < 2 ? TreesUtils.extractClusters(tree) : null);
-
+		try (var treeClusters = (round < 2 ? TreesUtils.extractClusters(tree) : null)) {
 		gc.setStroke(edgeColor);
 
 		for (var v : tree.nodes()) {
@@ -436,6 +439,7 @@ public class DensiTreeDrawer {
 				}
 				progress.checkForCancel();
 			}
+		}
 		}
 	}
 

@@ -34,6 +34,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.util.StringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.qr.QRViewUtils;
@@ -356,6 +357,18 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
+		controller.getAveragingCBox().setConverter(new StringConverter<>() {
+			@Override
+			public String toString(Averaging value) {
+				return value == null ? "" : Averaging.createLabel(value);
+			}
+
+			@Override
+			public Averaging fromString(String string) {
+				return null; // not used for non-editable choice box
+			}
+		});
+
 		view.optionAveragingProperty().addListener(e -> update.accept(false));
 
 		controller.getContractHorizontallyButton().setOnAction(e -> {

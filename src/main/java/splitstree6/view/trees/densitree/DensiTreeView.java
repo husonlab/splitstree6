@@ -49,7 +49,7 @@ import java.util.List;
 
 public class DensiTreeView implements IView {
 	public static final Color DEFAULT_LIGHTMODE_EDGE_COLOR = Color.BLACK.deriveColor(1, 1, 1, 0.05);
-	public static final Color DEFAULT_DARKMODE_EDGE_COLOR = Color.WHITE.deriveColor(1, 1, 1, 0.05);
+	public static final Color DEFAULT_DARKMODE_EDGE_COLOR = Color.WHITE.deriveColor(0.1, 0.1, 0.1, 0.05);
 	public static final Color DEFAULT_OTHER_COLOR = Color.DARKRED.deriveColor(1, 1, 1, 0.05);
 	public static final double DEFAULT_STROKE_WIDTH = 0.5;
 
@@ -93,7 +93,7 @@ public class DensiTreeView implements IView {
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	private final DoubleProperty optionStrokeWidth = new SimpleDoubleProperty(this, "optionStrokeWidth");
-	private final ObjectProperty<Color> optionEdgeColor = new SimpleObjectProperty<>(this, "optionEdgeColor");
+	private final ObjectProperty<Color> optionEdgeColor = new SimpleObjectProperty<>(this, "optionEdgeColor", DEFAULT_LIGHTMODE_EDGE_COLOR);
 	private final ObjectProperty<Color> optionOtherColor = new SimpleObjectProperty<>(this, "optionOtherColor");
 
 	{

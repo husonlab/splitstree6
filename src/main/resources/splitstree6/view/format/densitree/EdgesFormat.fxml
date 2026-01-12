@@ -38,7 +38,7 @@
                                 <Font size="12.0"/>
                             </font>
                         </Label>
-                        <ChoiceBox fx:id="widthCBox" editable="true" prefWidth="125.0" visibleRowCount="14">
+                        <ChoiceBox fx:id="widthCBox" prefWidth="125.0">
                             <tooltip>
                                 <Tooltip text="Line width"/>
                             </tooltip>

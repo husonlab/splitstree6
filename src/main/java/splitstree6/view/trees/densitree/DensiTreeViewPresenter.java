@@ -36,6 +36,7 @@ import jloda.fx.find.FindToolBar;
 import jloda.fx.qr.QRViewUtils;
 import jloda.fx.qr.TreeNewickQR;
 import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
@@ -139,16 +140,18 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionColorIncompatibleEdgesProperty());
 
 		InvalidationListener invalidationListener = e -> {
-			var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
-			drawer.apply(targetBounds.get(),
-					trees, controller.getCenterPane(), view.getOptionDiagram(), view.getOptionAveraging(),
-					view.getOptionOrientation().startsWith("Flip"),
-					view.isOptionJitter(), view.isOptionRerootAndRescale(),
-					view.getOptionColorIncompatibleEdges(),
-					view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
-					view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
-					view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
-			consensusTree.set(drawer.getConsensusTree());
+			RunAfterAWhile.applyInFXThread(drawer, () -> {
+				var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
+				drawer.apply(targetBounds.get(),
+						trees, controller.getCenterPane(), view.getOptionDiagram(), view.getOptionAveraging(),
+						view.getOptionOrientation().startsWith("Flip"),
+						view.isOptionJitter(), view.isOptionRerootAndRescale(),
+						view.getOptionColorIncompatibleEdges(),
+						view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
+						view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
+						view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
+				consensusTree.set(drawer.getConsensusTree());
+			});
 		};
 
 		targetBounds.addListener(invalidationListener);
@@ -215,7 +218,6 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 				view.setOptionEdgeColor(DensiTreeView.DEFAULT_DARKMODE_EDGE_COLOR);
 			else if (!n && view.getOptionEdgeColor().equals(DensiTreeView.DEFAULT_DARKMODE_EDGE_COLOR))
 				view.setOptionEdgeColor(DensiTreeView.DEFAULT_LIGHTMODE_EDGE_COLOR);
-
 		});
 
 		SwipeUtils.setConsumeSwipeLeft(controller.getAnchorPane());
