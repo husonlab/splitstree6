@@ -44,6 +44,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class WorldMap extends Pane {
@@ -199,7 +200,7 @@ public class WorldMap extends Pane {
 		var group = new Group();
 
 		var verbose = false;
-		try (var r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("world-outline-low-precision_759.dat")))) {
+		try (var r = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("world-outline-low-precision_759.dat"))))) {
 			var json = r.lines().collect(Collectors.joining("\n"));
 
 			var objectMapper = new ObjectMapper();
@@ -244,6 +245,7 @@ public class WorldMap extends Pane {
 						for (JsonNode level2 : coordinatesNode) {
 							if (level2.isArray()) {
 								var polygon = new Polygon();
+								polygon.setStyle("-fx-fill: #d8d5cc;-fx-stroke: gray;");
 								for (JsonNode level3 : level2) {
 									// Note: the file provides the coordinates as longitude latitude
 									var latitude = level3.get(1).asDouble();
@@ -254,8 +256,6 @@ public class WorldMap extends Pane {
 										System.err.printf("Long/lat: %.2f %.2f proj: %.2f %.2f%n", longitude, latitude, projection.getX(), projection.getY());
 									}
 								}
-								polygon.setFill(Color.WHITESMOKE);
-								polygon.setStroke(Color.BLACK);
 								Tooltip.install(polygon, new Tooltip(name));
 								polygon.setId(name);
 								group.getChildren().add(polygon);
@@ -267,6 +267,7 @@ public class WorldMap extends Pane {
 								for (JsonNode level3 : level2) {
 									if (level3.isArray()) {
 										var polygon = new Polygon();
+										polygon.setStyle("-fx-fill: #d8d5cc;-fx-stroke: gray;");
 										if (verbose)
 											System.err.println("part " + (++parts));
 										for (JsonNode level4 : level3) {
@@ -279,8 +280,6 @@ public class WorldMap extends Pane {
 											}
 										}
 
-										polygon.setFill(Color.WHITESMOKE);
-										polygon.setStroke(Color.BLACK);
 										Tooltip.install(polygon, new Tooltip(name));
 										polygon.setId(name);
 										group.getChildren().add(polygon);
@@ -302,22 +301,22 @@ public class WorldMap extends Pane {
 	private Group createGrid() {
 		var group = new Group();
 
-			for (var lon = -180; lon <= 180; lon += 30) {
-				var start = millerProjection(-90, lon);
-				var end = millerProjection(90, lon);
-				var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
-				line.setStrokeWidth(0.25);
-				line.setStroke(Color.GRAY);
-				group.getChildren().add(line);
-			}
-			for (var lat = -90; lat <= 90; lat += 30) {
-				var start = millerProjection(lat, -180);
-				var end = millerProjection(lat, 180);
-				var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
-				line.setStrokeWidth(0.25);
-				line.setStroke(Color.GRAY);
-				group.getChildren().add(line);
-			}
+		for (var lon = -180; lon <= 180; lon += 30) {
+			var start = millerProjection(-90, lon);
+			var end = millerProjection(90, lon);
+			var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
+			line.setStrokeWidth(0.25);
+			line.setStroke(Color.GRAY);
+			group.getChildren().add(line);
+		}
+		for (var lat = -90; lat <= 90; lat += 30) {
+			var start = millerProjection(lat, -180);
+			var end = millerProjection(lat, 180);
+			var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
+			line.setStrokeWidth(0.25);
+			line.setStroke(Color.GRAY);
+			group.getChildren().add(line);
+		}
 		return group;
 	}
 
@@ -350,7 +349,7 @@ public class WorldMap extends Pane {
 
 	private Group createGroup(String resource) {
 		var group = new Group();
-		try (var reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(resource)))) {
+		try (var reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(resource))))) {
 			while (reader.ready()) {
 				var line = reader.readLine();
 				var tokens = StringUtils.split(line, '\t');
