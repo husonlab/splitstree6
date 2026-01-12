@@ -79,11 +79,11 @@
                             <CheckMenuItem fx:id="jitterMenuItem" mnemonicParsing="false" text="Jitter"/>
                         </items>
                     </MenuButton>
-                    <ComboBox fx:id="averagingCBox" minWidth="50.0">
+                    <ChoiceBox fx:id="averagingCBox" minWidth="50.0">
                         <tooltip>
                             <Tooltip text="use child-average or leaf-average to place internal nodes"/>
                         </tooltip>
-                    </ComboBox>
+                    </ChoiceBox>
                     <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
                     <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false" text="Flip"/>
 

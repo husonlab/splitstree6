@@ -65,7 +65,6 @@ import splitstree6.splits.Compatibility;
 import splitstree6.splits.SplitNewick;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.view.utils.NodeLabelDialog;
 import splitstree6.window.MainWindow;
@@ -157,8 +156,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagramTypes, null));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagramTypes, null));
 		controller.getDiagramCBox().getItems().addAll(SplitsDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
@@ -193,8 +190,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		}
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));
 
-		controller.getRootingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledRootings, null));
-		controller.getRootingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledRootings, null));
 		controller.getRootingCBox().getItems().addAll(SplitsRooting.values());
 		controller.getRootingCBox().valueProperty().bindBidirectional(view.optionRootingProperty());
 

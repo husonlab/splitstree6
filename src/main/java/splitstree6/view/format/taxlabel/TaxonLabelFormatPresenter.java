@@ -27,10 +27,10 @@ import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import jloda.fx.control.EditableMenuButton;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
-import jloda.fx.util.AutoCompleteComboBox;
 import jloda.util.NumberUtils;
 import splitstree6.window.MainWindow;
 
@@ -46,12 +46,12 @@ public class TaxonLabelFormatPresenter {
 	public TaxonLabelFormatPresenter(MainWindow mainWindow, TaxonLabelFormatController controller, UndoManager undoManager) {
 		var selectionModel = mainWindow.getTaxonSelectionModel();
 
-		controller.getFontFamilyCbox().setItems(fontFamilies);
-		AutoCompleteComboBox.install(controller.getFontFamilyCbox());
+		var fontFamily = EditableMenuButton.setup(controller.getFontFamilyMenuButton(), fontFamilies, true, null);
 
-		controller.getFontFamilyCbox().setValue(RichTextLabel.getDefaultFont().getFamily());
-		controller.getFontFamilyCbox().valueProperty().addListener((v, o, n) -> {
-			if (!inUpdatingDefaults && n != null && !n.isBlank() && controller.getFontFamilyCbox().getItems().contains(n)) {
+		fontFamily.set(RichTextLabel.getDefaultFont().getFamily());
+
+		fontFamily.addListener((v, o, n) -> {
+			if (!inUpdatingDefaults && n != null && !n.isBlank() && controller.getFontFamilyMenuButton().getItems().stream().anyMatch(item -> item.getText().equals(n))) {
 				var undoList = new UndoableRedoableCommandList(" font");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
@@ -216,7 +216,7 @@ public class TaxonLabelFormatPresenter {
 		selectionListener = e -> {
 			inUpdatingDefaults = true;
 			try {
-				controller.getFontFamilyCbox().setDisable(selectionModel.size() == 0);
+				controller.getFontFamilyMenuButton().setDisable(selectionModel.size() == 0);
 				controller.getFontSizeField().setDisable(selectionModel.size() == 0);
 				controller.getBoldToggleButton().setDisable(selectionModel.size() == 0);
 				controller.getItalicToggleButton().setDisable(selectionModel.size() == 0);
@@ -254,7 +254,7 @@ public class TaxonLabelFormatPresenter {
 						backgroundColors.add(RichTextLabel.getBackgroundColor(text));
 					}
 				}
-				controller.getFontFamilyCbox().setValue(fontFamilies.size() == 1 ? fontFamilies.iterator().next() : null);
+				fontFamily.set(fontFamilies.size() == 1 ? fontFamilies.iterator().next() : null);
 				controller.getFontSizeField().setText(fontSizes.size() == 1 ? String.valueOf(fontSizes.iterator().next()) : "");
 				controller.getBoldToggleButton().setSelected(boldStates.size() == 1 ? boldStates.iterator().next() : false);
 				controller.getItalicToggleButton().setSelected(boldStates.size() == 1 ? italicStates.iterator().next() : false);

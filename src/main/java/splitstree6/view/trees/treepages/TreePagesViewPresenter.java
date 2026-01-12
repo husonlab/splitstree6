@@ -23,13 +23,14 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
-import javafx.scene.control.Label;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
+import javafx.util.StringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
@@ -44,20 +45,16 @@ import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * multi tree view presenter
  * Daniel Huson, 11.2021
  */
 public class TreePagesViewPresenter implements IDisplayTabPresenter {
-	private final static ObservableList<String> gridValues = FXCollections.observableArrayList(List.of("3x3", "2x1", "1x2", "2x2", "4x3", "3x4", "4x3", "5x5", "1x1"));
-
 	private final MainWindow mainWindow;
 	private final TreePagesView view;
 
@@ -92,13 +89,26 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 				view.setOptionDiagram(TreeDiagramType.RectangularCladogram);
 		});
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, TreeDiagramType::icon));
-		controller.getDiagramCBox().setPrefWidth(50);
-		controller.getDiagramCBox().setMinWidth(Pane.USE_PREF_SIZE);
-		controller.getDiagramCBox().setMaxWidth(Pane.USE_PREF_SIZE);
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::icon, true, false));
-		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
-		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
+		{
+			var menuButton = controller.getDiagramMenuButton();
+			menuButton.setPrefWidth(50);
+			menuButton.setMinWidth(Pane.USE_PREF_SIZE);
+			menuButton.setMaxWidth(Pane.USE_PREF_SIZE);
+
+			menuButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+			for (var diagram : TreeDiagramType.values()) {
+				var menuItem = new MenuItem(diagram.name());
+				menuItem.setGraphic(diagram.icon());
+				menuItem.setOnAction(e -> view.setOptionDiagram(diagram));
+				menuButton.getItems().add(menuItem);
+			}
+			view.optionDiagramProperty().addListener((v, o, n) -> {
+				if (n != null)
+					menuButton.setGraphic(n.icon());
+			});
+			if (view.getOptionDiagram() != null)
+				menuButton.setGraphic(view.getOptionDiagram().icon());
+		}
 
 		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft(90).toString()));
 		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
@@ -119,19 +129,26 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
 		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
+		controller.getAveragingCBox().setConverter(new StringConverter<>() {
+			@Override
+			public String toString(Averaging value) {
+				return value == null ? "" : Averaging.createLabel(value);
+			}
 
-		controller.getRowsColsCBox().getItems().setAll(gridValues);
-		controller.getRowsColsCBox().setValue(gridValues.get(0));
-		gridValues.addListener((ListChangeListener<? super String>) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
+			@Override
+			public Averaging fromString(String string) {
+				return null; // not used for non-editable choice box
+			}
+		});
+
 
 		view.optionRowsProperty().addListener((v, o, n) -> {
 			if (rowsAndCols.get().rows() != n.intValue())
 				rowsAndCols.set(new RowsCols(n.intValue(), rowsAndCols.get().cols()));
 		});
+
 		view.optionColsProperty().addListener((v, o, n) -> {
 			if (rowsAndCols.get().cols() != n.intValue())
 				rowsAndCols.set(new RowsCols(rowsAndCols.get().rows(), n.intValue()));
@@ -148,7 +165,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 				if (!changing.get()) {
 					changing.set(true);
 					try {
-						controller.getRowsColsCBox().setValue(n.toString());
+						controller.getRowsColsTextField().setText(n.toString());
 					} finally {
 						changing.set(false);
 					}
@@ -157,8 +174,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getRowsColsCBox().valueProperty().addListener((v, o, n) -> {
-			var rowsCols = RowsCols.valueOf(n);
+		controller.getRowsColsTextField().setOnAction(e -> {
+			var rowsCols = RowsCols.valueOf(controller.getRowsColsTextField().getText());
 			if (rowsCols != null) {
 				if (!changing.get()) {
 					changing.set(true);

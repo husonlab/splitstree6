@@ -33,7 +33,6 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
 import jloda.phylogeny.layout.Averaging;
-import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreeViewController {
 
@@ -54,7 +53,7 @@ public class TreeViewController {
 	private StackPane centerPane;
 
 	@FXML
-	private ComboBox<TreeDiagramType> diagramCBox;
+	private MenuButton diagramMenuButton;
 
 	@FXML
 	private Button rotateLeftButton;
@@ -69,10 +68,10 @@ public class TreeViewController {
 	private Button flipVerticalButton;
 
 	@FXML
-	private ComboBox<Averaging> averagingCBox;
+	private ChoiceBox<Averaging> averagingCBox;
 
 	@FXML
-	private ComboBox<String> treeCBox;
+	private ChoiceBox<String> treeCBox;
 
 	@FXML
 	private Button previousButton;
@@ -194,19 +193,19 @@ public class TreeViewController {
 		return toolBar;
 	}
 
-	public ComboBox<TreeDiagramType> getDiagramCBox() {
-		return diagramCBox;
+	public MenuButton getDiagramMenuButton() {
+		return diagramMenuButton;
 	}
 
 	public StackPane getCenterPane() {
 		return centerPane;
 	}
 
-	public ComboBox<String> getTreeCBox() {
+	public ChoiceBox<String> getTreeCBox() {
 		return treeCBox;
 	}
 
-	public ComboBox<Averaging> getAveragingCBox() {
+	public ChoiceBox<Averaging> getAveragingCBox() {
 		return averagingCBox;
 	}
 

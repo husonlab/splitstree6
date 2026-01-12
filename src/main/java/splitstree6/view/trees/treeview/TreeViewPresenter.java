@@ -30,7 +30,8 @@ import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
-import javafx.scene.control.Label;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
@@ -56,7 +57,6 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.treepages.TreePane;
-import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
@@ -200,13 +200,27 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				disabledDiagrams.add(TreeDiagramType.TriangularCladogram);
 			}
 		});
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, TreeDiagramType::icon));
-		controller.getDiagramCBox().setPrefWidth(50);
-		controller.getDiagramCBox().setMinWidth(Pane.USE_PREF_SIZE);
-		controller.getDiagramCBox().setMaxWidth(Pane.USE_PREF_SIZE);
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::icon, true, false));
-		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
-		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
+
+		{
+			var menuButton = controller.getDiagramMenuButton();
+			menuButton.setPrefWidth(50);
+			menuButton.setMinWidth(Pane.USE_PREF_SIZE);
+			menuButton.setMaxWidth(Pane.USE_PREF_SIZE);
+
+			menuButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+			for (var diagram : TreeDiagramType.values()) {
+				var menuItem = new MenuItem(diagram.name());
+				menuItem.setGraphic(diagram.icon());
+				menuItem.setOnAction(e -> view.setOptionDiagram(diagram));
+				menuButton.getItems().add(menuItem);
+			}
+			view.optionDiagramProperty().addListener((v, o, n) -> {
+				if (n != null)
+					menuButton.setGraphic(n.icon());
+			});
+			if (view.getOptionDiagram() != null)
+				menuButton.setGraphic(view.getOptionDiagram().icon());
+		}
 
 		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getRotateLeft(90).toString()));
 		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
@@ -340,8 +354,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
 		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 		view.optionAveragingProperty().addListener(e -> update.accept(false));

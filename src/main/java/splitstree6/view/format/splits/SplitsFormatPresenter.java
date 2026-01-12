@@ -28,6 +28,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
+import jloda.fx.control.EditableMenuButton;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
@@ -42,6 +43,7 @@ import splitstree6.view.splits.viewer.SplitsView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,11 +93,8 @@ public class SplitsFormatPresenter {
 		});
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
-		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
-		controller.getWidthCBox().valueProperty().addListener((v, o, n) -> {
-			if (n != null)
-				strokeWidth.set(n.doubleValue());
-		});
+
+		EditableMenuButton.setup(controller.getWidthMenuButton(), List.of("0.1", "0.5", "1", "2", "3", "4", "5", "6", "8", "10", "20"), true, strokeWidth);
 
 		strokeWidth.addListener((v, o, n) -> {
 			if (!inUpdatingDefaults) {
@@ -125,7 +124,6 @@ public class SplitsFormatPresenter {
 							undoList.add(editsProperty, oldEdits, newEdits);
 							undoManager.doAndAdd(undoList);
 						}
-						Platform.runLater(() -> controller.getWidthCBox().setValue(n));
 					}
 				}
 			}
@@ -171,7 +169,7 @@ public class SplitsFormatPresenter {
 		selectionListener = e -> {
 			inUpdatingDefaults = true;
 			try {
-				controller.getWidthCBox().setDisable(splitSelectionModel.size() == 0);
+				controller.getWidthMenuButton().setDisable(splitSelectionModel.size() == 0);
 				controller.getLineColorPicker().setDisable(splitSelectionModel.size() == 0);
 
 				var widths = new HashSet<Double>();
@@ -188,8 +186,7 @@ public class SplitsFormatPresenter {
 					}
 				}
 				var width = (widths.size() == 1 ? widths.iterator().next() : null);
-				controller.getWidthCBox().setValue(width);
-				strokeWidth.setValue(null);
+				strokeWidth.setValue(width);
 				controller.getLineColorPicker().setValue(colors.size() == 1 ? (Color) colors.iterator().next() : null);
 			} finally {
 				inUpdatingDefaults = false;
@@ -205,8 +202,8 @@ public class SplitsFormatPresenter {
 		controller.getOutlineFillColorPicker().valueProperty().bindBidirectional(outlineFill);
 		controller.getOutlineFillColorPicker().disableProperty().bind(optionDiagram.isNotEqualTo(SplitsDiagramType.Outline));
 
-		controller.getResetWidthButton().setOnAction(a -> controller.getWidthCBox().setValue(1.0));
-		controller.getResetWidthButton().disableProperty().bind(Bindings.isEmpty(splitSelectionModel.getSelectedItems()).or(controller.getWidthCBox().valueProperty().isEqualTo(1.0)));
+		controller.getResetWidthButton().setOnAction(a -> strokeWidth.set(1.0));
+		controller.getResetWidthButton().disableProperty().bind(Bindings.isEmpty(splitSelectionModel.getSelectedItems()).or(strokeWidth.isEqualTo(0)));
 
 		controller.getResetOutlineFillColorButton().setOnAction(e -> {
 			controller.getOutlineFillColorPicker().setValue(SplitsView.OUTLINE_FILL_COLOR);

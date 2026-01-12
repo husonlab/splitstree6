@@ -30,7 +30,6 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.phylo.PhyloTree;
 import jloda.phylogeny.layout.Averaging;
-import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreePagesViewController {
 
@@ -44,7 +43,7 @@ public class TreePagesViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private ComboBox<TreeDiagramType> diagramCBox;
+	private MenuButton diagramMenuButton;
 
 	@FXML
 	private Button rotateLeftButton;
@@ -59,10 +58,10 @@ public class TreePagesViewController {
 	private Button flipVerticalButton;
 
 	@FXML
-	private ComboBox<Averaging> averagingCBox;
+	private ChoiceBox<Averaging> averagingCBox;
 
 	@FXML
-	private ComboBox<String> rowsColsCBox;
+	private TextField rowsColsTextField;
 
 	@FXML
 	private Pane pane;
@@ -74,7 +73,7 @@ public class TreePagesViewController {
 	private ToggleButton showTreeNamesToggleButton;
 
 	@FXML
-	private ComboBox<PhyloTree> treeCBox;
+	private ChoiceBox<PhyloTree> treeCBox;
 
 	@FXML
 	private Button zoomInButton;
@@ -140,8 +139,8 @@ public class TreePagesViewController {
 		return toolBar;
 	}
 
-	public ComboBox<TreeDiagramType> getDiagramCBox() {
-		return diagramCBox;
+	public MenuButton getDiagramMenuButton() {
+		return diagramMenuButton;
 	}
 
 	public Button getRotateLeftButton() {
@@ -160,12 +159,12 @@ public class TreePagesViewController {
 		return flipVerticalButton;
 	}
 
-	public ComboBox<Averaging> getAveragingCBox() {
+	public ChoiceBox<Averaging> getAveragingCBox() {
 		return averagingCBox;
 	}
 
-	public ComboBox<String> getRowsColsCBox() {
-		return rowsColsCBox;
+	public TextField getRowsColsTextField() {
+		return rowsColsTextField;
 	}
 
 	public Pane getPane() {
@@ -180,7 +179,7 @@ public class TreePagesViewController {
 		return showTreeNamesToggleButton;
 	}
 
-	public ComboBox<PhyloTree> getTreeCBox() {
+	public ChoiceBox<PhyloTree> getTreeCBox() {
 		return treeCBox;
 	}
 

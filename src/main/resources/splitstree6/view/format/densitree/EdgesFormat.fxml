@@ -38,11 +38,11 @@
                                 <Font size="12.0"/>
                             </font>
                         </Label>
-                        <ComboBox fx:id="widthCBox" editable="true" prefWidth="125.0" visibleRowCount="14">
+                        <ChoiceBox fx:id="widthCBox" editable="true" prefWidth="125.0" visibleRowCount="14">
                             <tooltip>
                                 <Tooltip text="Line width"/>
                             </tooltip>
-                        </ComboBox>
+                        </ChoiceBox>
                         <Button fx:id="resetWidthButton" ellipsisString="" graphicTextGap="0.0" maxHeight="-Infinity"
                                 maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
                                 prefHeight="24.0" prefWidth="24.0"

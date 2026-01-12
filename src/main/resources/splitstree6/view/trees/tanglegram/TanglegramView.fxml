@@ -60,18 +60,18 @@
                         <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="34.0"
                                  styleClass="button-bar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                  AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                            <ComboBox fx:id="tree1CBox" prefWidth="100.0"/>
-                            <ComboBox fx:id="diagram1CBox" prefWidth="50.0">
+                            <ChoiceBox fx:id="tree1CBox" prefWidth="100.0"/>
+                            <MenuButton fx:id="diagram1MenuButton" prefWidth="50.0">
                                 <tooltip>
                                     <Tooltip text="Choose diagram for tree 1"/>
                                 </tooltip>
-                            </ComboBox>
-                            <ComboBox fx:id="diagram2CBox" layoutX="165.0" layoutY="10.0" prefWidth="50.0">
+                            </MenuButton>
+                            <MenuButton fx:id="diagram2MenuButton" layoutX="165.0" layoutY="10.0" prefWidth="50.0">
                                 <tooltip>
                                     <Tooltip text="Choose diagram for tree 2"/>
                                 </tooltip>
-                            </ComboBox>
-                            <ComboBox fx:id="tree2CBox" layoutX="165.0" layoutY="10.0" prefWidth="100.0"/>
+                            </MenuButton>
+                            <ChoiceBox fx:id="tree2CBox" layoutX="165.0" layoutY="10.0" prefWidth="100.0"/>
                             <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
                             <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
                                           maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"

@@ -43,11 +43,11 @@
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="34.0"
                          VBox.vgrow="NEVER">
-                    <ComboBox fx:id="diagramCBox">
+                    <ChoiceBox fx:id="diagramCBox">
                         <tooltip>
                             <Tooltip text="Choose diagram type"/>
                         </tooltip>
-                    </ComboBox>
+                    </ChoiceBox>
                     <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
 
                     <Button fx:id="newLayoutButton" contentDisplay="CENTER" mnemonicParsing="false" text="New Layout">

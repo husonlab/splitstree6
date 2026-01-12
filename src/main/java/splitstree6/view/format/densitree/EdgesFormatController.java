@@ -21,8 +21,8 @@ package splitstree6.view.format.densitree;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TitledPane;
 import javafx.util.converter.FormatStringConverter;
 
@@ -40,7 +40,7 @@ public class EdgesFormatController {
 	private TitledPane titledPane;
 
 	@FXML
-	private ComboBox<Number> widthCBox;
+	private ChoiceBox<Number> widthCBox;
 
 
 	@FXML
@@ -70,7 +70,7 @@ public class EdgesFormatController {
 		return titledPane;
 	}
 
-	public ComboBox<Number> getWidthCBox() {
+	public ChoiceBox<Number> getWidthCBox() {
 		return widthCBox;
 	}
 

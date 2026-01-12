@@ -119,7 +119,7 @@ public class DensiTreeViewController {
 	private Button flipButton;
 
 	@FXML
-	private ComboBox<Averaging> averagingCBox;
+	private ChoiceBox<Averaging> averagingCBox;
 
 
 	private final ToggleGroup diagramToggleGroup = new ToggleGroup();
@@ -281,7 +281,7 @@ public class DensiTreeViewController {
 		return flipButton;
 	}
 
-	public ComboBox<Averaging> getAveragingCBox() {
+	public ChoiceBox<Averaging> getAveragingCBox() {
 		return averagingCBox;
 	}
 }

@@ -21,9 +21,6 @@ package splitstree6.view.format.splits;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.util.converter.FormatStringConverter;
-
-import java.text.NumberFormat;
 
 public class SplitsFormatController {
 
@@ -31,7 +28,7 @@ public class SplitsFormatController {
 	private Label outlineFillLabel;
 
 	@FXML
-	private ComboBox<Number> widthCBox;
+	private MenuButton widthMenuButton;
 
 	@FXML
 	private ColorPicker lineColorPicker;
@@ -79,7 +76,6 @@ public class SplitsFormatController {
 
 	@FXML
 	private void initialize() {
-		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
 		outlineFillLabel.disableProperty().bind(outlineFillColorPicker.disableProperty());
 
 		labelByToggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelByConfidenceX100MenuItem, labelBySplitIdMenuItem);
@@ -90,8 +86,8 @@ public class SplitsFormatController {
 	}
 
 
-	public ComboBox<Number> getWidthCBox() {
-		return widthCBox;
+	public MenuButton getWidthMenuButton() {
+		return widthMenuButton;
 	}
 
 	public ColorPicker getLineColorPicker() {

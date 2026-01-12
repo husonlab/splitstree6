@@ -19,7 +19,6 @@
 
 package splitstree6.view.format.edges;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
@@ -27,6 +26,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
+import jloda.fx.control.EditableMenuButton;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
@@ -37,6 +37,7 @@ import splitstree6.view.trees.treeview.TreeEdits;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -61,11 +62,8 @@ public class EdgesFormatPresenter {
 
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
-		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
-		controller.getWidthCBox().valueProperty().addListener((v, o, n) -> {
-			if (n != null)
-				strokeWidth.set(n.doubleValue());
-		});
+
+		EditableMenuButton.setup(controller.getWidthMenuButton(), List.of("0.1", "0.5", "1", "2", "3", "4", "5", "6", "8", "10", "20"), true, strokeWidth);
 
 		strokeWidth.addListener((v, o, n) -> {
 			if (!inUpdatingDefaults) {
@@ -90,7 +88,6 @@ public class EdgesFormatPresenter {
 							undoList.add(editsProperty, oldEdits, newEdits);
 							undoManager.doAndAdd(undoList);
 						}
-						Platform.runLater(() -> controller.getWidthCBox().setValue(n));
 					}
 				}
 			}
@@ -135,7 +132,7 @@ public class EdgesFormatPresenter {
 		selectionListener = e -> {
 			inUpdatingDefaults = true;
 			try {
-				controller.getWidthCBox().setDisable(edgeSelectionModel.size() == 0);
+				controller.getWidthMenuButton().setDisable(edgeSelectionModel.size() == 0);
 				controller.getColorPicker().setDisable(edgeSelectionModel.size() == 0);
 
 				var widths = new HashSet<Double>();
@@ -150,8 +147,7 @@ public class EdgesFormatPresenter {
 					}
 				}
 				var width = (widths.size() == 1 ? widths.iterator().next() : null);
-				controller.getWidthCBox().setValue(width);
-				strokeWidth.setValue(null);
+				strokeWidth.setValue(width);
 				controller.getColorPicker().setValue(colors.size() == 1 ? (Color) colors.iterator().next() : null);
 			} finally {
 				inUpdatingDefaults = false;

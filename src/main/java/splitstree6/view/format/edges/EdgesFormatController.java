@@ -21,17 +21,14 @@ package splitstree6.view.format.edges;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
-import javafx.util.converter.FormatStringConverter;
-
-import java.text.NumberFormat;
 
 public class EdgesFormatController {
 
 	@FXML
-	private ComboBox<Number> widthCBox;
+	private MenuButton widthMenuButton;
 
 
 	@FXML
@@ -44,11 +41,11 @@ public class EdgesFormatController {
 
 	@FXML
 	private void initialize() {
-		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
+
 	}
 
-	public ComboBox<Number> getWidthCBox() {
-		return widthCBox;
+	public MenuButton getWidthMenuButton() {
+		return widthMenuButton;
 	}
 
 	public ColorPicker getColorPicker() {

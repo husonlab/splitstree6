@@ -29,7 +29,7 @@ public class TaxonLabelFormatController {
 	private VBox vBox;
 
 	@FXML
-	private ComboBox<String> fontFamilyCbox;
+	private MenuButton fontFamilyMenuButton;
 
 	@FXML
 	private TextField fontSizeField;
@@ -70,8 +70,8 @@ public class TaxonLabelFormatController {
 		return vBox;
 	}
 
-	public ComboBox<String> getFontFamilyCbox() {
-		return fontFamilyCbox;
+	public MenuButton getFontFamilyMenuButton() {
+		return fontFamilyMenuButton;
 	}
 
 	public TextField getFontSizeField() {

@@ -23,6 +23,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
+import splitstree6.data.parts.CharactersType;
 import splitstree6.io.utils.SimilaritiesToDistances;
 import splitstree6.workflow.DataBlock;
 
@@ -35,19 +37,19 @@ public class ImportDialogController {
 	private Tab charactersTab;
 
 	@FXML
-	private ComboBox<?> charactersTypeCBox;
+	private ChoiceBox<CharactersType> charactersTypeCBox;
 
 	@FXML
 	private Button closeButton;
 
 	@FXML
-	private ComboBox<Class<? extends DataBlock>> dataTypeComboBox;
+	private ChoiceBox<Class<? extends DataBlock>> dataTypeCBox;
 
 	@FXML
 	private Tab distancesTab;
 
 	@FXML
-	private ComboBox<String> fileFormatComboBox;
+	private ChoiceBox<String> fileFormatCBox;
 
 	@FXML
 	private TextField fileTextField;
@@ -74,7 +76,7 @@ public class ImportDialogController {
 	private FlowPane progressBarPane;
 
 	@FXML
-	private ComboBox<SimilaritiesToDistances.Method> similarityToDistanceMethod;
+	private ChoiceBox<SimilaritiesToDistances.Method> similarityToDistanceMethodCBox;
 
 	@FXML
 	private CheckBox similarityValues;
@@ -87,32 +89,22 @@ public class ImportDialogController {
 
 	@FXML
 	private void initialize() {
-		similarityToDistanceMethod.getItems().addAll(SimilaritiesToDistances.Method.values());
-		similarityToDistanceMethod.setValue(SimilaritiesToDistances.Method.log);
+		similarityToDistanceMethodCBox.getItems().addAll(SimilaritiesToDistances.Method.values());
+		similarityToDistanceMethodCBox.setValue(SimilaritiesToDistances.Method.log);
 
 		// Set the cell factory to display the short name
-		dataTypeComboBox.setCellFactory(param -> new ListCell<>() {
+		dataTypeCBox.setConverter(new StringConverter<>() {
 			@Override
-			protected void updateItem(Class<? extends DataBlock> item, boolean empty) {
-				super.updateItem(item, empty);
-				if (empty || item == null) {
-					setText(null);
-				} else {
-					setText(item.getSimpleName());
-				}
+			public String toString(Class<? extends DataBlock> item) {
+				return item == null ? "" : item.getSimpleName();
+			}
+
+			@Override
+			public Class<? extends DataBlock> fromString(String s) {
+				return null;
 			}
 		});
-		dataTypeComboBox.setButtonCell(new ListCell<>() {
-			@Override
-			protected void updateItem(Class<? extends DataBlock> item, boolean empty) {
-				super.updateItem(item, empty);
-				if (empty || item == null) {
-					setText(null);
-				} else {
-					setText(item.getSimpleName());
-				}
-			}
-		});
+
 		charactersTab.getTabPane().setVisible(false);
 	}
 
@@ -124,7 +116,7 @@ public class ImportDialogController {
 		return charactersTab;
 	}
 
-	public ComboBox<?> getCharactersTypeCBox() {
+	public ChoiceBox<CharactersType> getCharactersTypeCBox() {
 		return charactersTypeCBox;
 	}
 
@@ -132,16 +124,16 @@ public class ImportDialogController {
 		return closeButton;
 	}
 
-	public ComboBox<Class<? extends DataBlock>> getDataTypeComboBox() {
-		return dataTypeComboBox;
+	public ChoiceBox<Class<? extends DataBlock>> getDataTypeCBox() {
+		return dataTypeCBox;
 	}
 
 	public Tab getDistancesTab() {
 		return distancesTab;
 	}
 
-	public ComboBox<String> getFileFormatComboBox() {
-		return fileFormatComboBox;
+	public ChoiceBox<String> getFileFormatCBox() {
+		return fileFormatCBox;
 	}
 
 	public TextField getFileTextField() {
@@ -172,8 +164,8 @@ public class ImportDialogController {
 		return progressBarPane;
 	}
 
-	public ComboBox<SimilaritiesToDistances.Method> getSimilarityToDistanceMethod() {
-		return similarityToDistanceMethod;
+	public ChoiceBox<SimilaritiesToDistances.Method> getSimilarityToDistanceMethodCBox() {
+		return similarityToDistanceMethodCBox;
 	}
 
 	public CheckBox getSimilarityValues() {

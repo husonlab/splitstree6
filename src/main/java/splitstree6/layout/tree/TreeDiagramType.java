@@ -59,6 +59,22 @@ public enum TreeDiagramType {
 		return node;
 	}
 
+	public Node iconFlipped() {
+		if (effect == null) {
+			var dropShadow = new DropShadow();
+			dropShadow.setColor(Color.WHITE);
+			dropShadow.setRadius(2);
+			dropShadow.setSpread(0);
+			effect = dropShadow;
+		}
+		var node = ResourceManagerFX.getIconAsImageView(name() + ".png", 16);
+		node.setEffect(effect);
+		node.setBlendMode(BlendMode.SRC_ATOP);
+		node.setStyle("-fx-scale-x: -1;");
+
+		return node;
+	}
+
 	/**
 	 * this is not currently one of the supported tree drawing modes (only used in Densitree)
 	 *

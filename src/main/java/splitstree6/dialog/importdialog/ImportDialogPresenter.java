@@ -44,12 +44,12 @@ public class ImportDialogPresenter {
 		fileName.bindBidirectional(controller.getFileTextField().textProperty());
 		controller.getFileTextField().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 
-		controller.getDataTypeComboBox().getItems().setAll(List.of(CharactersBlock.class, DistancesBlock.class, SplitsBlock.class, TreesBlock.class));
-		controller.getDataTypeComboBox().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
+		controller.getDataTypeCBox().getItems().setAll(List.of(CharactersBlock.class, DistancesBlock.class, SplitsBlock.class, TreesBlock.class));
+		controller.getDataTypeCBox().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 
-		controller.getSimilarityToDistanceMethod().disableProperty().bind(controller.getSimilarityValues().selectedProperty().not());
+		controller.getSimilarityToDistanceMethodCBox().disableProperty().bind(controller.getSimilarityValues().selectedProperty().not());
 
-		controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+		controller.getDataTypeCBox().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			if (n == CharactersBlock.class)
 				controller.getCharactersTab().getTabPane().getSelectionModel().select(controller.getCharactersTab());
 			else if (n == DistancesBlock.class)
@@ -62,8 +62,8 @@ public class ImportDialogPresenter {
 			controller.getCharactersTab().getTabPane().setVisible(n != null);
 		});
 
-		controller.getFileFormatComboBox().getItems().addAll(ImportManager.getInstance().getAllFileFormats());
-		controller.getFileFormatComboBox().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
+		controller.getFileFormatCBox().getItems().addAll(ImportManager.getInstance().getAllFileFormats());
+		controller.getFileFormatCBox().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 
 		final var selectedExtensionFilter = new SimpleObjectProperty<FileChooser.ExtensionFilter>();
 		controller.getBrowseButton().setOnAction((e) -> {
@@ -88,11 +88,11 @@ public class ImportDialogPresenter {
 		controller.getBrowseButton().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 
 		fileName.addListener((c, o, n) -> {
-			controller.getDataTypeComboBox().getItems().setAll(ImportManager.getInstance().getAllDataTypes(n));
+			controller.getDataTypeCBox().getItems().setAll(ImportManager.getInstance().getAllDataTypes(n));
 			var dataType = ImportManager.getInstance().getDataType(n);
-			controller.getDataTypeComboBox().setValue(dataType);
-			controller.getFileFormatComboBox().getItems().setAll(ImportManager.getInstance().getAllFileFormats(n));
-			controller.getFileFormatComboBox().setValue(ImportManager.getInstance().getFileFormat(n));
+			controller.getDataTypeCBox().setValue(dataType);
+			controller.getFileFormatCBox().getItems().setAll(ImportManager.getInstance().getAllFileFormats(n));
+			controller.getFileFormatCBox().setValue(ImportManager.getInstance().getFileFormat(n));
 		});
 
 		controller.getCloseButton().setOnAction((e) -> {
@@ -102,8 +102,8 @@ public class ImportDialogPresenter {
 		});
 
 		controller.getImportButton().setOnAction((e) -> {
-			final var importer = ImportManager.getInstance().getImporterByDataTypeAndFileFormat(controller.getDataTypeComboBox().getSelectionModel().getSelectedItem(),
-					controller.getFileFormatComboBox().getSelectionModel().getSelectedItem());
+			final var importer = ImportManager.getInstance().getImporterByDataTypeAndFileFormat(controller.getDataTypeCBox().getSelectionModel().getSelectedItem(),
+					controller.getFileFormatCBox().getSelectionModel().getSelectedItem());
 			if (importer == null)
 				NotificationManager.showWarning("Can't import selected data type and file format");
 			else {
@@ -112,10 +112,10 @@ public class ImportDialogPresenter {
 			}
 		});
 		controller.getImportButton().disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(
-				Bindings.isNull(controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty())
-						.or(Bindings.equal(controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty(), "Unknown"))
-						.or(Bindings.isNull(controller.getFileFormatComboBox().getSelectionModel().selectedItemProperty()))
-						.or(Bindings.equal(controller.getFileFormatComboBox().getSelectionModel().selectedItemProperty(), "Unknown"))));
+				Bindings.isNull(controller.getDataTypeCBox().getSelectionModel().selectedItemProperty())
+						.or(Bindings.equal(controller.getDataTypeCBox().getSelectionModel().selectedItemProperty(), "Unknown"))
+						.or(Bindings.isNull(controller.getFileFormatCBox().getSelectionModel().selectedItemProperty()))
+						.or(Bindings.equal(controller.getFileFormatCBox().getSelectionModel().selectedItemProperty(), "Unknown"))));
 	}
 
 }

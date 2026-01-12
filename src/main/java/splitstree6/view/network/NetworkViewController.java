@@ -48,7 +48,7 @@ public class NetworkViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private ComboBox<DiagramType> diagramCBox;
+	private ChoiceBox<DiagramType> diagramCBox;
 
 	@FXML
 	private Button newLayoutButton;
@@ -159,7 +159,7 @@ public class NetworkViewController {
 		return toolBar;
 	}
 
-	public ComboBox<DiagramType> getDiagramCBox() {
+	public ChoiceBox<DiagramType> getDiagramCBox() {
 		return diagramCBox;
 	}
 

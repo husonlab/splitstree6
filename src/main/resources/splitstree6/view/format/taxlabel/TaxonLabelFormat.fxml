@@ -37,11 +37,11 @@
                     </padding>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                         <Label text="Font"/>
-                        <ComboBox fx:id="fontFamilyCbox" prefWidth="150.0">
+                        <MenuButton fx:id="fontFamilyMenuButton" prefWidth="150.0">
                             <tooltip>
                                 <Tooltip text="Font family"/>
                             </tooltip>
-                        </ComboBox>
+                        </MenuButton>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="4.0">
                         <Label text="Size">

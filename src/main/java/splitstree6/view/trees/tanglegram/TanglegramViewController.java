@@ -30,7 +30,6 @@ import jloda.fx.control.CopyableLabel;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
-import splitstree6.layout.tree.TreeDiagramType;
 
 /**
  * tanglegram view controller
@@ -67,15 +66,15 @@ public class TanglegramViewController {
 	private Button expandCollapseVerticallyButton;
 
 	@FXML
-	private ComboBox<String> tree1CBox;
+	private ChoiceBox<String> tree1CBox;
 
 	@FXML
-	private ComboBox<TreeDiagramType> diagram1CBox;
+	private MenuButton diagram1MenuButton;
 
 	@FXML
-	private ComboBox<String> tree2CBox;
+	private ChoiceBox<String> tree2CBox;
 	@FXML
-	private ComboBox<TreeDiagramType> diagram2CBox;
+	private MenuButton diagram2MenuButton;
 
 	@FXML
 	private Button flipButton;
@@ -240,20 +239,20 @@ public class TanglegramViewController {
 		return expandCollapseVerticallyButton;
 	}
 
-	public ComboBox<String> getTree1CBox() {
+	public ChoiceBox<String> getTree1CBox() {
 		return tree1CBox;
 	}
 
-	public ComboBox<TreeDiagramType> getDiagram1CBox() {
-		return diagram1CBox;
+	public MenuButton getDiagram1MenuButton() {
+		return diagram1MenuButton;
 	}
 
-	public ComboBox<String> getTree2CBox() {
+	public ChoiceBox<String> getTree2CBox() {
 		return tree2CBox;
 	}
 
-	public ComboBox<TreeDiagramType> getDiagram2CBox() {
-		return diagram2CBox;
+	public MenuButton getDiagram2MenuButton() {
+		return diagram2MenuButton;
 	}
 
 	public Button getFlipButton() {

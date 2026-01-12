@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 
 public class ImportApply {
 	public static void parseAndLoad(MainWindow mainWindow, String fileName, ImportDialogController controller) {
-		var dataType = controller.getDataTypeComboBox().getValue();
+		var dataType = controller.getDataTypeCBox().getValue();
 		try {
 			final Consumer<Throwable> failedHandler = ex -> {
 				mainWindow.getWorkflow().clear();
@@ -40,7 +40,7 @@ public class ImportApply {
 			final Runnable runOnSuccess = () -> {
 				if (dataType.equals(DistancesBlock.class)) {
 					if (controller.getSimilarityValues().isSelected()) {
-						var method = controller.getSimilarityToDistanceMethod().getValue();
+						var method = controller.getSimilarityToDistanceMethodCBox().getValue();
 						if (method != null) {
 							if (mainWindow.getWorkflow().getInputDataBlock() instanceof DistancesBlock distancesBlock) {
 								SimilaritiesToDistances.apply(method, distancesBlock);

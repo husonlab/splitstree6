@@ -54,10 +54,10 @@ public class SplitsViewController {
 	private StackPane centerPane;
 
 	@FXML
-	private ComboBox<SplitsDiagramType> diagramCBox;
+	private ChoiceBox<SplitsDiagramType> diagramCBox;
 
 	@FXML
-	private ComboBox<SplitsRooting> rootingCBox;
+	private ChoiceBox<SplitsRooting> rootingCBox;
 
 	@FXML
 	private Button zoomInButton;
@@ -179,11 +179,11 @@ public class SplitsViewController {
 		return toolBar;
 	}
 
-	public ComboBox<SplitsDiagramType> getDiagramCBox() {
+	public ChoiceBox<SplitsDiagramType> getDiagramCBox() {
 		return diagramCBox;
 	}
 
-	public ComboBox<SplitsRooting> getRootingCBox() {
+	public ChoiceBox<SplitsRooting> getRootingCBox() {
 		return rootingCBox;
 	}
 

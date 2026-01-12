@@ -79,19 +79,19 @@
                 <HBox prefHeight="40.0" prefWidth="200.0">
                     <children>
                         <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="SOMETIMES"/>
-                        <ComboBox fx:id="dataTypeComboBox" minWidth="-Infinity" promptText="Data type"
+                        <ChoiceBox fx:id="dataTypeCBox" minWidth="-Infinity"
                                   HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </HBox.margin>
-                        </ComboBox>
+                        </ChoiceBox>
                         <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="SOMETIMES"/>
-                        <ComboBox fx:id="fileFormatComboBox" minWidth="-Infinity" promptText="File format"
+                        <ChoiceBox fx:id="fileFormatCBox" minWidth="-Infinity"
                                   HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </HBox.margin>
-                        </ComboBox>
+                        </ChoiceBox>
                         <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="SOMETIMES"/>
                     </children>
                 </HBox>
@@ -138,7 +138,8 @@
                                                            promptText="." GridPane.columnIndex="1"
                                                            GridPane.rowIndex="3"/>
                                                 <Label layoutX="10.0" layoutY="41.0" text="Characters type"/>
-                                                <ComboBox fx:id="charactersTypeCBox" prefHeight="29.0" prefWidth="124.0"
+                                                <ChoiceBox fx:id="charactersTypeCBox" prefHeight="29.0"
+                                                           prefWidth="124.0"
                                                           GridPane.columnIndex="1"/>
                                             </children>
                                             <BorderPane.margin>
@@ -157,8 +158,7 @@
                                             <children>
                                                 <CheckBox fx:id="similarityValues" alignment="CENTER"
                                                           mnemonicParsing="false" text="Data are similarity values"/>
-                                                <ComboBox fx:id="similarityToDistanceMethod" prefWidth="150.0"
-                                                          promptText="D = -ln(S)"/>
+                                                <ChoiceBox fx:id="similarityToDistanceMethodCBox" prefWidth="150.0"/>
                                             </children>
                                             <padding>
                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>

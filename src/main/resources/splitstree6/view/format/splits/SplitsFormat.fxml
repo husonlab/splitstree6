@@ -39,11 +39,12 @@
                                 <Insets right="5.0"/>
                             </HBox.margin>
                         </Label>
-                        <ComboBox fx:id="widthCBox" editable="true" prefWidth="125.0" visibleRowCount="14">
-                            <tooltip>
+                        <MenuButton fx:id="widthMenuButton" prefWidth="135.0">
+
+                        <tooltip>
                                 <Tooltip text="Line width"/>
                             </tooltip>
-                        </ComboBox>
+                        </MenuButton>
                         <Button fx:id="resetWidthButton" ellipsisString="" graphicTextGap="0.0" maxHeight="-Infinity"
                                 maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
                                 prefHeight="24.0" prefWidth="24.0"

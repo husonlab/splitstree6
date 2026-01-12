@@ -31,7 +31,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
-import jloda.fx.dialog.SetParameterDialog;
+import jloda.fx.dialog.SetParameterInternalDialog;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ClipboardUtils;
@@ -462,20 +462,21 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		controller.getSelectRangeMenuItem().setOnAction(e -> {
 			var range = ProgramProperties.get("SelectRange", "");
-			var result = SetParameterDialog.apply(mainWindow.getStage(), "Enter range of sites to select", range);
-			if (result != null) {
-				try {
-					ProgramProperties.put("SelectRange", range);
-					var sites = BitSetUtils.union(BitSetUtils.copy(view.getSelectedSites()),
-							BitSetUtils.asBitSet(NumberUtils.parsePositiveIntegers(result, false)));
-					sites.and(BitSetUtils.asBitSet(BitSetUtils.range(1, view.getInputCharacters().getNchar() + 1)));
-					view.setSelectedSites(sites);
-				} catch (IOException ex) {
-					NotificationManager.showError("Failed to parse pane: " + ex.getMessage());
-				}
-			}
-
+			var dialog = new SetParameterInternalDialog(controller.getInnerAnchorPane(), "Select sites", "Enter range", range,
+					result -> {
+						try {
+							ProgramProperties.put("SelectRange", result);
+							var sites = BitSetUtils.union(BitSetUtils.copy(view.getSelectedSites()),
+									BitSetUtils.asBitSet(NumberUtils.parsePositiveIntegers(result, false)));
+							sites.and(BitSetUtils.asBitSet(BitSetUtils.range(1, view.getInputCharacters().getNchar() + 1)));
+							view.setSelectedSites(sites);
+						} catch (IOException ex) {
+							NotificationManager.showError("Failed to parse pane: " + ex.getMessage());
+						}
+					});
+			dialog.show();
 		});
+
 		controller.getSelectRangeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		controller.getEnableAllTaxaMenuItem().setOnAction(e -> {
@@ -565,7 +566,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				taxonVBar.valueProperty().bindBidirectional(controller.getVerticalScrollBar().valueProperty());
 			}
 		});
-
 
 
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));

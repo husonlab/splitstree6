@@ -38,7 +38,6 @@ import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
@@ -92,8 +91,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * view.getOptionZoomFactor()));
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, null));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, null));
 		controller.getDiagramCBox().getItems().addAll(DiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 

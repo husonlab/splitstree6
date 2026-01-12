@@ -50,18 +50,18 @@
                     <children>
                         <ToolBar fx:id="toolBar" minHeight="-Infinity" prefHeight="34.0" AnchorPane.bottomAnchor="0.0"
                                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                            <ComboBox fx:id="diagramCBox" prefWidth="50.0">
+                            <MenuButton fx:id="diagramMenuButton" prefWidth="50.0">
                                 <tooltip>
                                     <Tooltip text="Choose diagram"/>
                                 </tooltip>
-                            </ComboBox>
-                            <ComboBox fx:id="averagingCBox" minWidth="50.0">
+                            </MenuButton>
+                            <ChoiceBox fx:id="averagingCBox" minWidth="50.0">
                                 <tooltip>
                                     <Tooltip text="use child-average or leaf-average to place internal nodes"/>
                                 </tooltip>
-                            </ComboBox>
+                            </ChoiceBox>
 
-                            <ComboBox fx:id="treeCBox" minWidth="100.0"/>
+                            <ChoiceBox fx:id="treeCBox" minWidth="100.0"/>
 
                             <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
                                           maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
@@ -105,11 +105,11 @@
           AnchorPane.topAnchor="0.0">
         <children>
 
-            <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
+            <TextField fx:id="rowsColsTextField" promptText="r x c" prefWidth="80.0">
                 <tooltip>
                     <Tooltip text="Set rows x columns"/>
                 </tooltip>
-            </ComboBox>
+            </TextField>
             <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
                 <tooltip>

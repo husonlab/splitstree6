@@ -30,7 +30,10 @@ import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Orientation;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
@@ -50,11 +53,11 @@ import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static splitstree6.layout.tree.TreeDiagramType.*;
@@ -281,45 +284,63 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 			});
 
-			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams1, TreeDiagramType::icon, false));
-			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams1, TreeDiagramType::icon, false));
-			controller.getDiagram1CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
-			controller.getDiagram1CBox().setValue(view.getOptionDiagram1());
-			view.optionDiagram1Property().addListener((v, o, n) -> controller.getDiagram1CBox().setValue(n));
-			controller.getDiagram1CBox().valueProperty().addListener((v, o, n) -> {
-				view.setOptionOrientation("Rotate0Deg");
-				view.optionDiagram1Property().set(n);
-			});
+			{
+				var menuButton = controller.getDiagram1MenuButton();
+				menuButton.setPrefWidth(50);
+				menuButton.setMinWidth(Pane.USE_PREF_SIZE);
+				menuButton.setMaxWidth(Pane.USE_PREF_SIZE);
+
+				menuButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+				for (var diagram : Arrays.stream(values()).filter(d -> !d.isRadialOrCircular()).toList()) {
+					var menuItem = new MenuItem(diagram.name());
+					menuItem.setGraphic(diagram.icon());
+					menuItem.setOnAction(e -> {
+						view.optionDiagram1Property().set(diagram);
+						view.setOptionOrientation("Rotate0Deg");
+					});
+					menuButton.getItems().add(menuItem);
+				}
+				view.optionDiagram1Property().addListener((v, o, n) -> {
+					if (n != null)
+						menuButton.setGraphic(n.icon());
+				});
+				if (view.optionDiagram1Property() != null)
+					menuButton.setGraphic(view.optionDiagram1Property().get().icon());
+			}
 		}
+
 		{
-			final ObservableSet<TreeDiagramType> disabledDiagrams2 = FXCollections.observableSet();
-			tree2.addListener((v, o, n) -> {
-				disabledDiagrams2.clear();
-				if (tree2.get() != null && tree2.get().isReticulated()) {
-					disabledDiagrams2.add(TreeDiagramType.TriangularCladogram);
-					if (view.getOptionDiagram2() == TriangularCladogram)
-						view.optionDiagram2Property().set(RectangularCladogram);
+			var menuButton = controller.getDiagram2MenuButton();
+			menuButton.setPrefWidth(50);
+			menuButton.setMinWidth(Pane.USE_PREF_SIZE);
+			menuButton.setMaxWidth(Pane.USE_PREF_SIZE);
+
+			menuButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+			for (var diagram : Arrays.stream(values()).filter(d -> !d.isRadialOrCircular()).toList()) {
+				var menuItem = new MenuItem(diagram.name());
+				menuItem.setGraphic(diagram.iconFlipped());
+				menuItem.setOnAction(e -> {
+					view.optionDiagram2Property().set(diagram);
+					view.setOptionOrientation("Rotate0Deg");
+				});
+				menuButton.getItems().add(menuItem);
+			}
+			view.optionDiagram2Property().addListener((v, o, n) -> {
+				if (n != null) {
+					menuButton.setGraphic(n.iconFlipped());
 				}
 			});
-
-			controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams2, TreeDiagramType::icon, true));
-			controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams2, TreeDiagramType::icon, true));
-			controller.getDiagram2CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
-			controller.getDiagram2CBox().setValue(view.getOptionDiagram2());
-			view.optionDiagram2Property().addListener((v, o, n) -> controller.getDiagram2CBox().setValue(n));
-			controller.getDiagram2CBox().valueProperty().addListener((v, o, n) -> {
-				view.setOptionOrientation("Rotate0Deg");
-				view.optionDiagram2Property().set(n);
-			});
+			if (view.optionDiagram2Property() != null) {
+				controller.getFlipButton().setOnAction(e -> {
+					if (view.getOptionOrientation().equals("Rotate0Deg"))
+						view.setOptionOrientation("FlipRotate180Deg");
+					else
+						view.setOptionOrientation("Rotate0Deg");
+				});
+				menuButton.setGraphic(view.optionDiagram2Property().get().iconFlipped());
+			}
+			controller.getFlipButton().disableProperty().bind(view.emptyProperty());
 		}
-
-		controller.getFlipButton().setOnAction(e -> {
-			if (view.getOptionOrientation().equals("Rotate0Deg"))
-				view.setOptionOrientation("FlipRotate180Deg");
-			else
-				view.setOptionOrientation("Rotate0Deg");
-		});
-		controller.getFlipButton().disableProperty().bind(view.emptyProperty());
 
 		{
 			var labelProperty = new SimpleStringProperty();

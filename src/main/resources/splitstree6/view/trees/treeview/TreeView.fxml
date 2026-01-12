@@ -44,18 +44,18 @@
         <top>
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="34.0">
-                    <ComboBox fx:id="treeCBox" minWidth="100.0"/>
-                    <ComboBox fx:id="diagramCBox">
+                    <ChoiceBox fx:id="treeCBox" minWidth="100.0"/>
+                    <MenuButton fx:id="diagramMenuButton">
                         <tooltip>
                             <Tooltip text="Choose diagram type"/>
                         </tooltip>
-                    </ComboBox>
+                    </MenuButton>
 
-                    <ComboBox fx:id="averagingCBox" minWidth="50.0">
+                    <ChoiceBox fx:id="averagingCBox" minWidth="50.0">
                         <tooltip>
                             <Tooltip text="use child-average or leaf-average to place internal nodes"/>
                         </tooltip>
-                    </ComboBox>
+                    </ChoiceBox>
 
                     <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
                     <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" focusTraversable="false"

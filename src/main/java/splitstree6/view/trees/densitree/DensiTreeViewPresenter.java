@@ -28,9 +28,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
-import javafx.scene.control.Label;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.image.ImageView;
+import javafx.util.StringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.qr.QRViewUtils;
@@ -45,7 +45,6 @@ import jloda.util.StringUtils;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
@@ -188,11 +187,20 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 				disabledAveraging.add(Averaging.ChildAverage);
 			}
 		});
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, a -> new Label(Averaging.createLabel(a))));
 		controller.getAveragingCBox().getItems().addAll(Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 		view.optionAveragingProperty().addListener(invalidationListener);
+		controller.getAveragingCBox().setConverter(new StringConverter<>() {
+			@Override
+			public String toString(Averaging value) {
+				return value == null ? "" : Averaging.createLabel(value);
+			}
+
+			@Override
+			public Averaging fromString(String string) {
+				return null; // not used for non-editable choice box
+			}
+		});
 
 		controller.getFlipButton().setOnAction(e -> {
 			view.setOptionOrientation(LayoutOrientation.valueOf(view.getOptionOrientation()).getFlipVertical().toString());
