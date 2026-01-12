@@ -156,28 +156,28 @@ public class AlignmentViewController {
 	private Group siteSelectionGroup;
 
 	@FXML
-	private MenuItem disableSelectedSitesMenuItem;
+	private MenuItem deactivateSelectedSitesMenuItem;
 
 	@FXML
-	private MenuItem enableSelectedSitesOnlyMenuItem;
+	private MenuItem activateSelectedSitesOnlyMenuItem;
 
 	@FXML
-	private MenuItem enableSelectedSitesMenuItem;
+	private MenuItem activateSelectedSitesMenuItem;
 
 	@FXML
-	private MenuItem disableSelectedTaxaMenuItem;
+	private MenuItem deactivateSelectedTaxaMenuItem;
 
 	@FXML
-	private MenuItem enableAllSitesMenuItem;
+	private MenuItem activateAllSitesMenuItem;
 
 	@FXML
-	private MenuItem enableAllTaxaMenuItem;
+	private MenuItem activateAllTaxaMenuItem;
 
 	@FXML
-	private MenuItem enableSelectedTaxaOnlyMenuItem;
+	private MenuItem activateSelectedTaxaOnlyMenuItem;
 
 	@FXML
-	private MenuItem enableSelectedTaxaMenuItem;
+	private MenuItem activateSelectedTaxaMenuItem;
 
 	@FXML
 	private MenuItem selectRangeMenuItem;
@@ -430,36 +430,36 @@ public class AlignmentViewController {
 		return rightTopPane;
 	}
 
-	public MenuItem getDisableSelectedSitesMenuItem() {
-		return disableSelectedSitesMenuItem;
+	public MenuItem getDeactivateSelectedSitesMenuItem() {
+		return deactivateSelectedSitesMenuItem;
 	}
 
-	public MenuItem getEnableSelectedSitesOnlyMenuItem() {
-		return enableSelectedSitesOnlyMenuItem;
+	public MenuItem getActivateSelectedSitesOnlyMenuItem() {
+		return activateSelectedSitesOnlyMenuItem;
 	}
 
-	public MenuItem getDisableSelectedTaxaMenuItem() {
-		return disableSelectedTaxaMenuItem;
+	public MenuItem getDeactivateSelectedTaxaMenuItem() {
+		return deactivateSelectedTaxaMenuItem;
 	}
 
-	public MenuItem getEnableAllSitesMenuItem() {
-		return enableAllSitesMenuItem;
+	public MenuItem getActivateAllSitesMenuItem() {
+		return activateAllSitesMenuItem;
 	}
 
-	public MenuItem getEnableAllTaxaMenuItem() {
-		return enableAllTaxaMenuItem;
+	public MenuItem getActivateAllTaxaMenuItem() {
+		return activateAllTaxaMenuItem;
 	}
 
-	public MenuItem getEnableSelectedTaxaOnlyMenuItem() {
-		return enableSelectedTaxaOnlyMenuItem;
+	public MenuItem getActivateSelectedTaxaOnlyMenuItem() {
+		return activateSelectedTaxaOnlyMenuItem;
 	}
 
-	public MenuItem getEnableSelectedSitesMenuItem() {
-		return enableSelectedSitesMenuItem;
+	public MenuItem getActivateSelectedSitesMenuItem() {
+		return activateSelectedSitesMenuItem;
 	}
 
-	public MenuItem getEnableSelectedTaxaMenuItem() {
-		return enableSelectedTaxaMenuItem;
+	public MenuItem getActivateSelectedTaxaMenuItem() {
+		return activateSelectedTaxaMenuItem;
 	}
 
 	public CopyableLabel getSelectionLabel() {

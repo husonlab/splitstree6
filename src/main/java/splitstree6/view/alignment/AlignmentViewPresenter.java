@@ -479,7 +479,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		controller.getSelectRangeMenuItem().disableProperty().bind(view.emptyProperty());
 
-		controller.getEnableAllTaxaMenuItem().setOnAction(e -> {
+		controller.getActivateAllTaxaMenuItem().setOnAction(e -> {
 			var inputTaxa = view.getInputTaxa();
 			if (inputTaxa != null) {
 				var oldBits = view.getActiveTaxa();
@@ -488,33 +488,33 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					view.getUndoManager().doAndAdd("enable all taxa", () -> view.setActiveTaxa(oldBits), () -> view.setActiveTaxa(newBits));
 			}
 		});
-		controller.getEnableAllTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getInputTaxa() == null || view.getActiveTaxa().cardinality() == view.getInputTaxa().getNtax(), view.activeTaxaProperty()));
+		controller.getActivateAllTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getInputTaxa() == null || view.getActiveTaxa().cardinality() == view.getInputTaxa().getNtax(), view.activeTaxaProperty()));
 
-		controller.getEnableSelectedTaxaOnlyMenuItem().setOnAction(e -> {
+		controller.getActivateSelectedTaxaOnlyMenuItem().setOnAction(e -> {
 			var oldBits = view.getActiveTaxa();
 			var newBits = view.getSelectedTaxa();
 			if (!oldBits.equals(newBits))
 				view.getUndoManager().doAndAdd("enable selected taxa only", () -> view.setActiveTaxa(oldBits), () -> view.setActiveTaxa(newBits));
 		});
-		controller.getEnableSelectedTaxaOnlyMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSelectedTaxa().cardinality() == 0, view.selectedTaxaProperty()));
+		controller.getActivateSelectedTaxaOnlyMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSelectedTaxa().cardinality() == 0, view.selectedTaxaProperty()));
 
-		controller.getEnableSelectedTaxaMenuItem().setOnAction(e -> {
+		controller.getActivateSelectedTaxaMenuItem().setOnAction(e -> {
 			var oldBits = view.getActiveTaxa();
 			var newBits = BitSetUtils.union(view.getActiveTaxa(), view.getSelectedTaxa());
 			if (!oldBits.equals(newBits))
 				view.getUndoManager().doAndAdd("enable selected taxa", () -> view.setActiveTaxa(oldBits), () -> view.setActiveTaxa(newBits));
 		});
-		controller.getEnableSelectedTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> BitSetUtils.minus(view.getSelectedTaxa(), view.getActiveTaxa()).cardinality() == 0, view.selectedTaxaProperty(), view.activeTaxaProperty()));
+		controller.getActivateSelectedTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> BitSetUtils.minus(view.getSelectedTaxa(), view.getActiveTaxa()).cardinality() == 0, view.selectedTaxaProperty(), view.activeTaxaProperty()));
 
-		controller.getDisableSelectedTaxaMenuItem().setOnAction(e -> {
+		controller.getDeactivateSelectedTaxaMenuItem().setOnAction(e -> {
 			var oldBits = view.getActiveTaxa();
 			var newBits = BitSetUtils.minus(view.getActiveTaxa(), view.getSelectedTaxa());
 			if (!oldBits.equals(newBits))
 				view.getUndoManager().doAndAdd("disable selected taxa", () -> view.setActiveTaxa(oldBits), () -> view.setActiveTaxa(newBits));
 		});
-		controller.getDisableSelectedTaxaMenuItem().disableProperty().bind(controller.getEnableSelectedTaxaOnlyMenuItem().disableProperty());
+		controller.getDeactivateSelectedTaxaMenuItem().disableProperty().bind(controller.getActivateSelectedTaxaOnlyMenuItem().disableProperty());
 
-		controller.getEnableAllSitesMenuItem().setOnAction(e -> {
+		controller.getActivateAllSitesMenuItem().setOnAction(e -> {
 			var inputCharacters = view.getInputCharacters();
 			if (inputCharacters != null) {
 				var oldBits = view.getActiveSites();
@@ -523,31 +523,31 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					view.getUndoManager().doAndAdd("enable all sites", () -> view.setActiveSites(oldBits), () -> view.setActiveSites(newBits));
 			}
 		});
-		controller.getEnableAllSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getInputCharacters() == null || view.getActiveSites().cardinality() == view.getInputCharacters().getNchar(), view.inputCharactersNodeValidProperty(), view.activeSitesProperty()));
+		controller.getActivateAllSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getInputCharacters() == null || view.getActiveSites().cardinality() == view.getInputCharacters().getNchar(), view.inputCharactersNodeValidProperty(), view.activeSitesProperty()));
 
-		controller.getEnableSelectedSitesOnlyMenuItem().setOnAction(e -> {
+		controller.getActivateSelectedSitesOnlyMenuItem().setOnAction(e -> {
 			var oldBits = view.getActiveSites();
 			var newBits = view.getSelectedSites();
 			if (!oldBits.equals(newBits))
 				view.getUndoManager().doAndAdd("enable selected sites only", () -> view.setActiveSites(oldBits), () -> view.setActiveSites(newBits));
 		});
-		controller.getEnableSelectedSitesOnlyMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSelectedSites().cardinality() == 0, view.selectedSitesProperty()));
+		controller.getActivateSelectedSitesOnlyMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSelectedSites().cardinality() == 0, view.selectedSitesProperty()));
 
-		controller.getEnableSelectedSitesMenuItem().setOnAction(e -> {
+		controller.getActivateSelectedSitesMenuItem().setOnAction(e -> {
 			var oldBits = view.getActiveSites();
 			var newBits = BitSetUtils.union(view.getActiveSites(), view.getActiveSites());
 			if (!oldBits.equals(newBits))
 				view.getUndoManager().doAndAdd("enable selected sites", () -> view.setActiveSites(oldBits), () -> view.setActiveSites(newBits));
 		});
-		controller.getEnableSelectedSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> BitSetUtils.minus(view.getSelectedSites(), view.getActiveSites()).cardinality() == 0, view.selectedSitesProperty(), view.activeSitesProperty()));
+		controller.getActivateSelectedSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> BitSetUtils.minus(view.getSelectedSites(), view.getActiveSites()).cardinality() == 0, view.selectedSitesProperty(), view.activeSitesProperty()));
 
-		controller.getDisableSelectedSitesMenuItem().setOnAction(e -> {
+		controller.getDeactivateSelectedSitesMenuItem().setOnAction(e -> {
 			var oldBits = view.getActiveSites();
 			var newBits = BitSetUtils.minus(view.getActiveSites(), view.getSelectedSites());
 			if (!oldBits.equals(newBits))
 				view.getUndoManager().doAndAdd("disable selected sites", () -> view.setActiveSites(oldBits), () -> view.setActiveSites(newBits));
 		});
-		controller.getDisableSelectedSitesMenuItem().disableProperty().bind(controller.getEnableSelectedSitesOnlyMenuItem().disableProperty());
+		controller.getDeactivateSelectedSitesMenuItem().disableProperty().bind(controller.getActivateSelectedSitesOnlyMenuItem().disableProperty());
 
 		controller.getFilterMenu().disableProperty().bind(workflow.runningProperty());
 

@@ -193,20 +193,23 @@
         <children>
             <MenuButton fx:id="filterMenu" mnemonicParsing="false" text="Filter">
                 <items>
-                    <MenuItem fx:id="enableAllTaxaMenuItem" mnemonicParsing="false" text="Enable All Taxa"/>
-                    <MenuItem fx:id="enableSelectedTaxaOnlyMenuItem" mnemonicParsing="false"
-                              text="Enable Selected Taxa Only"/>
+                    <MenuItem fx:id="activateAllTaxaMenuItem" mnemonicParsing="false" text="Activate All Taxa"/>
+                    <MenuItem fx:id="activateSelectedTaxaOnlyMenuItem" mnemonicParsing="false"
+                              text="Activate Selected Taxa Only"/>
                     <SeparatorMenuItem mnemonicParsing="false"/>
-                    <MenuItem fx:id="enableSelectedTaxaMenuItem" mnemonicParsing="false" text="Enable Selected Taxa"/>
-                    <MenuItem fx:id="disableSelectedTaxaMenuItem" mnemonicParsing="false" text="Disable Selected Taxa"/>
+                    <MenuItem fx:id="activateSelectedTaxaMenuItem" mnemonicParsing="false"
+                              text="Activate Selected Taxa"/>
+                    <MenuItem fx:id="deactivateSelectedTaxaMenuItem" mnemonicParsing="false"
+                              text="Deactivate Selected Taxa"/>
                     <SeparatorMenuItem mnemonicParsing="false"/>
-                    <MenuItem fx:id="enableAllSitesMenuItem" mnemonicParsing="false" text="Enable All Sites"/>
-                    <MenuItem fx:id="enableSelectedSitesOnlyMenuItem" mnemonicParsing="false"
-                              text="Enable Selected Sites Only"/>
+                    <MenuItem fx:id="activateAllSitesMenuItem" mnemonicParsing="false" text="Activate All Sites"/>
+                    <MenuItem fx:id="activateSelectedSitesOnlyMenuItem" mnemonicParsing="false"
+                              text="Activate Selected Sites Only"/>
                     <SeparatorMenuItem mnemonicParsing="false"/>
-                    <MenuItem fx:id="enableSelectedSitesMenuItem" mnemonicParsing="false" text="Enable Selected Sites"/>
-                    <MenuItem fx:id="disableSelectedSitesMenuItem" mnemonicParsing="false"
-                              text="Disable Selected Sites"/>
+                    <MenuItem fx:id="activateSelectedSitesMenuItem" mnemonicParsing="false"
+                              text="Activate Selected Sites"/>
+                    <MenuItem fx:id="deactivateSelectedSitesMenuItem" mnemonicParsing="false"
+                              text="Deactivate Selected Sites"/>
                 </items>
             </MenuButton>
         </children>
