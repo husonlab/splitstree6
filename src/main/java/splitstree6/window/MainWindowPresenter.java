@@ -98,7 +98,6 @@ import splitstree6.io.nexus.TraitsNexusOutput;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.utils.ReaderWriterBase;
 import splitstree6.main.CheckForUpdate;
-import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -696,7 +695,7 @@ public class MainWindowPresenter {
 		});
 
 		if (controller.getFileMenuButton().getItems().isEmpty()) {
-			if (SplitsTree6.isDesktop()) {
+			if (ProgramProperties.isDesktop()) {
 				controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
 						controller.getNewMenuItem(), controller.getEditInputMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
 						controller.getCloseMenuItem(), new SeparatorMenuItem(),

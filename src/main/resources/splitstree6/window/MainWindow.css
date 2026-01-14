@@ -36,16 +36,15 @@ viewer-background {
 }
 
 .table-view {
-    -fx-background-color: transparent;
+    -fx-background-color: derive(-fx-background, 0%);
 }
 
 .table-view .column-header-background {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
+    -fx-background-color: derive(-fx-background, 0%);
+    -fx-border-color: derive(-fx-background, 0%);
 }
 
 .progress-indicator .text {
-    -fx-text-alignment: transparent;
     visibity: hidden;
 }
 
@@ -91,7 +90,7 @@ viewer-background {
 
 .tool-bar {
     -fx-background-insets: 0;
-    -fx-background-color: transparent;
+    -fx-background-color: derive(-fx-background, 0%);
     -fx-spacing: 3mm;
 }
 

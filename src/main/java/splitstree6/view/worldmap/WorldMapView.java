@@ -37,7 +37,6 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.*;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
-import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.locations.LocationsFormat;
 import splitstree6.view.utils.IView;
@@ -125,7 +124,7 @@ public class WorldMapView implements IView {
 
 
 		legend.setClickOnLabel((e, label) -> {
-			if (label == null || !e.isShiftDown() || !SplitsTree6.isDesktop())
+			if (label == null || !e.isShiftDown() || !ProgramProperties.isDesktop())
 				mainWindow.getTaxonSelectionModel().clearSelection();
 			var taxon = mainWindow.getWorkingTaxa().get(label);
 			if (taxon != null)
@@ -184,7 +183,7 @@ public class WorldMapView implements IView {
 		selectionListener.invalidated(null);
 
 		clickOnLabel = (e, label) -> {
-			if (label == null || !e.isShiftDown() || !SplitsTree6.isDesktop())
+			if (label == null || !e.isShiftDown() || !ProgramProperties.isDesktop())
 				mainWindow.getTaxonSelectionModel().clearSelection();
 			if (label != null) {
 				var taxon = mainWindow.getWorkingTaxa().get(label);

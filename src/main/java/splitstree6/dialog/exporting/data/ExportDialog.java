@@ -26,7 +26,7 @@ import javafx.scene.control.MenuItem;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jloda.fx.util.ExtendedFXMLLoader;
-import splitstree6.main.SplitsTree6;
+import jloda.fx.util.ProgramProperties;
 import splitstree6.main.Version;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataNode;
@@ -53,8 +53,8 @@ public class ExportDialog {
 		//stage.setAlwaysOnTop(true);
 		stage.setScene(scene);
 		stage.sizeToScene();
-		stage.setX(SplitsTree6.isDesktop() ? mainWindow.getStage().getX() + 100 : 100);
-		stage.setY(SplitsTree6.isDesktop() ? mainWindow.getStage().getY() + 100 : 100);
+		stage.setX(ProgramProperties.isDesktop() ? mainWindow.getStage().getX() + 100 : 100);
+		stage.setY(ProgramProperties.isDesktop() ? mainWindow.getStage().getY() + 100 : 100);
 
 		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.initOwner(mainWindow.getStage());

@@ -35,10 +35,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
 import jloda.fx.find.ITextSearcher;
 import jloda.fx.find.TextAreaSearcher;
+import jloda.fx.util.ProgramProperties;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import splitstree6.main.SplitsTree6;
 import splitstree6.view.displaytext.highlighters.Highlighter;
 
 public class MyTextArea {
@@ -52,7 +52,7 @@ public class MyTextArea {
 
 
 	public MyTextArea() {
-		if (SplitsTree6.isDesktop()) {
+		if (ProgramProperties.isDesktop()) {
 			codeArea = new CodeArea();
 			codeArea.requestFollowCaret();
 			node = codeArea;

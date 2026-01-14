@@ -44,10 +44,7 @@ import jloda.fx.control.MultiTouchGestureMonitor;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.AService;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.util.SelectionEffectBlue;
+import jloda.fx.util.*;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
@@ -89,7 +86,7 @@ public class InteractionSetup {
 		this.undoManager = undoManager;
 
 		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(pane);
-		if (scrollPane != null && !SplitsTree6.isDesktop()) {
+		if (scrollPane != null && !ProgramProperties.isDesktop()) {
 			scrollPane.setPannable(false);
 			scrollPane.addEventFilter(ScrollEvent.ANY, e -> {
 				if (e.getTouchCount() < 2)
@@ -360,7 +357,7 @@ public class InteractionSetup {
 	private EventHandler<MouseEvent> createMouseClickedOnNodeHandler(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, Node v) {
 		return e -> {
 			if (v.getOwner() instanceof PhyloGraph graph) {
-				if (!e.isShiftDown() && SplitsTree6.isDesktop()) {
+				if (!e.isShiftDown() && ProgramProperties.isDesktop()) {
 					taxonSelectionModel.clearSelection();
 				}
 				for (var t : graph.getTaxa(v)) {
@@ -380,7 +377,7 @@ public class InteractionSetup {
 					if (me.isAltDown()) {
 						edgeSelectionModel.toggleSelection(e);
 					} else {
-						if (!me.isShiftDown() && SplitsTree6.isDesktop()) {
+						if (!me.isShiftDown() && ProgramProperties.isDesktop()) {
 							taxonSelectionModel.clearSelection();
 						}
 						edgeSelectionModel.toggleSelection(e);
@@ -457,7 +454,7 @@ public class InteractionSetup {
 			if (allow == null || allow.get()) {
 				var editLabelMenuItem = new MenuItem("Edit Label...");
 				editLabelMenuItem.setOnAction(e -> {
-					if (SplitsTree6.isDesktop()) {
+					if (ProgramProperties.isDesktop()) {
 						NodeLabelDialog.apply(undoManager, stage, label);
 					} else {
 						NodeLabelDialog.apply(undoManager, label, null);

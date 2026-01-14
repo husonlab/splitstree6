@@ -37,16 +37,12 @@ import jloda.fx.graph.GraphFX;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.GrayOutlineEffect;
-import jloda.fx.util.Icebergs;
-import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.util.SelectionEffect;
+import jloda.fx.util.*;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.algorithms.IsDAG;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
-import splitstree6.main.SplitsTree6;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -542,7 +538,7 @@ public class DrawPane extends Pane {
 		nodeLabelsGroup.getChildren().add(label);
 
 		label.setOnMouseClicked(e -> {
-			if (!e.isShiftDown() && SplitsTree6.isDesktop()) {
+			if (!e.isShiftDown() && ProgramProperties.isDesktop()) {
 				getNodeSelectionModel().clearSelection();
 				getEdgeSelectionModel().clearSelection();
 			}

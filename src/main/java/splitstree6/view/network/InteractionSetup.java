@@ -34,6 +34,7 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Edge;
@@ -46,7 +47,6 @@ import jloda.util.Single;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
-import splitstree6.main.SplitsTree6;
 import splitstree6.view.utils.NodeLabelDialog;
 
 import java.util.ArrayList;
@@ -305,7 +305,7 @@ public class InteractionSetup {
 			var shape = entry.getValue();
 			shape.setOnMouseClicked(e -> {
 				if (e.isStillSincePress()) {
-					if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop()) {
+					if (!e.isShiftDown() && !e.isShortcutDown() && ProgramProperties.isDesktop()) {
 						nodeSelectionModel.clearSelection();
 					}
 					nodeSelectionModel.select(v);
@@ -338,7 +338,7 @@ public class InteractionSetup {
 
 							label.setOnMouseClicked(e -> {
 								if (e.isStillSincePress()) {
-									if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
+									if (!e.isShiftDown() && !e.isShortcutDown() && ProgramProperties.isDesktop())
 										taxonSelectionModel.clearSelection();
 									taxonSelectionModel.toggleSelection(taxon);
 									e.consume();
@@ -402,7 +402,7 @@ public class InteractionSetup {
 				var shape = entry.getValue();
 				shape.setOnMouseClicked(e -> {
 					if (e.isStillSincePress()) {
-						if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop()) {
+						if (!e.isShiftDown() && !e.isShortcutDown() && ProgramProperties.isDesktop()) {
 							edgeSelectionModel.clearSelection();
 						}
 						edgeSelectionModel.select(edge);
@@ -434,7 +434,7 @@ public class InteractionSetup {
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
-			if (SplitsTree6.isDesktop()) {
+			if (ProgramProperties.isDesktop()) {
 				NodeLabelDialog.apply(undoManager, stage, label);
 			} else {
 				NodeLabelDialog.apply(undoManager, label, null);

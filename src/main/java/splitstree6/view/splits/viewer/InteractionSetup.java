@@ -43,6 +43,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.GraphTraversals;
 import jloda.graph.Node;
@@ -97,7 +98,7 @@ public class InteractionSetup {
 
 		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(pane);
 
-		if (scrollPane != null && !SplitsTree6.isDesktop()) {
+		if (scrollPane != null && !ProgramProperties.isDesktop()) {
 			scrollPane.setPannable(false);
 			scrollPane.addEventFilter(ScrollEvent.ANY, e -> {
 				if (e.getTouchCount() < 2)
@@ -220,7 +221,7 @@ public class InteractionSetup {
 
 						final EventHandler<MouseEvent> mouseClickedHandler = e -> {
 							if (e.isStillSincePress()) {
-								if (!e.isShiftDown() && SplitsTree6.isDesktop())
+								if (!e.isShiftDown() && ProgramProperties.isDesktop())
 									taxonSelectionModel.clearSelection();
 								taxonSelectionModel.toggleSelection(taxon);
 								e.consume();
@@ -294,7 +295,7 @@ public class InteractionSetup {
 					shape.setOnMouseClicked(e -> {
 						if (e.isStillSincePress() && idSplitMap.apply(splitId) != null) {
 								if (e.getClickCount() == 1) {
-									if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
+									if (!e.isShiftDown() && !e.isShortcutDown() && ProgramProperties.isDesktop())
 										splitSelectionModel.clearSelection();
 									splitSelectionModel.toggleSelection(splitId);
 
@@ -304,7 +305,7 @@ public class InteractionSetup {
 									var whichPart = ((partA.cardinality() < partB.cardinality()) == !e.isAltDown() ? partA : partB);
 									var taxa = BitSetUtils.asStream(whichPart).map(idTaxonMap).collect(Collectors.toList());
 									if (splitSelectionModel.isSelected(splitId)) {
-										if (!e.isShiftDown() && SplitsTree6.isDesktop())
+										if (!e.isShiftDown() && ProgramProperties.isDesktop())
 											taxonSelectionModel.clearSelection();
 										taxonSelectionModel.selectAll(taxa);
 									} else
@@ -366,7 +367,7 @@ public class InteractionSetup {
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
-			if (SplitsTree6.isDesktop()) {
+			if (ProgramProperties.isDesktop()) {
 				NodeLabelDialog.apply(undoManager, stage, label);
 			} else {
 				NodeLabelDialog.apply(undoManager, label, null);

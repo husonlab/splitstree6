@@ -43,6 +43,7 @@ import jloda.fx.control.ProgressPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.*;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -268,7 +269,7 @@ public class DensiTreeDrawer {
 	}
 
 	private static void drawConsensus(MainWindow mainWindow, PhyloTree consensusTree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap,
-									  DensiTreeDiagramType diagramType, RadialLabelLayout radialLabelLayout, ReadOnlyBooleanProperty showConsensus, Pane labelPane) {
+									  DensiTreeDiagramType diagramType, RadialLabelLayout radialLabelLayout, ReadOnlyBooleanProperty showConsensus, Pane pane) {
 
 		if (consensusTree.getRoot() == null)
 			return;
@@ -302,7 +303,7 @@ public class DensiTreeDrawer {
 			shape.setStrokeWidth(1.5);
 			edgesGroup.getChildren().add(shape);
 			shape.setOnMouseClicked(a -> {
-				if (!a.isShiftDown() && SplitsTree6.isDesktop())
+				if (!a.isShiftDown() && ProgramProperties.isDesktop())
 					mainWindow.getTaxonSelectionModel().clearSelection();
 
 				consensusTree.preorderTraversal(e.getTarget(), v -> {
@@ -343,7 +344,7 @@ public class DensiTreeDrawer {
 			maxLeafX = IteratorUtils.asStream(consensusTree.leaves()).mapToDouble(v -> nodePointMap.get(v).getX()).max().orElse(maxLeafX);
 		}
 
-		var fontSize = Math.min(14, labelPane.getPrefHeight() / (1.5 * taxaBlock.getNtax() + 1));
+		var fontSize = Math.min(14, pane.getPrefHeight() / (1.5 * taxaBlock.getNtax() + 1));
 		for (var v : consensusTree.leaves()) {
 			var t = consensusTree.getTaxon(v);
 			var label = new RichTextLabel(taxaBlock.get(t).getDisplayLabelOrName());
@@ -361,7 +362,7 @@ public class DensiTreeDrawer {
 					label.widthProperty(), label.heightProperty(), a -> label.setTranslateX(x + a), a -> label.setTranslateY(point.getY() + a));
 			labelGroup.getChildren().add(label);
 		}
-		labelPane.getChildren().addAll(edgesGroup, labelGroup);
+		pane.getChildren().addAll(edgesGroup, labelGroup);
 	}
 
 	private static NodeArray<Point2D> computeTreeCoordinates(TaxaBlock taxaBlock, PhyloTree tree, Averaging averaging, boolean vFlip, int[] taxon2pos, int lastTaxon,
@@ -560,7 +561,7 @@ public class DensiTreeDrawer {
 				//label.setOnMouseDragged(mouseDraggedHandler);
 				final EventHandler<MouseEvent> mouseClickedHandler = e -> {
 					if (e.isStillSincePress()) {
-						if (!e.isShiftDown() && SplitsTree6.isDesktop())
+						if (!e.isShiftDown() && ProgramProperties.isDesktop())
 							taxonSelectionModel.clearSelection();
 						taxonSelectionModel.toggleSelection(taxon);
 					}

@@ -33,7 +33,6 @@ import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.Single;
-import splitstree6.main.SplitsTree6;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -509,7 +508,7 @@ public class MainWindowController {
 
 	@FXML
 	void initialize() {
-		if (!SplitsTree6.isDesktop()) {
+		if (!ProgramProperties.isDesktop()) {
 			menuBar.setVisible(false);
 			topVBox.setPadding(new Insets(30, 0, 0, 0));
 			((Pane) fileMenuButton.getParent()).getChildren().remove(fileMenuButton);

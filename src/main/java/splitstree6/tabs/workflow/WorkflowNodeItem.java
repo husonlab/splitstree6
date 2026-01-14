@@ -23,8 +23,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.workflow.WorkflowNode;
-import splitstree6.main.SplitsTree6;
 import splitstree6.workflow.Workflow;
 
 import java.util.HashSet;
@@ -75,7 +75,7 @@ abstract public class WorkflowNodeItem extends Pane {
 		setOnMouseClicked(e -> {
 			if (e.getClickCount() == 1) {
 				if (e.isStillSincePress()) {
-					if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
+					if (!e.isShiftDown() && !e.isShortcutDown() && ProgramProperties.isDesktop())
 						selectionModel.clearSelection();
 					if (e.isShiftDown()) {
 						selectionModel.setSelected(getWorkflowNode(), true);

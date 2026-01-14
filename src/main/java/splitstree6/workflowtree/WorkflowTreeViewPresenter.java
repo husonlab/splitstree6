@@ -28,13 +28,13 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.NexusExporter;
 import splitstree6.io.nexus.workflow.WorkflowNexusOutput;
-import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
@@ -141,7 +141,7 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 				if (treeView.getSelectionModel().getSelectedItem() instanceof WorkflowTreeItem item
 					&& item.getWorkflowNode() instanceof DataNode<?> dataNode) {
 					if (dataNode.getDataBlock() instanceof ViewBlock viewBlock) {
-						if (SplitsTree6.isDesktop()) { // todo: fix problem with pasting image when not running on desktop
+						if (ProgramProperties.isDesktop()) { // todo: fix problem with pasting image when not running on desktop
 							var image = viewBlock.getViewTab().getMainNode().snapshot(new SnapshotParameters(), null);
 							ClipboardUtils.put(viewBlock.getName(), image, null);
 							return;

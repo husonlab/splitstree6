@@ -35,7 +35,6 @@ import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import splitstree6.io.utils.DataBlockWriter;
 import splitstree6.io.writers.ExportManager;
-import splitstree6.main.SplitsTree6;
 import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
 import splitstree6.window.MainWindow;
@@ -63,7 +62,7 @@ public class ExportDialogPresenter {
 
 		var exporter = new SimpleObjectProperty<DataBlockWriter>();
 
-		if (!SplitsTree6.isDesktop()) {
+		if (!ProgramProperties.isDesktop()) {
 			if (controller.getBrowseButton().getParent() instanceof Pane pane) {
 				pane.getChildren().remove(controller.getBrowseButton());
 			}
@@ -110,7 +109,7 @@ public class ExportDialogPresenter {
 		controller.getApplyButton().setOnAction(e -> {
 			try {
 				var fileName = controller.getFileTextField().getText();
-				if (!SplitsTree6.isDesktop()) {
+				if (!ProgramProperties.isDesktop()) {
 					fileName = mobileDirectory.get() + File.separator + fileName + ".txt";
 				}
 				FileUtils.checkFileWritable(fileName, true);

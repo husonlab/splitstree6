@@ -27,9 +27,9 @@ import javafx.scene.layout.*;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
+import jloda.fx.util.ProgramProperties;
 import jloda.phylogeny.layout.Averaging;
 import splitstree6.layout.tree.TreeDiagramType;
-import splitstree6.main.SplitsTree6;
 
 public class DensiTreeViewController {
 
@@ -98,7 +98,7 @@ public class DensiTreeViewController {
 	private CheckMenuItem rerootAndRescaleCheckMenuItem;
 
 	@FXML
-	private MenuButton menuButton;
+	private MenuButton diagramMenuButton;
 
 	@FXML
 	private CheckMenuItem showTreesMenuItem;
@@ -140,13 +140,13 @@ public class DensiTreeViewController {
 
 		diagramToggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
 			if (n == trianglDendrogramToggleItem) {
-				menuButton.setGraphic(TreeDiagramType.TriangularCladogram.icon());
+				diagramMenuButton.setGraphic(TreeDiagramType.TriangularCladogram.icon());
 			} else if (n == radialPhylogramToggleItem) {
-				menuButton.setGraphic(TreeDiagramType.RadialPhylogram.icon());
+				diagramMenuButton.setGraphic(TreeDiagramType.RadialPhylogram.icon());
 			} else if (n == rectangularPhylogramToggleItem) {
-				menuButton.setGraphic(TreeDiagramType.RectangularPhylogram.icon());
+				diagramMenuButton.setGraphic(TreeDiagramType.RectangularPhylogram.icon());
 			} else if (n == roundedPhylogramToggleItem) {
-				menuButton.setGraphic(TreeDiagramType.iconForRoundedPhylogram());
+				diagramMenuButton.setGraphic(TreeDiagramType.iconForRoundedPhylogram());
 			}
 		});
 		trianglDendrogramToggleItem.setGraphic(TreeDiagramType.TriangularCladogram.icon());
@@ -154,8 +154,8 @@ public class DensiTreeViewController {
 		rectangularPhylogramToggleItem.setGraphic(TreeDiagramType.RectangularPhylogram.icon());
 		roundedPhylogramToggleItem.setGraphic(TreeDiagramType.iconForRoundedPhylogram());
 
-		if (!SplitsTree6.isDesktop())
-			menuButton.getItems().remove(roundedPhylogramToggleItem);
+		if (!ProgramProperties.isDesktop()) // todo: this takes too long to compute on a mobile device
+			diagramMenuButton.getItems().remove(roundedPhylogramToggleItem);
 
 		diagramToggleGroup.selectToggle(trianglDendrogramToggleItem);
 
@@ -261,8 +261,8 @@ public class DensiTreeViewController {
 		return diagramToggleGroup;
 	}
 
-	public MenuButton getMenuButton() {
-		return menuButton;
+	public MenuButton getDiagramMenuButton() {
+		return diagramMenuButton;
 	}
 
 	public CheckMenuItem getJitterMenuItem() {

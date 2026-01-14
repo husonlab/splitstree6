@@ -29,7 +29,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.icons.MaterialIcons;
-import splitstree6.main.SplitsTree6;
+import jloda.fx.util.ProgramProperties;
 import splitstree6.view.displaytext.highlighters.Highlighter;
 
 public class DisplayTextViewController {
@@ -84,7 +84,7 @@ public class DisplayTextViewController {
 		codeArea.prefWidthProperty().bind(borderPane.widthProperty());
 		highlighter = codeArea.getHighlighter();
 
-		if (!SplitsTree6.isDesktop())
+		if (!ProgramProperties.isDesktop())
 			toolBar.getItems().remove(lineNumbersToggle);
 	}
 

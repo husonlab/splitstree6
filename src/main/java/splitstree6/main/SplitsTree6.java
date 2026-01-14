@@ -54,8 +54,6 @@ public class SplitsTree6 extends Application {
 
 	private static final ArrayList<String> inputFiles = new ArrayList<>();
 
-	private static boolean desktop = true;
-
 	private static boolean allowExperimental = false;
 	public static boolean allowRazorNet = false;
 
@@ -184,14 +182,6 @@ public class SplitsTree6 extends Application {
 	public void stop() {
 		ProgramProperties.store();
 		System.exit(0);
-	}
-
-	public static boolean isDesktop() {
-		return desktop;
-	}
-
-	public static void setDesktop(boolean desktop) {
-		SplitsTree6.desktop = desktop;
 	}
 
 	public static boolean isAllowExperimental() {

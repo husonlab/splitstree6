@@ -54,7 +54,7 @@
         <top>
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
-                    <MenuButton fx:id="menuButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false"
+                    <MenuButton fx:id="diagramMenuButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false"
                                 text="DensiTree">
                         <items>
                             <RadioMenuItem fx:id="trianglDendrogramToggleItem" mnemonicParsing="false"

@@ -42,7 +42,6 @@ public class EdgesFormatController {
 	@FXML
 	private ChoiceBox<Number> widthCBox;
 
-
 	@FXML
 	private Button resetColorButton;
 

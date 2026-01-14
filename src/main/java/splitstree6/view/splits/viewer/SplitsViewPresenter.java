@@ -41,10 +41,8 @@ import jloda.fx.dialog.InlineTextPrompt;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.qr.QRViewUtils;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.ClipboardUtils;
-import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.util.SwipeUtils;
+import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.*;
 import jloda.util.*;
 import splitstree6.algorithms.utils.CharactersUtilities;
 import splitstree6.data.CharactersBlock;
@@ -59,7 +57,6 @@ import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
-import splitstree6.main.SplitsTree6;
 import splitstree6.qr.SplitNewickQR;
 import splitstree6.splits.Compatibility;
 import splitstree6.splits.SplitNewick;
@@ -216,7 +213,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getSetScaleRatioButton().setOnAction(e -> {
 			var currentValue = 100.0 / (controller.getScaleBar().getUnitLengthX() * view.getOptionZoomFactor());
 
-			if (SplitsTree6.isDesktop()) {
+			if (ProgramProperties.isDesktop()) {
 				var dialog = new TextInputDialog(StringUtils.removeTrailingZerosAfterDot(currentValue));
 				dialog.setTitle("Set Scale Ratio - SplitsTree App");
 				dialog.setHeaderText("Define the length representation per 100 pixels");
@@ -525,7 +522,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
-			if (false && SplitsTree6.isDesktop()) {
+			if (false && ProgramProperties.isDesktop()) {
 				NodeLabelDialog.apply(undoManager, stage, label);
 			} else {
 				NodeLabelDialog.apply(undoManager, label, null);

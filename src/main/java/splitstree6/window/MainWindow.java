@@ -45,7 +45,6 @@ import splitstree6.cite.ExtractMethodsText;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
@@ -92,7 +91,7 @@ public class MainWindow implements IMainWindow {
 
 		{
 			var fxmlLoader = new FXMLLoader();
-			try (var ins = StatementFilter.applyMobileFXML(Objects.requireNonNull(MainWindowController.class.getResource("MainWindow.fxml")).openStream(), SplitsTree6.isDesktop())) {
+			try (var ins = StatementFilter.applyMobileFXML(Objects.requireNonNull(MainWindowController.class.getResource("MainWindow.fxml")).openStream(), ProgramProperties.isDesktop())) {
 				fxmlLoader.load(ins);
 				root = fxmlLoader.getRoot();
 				controller = fxmlLoader.getController();
@@ -201,7 +200,7 @@ public class MainWindow implements IMainWindow {
 		name.addListener(invalidationListener);
 		dirty.addListener(invalidationListener);
 		invalidationListener.invalidated(null);
-		if (SplitsTree6.isDesktop())
+		if (ProgramProperties.isDesktop())
 			stage.show();
 		Platform.runLater(() -> {
 			stage.setWidth(stage.getWidth() - 1);
