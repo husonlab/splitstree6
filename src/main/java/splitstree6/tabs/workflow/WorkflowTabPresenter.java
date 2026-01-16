@@ -26,6 +26,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
+import javafx.scene.layout.Pane;
+import jloda.fx.control.MultiTouchGestureMonitor;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.util.SwipeUtils;
@@ -168,6 +170,8 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutMenuItem().setOnAction(null);
 
 		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
+		if (controller.getScrollPane().getContent() instanceof Pane pane)
+			MultiTouchGestureMonitor.setup(controller.getScrollPane(), pane);
 	}
 
 	public WorkflowTabLayout getWorkflowTabLayout() {

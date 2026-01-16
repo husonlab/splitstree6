@@ -84,7 +84,7 @@ public class InteractionSetup {
 							ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 		this.undoManager = undoManager;
 
-		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(scrollPane, pane, !ProgramProperties.isDesktop());
+		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(scrollPane, pane);
 
 		pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 			if (e.isStillSincePress()) {

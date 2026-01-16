@@ -38,7 +38,10 @@ import javafx.scene.paint.Color;
 import jloda.fx.control.MultiTouchGestureMonitor;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.util.*;
+import jloda.fx.util.BasicFX;
+import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.RunAfterAWhile;
+import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Graph;
 import jloda.graph.Node;
@@ -92,7 +95,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 
 		if (controller.getScrollPane().getContent() instanceof Pane pane) {
-			MultiTouchGestureMonitor.setup(controller.getScrollPane(), pane, !ProgramProperties.isDesktop());
+			MultiTouchGestureMonitor.setup(controller.getScrollPane(), pane);
 		}
 
 		tree1.addListener((v, o, n) -> {

@@ -95,7 +95,7 @@ public class InteractionSetup {
 		this.taxonSelectionModel = taxonSelectionModel;
 		this.splitSelectionModel = splitSelectionModel;
 
-		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(scrollPane, pane, !ProgramProperties.isDesktop());
+		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(scrollPane, pane);
 
 		pane.setOnMouseClicked(e -> {
 			if (e.isStillSincePress() && !e.isShiftDown()) {

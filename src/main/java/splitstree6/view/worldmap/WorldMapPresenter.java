@@ -32,8 +32,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import jloda.fx.control.MultiTouchGestureMonitor;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.undo.UndoableRedoableCommand;
+import jloda.fx.util.SwipeUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.utils.worldmap.WorldMap;
 import splitstree6.view.utils.ExportUtils;
@@ -205,6 +207,9 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		}
 		while ((Math.abs(delta.getX()) >= 1 || Math.abs(delta.getY()) >= 1) &&
 			   (Math.abs(delta.getX()) < Math.abs(previous.getX()) || Math.abs(delta.getY()) < Math.abs(previous.getY())));
+
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
+		MultiTouchGestureMonitor.setup(controller.getZoomableScrollPane(), controller.getAnchorPane());
 
 	}
 
