@@ -379,7 +379,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getExpandHorizontallyButton().setOnAction(e -> {
 			view.setOptionHorizontalZoomFactor(view.getOptionHorizontalZoomFactor() * 1.1);
 		});
-		controller.getExpandHorizontallyButton().disableProperty().bind(view.emptyProperty().or(lockAspectRatio).or(view.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));
+		controller.getExpandHorizontallyButton().disableProperty().bind(view.emptyProperty().or(lockAspectRatio).or(view.optionHorizontalZoomFactorProperty().greaterThan(10000.0)));
 
 		controller.getContractVerticallyButton().setOnAction(e -> {
 			view.setOptionVerticalZoomFactor((1.0 / 1.1) * view.getOptionVerticalZoomFactor());
@@ -393,7 +393,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			if (lockAspectRatio.get())
 				view.setOptionHorizontalZoomFactor(1.1 * view.getOptionHorizontalZoomFactor());
 		});
-		controller.getExpandVerticallyButton().disableProperty().bind(view.emptyProperty().or(view.optionVerticalZoomFactorProperty().greaterThan(8.0 / 1.1)));
+		controller.getExpandVerticallyButton().disableProperty().bind(view.emptyProperty().or(view.optionVerticalZoomFactorProperty().greaterThan(10000)));
 
 		controller.getExpandCollapseVerticallyButton().setOnAction(e -> {
 			var minLabelHeight = treePane.get().getMinLabelHeight();

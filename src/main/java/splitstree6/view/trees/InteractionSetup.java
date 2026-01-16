@@ -21,7 +21,7 @@ package splitstree6.view.trees;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanExpression;
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -35,7 +35,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Shape;
@@ -75,7 +74,7 @@ public class InteractionSetup {
 
 	private final AService<Collection<Edge>> computeEdgeSelectionService = new AService<>();
 
-	private final BooleanProperty multiTouchGestureInProgress;
+	private final ReadOnlyBooleanProperty multiTouchGestureInProgress;
 
 	private double mouseDownX;
 	private double mouseDownY;
@@ -85,17 +84,7 @@ public class InteractionSetup {
 							ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 		this.undoManager = undoManager;
 
-		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(pane);
-		if (scrollPane != null && !ProgramProperties.isDesktop()) {
-			scrollPane.setPannable(false);
-			scrollPane.addEventFilter(ScrollEvent.ANY, e -> {
-				if (e.getTouchCount() < 2)
-					e.consume();
-			});
-			multiTouchGestureInProgress.addListener((v, o, n) -> {
-				scrollPane.setPannable(n);
-			});
-		}
+		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(scrollPane, pane, !ProgramProperties.isDesktop());
 
 		pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 			if (e.isStillSincePress()) {

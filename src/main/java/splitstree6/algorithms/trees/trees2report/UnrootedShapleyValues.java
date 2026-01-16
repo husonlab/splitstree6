@@ -40,8 +40,8 @@ import java.util.Collection;
 public class UnrootedShapleyValues extends Trees2ReportBase {
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
-		var taxa = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());
-		return report(progress, taxaBlock, treesBlock, taxa);
+		var selectedTaxonSet = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());
+		return report(progress, taxaBlock, treesBlock, selectedTaxonSet);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class UnrootedShapleyValues extends Trees2ReportBase {
 			buf.append("%nTree %s:%n".formatted(tree.getName()));
 			var splits = new ArrayList<ASplit>();
 			SplitUtils.computeSplits(null, tree, splits);
-			buf.append(ShapleyValues.report(taxaBlock, splits));
+			buf.append(ShapleyValues.report(taxaBlock, selectedTaxa, splits));
 			progress.incrementProgress();
 		}
 		progress.reportTaskCompleted();

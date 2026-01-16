@@ -31,6 +31,7 @@ import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.ScaleBar;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
@@ -120,7 +121,7 @@ public class SplitsViewController {
 
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
-		zoomableScrollPane.setPannable(true);
+		zoomableScrollPane.setPannable(ProgramProperties.isDesktop());
 
 		centerPane.getChildren().add(zoomableScrollPane);
 

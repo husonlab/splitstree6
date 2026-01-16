@@ -23,6 +23,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
+import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -33,6 +34,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.utils.TreesUtils;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
@@ -75,9 +77,10 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
+		var selectedTaxonSet = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());
 		return switch (getOptionMethod()) {
-			case FairProportions -> reportFairProportions(progress, taxaBlock, treesBlock);
-			case EqualSplits -> reportEqualSplits(progress, taxaBlock, treesBlock);
+			case FairProportions -> reportFairProportions(progress, taxaBlock, selectedTaxonSet, treesBlock);
+			case EqualSplits -> reportEqualSplits(progress, taxaBlock, selectedTaxonSet, treesBlock);
 		};
 	}
 
@@ -98,7 +101,7 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 		this.optionMethod.set(optionMethod);
 	}
 
-	public static String reportFairProportions(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock) throws CanceledException {
+	public static String reportFairProportions(ProgressListener progress, TaxaBlock taxaBlock, BitSet selectedTaxa, TreesBlock treesBlock) throws CanceledException {
 		var buf = new StringBuilder();
 		buf.append("Fair Proportions Diversity Index:\n");
 		progress.setTasks("Computing", "fair proportions diversity index");
@@ -110,13 +113,15 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 
 			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.removeTrailingZerosAfterDot(totalRounded)));
 
-			var map = computeFairProportions(tree);
-			var entries = new ArrayList<>(map.entrySet());
-			entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue())); // by decreasing value
-			for (var entry : entries) {
-				for (var t : tree.getTaxa(entry.getKey())) {
-					var valueRounded = NumberUtils.roundSigFig(entry.getValue(), 5);
-					buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(t).getName(), StringUtils.removeTrailingZerosAfterDot(valueRounded), 100.0 * entry.getValue() / total));
+			try (var map = computeFairProportions(tree)) {
+				var entries = new ArrayList<>(map.entrySet());
+				entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue())); // by decreasing value
+				for (var entry : entries) {
+					var t = tree.getTaxon(entry.getKey());
+					if (selectedTaxa.cardinality() == 0 || selectedTaxa.get(t)) {
+						var valueRounded = NumberUtils.roundSigFig(entry.getValue(), 5);
+						buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(t).getName(), StringUtils.removeTrailingZerosAfterDot(valueRounded), 100.0 * entry.getValue() / total));
+					}
 				}
 			}
 			progress.incrementProgress();
@@ -153,7 +158,7 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 		}
 	}
 
-	public static String reportEqualSplits(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock) throws CanceledException {
+	public static String reportEqualSplits(ProgressListener progress, TaxaBlock taxaBlock, BitSet selectedTaxa, TreesBlock treesBlock) throws CanceledException {
 		var buf = new StringBuilder();
 		buf.append("Equal Splits Diversity Index:\n");
 		progress.setTasks("Computing", "equal splits diversity index");
@@ -170,7 +175,8 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 			entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue())); // by decreasing value
 
 			for (var entry : entries) {
-				for (var t : tree.getTaxa(entry.getKey())) {
+				var t = tree.getTaxon(entry.getKey());
+				if (selectedTaxa.cardinality() == 0 || selectedTaxa.get(t)) {
 					var valueRounded = NumberUtils.roundSigFig(entry.getValue(), 5);
 					buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(t).getName(), StringUtils.removeTrailingZerosAfterDot(valueRounded), 100 * entry.getValue() / total));
 				}

@@ -22,7 +22,7 @@ package splitstree6.view.splits.viewer;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -32,7 +32,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
@@ -85,7 +84,7 @@ public class InteractionSetup {
 	private static EventHandler<MouseEvent> mouseDraggedHandler;
 	private static EventHandler<MouseEvent> mouseReleasedHandler;
 
-	private final BooleanProperty multiTouchGestureInProgress;
+	private final ReadOnlyBooleanProperty multiTouchGestureInProgress;
 
 	/**
 	 * constructor
@@ -96,19 +95,7 @@ public class InteractionSetup {
 		this.taxonSelectionModel = taxonSelectionModel;
 		this.splitSelectionModel = splitSelectionModel;
 
-		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(pane);
-
-		if (scrollPane != null && !ProgramProperties.isDesktop()) {
-			scrollPane.setPannable(false);
-			scrollPane.addEventFilter(ScrollEvent.ANY, e -> {
-				if (e.getTouchCount() < 2)
-					e.consume();
-			});
-			multiTouchGestureInProgress.addListener((v, o, n) -> {
-				scrollPane.setPannable(n);
-				System.err.println("Pannable: " + n);
-			});
-		}
+		this.multiTouchGestureInProgress = MultiTouchGestureMonitor.setup(scrollPane, pane, !ProgramProperties.isDesktop());
 
 		pane.setOnMouseClicked(e -> {
 			if (e.isStillSincePress() && !e.isShiftDown()) {

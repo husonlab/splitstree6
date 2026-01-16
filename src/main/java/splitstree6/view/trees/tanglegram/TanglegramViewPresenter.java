@@ -35,12 +35,10 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import jloda.fx.control.MultiTouchGestureMonitor;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.ClipboardUtils;
-import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.util.SwipeUtils;
+import jloda.fx.util.*;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Graph;
 import jloda.graph.Node;
@@ -92,6 +90,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			if (n)
 				mainWindow.setDirty(true);
 		});
+
+		if (controller.getScrollPane().getContent() instanceof Pane pane) {
+			MultiTouchGestureMonitor.setup(controller.getScrollPane(), pane, !ProgramProperties.isDesktop());
+		}
 
 		tree1.addListener((v, o, n) -> {
 					controller.getTree1CBox().setValue(n == null ? null : n.getName());
@@ -422,13 +424,13 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		view.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("show tree info", view.optionShowTreeInfoProperty(), o, n));
 
 		controller.getContractHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor((1.0 / 1.1) * view.getOptionHorizontalZoomFactor()));
-		controller.getContractHorizontallyButton().disableProperty().bind(view.emptyProperty().or(view.optionHorizontalZoomFactorProperty().greaterThan(128)));
+		controller.getContractHorizontallyButton().disableProperty().bind(view.emptyProperty().or(view.optionHorizontalZoomFactorProperty().greaterThan(10000)));
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor(1.1 * view.getOptionHorizontalZoomFactor()));
 		controller.getExpandHorizontallyButton().disableProperty().bind(view.emptyProperty());
 
 		controller.getExpandVerticallyButton().setOnAction(e -> view.setOptionVerticalZoomFactor(1.1 * view.getOptionVerticalZoomFactor()));
-		controller.getExpandVerticallyButton().disableProperty().bind(view.emptyProperty().or(view.optionVerticalZoomFactorProperty().greaterThan(128)));
+		controller.getExpandVerticallyButton().disableProperty().bind(view.emptyProperty().or(view.optionVerticalZoomFactorProperty().greaterThan(10000)));
 
 		controller.getContractVerticallyButton().setOnAction(e -> view.setOptionVerticalZoomFactor((1.0 / 1.1) * view.getOptionVerticalZoomFactor()));
 		controller.getContractVerticallyButton().disableProperty().bind(view.emptyProperty());

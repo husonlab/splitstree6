@@ -38,7 +38,8 @@ import java.util.*;
 public class ShapleyValues extends Splits2ReportBase {
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splitsBlock, Collection<Taxon> selectedTaxa) {
-		return report(taxaBlock, splitsBlock.getSplits());
+		var selectedTaxonSet = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());
+		return report(taxaBlock, selectedTaxonSet, splitsBlock.getSplits());
 	}
 
 	@Override
@@ -53,6 +54,10 @@ public class ShapleyValues extends Splits2ReportBase {
 	}
 
 	public static String report(TaxaBlock taxaBlock, Collection<ASplit> splits) {
+		return report(taxaBlock, new BitSet(), splits);
+	}
+
+	public static String report(TaxaBlock taxaBlock, BitSet whichTaxa, Collection<ASplit> splits) {
 		var total = splits.stream().mapToDouble(ASplit::getWeight).sum();
 
 		var map = compute(taxaBlock.getTaxaSet(), splits);
@@ -60,8 +65,10 @@ public class ShapleyValues extends Splits2ReportBase {
 		entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue())); // by decreasing value
 		var buf = new StringBuilder("Unrooted Shapley values:\n");
 		for (var entry : entries) {
-			var valueRounded = NumberUtils.roundSigFig(entry.getValue(), 5);
-			buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(entry.getKey()).getName(), valueRounded, 100 * entry.getValue() / total));
+			if (whichTaxa.cardinality() == 0 || whichTaxa.get(entry.getKey())) {
+				var valueRounded = NumberUtils.roundSigFig(entry.getValue(), 5);
+				buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(entry.getKey()).getName(), valueRounded, 100 * entry.getValue() / total));
+			}
 		}
 		return buf.toString();
 	}
