@@ -19,6 +19,7 @@
 
 package splitstree6.workflowtree;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
@@ -43,10 +44,12 @@ public class WorkflowTreeViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(editButton, "edit_note");
-		MaterialIcons.setIcon(addMenuButton, "add");
-		MaterialIcons.setIcon(deleteButton, "delete");
-		MaterialIcons.setIcon(copyButton, "copy");
+		Platform.runLater(() -> {
+			MaterialIcons.setIcon(editButton, MaterialIcons.edit_note);
+			MaterialIcons.setIcon(addMenuButton, MaterialIcons.add);
+			MaterialIcons.setIcon(deleteButton, MaterialIcons.delete);
+			MaterialIcons.setIcon(copyButton, MaterialIcons.copy);
+		});
 
 		workflowTreeView.addEventFilter(javafx.scene.input.TouchEvent.TOUCH_PRESSED, e -> {
 			var target = e.getTouchPoint().getPickResult().getIntersectedNode();

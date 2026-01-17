@@ -18,6 +18,7 @@
  */
 package splitstree6.dialog.analyzegenomes;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -152,13 +153,15 @@ public class AnalyzeGenomesController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(inputBrowseButton, "file_open");
-		MaterialIcons.setIcon(outputBrowseButton, "file_open");
-		MaterialIcons.setIcon(referencesDatabaseButton, "file_open");
-		//MaterialIcons.setIcon(findReferencesButton, "search","",false);
-		MaterialIcons.setIcon(replaceButton, "find_replace");
-		MaterialIcons.setIcon(cacheButton, "folder_open");
-		MaterialIcons.setIcon(htmlInfoButton, "info", "-fx-font-size: 13", true);
+		Platform.runLater(() -> {
+			MaterialIcons.setIcon(inputBrowseButton, "file_open");
+			MaterialIcons.setIcon(outputBrowseButton, "file_open");
+			MaterialIcons.setIcon(referencesDatabaseButton, "file_open");
+			//MaterialIcons.setIcon(findReferencesButton, "search","",false);
+			MaterialIcons.setIcon(replaceButton, "find_replace");
+			MaterialIcons.setIcon(cacheButton, "folder_open");
+			MaterialIcons.setIcon(htmlInfoButton, "info", "-fx-font-size: 13", true);
+		});
 
 		//MaterialIcons.setIcon(addReferencesButton, "add");
 		// MaterialIcons.setIcon(removeAllReferencesButton, "remove");

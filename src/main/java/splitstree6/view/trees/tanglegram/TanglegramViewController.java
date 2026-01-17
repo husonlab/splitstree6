@@ -19,6 +19,7 @@
 
 package splitstree6.view.trees.tanglegram;
 
+import javafx.application.Platform;
 import javafx.beans.binding.When;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -140,17 +141,19 @@ public class TanglegramViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(flipButton, "flip", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(previousButton, MaterialIcons.arrow_left);
-		MaterialIcons.setIcon(nextButton, MaterialIcons.arrow_right);
-		MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.tune);
-		MaterialIcons.setIcon(formatToggleButton, MaterialIcons.format_shapes);
-		MaterialIcons.setIcon(expandHorizontallyButton, MaterialIcons.unfold_more, "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(contractHorizontallyButton, MaterialIcons.unfold_less, "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(expandCollapseVerticallyButton, MaterialIcons.sync_alt, "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(expandVerticallyButton, MaterialIcons.unfold_more);
-		MaterialIcons.setIcon(contractVerticallyButton, MaterialIcons.unfold_less);
-		MaterialIcons.setIcon(optimizeMenuButton, MaterialIcons.rule);
+		Platform.runLater(() -> {
+			MaterialIcons.setIcon(flipButton, "flip", "-fx-rotate: 90;", true);
+			MaterialIcons.setIcon(previousButton, MaterialIcons.arrow_left);
+			MaterialIcons.setIcon(nextButton, MaterialIcons.arrow_right);
+			MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.tune);
+			MaterialIcons.setIcon(formatToggleButton, MaterialIcons.format_shapes);
+			MaterialIcons.setIcon(expandHorizontallyButton, MaterialIcons.unfold_more, "-fx-rotate: 90;", true);
+			MaterialIcons.setIcon(contractHorizontallyButton, MaterialIcons.unfold_less, "-fx-rotate: 90;", true);
+			MaterialIcons.setIcon(expandCollapseVerticallyButton, MaterialIcons.sync_alt, "-fx-rotate: 90;", true);
+			MaterialIcons.setIcon(expandVerticallyButton, MaterialIcons.unfold_more);
+			MaterialIcons.setIcon(contractVerticallyButton, MaterialIcons.unfold_less);
+			MaterialIcons.setIcon(optimizeMenuButton, MaterialIcons.rule);
+		});
 
 
 		// draw applyCentering first:

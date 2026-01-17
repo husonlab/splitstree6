@@ -52,7 +52,7 @@ public class ExportDialogController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(browseButton, "file_open");
+		MaterialIcons.setIcon(browseButton, MaterialIcons.file_open);
 	}
 
 	public ChoiceBox<String> getFormatCBox() {

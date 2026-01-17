@@ -19,6 +19,7 @@
 
 package splitstree6.window;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.Property;
 import javafx.fxml.FXML;
@@ -518,15 +519,20 @@ public class MainWindowController {
 		algorithmTabPane.setAllowUndock(false);
 		mainTabPane.setAllowUndock(false);
 
-		MaterialIcons.setIcon(fileMenuButton, MaterialIcons.file_open);
+		Platform.runLater(() -> {
+			MaterialIcons.setIcon(fileMenuButton, MaterialIcons.file_open);
 
-		MaterialIcons.setIcon(undoButton, MaterialIcons.undo);
-		MaterialIcons.setIcon(redoButton, MaterialIcons.redo);
-		MaterialIcons.setIcon(increaseFontSizeButton, MaterialIcons.text_increase);
-		MaterialIcons.setIcon(decreaseFontSizeButton, MaterialIcons.text_decrease);
-		MaterialIcons.setIcon(selectButton, MaterialIcons.select_all);
-		MaterialIcons.setIcon(showWorkflowTreeCheckButton, MaterialIcons.view_sidebar, "-fx-rotate: 180;", true);
-		MaterialIcons.setIcon(importButton, MaterialIcons.file_download);
+			MaterialIcons.setIcon(undoButton, MaterialIcons.undo);
+			MaterialIcons.setIcon(redoButton, MaterialIcons.redo);
+			MaterialIcons.setIcon(increaseFontSizeButton, MaterialIcons.text_increase);
+			MaterialIcons.setIcon(decreaseFontSizeButton, MaterialIcons.text_decrease);
+			MaterialIcons.setIcon(selectButton, MaterialIcons.select_all);
+			MaterialIcons.setIcon(showWorkflowTreeCheckButton, MaterialIcons.view_sidebar, "-fx-rotate: 180;", true);
+			MaterialIcons.setIcon(importButton, MaterialIcons.file_download);
+
+			MaterialIcons.setIcon(findButton, MaterialIcons.search);
+			MaterialIcons.setIcon(exportButton, MaterialIcons.ios_share);
+		});
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -535,8 +541,6 @@ public class MainWindowController {
 		decreaseFontSizeButton.disableProperty().bind(decreaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
 
 
-		MaterialIcons.setIcon(findButton, MaterialIcons.search);
-		MaterialIcons.setIcon(exportButton, MaterialIcons.ios_share);
 
 		algorithmsBorderPane.setCenter(algorithmTabPane);
 		mainBorderPane.setCenter(mainTabPane);
