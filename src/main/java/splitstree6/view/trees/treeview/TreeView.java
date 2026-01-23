@@ -31,13 +31,11 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.DraggableLabel;
-import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.FuzzyBoolean;
-import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.*;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
 import jloda.phylogeny.layout.Averaging;
@@ -58,6 +56,8 @@ import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
+
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
 
 /**
  * show a single tree
@@ -208,6 +208,13 @@ public class TreeView implements IView {
 		};
 		mainWindow.workingTaxaProperty().addListener(new WeakInvalidationListener(updateBreadCrumbs));
 		treeProperty().addListener(updateBreadCrumbs);
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 	}
 
 	@Override

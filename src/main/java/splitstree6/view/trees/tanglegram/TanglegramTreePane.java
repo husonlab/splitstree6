@@ -40,7 +40,7 @@ import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
-import splitstree6.view.trees.treepages.TreePane;
+import splitstree6.view.trees.treeview.TreePane;
 import splitstree6.window.MainWindow;
 
 /**

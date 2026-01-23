@@ -57,7 +57,6 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
-import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
@@ -455,10 +454,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		}
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
-		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
-		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
-		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
-		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
 
 		var qrImageView = new SimpleObjectProperty<ImageView>();
 		QRViewUtils.setup(controller.getAnchorPane(), tree, () -> TreeNewickQR.apply(tree.get(), true, false, false, 4296), qrImageView, view.optionShowQRCodeProperty());

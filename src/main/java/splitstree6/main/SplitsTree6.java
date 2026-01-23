@@ -52,6 +52,8 @@ import java.util.ArrayList;
 public class SplitsTree6 extends Application {
 	public static boolean nodeZoomOnMouseOver = false;
 
+	public static boolean setMinWidthHeightToZero = true;
+
 	private static final ArrayList<String> inputFiles = new ArrayList<>();
 
 	private static boolean allowExperimental = false;

@@ -24,8 +24,8 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/22"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.window.MainWindowController">
+<AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.window.MainWindowController">
     <BorderPane fx:id="outsideBorderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <top>
@@ -531,37 +531,23 @@
                         </MenuItem>
                     </Menu>
                 </MenuBar>
-                <BorderPane fx:id="toolBarBorderPane" VBox.vgrow="NEVER">
-                    <right>
-                        <HBox fx:id="rightToolBarPane" alignment="CENTER_RIGHT" maxHeight="-Infinity"
-                              minHeight="-Infinity" prefHeight="26.0" spacing="4.0" BorderPane.alignment="CENTER_RIGHT">
+                <GridPane fx:id="toolbarGrid">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints hgrow="NEVER"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints/>
+                    </rowConstraints>
+                    <children>
+                        <HBox fx:id="leftBox" alignment="CENTER_LEFT" maxHeight="-Infinity" minHeight="-Infinity"
+                              prefHeight="26.0">
                             <children>
-                                <Button fx:id="undoButton" mnemonicParsing="false" text="Undo"/>
-                                <Button fx:id="redoButton" mnemonicParsing="false" text="Redo"/>
-                                <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
-                                        HBox.hgrow="NEVER"/>
-
-                                <Button fx:id="increaseFontSizeButton" mnemonicParsing="false" text="Font+"/>
-                                <Button fx:id="decreaseFontSizeButton" mnemonicParsing="false" text="Font-"/>
-                                <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
-                                        HBox.hgrow="NEVER"/>
-                                <Button fx:id="selectButton" mnemonicParsing="false" text="Select">
+                                <ToggleButton fx:id="showSideBarButton" mnemonicParsing="false" text="Side Bar">
                                     <tooltip>
-                                        <Tooltip text="Select All or None"/>
+                                        <Tooltip text="Show/hide methods sidebar"/>
                                     </tooltip>
-                                </Button>
-                                <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
-                                        HBox.hgrow="NEVER"/>
-                                <Button fx:id="findButton" mnemonicParsing="false" text="Find"/>
-                                <MenuButton fx:id="exportButton" alignment="CENTER" mnemonicParsing="false"
-                                            text="Export"/>
-                            </children>
-                        </HBox>
-                    </right>
-                    <left>
-                        <HBox fx:id="leftToolBarPane" alignment="CENTER_LEFT" maxHeight="-Infinity"
-                              minHeight="-Infinity" prefHeight="26.0">
-                            <children>
+                                </ToggleButton>
                                 <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="File"/>
                                 <Button fx:id="importButton" mnemonicParsing="false" text="Import">
@@ -569,29 +555,35 @@
                                         <Tooltip text="Paste text into new document"/>
                                     </tooltip>
                                 </Button>
-                                <Region layoutX="179.0" layoutY="10.0" prefWidth="10.0"/>
-                                <ToggleButton fx:id="showWorkflowTreeCheckButton" mnemonicParsing="false"
-                                              text="Side Bar">
-                                    <tooltip>
-                                        <Tooltip text="Show/hide methods sidebar"/>
-                                    </tooltip>
-                                </ToggleButton>
-                                <Region prefWidth="4.0"/>
                                 <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false"/>
                             </children>
+                            <padding>
+                                <Insets left="5.0" right="2.0"/>
+                            </padding>
                         </HBox>
-                    </left>
-                    <center>
-                        <HBox fx:id="centerToolBarPane" alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity"
-                              prefHeight="26.0" BorderPane.alignment="TOP_CENTER">
+                        <HBox fx:id="rightBox" alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity"
+                              prefHeight="26.0" spacing="4.0" GridPane.columnIndex="1">
                             <children>
+                                <Button fx:id="undoButton" mnemonicParsing="false" text="Undo"/>
+                                <Button fx:id="redoButton" mnemonicParsing="false" text="Redo"/>
+
+                                <Button fx:id="increaseFontSizeButton" mnemonicParsing="false" text="Font+"/>
+                                <Button fx:id="decreaseFontSizeButton" mnemonicParsing="false" text="Font-"/>
+                                <Button fx:id="selectButton" mnemonicParsing="false" text="Select">
+                                    <tooltip>
+                                        <Tooltip text="Select All or None"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="findButton" mnemonicParsing="false" text="Find"/>
+                                <MenuButton fx:id="exportButton" alignment="CENTER" mnemonicParsing="false"
+                                            text="Export"/>
                             </children>
+                            <GridPane.margin>
+                                <Insets left="2.0" right="5.0"/>
+                            </GridPane.margin>
                         </HBox>
-                    </center>
-                    <padding>
-                        <Insets left="9.0" right="20.0"/>
-                    </padding>
-                </BorderPane>
+                    </children>
+                </GridPane>
             </VBox>
         </top>
         <center>
@@ -662,7 +654,8 @@
                     <HBox.margin>
                         <Insets/>
                     </HBox.margin>
-                    <Label fx:id="memoryUsageLabel" alignment="CENTER_RIGHT" text="Memory" textFill="DARKGRAY">
+                    <Label fx:id="memoryUsageLabel" alignment="CENTER_RIGHT" minWidth="-Infinity" text="Memory"
+                           textFill="DARKGRAY">
                         <font>
                             <Font size="12.0"/>
                         </font>

@@ -393,10 +393,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
-		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
-		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
-		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
-		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
 
 		Platform.runLater(this::setupMenuItems);
 	}

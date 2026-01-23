@@ -26,7 +26,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.Region;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTab;
@@ -38,6 +40,8 @@ import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
 
 import java.util.Map;
+
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
 
 public class WorkflowTab extends Tab implements IDisplayTab {
 	private final MainWindow mainWindow;
@@ -66,6 +70,13 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 
 		setText("Workflow");
 		setClosable(false);
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 	}
 
 	@Override

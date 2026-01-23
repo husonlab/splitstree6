@@ -19,6 +19,7 @@
 
 package splitstree6.view.splits.viewer;
 
+import javafx.application.Platform;
 import javafx.beans.binding.When;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -109,15 +110,20 @@ public class SplitsViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
-		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
-		MaterialIcons.setIcon(flipHorizontalButton, "flip");
-		MaterialIcons.setIcon(flipVerticalButton, "flip", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(zoomInButton, "zoom_in");
-		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
-		MaterialIcons.setIcon(setScaleRatioButton, "more_vert");
-		MaterialIcons.setIcon(settingsToggleButton, "tune");
-		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
+		Platform.runLater(() -> {
+			MaterialIcons.setIcon(rotateLeftButton, MaterialIcons.rotate_left);
+			MaterialIcons.setIcon(rotateRightButton, MaterialIcons.rotate_right);
+
+			MaterialIcons.setIcon(flipHorizontalButton, MaterialIcons.flip);
+			MaterialIcons.setIcon(flipVerticalButton, MaterialIcons.flip, "-fx-rotate: 90;", true);
+
+			MaterialIcons.setIcon(zoomInButton, MaterialIcons.zoom_in);
+			MaterialIcons.setIcon(zoomOutButton, MaterialIcons.zoom_out);
+
+			MaterialIcons.setIcon(setScaleRatioButton, MaterialIcons.tune);
+			MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.more_vert);
+			MaterialIcons.setIcon(formatToggleButton, MaterialIcons.tune);
+		});
 
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);

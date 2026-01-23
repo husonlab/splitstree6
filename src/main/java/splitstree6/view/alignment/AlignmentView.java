@@ -24,9 +24,11 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.AService;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.window.NotificationManager;
 import jloda.util.BitSetUtils;
@@ -47,6 +49,8 @@ import splitstree6.workflow.DataNode;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
+
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
 
 /**
  * displays the input alignment
@@ -118,6 +122,13 @@ public class AlignmentView implements IView {
 				n.setGraphic(MaterialIcons.graphic("format_align_justify"));
 			}
 		});
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 
 		viewTab.emptyProperty().bind(empty);
 		viewTabProperty().addListener((v, o, n) -> {
@@ -311,6 +322,13 @@ public class AlignmentView implements IView {
 		};
 		mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
 		invalidationListener.invalidated(null);
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 	}
 
 	public String createSelectionString() {

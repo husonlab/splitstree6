@@ -29,10 +29,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.MemoryUsage;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.StatementFilter;
@@ -58,6 +60,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Objects;
+
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
 
 public class MainWindow implements IMainWindow {
 	private final Parent root;
@@ -162,6 +166,13 @@ public class MainWindow implements IMainWindow {
 				System.out.println(MenusToLaTeX.apply(controller.getMenuBar()));
 				System.exit(0);
 			});
+		}
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(root, Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
 		}
 	}
 

@@ -31,6 +31,7 @@ import javafx.scene.layout.*;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.Single;
@@ -41,7 +42,7 @@ import java.util.Map;
 
 public class MainWindowController {
 	@FXML
-	private ToggleButton showWorkflowTreeCheckButton;
+	private ToggleButton showSideBarButton;
 
 	@FXML
 	private VBox topVBox;
@@ -467,16 +468,12 @@ public class MainWindowController {
 	private MenuButton exportButton;
 
 	@FXML
-	private HBox leftToolBarPane;
+	private GridPane toolbarGrid;
+	@FXML
+	private HBox leftBox;
 
 	@FXML
-	private HBox centerToolBarPane;
-
-	@FXML
-	private HBox rightToolBarPane;
-
-	@FXML
-	private BorderPane toolBarBorderPane;
+	private HBox rightBox;
 
 	@FXML
 	private Pane rootPane;
@@ -527,7 +524,7 @@ public class MainWindowController {
 			MaterialIcons.setIcon(increaseFontSizeButton, MaterialIcons.text_increase);
 			MaterialIcons.setIcon(decreaseFontSizeButton, MaterialIcons.text_decrease);
 			MaterialIcons.setIcon(selectButton, MaterialIcons.select_all);
-			MaterialIcons.setIcon(showWorkflowTreeCheckButton, MaterialIcons.view_sidebar, "-fx-rotate: 180;", true);
+			MaterialIcons.setIcon(showSideBarButton, MaterialIcons.view_sidebar, "-fx-rotate: 180;", true);
 			MaterialIcons.setIcon(importButton, MaterialIcons.file_download);
 
 			MaterialIcons.setIcon(findButton, MaterialIcons.search);
@@ -588,8 +585,8 @@ public class MainWindowController {
 
 		var rightWidth = new Single<>(250.0);
 		javafx.application.Platform.runLater(() -> {
-			rightToolBarPane.applyCss();
-			rightWidth.set(rightToolBarPane.getWidth());
+			rightBox.applyCss();
+			rightWidth.set(rightBox.getWidth());
 		});
 
 		SwipeUtils.setConsumeSwipes(mainTabPane);
@@ -597,6 +594,29 @@ public class MainWindowController {
 
 		SwipeUtils.setConsumeSwipes(algorithmTabPane);
 		algorithmTabPane.setFocusTraversable(false);
+
+		toolbarGrid.widthProperty().addListener(e -> RunAfterAWhile.applyInFXThread(toolbarGrid, this::updateToolbarLayout));
+		updateToolbarLayout();
+	}
+
+	public void updateToolbarLayout() {
+		var wrap = (toolbarGrid.getWidth() <= Math.max(leftBox.prefWidth(-1) + rightBox.prefWidth(-1), 350));
+
+		if (!wrap) {
+			// Wide: right group in row 0, col 1
+			GridPane.setRowIndex(rightBox, 0);
+			GridPane.setColumnIndex(rightBox, 1);
+			GridPane.setColumnSpan(rightBox, 1);
+
+			rightBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+		} else {
+			// Narrow: move right group to row 1 spanning both columns
+			GridPane.setRowIndex(rightBox, 1);
+			GridPane.setColumnIndex(rightBox, 0);
+			GridPane.setColumnSpan(rightBox, 2);
+
+			rightBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+		}
 	}
 
 	public VBox getTopVBox() {
@@ -1135,10 +1155,6 @@ public class MainWindowController {
 		return outsideBorderPane;
 	}
 
-	public BorderPane getToolBarBorderPane() {
-		return toolBarBorderPane;
-	}
-
 	public FlowPane getBottomFlowPane() {
 		return bottomFlowPane;
 	}
@@ -1180,12 +1196,12 @@ public class MainWindowController {
 		return rootPane;
 	}
 
-	public HBox getLeftToolBarPane() {
-		return leftToolBarPane;
+	public HBox getLeftBox() {
+		return leftBox;
 	}
 
-	public ToggleButton getShowWorkflowTreeCheckButton() {
-		return showWorkflowTreeCheckButton;
+	public ToggleButton getShowSideBarButton() {
+		return showSideBarButton;
 	}
 
 	public ProgressIndicator getProgressIndicator() {
@@ -1194,6 +1210,10 @@ public class MainWindowController {
 
 	public Button getImportButton() {
 		return importButton;
+	}
+
+	public GridPane getToolbarGrid() {
+		return toolbarGrid;
 	}
 
 	private final Map<Property, Property> bidirectionalBoundPairs = new HashMap<>();

@@ -220,10 +220,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 				view.setOptionEdgeColor(DensiTreeView.DEFAULT_LIGHTMODE_EDGE_COLOR);
 		});
 
-		SwipeUtils.setConsumeSwipeLeft(controller.getAnchorPane());
-		SwipeUtils.setConsumeSwipeRight(controller.getAnchorPane());
-		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
-		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
 
 		var qrImageView = new SimpleObjectProperty<ImageView>();
 		QRViewUtils.setup(controller.getAnchorPane(), consensusTree, () -> TreeNewickQR.apply(consensusTree.get(), true, false, false, 4296), qrImageView, view.optionShowQRCodeProperty());

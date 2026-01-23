@@ -28,8 +28,10 @@ import javafx.collections.ObservableList;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
@@ -46,6 +48,8 @@ import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
+
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
 
 public class DensiTreeView implements IView {
 	public static final Color DEFAULT_LIGHTMODE_EDGE_COLOR = Color.BLACK.deriveColor(1, 1, 1, 0.05);
@@ -184,6 +188,13 @@ public class DensiTreeView implements IView {
 		});
 
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "n: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 	}
 
 	@Override

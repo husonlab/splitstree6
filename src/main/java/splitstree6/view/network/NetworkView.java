@@ -27,12 +27,10 @@ import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.DraggableLabel;
-import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.FuzzyBoolean;
-import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.*;
 import jloda.graph.Edge;
 import splitstree6.data.NetworkBlock;
 import splitstree6.layout.network.DiagramType;
@@ -49,6 +47,8 @@ import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
+
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
 
 public class NetworkView implements IView {
 	private final MainWindow mainWindow;
@@ -163,6 +163,13 @@ public class NetworkView implements IView {
 						networkBlock.get() == null || networkBlock.get().getGraph() == null ? 0 : networkBlock.get().getGraph().getNumberOfNodes(),
 						networkBlock.get() == null || networkBlock.get().getGraph() == null ? 0 : networkBlock.get().getGraph().getNumberOfEdges()),
 				mainWindow.workingTaxaProperty(), networkBlockProperty()));
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 	}
 
 	@Override

@@ -61,7 +61,7 @@ public class SplitPanePresenter {
 
 		var mainSplitPaneDividerChanging = new SimpleBooleanProperty(false);
 
-		controller.getShowWorkflowTreeCheckButton().selectedProperty().addListener((v, o, n) -> {
+		controller.getShowSideBarButton().selectedProperty().addListener((v, o, n) -> {
 			if (!mainSplitPaneDividerChanging.get()) {
 				try {
 					if (n) {
@@ -84,7 +84,7 @@ public class SplitPanePresenter {
 						if (!mainSplitPaneDividerChanging.get()) {
 							try {
 								mainSplitPaneDividerChanging.set(true);
-								controller.getShowWorkflowTreeCheckButton().setSelected(n.doubleValue() >= 0.01);
+								controller.getShowSideBarButton().setSelected(n.doubleValue() >= 0.01);
 							} finally {
 								mainSplitPaneDividerChanging.set(false);
 							}

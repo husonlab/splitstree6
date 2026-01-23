@@ -475,10 +475,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
 
-		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getNextButton().fire());
-		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getNextButton().fire());
-		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
-		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
 
 		Platform.runLater(this::setupMenuItems);
 	}

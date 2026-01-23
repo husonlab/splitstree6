@@ -1,5 +1,5 @@
 /*
- *  TreePane.java Copyright (C) 2024 Daniel H. Huson
+ * TreePane.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -15,9 +15,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-package splitstree6.view.trees.treepages;
+package splitstree6.view.trees.treeview;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;

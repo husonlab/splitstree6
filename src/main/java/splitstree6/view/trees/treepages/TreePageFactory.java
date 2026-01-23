@@ -35,6 +35,7 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.view.trees.treeview.TreePane;
 import splitstree6.window.MainWindow;
 
 /**

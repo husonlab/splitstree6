@@ -28,7 +28,9 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
+import javafx.scene.layout.Region;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.PhyloTree;
@@ -44,6 +46,8 @@ import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
+
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
 
 /**
  * tanglegram view
@@ -161,6 +165,13 @@ public class TanglegramView implements IView {
 				new Separator(Orientation.HORIZONTAL), edgeLabelFormat);
 
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "n: %,d, t: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 	}
 
 	public void setViewTab(ViewTab viewTab) {

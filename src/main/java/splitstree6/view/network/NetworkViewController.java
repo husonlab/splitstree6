@@ -19,6 +19,7 @@
 
 package splitstree6.view.network;
 
+import javafx.application.Platform;
 import javafx.beans.binding.When;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -93,15 +94,20 @@ public class NetworkViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(newLayoutButton, MaterialIcons.play_circle);
+		Platform.runLater(() -> {
+			MaterialIcons.setIcon(newLayoutButton, MaterialIcons.play_circle);
 
-		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
-		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
-		MaterialIcons.setIcon(flipButton, "flip");
-		MaterialIcons.setIcon(settingsToggleButton, "tune");
-		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
-		MaterialIcons.setIcon(zoomInButton, "zoom_in");
-		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
+			MaterialIcons.setIcon(rotateLeftButton, MaterialIcons.rotate_left);
+			MaterialIcons.setIcon(rotateRightButton, MaterialIcons.rotate_right);
+
+			MaterialIcons.setIcon(flipButton, MaterialIcons.flip);
+
+			MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.more_vert);
+			MaterialIcons.setIcon(formatToggleButton, MaterialIcons.tune);
+
+			MaterialIcons.setIcon(zoomInButton, MaterialIcons.zoom_in);
+			MaterialIcons.setIcon(zoomOutButton, MaterialIcons.zoom_out);
+		});
 
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);

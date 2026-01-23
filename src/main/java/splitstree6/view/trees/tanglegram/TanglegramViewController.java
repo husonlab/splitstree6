@@ -145,8 +145,8 @@ public class TanglegramViewController {
 			MaterialIcons.setIcon(flipButton, "flip", "-fx-rotate: 90;", true);
 			MaterialIcons.setIcon(previousButton, MaterialIcons.arrow_left);
 			MaterialIcons.setIcon(nextButton, MaterialIcons.arrow_right);
-			MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.tune);
-			MaterialIcons.setIcon(formatToggleButton, MaterialIcons.format_shapes);
+			MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.more_vert);
+			MaterialIcons.setIcon(formatToggleButton, MaterialIcons.tune);
 			MaterialIcons.setIcon(expandHorizontallyButton, MaterialIcons.unfold_more, "-fx-rotate: 90;", true);
 			MaterialIcons.setIcon(contractHorizontallyButton, MaterialIcons.unfold_less, "-fx-rotate: 90;", true);
 			MaterialIcons.setIcon(expandCollapseVerticallyButton, MaterialIcons.sync_alt, "-fx-rotate: 90;", true);
@@ -208,6 +208,10 @@ public class TanglegramViewController {
 		});
 
 		DraggableLabel.makeDraggable(formatVBox);
+
+		// todo: flip is broken, disable for now:
+
+		toolBar.getItems().remove(flipButton);
 	}
 
 	public AnchorPane getAnchorPane() {

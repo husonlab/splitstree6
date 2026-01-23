@@ -26,17 +26,16 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.DraggableLabel;
-import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.FuzzyBoolean;
-import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.*;
 import splitstree6.data.SplitsBlock;
 import splitstree6.layout.splits.LabelSplitsBy;
 import splitstree6.layout.splits.LoopView;
@@ -56,6 +55,8 @@ import splitstree6.window.MainWindow;
 import java.util.ArrayList;
 import java.util.List;
 
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
+
 public class SplitsView implements IView {
 	public static final Color OUTLINE_FILL_COLOR = Color.DARKGRAY;
 
@@ -64,6 +65,7 @@ public class SplitsView implements IView {
 	private final SelectionModel<Integer> splitSelectionModel = new SetSelectionModel<>();
 
 	private final SplitsViewController controller;
+	private final Parent root;
 	private final SplitsViewPresenter presenter;
 
 	private final SplitsFormat splitsFormatter;
@@ -123,6 +125,7 @@ public class SplitsView implements IView {
 		this.name.set(name);
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
+		root = loader.getRoot();
 
 		// BasicFX.reportChanges(optionDiagram);
 
@@ -189,6 +192,13 @@ public class SplitsView implements IView {
 		optionDiagramProperty().addListener(e -> mainWindow.updateMethodsTab());
 
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "n: %,d s: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), getSplitsBlock() == null ? 0 : getSplitsBlock().size()), mainWindow.workingTaxaProperty(), splitsBlockProperty()));
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(root, Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 	}
 
 	@Override

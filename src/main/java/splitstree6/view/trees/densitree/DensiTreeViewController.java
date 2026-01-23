@@ -19,6 +19,7 @@
 
 package splitstree6.view.trees.densitree;
 
+import javafx.application.Platform;
 import javafx.beans.binding.When;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -126,13 +127,18 @@ public class DensiTreeViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(flipButton, "swap_vert");
-		MaterialIcons.setIcon(settingsToggleButton, "tune");
-		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
-		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
-		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
+		Platform.runLater(() -> {
+			MaterialIcons.setIcon(flipButton, MaterialIcons.flip, "-fx-rotate: 90;", true);
+
+			MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.more_vert);
+			MaterialIcons.setIcon(formatToggleButton, MaterialIcons.tune);
+
+			MaterialIcons.setIcon(expandHorizontallyButton, MaterialIcons.unfold_more, "-fx-rotate: 90;", true);
+			MaterialIcons.setIcon(contractHorizontallyButton, MaterialIcons.unfold_less, "-fx-rotate: 90;", true);
+
+			MaterialIcons.setIcon(expandVerticallyButton, MaterialIcons.unfold_more);
+			MaterialIcons.setIcon(contractVerticallyButton, MaterialIcons.unfold_less);
+		});
 
 		centerPane.getStyleClass().add("viewer-background");
 

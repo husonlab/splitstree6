@@ -29,6 +29,7 @@ import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 import jloda.fx.control.Legend;
@@ -44,6 +45,8 @@ import splitstree6.window.MainWindow;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+
+import static splitstree6.main.SplitsTree6.setMinWidthHeightToZero;
 
 public class WorldMapView implements IView {
 	private final MainWindow mainWindow;
@@ -191,6 +194,13 @@ public class WorldMapView implements IView {
 					mainWindow.getTaxonSelectionModel().select(taxon);
 			}
 		};
+
+		if (setMinWidthHeightToZero) {
+			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
+				region.setMinWidth(0);
+				region.setMinHeight(0);
+			}
+		}
 	}
 
 	@Override
