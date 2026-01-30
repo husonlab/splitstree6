@@ -171,7 +171,10 @@ public class TreePane extends StackPane {
 						phyloTree.edgeStream().filter(e -> !e.getTarget().isLeaf()).forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeProbabilities().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getProbability(e)) : null));
 				}
 			}
-			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap, optimizeReticulationEdges);
+
+			var optimizeReticulationEdgesFinal = (optimizeReticulationEdges || (phyloTree.hasReticulateEdges() && !phyloTree.hasLSAChildrenMap()));
+
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap, optimizeReticulationEdgesFinal);
 		});
 
 		service.setOnSucceeded(a -> {
