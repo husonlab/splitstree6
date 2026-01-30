@@ -237,7 +237,7 @@ public class MainWindowPresenter {
 		});
 		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
 
-		ImportButtonUtils.setup(controller.getImportButton());
+		ImportButtonUtils.setup(controller.getImportButton(), mainWindow);
 
 		SwipeUtils.setConsumeSwipes(controller.getRootPane());
 	}

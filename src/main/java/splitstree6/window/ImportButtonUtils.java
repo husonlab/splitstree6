@@ -41,11 +41,11 @@ import static jloda.fx.util.ClipboardUtils.isTextFile;
  * Daniel Huson, 4.2024
  */
 public class ImportButtonUtils {
-	public static void setup(Button importButton) {
+	public static void setup(Button importButton, MainWindow mainWindow) {
 		var dragOver = new SimpleBooleanProperty(false);
 
 		importButton.disableProperty().bind(dragOver.not().and(ClipboardUtils.hasStringProperty().not()).and(ClipboardUtils.hasFilesProperty().not()));
-		importButton.setOnAction(e -> openString(ClipboardUtils.getTextFilesContentOrString()));
+		importButton.setOnAction(e -> openString(ClipboardUtils.getTextFilesContentOrString(), mainWindow));
 
 		importButton.setOnDragOver(e -> {
 			var db = e.getDragboard();
@@ -61,7 +61,7 @@ public class ImportButtonUtils {
 			var db = e.getDragboard();
 			boolean success = false;
 			if (db.getString() != null) {
-				openString(db.getString());
+				openString(db.getString(), mainWindow);
 				success = true;
 			} else if (db.hasFiles()) {
 				var buf = new StringBuilder();
@@ -73,7 +73,7 @@ public class ImportButtonUtils {
 						}
 					}
 				}
-				openString(buf.toString());
+				openString(buf.toString(), mainWindow);
 				success = true;
 			}
 			e.setDropCompleted(success);
@@ -83,6 +83,12 @@ public class ImportButtonUtils {
 			dragOver.set(false);
 			event.consume();
 		});
+	}
+
+	public static void openString(String string, MainWindow mainWindow) {
+		if (string.length() < 1000000 && mainWindow.getController().getMainTabPane().getSelectionModel().getSelectedItem() instanceof InputEditorTab editorTab) {
+			((InputEditorView) editorTab.getView()).setOptionText(string);
+		} else openString(string);
 	}
 
 	public static void openString(String string) {
