@@ -29,7 +29,6 @@ module splitstreesix {
 	requires razornet;
 
 	opens splitstree6.resources.icons;
-	opens splitstree6.resources.images;
 
 	opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;

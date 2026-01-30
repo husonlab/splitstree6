@@ -72,7 +72,7 @@ public class SplitsTree6 extends Application {
 		Basic.startCollectionStdErr();
 
 		ResourceManagerFX.addResourceRoot(SplitsTree6.class, "splitstree6.resources");
-		ProgramProperties.getProgramIconsFX().setAll(ResourceManagerFX.getIcons("SplitsTree6-16.png", "SplitsTree6-32.png", "SplitsTree6-48.png", "SplitsTree6-64.png", "SplitsTree6-128.png"));
+		ProgramProperties.getProgramIconsFX().setAll(Utils.getImage(SplitsTree6.class, "SplitsTree6-512x512.png"));
 
 		ProgramProperties.setProgramName(Version.NAME);
 		ProgramProperties.setProgramVersion(Version.SHORT_DESCRIPTION);
@@ -89,7 +89,7 @@ public class SplitsTree6 extends Application {
 		SplashScreen.setLabelAnchor(new Point2D(40, 14));
 		SplashScreen.setFitHeight(250);
 		SplashScreen.setVersionString(ProgramProperties.getProgramVersion());
-		SplashScreen.setImageResourceName("SplitsTree6-splash.png");
+		SplashScreen.setImage(Utils.getImage(SplitsTree6.class, "SplitsTree6-Splash.png"));
 
 		try {
 			parseArguments(args);
