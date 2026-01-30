@@ -161,6 +161,8 @@ module splitstreesix {
 
 	opens splitstree6.view.splits.viewer;
 
+	opens splitstree6.main;
+
 	opens splitstree6.view.trees.treepages;
 	opens splitstree6.view.trees.tanglegram;
 	opens splitstree6.view.trees.treeview;
