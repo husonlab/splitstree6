@@ -44,7 +44,7 @@ public class SplitPanePresenter {
 	private final SplitPane leftSplitPane;
 	private final SplitPane mainSplitPane;
 
-	private final DoubleProperty sideBarWidth = new SimpleDoubleProperty(this, "sideBarWidth", SIDE_BAR_DEFAULT_WIDTH);
+	private final DoubleProperty sideBarPreviousWidth = new SimpleDoubleProperty(this, "sideBarWidth", SIDE_BAR_DEFAULT_WIDTH);
 
 
 	public SplitPanePresenter(MainWindowController controller) {
@@ -54,7 +54,7 @@ public class SplitPanePresenter {
 
 
 		if (false) {
-			ProgramProperties.track(sideBarWidth, SIDE_BAR_DEFAULT_WIDTH);
+			ProgramProperties.track(sideBarPreviousWidth, SIDE_BAR_DEFAULT_WIDTH);
 			DoubleProperty bottomBarHeight = new SimpleDoubleProperty(this, "bottomBarHeight", BOTTOM_BAR_DEFAULT_HEIGHT);
 			ProgramProperties.track(bottomBarHeight, BOTTOM_BAR_DEFAULT_HEIGHT);
 		}
@@ -66,11 +66,12 @@ public class SplitPanePresenter {
 				try {
 					if (n) {
 						mainSplitPaneDividerChanging.set(true);
-						mainSplitPane.setDividerPositions(sideBarWidth.get() / mainSplitPane.getWidth());
+						var openPos = Math.min(0.9, Math.max(150, sideBarPreviousWidth.get()) / mainSplitPane.getWidth());
+						mainSplitPane.setDividerPositions(openPos);
 					} else {
 						var pos = mainSplitPane.getDividerPositions()[0] * mainSplitPane.getWidth();
 						if (pos > 0)
-							sideBarWidth.set(pos);
+							sideBarPreviousWidth.set(pos);
 						mainSplitPane.setDividerPositions(0.0);
 					}
 				} finally {
@@ -84,7 +85,7 @@ public class SplitPanePresenter {
 						if (!mainSplitPaneDividerChanging.get()) {
 							try {
 								mainSplitPaneDividerChanging.set(true);
-								controller.getShowSideBarButton().setSelected(n.doubleValue() >= 0.01);
+								controller.getShowSideBarButton().setSelected(n.doubleValue() >= 0.05);
 							} finally {
 								mainSplitPaneDividerChanging.set(false);
 							}
@@ -94,7 +95,7 @@ public class SplitPanePresenter {
 		});
 
 		Platform.runLater(() -> {
-			mainSplitPane.setDividerPositions(sideBarWidth.get() / mainSplitPane.getWidth());
+			mainSplitPane.setDividerPositions(sideBarPreviousWidth.get() / mainSplitPane.getWidth());
 		});
 
 		mainSplitPane.widthProperty().addListener((c, o, n) -> {
