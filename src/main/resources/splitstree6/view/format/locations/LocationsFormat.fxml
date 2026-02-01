@@ -23,13 +23,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<Accordion maxWidth="-Infinity" minHeight="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/16"
+<Accordion maxWidth="-Infinity" minHeight="-Infinity" prefWidth="230.0" xmlns="http://javafx.com/javafx/16"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="splitstree6.view.format.locations.LocationsFormatController">
     <panes>
         <TitledPane fx:id="titledPane" minHeight="-Infinity" minWidth="-Infinity" text="Locations Pie Charts">
             <content>
-                <VBox fx:id="vBox" minHeight="-Infinity" prefWidth="200.0" spacing="5.0">
+                <VBox fx:id="vBox" minHeight="-Infinity" prefWidth="230.0" spacing="5.0">
                     <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </padding>

@@ -34,7 +34,7 @@
                         <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     </AnchorPane>
-                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
+                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="230.0" styleClass="context-menu"
                           AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
                 </children>
             </AnchorPane>
@@ -48,20 +48,18 @@
                             <Tooltip text="Choose diagram type"/>
                         </tooltip>
                     </ChoiceBox>
-                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
 
                     <Button fx:id="newLayoutButton" contentDisplay="CENTER" mnemonicParsing="false" text="New Layout">
                         <tooltip>
                             <Tooltip text="Rerun layout using different random seed"/>
                         </tooltip>
                     </Button>
-                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
 
                     <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
                     <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"
                             text="Rotate Right"/>
                     <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false" text="Flip"/>
-                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+
                     <Button fx:id="zoomInButton" contentDisplay="CENTER" mnemonicParsing="false" text="Zoom In">
                         <tooltip>
                             <Tooltip text="Zoom in"/>

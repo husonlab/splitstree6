@@ -138,7 +138,7 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
 
 	private static Node makeBreadCrumb(MainWindow mainWindow, AlgorithmNode algorithmNode, ArrayList<ChangeListener<Worker.State>> stateChangeListeners) {
 		final var button = new Button();
-		button.getStylesheets().add(MaterialIcons.getStyleSheet());
+		button.getStyleClass().add("mi");
 
 		button.textProperty().bind(algorithmNode.titleProperty());
 
@@ -184,7 +184,8 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
 
 	private static Node makeInputTabBreadCrumb(MainWindow mainWindow) {
 		final var button = new Button();
-		button.getStylesheets().add(MaterialIcons.getStyleSheet());
+		button.getStyleClass().add("mi");
+
 		button.setText("Input");
 		button.disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 		final var tooltip = new Tooltip("Input editor");
@@ -200,6 +201,8 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
 		var menu = new ContextMenu();
 		for (var viewType : ShowTrees.ViewType.values()) {
 			var menuItem = new MenuItem(viewType.name());
+			menuItem.getStyleClass().add("mi");
+
 			menuItem.setOnAction(e -> {
 				if (!workflow.isRunning()) {
 					showTrees.setOptionView(viewType);
@@ -218,6 +221,8 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
 				if (algorithm.getFromClass() == algorithmNode0.getAlgorithm().getFromClass()
 					&& algorithm.getToClass() == algorithmNode0.getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter)) {
 					var menuItem = new MenuItem(algorithm.getName());
+					menuItem.getStyleClass().add("mi");
+
 					menuItem.setOnAction(e -> {
 						var algorithmNode = (AlgorithmNode) workflow.nodeStream().filter(v -> v.getId() == algorithmNode0.getId()).findAny().orElse(algorithmNode0);
 						algorithmNode.setAlgorithm(algorithm);

@@ -23,12 +23,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+<Accordion prefWidth="230.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="splitstree6.view.format.selecttraits.SelectTraitsController">
    <panes>
-      <TitledPane fx:id="titledPane" prefWidth="200.0" text="Select Taxa By Trait Values">
+       <TitledPane fx:id="titledPane" prefWidth="230.0" text="Select Taxa By Trait Values">
          <content>
-            <VBox prefWidth="200.0" spacing="5.0">
+             <VBox prefWidth="230.0" spacing="5.0">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                </padding>

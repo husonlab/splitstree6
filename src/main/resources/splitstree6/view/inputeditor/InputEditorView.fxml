@@ -25,7 +25,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.layout.Region?>
 <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
          xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.inputeditor.InputEditorViewController">
 
@@ -34,7 +33,6 @@
             <Tooltip text="Parse text and load data"/>
         </tooltip>
     </Button>
-    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0"/>
 
     <Label fx:id="formatLabel" textFill="DARKGRAY">
         <padding>

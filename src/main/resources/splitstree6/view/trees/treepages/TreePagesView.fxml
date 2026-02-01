@@ -39,7 +39,7 @@
                     <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"
                                 AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0"
                                 AnchorPane.topAnchor="3.0"/>
-                    <VBox fx:id="formatVBox" prefWidth="200.0" styleClass="context-menu" AnchorPane.rightAnchor="16.0"
+                    <VBox fx:id="formatVBox" prefWidth="230.0" styleClass="context-menu" AnchorPane.rightAnchor="16.0"
                           AnchorPane.topAnchor="2.0"/>
                 </children>
             </AnchorPane>
@@ -110,7 +110,6 @@
                     <Tooltip text="Set rows x columns"/>
                 </tooltip>
             </TextField>
-            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
                 <tooltip>
                     <Tooltip text="Show the Settings toolbar"/>

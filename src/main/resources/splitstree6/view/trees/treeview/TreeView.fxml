@@ -36,7 +36,7 @@
                         <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0"
                                    AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0"/>
                     </AnchorPane>
-                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
+                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="230.0" styleClass="context-menu"
                           AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
                 </children>
             </AnchorPane>
@@ -57,7 +57,6 @@
                         </tooltip>
                     </ChoiceBox>
 
-                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
                     <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" focusTraversable="false"
                                   maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
                                   mnemonicParsing="false" prefHeight="24.0" prefWidth="30.0" text="n">
@@ -69,13 +68,10 @@
                         </font>
                     </ToggleButton>
 
-                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
                     <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
                     <Button fx:id="rotateRightButton" mnemonicParsing="false" text="Rotate Right"/>
                     <Button fx:id="flipHorizontalButton" mnemonicParsing="false" text="Flip Horizontal"/>
                     <Button fx:id="flipVerticalButton" mnemonicParsing="false" text="Flip Vertical"/>
-
-                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
 
                     <Button fx:id="expandVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
                             text="X Vert">
@@ -124,7 +120,7 @@
                     <Tooltip text="Move to next phylogeny"/>
                 </tooltip>
             </Button>
-            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
+
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
                 <tooltip>
                     <Tooltip text="Show the Settings toolbar"/>

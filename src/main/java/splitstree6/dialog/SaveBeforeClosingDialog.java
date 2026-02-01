@@ -47,11 +47,11 @@ public class SaveBeforeClosingDialog {
 		} else {
 			mainWindow.getStage().toFront();
 			var alert = new Alert(Alert.AlertType.CONFIRMATION);
+			alert.initOwner(mainWindow.getStage());
 			if (MainWindowManager.isUseDarkTheme()) {
 				alert.getDialogPane().getScene().getWindow().getScene().getStylesheets().add("jloda/resources/css/dark.css");
 			}
 
-			alert.initOwner(mainWindow.getStage());
 			alert.setTitle("Save File Dialog");
 			alert.setHeaderText("This document has unsaved changes");
 			alert.setContentText("Save changes?");

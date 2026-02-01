@@ -93,12 +93,12 @@ public class WorkflowTreeItem extends TreeItem<String> {
 					label.setStyle("-fx-background-color: LIGHTBLUE;");
 				}
 				case CANCELLED, FAILED -> {
-					label.setStyle("");
+					label.setStyle(null);
 					label.setTextFill(Color.DARKRED);
 				}
 				default -> {
 					label.setTextFill(Color.BLACK);
-					label.setStyle("");
+					label.setStyle(null);
 				}
 			}
 		};

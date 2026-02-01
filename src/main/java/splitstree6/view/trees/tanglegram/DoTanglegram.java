@@ -79,7 +79,7 @@ public class DoTanglegram {
 		var finalOptimizeReticulateDisplacement2 = optimizeReticulateDisplacement2 && network2.hasReticulateEdges();
 
 		{
-			System.err.println("Initial score: " + computeScore(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2));
+			System.err.printf("Initial score: %.1f%n", computeScore(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2));
 		}
 
 		if (optimizeTaxonDisplacement1 || finalOptimizeReticulateDisplacement1 || optimizeTaxonDisplacement2 || finalOptimizeReticulateDisplacement2) {
@@ -112,7 +112,7 @@ public class DoTanglegram {
 					NNCircularOrderingHeuristic.apply(network1, childrenMap1, network2, childrenMap2);
 
 					var score = computeScore(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2);
-					System.err.println("NN score: " + score);
+					System.err.printf("NN score: %.1f%n", score);
 
 					if (score < bestScore.get()) {
 						bestChildrenMap1.get().clear();

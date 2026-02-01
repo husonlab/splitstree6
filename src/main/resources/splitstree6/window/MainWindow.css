@@ -17,12 +17,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-viewer-background {
+.viewer-background {
     -fx-background-color: white;
-}
-
-.scroll-pane {
-    -fx-background: white;
 }
 
 .chart-pie {
@@ -36,7 +32,7 @@ viewer-background {
 }
 
 .table-view {
-    -fx-background-color: derive(-fx-background, 0%);
+    -fx-background-color: -fx-control-inner-background;
 }
 
 .table-view .column-header-background {
@@ -45,7 +41,7 @@ viewer-background {
 }
 
 .progress-indicator .text {
-    visibity: hidden;
+    -fx-opacity: 0;
 }
 
 .scroll-bar .thumb {
@@ -62,9 +58,10 @@ viewer-background {
 
 .tool-bar {
     -fx-background-insets: 0;
-    -fx-background-color: derive(-fx-background, 0%);
-    -fx-spacing: 3mm;
+    -fx-background-color: derive(-fx-base, 0%);
+    -fx-spacing: 10px;
 }
+
 
 #iceberg {
     -fx-fill: transparent;

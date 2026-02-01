@@ -23,12 +23,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<Accordion maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
+<Accordion maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" xmlns="http://javafx.com/javafx/18"
            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.edges.EdgesFormatController">
     <panes>
-        <TitledPane fx:id="titledPane" maxHeight="-Infinity" minHeight="-Infinity" prefWidth="200.0" text="Edge Format">
+        <TitledPane fx:id="titledPane" maxHeight="-Infinity" minHeight="-Infinity" prefWidth="230.0" text="Edge Format">
             <content>
-                <VBox maxHeight="-Infinity" minHeight="-Infinity" prefWidth="200.0" spacing="5.0">
+                <VBox maxHeight="-Infinity" minHeight="-Infinity" prefWidth="230.0" spacing="5.0">
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="6.0">
                         <Label text="Width">
                             <HBox.margin>

@@ -1,0 +1,56 @@
+/*
+ * button.css Copyright (C) 2023 Daniel H. Huson
+ *
+ * (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.button,
+.toggle-button,
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0 2 0 2;
+    -fx-border-width: 0;
+}
+
+.toggle-button:selected {
+    -fx-background-color: derive(-fx-base, -15%);
+}
+
+.button:hover,
+.toggle-button:hover,
+.menu-button:hover {
+    -fx-background-color: derive(-fx-base, 60%);
+}
+
+/* Only affects checkboxes you explicitly mark */
+.check-box {
+    -fx-padding: 0;
+}
+
+.check-box .box {
+    -fx-background-color: transparent;
+    -fx-border-color: derive(-fx-base, -15%);
+    -fx-border-width: 1px;
+}
+
+.button:armed,
+.button:armed .graphic,
+.toggle-button:armed,
+.toggle-button:armed .graphic {
+    -fx-background-color: lightgray;
+}

@@ -24,12 +24,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
-<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+<Accordion prefWidth="230.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="splitstree6.view.format.taxmark.TaxonMarkController">
     <panes>
         <TitledPane fx:id="titledPane" text="Taxon Marks">
             <content>
-                <VBox fx:id="vBox" prefWidth="200.0" spacing="5.0">
+                <VBox fx:id="vBox" prefWidth="230.0" spacing="5.0">
                     <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </padding>

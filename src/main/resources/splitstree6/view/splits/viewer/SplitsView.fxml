@@ -23,7 +23,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="1000.0" style="-fx-background-color: transparent;"
-            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.splits.viewer.SplitsViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -36,7 +36,7 @@
                         <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     </AnchorPane>
-                    <VBox fx:id="formatVBox" minHeight="30.0" minWidth="-Infinity" prefWidth="200.0"
+                    <VBox fx:id="formatVBox" minHeight="30.0" minWidth="-Infinity" prefWidth="230.0"
                           styleClass="context-menu" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0">
                         <opaqueInsets>
                             <Insets/>
@@ -72,7 +72,7 @@
                             text="Flip Horizontal"/>
                     <Button fx:id="flipVerticalButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false"
                             text="Flip Vertical"/>
-                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
+
                     <Button fx:id="zoomInButton" contentDisplay="CENTER" maxHeight="20.0" mnemonicParsing="false"
                             text="Zoom In">
                         <tooltip>

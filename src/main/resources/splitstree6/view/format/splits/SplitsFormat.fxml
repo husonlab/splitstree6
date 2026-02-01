@@ -24,12 +24,13 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.*?>
-<Accordion maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
-           xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.splits.SplitsFormatController">
+<Accordion maxWidth="-Infinity" minHeight="0.0" minWidth="-Infinity" prefWidth="230.0"
+           xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="splitstree6.view.format.splits.SplitsFormatController">
     <panes>
-        <TitledPane fx:id="titledPane" maxHeight="-Infinity" minHeight="-Infinity" prefWidth="200.0" text="Splits">
+        <TitledPane fx:id="titledPane" maxHeight="-Infinity" minHeight="-Infinity" prefWidth="230.0" text="Splits">
             <content>
-                <VBox maxHeight="-Infinity" minHeight="-Infinity" prefWidth="200.0" spacing="5.0">
+                <VBox prefWidth="230.0" spacing="5">
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0">
                         <Label text="Width">
                             <font>
@@ -42,7 +43,7 @@
                         <MenuButton fx:id="widthMenuButton" prefWidth="135.0">
 
                         <tooltip>
-                                <Tooltip text="Line width"/>
+                            <Tooltip text="Line width"/>
                             </tooltip>
                         </MenuButton>
                         <Button fx:id="resetWidthButton" ellipsisString="" graphicTextGap="0.0" maxHeight="-Infinity"
@@ -95,7 +96,7 @@
                             </tooltip>
                         </Button>
                     </HBox>
-                    <Separator prefWidth="200.0"/>
+                    <Separator prefWidth="230.0"/>
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0">
                         <Label fx:id="outlineFillLabel" text="Fill">
                             <font>
@@ -131,7 +132,7 @@
                             </tooltip>
                         </Button>
                     </HBox>
-                    <Separator prefWidth="200.0"/>
+                    <Separator prefWidth="230.0"/>
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="85.0" spacing="6.0">
                         <children>
                             <Label text="Labels"/>
@@ -150,7 +151,7 @@
                             </MenuButton>
                         </children>
                     </HBox>
-                    <Separator layoutX="15.0" layoutY="116.0" prefWidth="200.0"/>
+                    <Separator layoutX="15.0" layoutY="116.0" prefWidth="230.0"/>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <Label text="Rotate">
                             <font>

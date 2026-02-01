@@ -46,7 +46,7 @@
                             </children>
                         </StackPane>
                     </AnchorPane>
-                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
+                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="230.0" styleClass="context-menu"
                           AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
                 </children>
             </AnchorPane>
@@ -84,10 +84,7 @@
                             <Tooltip text="use child-average or leaf-average to place internal nodes"/>
                         </tooltip>
                     </ChoiceBox>
-                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
                     <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false" text="Flip"/>
-
-                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
 
                     <Button fx:id="expandVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
                             text="Expand Vertically">
