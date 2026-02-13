@@ -182,6 +182,17 @@ public class PhyloFusion extends Trees2Trees {
 				network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
 			break; // only copy one
 		}
+
+		// todo: this is just to test storage of tree ids:
+		if (true) {
+			outputBlock.setNodeIndexSet(true);
+			for (var network : outputBlock.getTrees()) {
+				for (var v : network.nodes()) {
+					var set = BitSetUtils.asBitSet(BitSetUtils.range(1, inputTrees.size() + 1));
+					v.setData(set);
+				}
+			}
+		}
 	}
 
 	/**

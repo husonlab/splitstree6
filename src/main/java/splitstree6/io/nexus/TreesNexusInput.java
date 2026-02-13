@@ -21,6 +21,7 @@ package splitstree6.io.nexus;
 
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
+import jloda.util.BitSetUtils;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.NumberUtils;
 import jloda.util.parse.NexusStreamParser;
@@ -39,7 +40,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			BEGIN TREES;
 			    [TITLE {title};]
 			    [LINK {type} = {title};]
-			[PROPERTIES [PARTIALTREES={YES|NO}] [ROOTED={YES|NO}] [RETICULATED={YES|NO}];]
+			[PROPERTIES [PartialTrees={YES|NO}] [Rooted={YES|NO}] [Reticulated={YES|NO}] [NodeIndexSet={YES|NO}];]
 			[TRANSLATE
 			    nodeLabel1 taxon1,
 			    nodeLabel2 taxon2,
@@ -108,7 +109,10 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 				rootedExplicitySet = true;
 			}
 
-			if (tokens.size() != 0)
+			treesBlock.setNodeIndexSet(np.findIgnoreCase(tokens, "nodeIndexSet=no", false, treesBlock.isNodeIndexSet()));
+			treesBlock.setNodeIndexSet(np.findIgnoreCase(tokens, "nodeIndexSet=yes", true, treesBlock.isNodeIndexSet()));
+
+			if (!tokens.isEmpty())
 				throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in PROPERTIES");
 		}
 
@@ -138,7 +142,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 		} else {
 			translator = null;
 			format.setOptionTranslate(false);
-			if (taxaBlock.getTaxa().size() > 0) {
+			if (!taxaBlock.getTaxa().isEmpty()) {
 				for (var t = 1; t <= taxaBlock.getNtax(); t++) {
 					final var taxonLabel = taxaBlock.get(t).getName();
 					taxonNamesFound.add(taxonLabel);
@@ -166,7 +170,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			name = name.replaceAll("]", ")");
 			name = name.trim();
 
-			if (name.length() == 0)
+			if (name.isEmpty())
 				name = "t" + treeNumber;
 
 			np.matchIgnoreCase("=");
@@ -174,9 +178,17 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 
 			final StringBuilder buf = new StringBuilder();
 
-			final var tokensToCome = np.getTokensRespectCase(null, ";");
-			for (var s : tokensToCome) {
-				buf.append(s);
+			{
+				var squareBracketsComments = np.isSquareBracketsSurroundComments();
+				np.setSquareBracketsSurroundComments(false);
+				try {
+					final var tokensToCome = np.getTokensRespectCase(null, ";");
+					for (var s : tokensToCome) {
+						buf.append(s);
+					}
+				} finally {
+					np.setSquareBracketsSurroundComments(squareBracketsComments);
+				}
 			}
 
 			final boolean isRooted; // In SplitsTree6 we ignore this because trees are now always rooted
@@ -188,7 +200,21 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			// final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);
 			final var tree = new PhyloTree();
 
-			newickIO.parseBracketNotation(tree, buf.toString(), true);
+			if (treesBlock.isNodeIndexSet()) {
+				newickIO.setNewickNodeCommentConsumer((v, comment) -> {
+					if (v != null && comment != null && comment.startsWith("IS=")) {
+						try {
+							var set = BitSetUtils.valueOf(comment.substring(comment.indexOf("IS=") + 3).trim());
+							tree.setData(v, set);
+						} catch (Exception ignored) {
+						}
+					}
+				});
+			}
+			{
+				var newickString = buf.toString();
+				newickIO.parseBracketNotation(tree, newickString.endsWith(";") ? newickString : newickString + ";", true);
+			}
 
 			if (translator != null)
 				tree.changeLabels(translator, true);

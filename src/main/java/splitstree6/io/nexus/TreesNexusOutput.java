@@ -28,6 +28,7 @@ import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.BitSet;
 import java.util.function.Function;
 
 /**
@@ -52,6 +53,8 @@ public class TreesNexusOutput extends NexusIOBase implements INexusOutput<TreesB
 			w.write(" rooted=" + (treesBlock.isRooted() ? "yes" : "no"));
 			if (treesBlock.isReticulated())
 				w.write(" reticulated=yes");
+			w.write(" nodeIndexSet=" + (treesBlock.isNodeIndexSet() ? "yes" : "no"));
+
 			w.write(";\n");
 		}
 
@@ -72,8 +75,15 @@ public class TreesNexusOutput extends NexusIOBase implements INexusOutput<TreesB
 		var newickIO = new NewickIO();
 		int t = 1;
 		for (var tree : treesBlock.getTrees()) {
-			final String name = (tree.getName() != null && tree.getName().length() > 0 ? tree.getName() : "t" + t);
+			var name = (tree.getName() != null && !tree.getName().isEmpty() ? tree.getName() : "t" + t);
 			w.write("\t\t[" + (t++) + "] tree '" + name + "'=" + getFlags(tree) + " ");
+			if (treesBlock.isNodeIndexSet()) {
+				newickIO.setNewickNodeCommentSupplier(v -> {
+					if (v.getData() instanceof BitSet set) {
+						return "IS=" + StringUtils.toString(set);
+					} else return null;
+				});
+			}
 			newickIO.write(tree, w, format.isOptionWeights(), labeler);
 			w.write(";\n");
 		}
@@ -102,7 +112,7 @@ public class TreesNexusOutput extends NexusIOBase implements INexusOutput<TreesB
 			if (tree.getNumberOfTaxa(v) > 0) {
 				final StringBuilder buf = new StringBuilder();
 				for (int taxId : tree.getTaxa(v)) {
-					if (buf.length() > 0)
+					if (!buf.isEmpty())
 						buf.append(",");
 					else
 						buf.append(taxonBlock.getLabel(taxId));
