@@ -19,9 +19,9 @@
 
 package splitstree6.io.nexus;
 
+import jloda.phylo.CommentData;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
-import jloda.util.BitSetUtils;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.NumberUtils;
 import jloda.util.parse.NexusStreamParser;
@@ -40,7 +40,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			BEGIN TREES;
 			    [TITLE {title};]
 			    [LINK {type} = {title};]
-			[PROPERTIES [PartialTrees={YES|NO}] [Rooted={YES|NO}] [Reticulated={YES|NO}] [NodeIndexSet={YES|NO}];]
+			[PROPERTIES [PartialTrees={YES|NO}] [Rooted={YES|NO}] [Reticulated={YES|NO}];]
 			[TRANSLATE
 			    nodeLabel1 taxon1,
 			    nodeLabel2 taxon2,
@@ -109,9 +109,6 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 				rootedExplicitySet = true;
 			}
 
-			treesBlock.setNodeIndexSet(np.findIgnoreCase(tokens, "nodeIndexSet=no", false, treesBlock.isNodeIndexSet()));
-			treesBlock.setNodeIndexSet(np.findIgnoreCase(tokens, "nodeIndexSet=yes", true, treesBlock.isNodeIndexSet()));
-
 			if (!tokens.isEmpty())
 				throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in PROPERTIES");
 		}
@@ -156,6 +153,8 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 
 		var newickIO = new NewickIO();
 		newickIO.allowMultiLabeledNodes = true;
+		newickIO.setNewickNodeCommentConsumer(CommentData.createDataNodeConsumer());
+
 
 		int treeNumber = 1;
 		while (np.peekMatchIgnoreCase("tree")) {
@@ -200,17 +199,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			// final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);
 			final var tree = new PhyloTree();
 
-			if (treesBlock.isNodeIndexSet()) {
-				newickIO.setNewickNodeCommentConsumer((v, comment) -> {
-					if (v != null && comment != null && comment.startsWith("IS=")) {
-						try {
-							var set = BitSetUtils.valueOf(comment.substring(comment.indexOf("IS=") + 3).trim());
-							tree.setData(v, set);
-						} catch (Exception ignored) {
-						}
-					}
-				});
-			}
+
 			{
 				var newickString = buf.toString();
 				newickIO.parseBracketNotation(tree, newickString.endsWith(";") ? newickString : newickString + ";", true);

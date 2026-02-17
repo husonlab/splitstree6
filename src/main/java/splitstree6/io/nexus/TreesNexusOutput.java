@@ -20,6 +20,7 @@
 package splitstree6.io.nexus;
 
 import jloda.graph.Node;
+import jloda.phylo.CommentData;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
@@ -28,7 +29,6 @@ import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.BitSet;
 import java.util.function.Function;
 
 /**
@@ -53,7 +53,6 @@ public class TreesNexusOutput extends NexusIOBase implements INexusOutput<TreesB
 			w.write(" rooted=" + (treesBlock.isRooted() ? "yes" : "no"));
 			if (treesBlock.isReticulated())
 				w.write(" reticulated=yes");
-			w.write(" nodeIndexSet=" + (treesBlock.isNodeIndexSet() ? "yes" : "no"));
 
 			w.write(";\n");
 		}
@@ -73,17 +72,12 @@ public class TreesNexusOutput extends NexusIOBase implements INexusOutput<TreesB
 		w.write("[TREES]\n");
 
 		var newickIO = new NewickIO();
+		newickIO.setNewickNodeCommentSupplier(CommentData.createDataNodeSupplier());
+
 		int t = 1;
 		for (var tree : treesBlock.getTrees()) {
 			var name = (tree.getName() != null && !tree.getName().isEmpty() ? tree.getName() : "t" + t);
 			w.write("\t\t[" + (t++) + "] tree '" + name + "'=" + getFlags(tree) + " ");
-			if (treesBlock.isNodeIndexSet()) {
-				newickIO.setNewickNodeCommentSupplier(v -> {
-					if (v.getData() instanceof BitSet set) {
-						return "IS=" + StringUtils.toString(set);
-					} else return null;
-				});
-			}
 			newickIO.write(tree, w, format.isOptionWeights(), labeler);
 			w.write(";\n");
 		}

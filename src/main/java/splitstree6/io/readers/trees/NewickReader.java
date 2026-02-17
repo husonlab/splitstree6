@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.DAGTraversals;
 import jloda.graph.NodeArray;
+import jloda.phylo.CommentData;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
@@ -77,6 +78,7 @@ public class NewickReader extends TreesReader {
 		// read in the trees
 		var newickIO = new NewickIO();
 		newickIO.allowMultiLabeledNodes = false;
+		newickIO.setNewickNodeCommentConsumer(CommentData.createDataNodeConsumer());
 
 		while (it.hasNext()) {
 			lineno++;
@@ -93,18 +95,7 @@ public class NewickReader extends TreesReader {
 				final var tree = new PhyloTree();
 				try {
 					try (NodeArray<String> nodeCommentMap = tree.newNodeArray()) {
-						newickIO.parseBracketNotation(tree, treeLine, true,
-								s -> {
-									if (s.startsWith(GENE_NAME_TAG))
-										tree.setName(s.substring(GENE_NAME_TAG.length() + 1).trim());
-								}, (v, s) -> {
-									if (v != null && s != null) {
-										if (s.startsWith(GENE_NAME_TAG))
-											tree.setName(s.substring(GENE_NAME_TAG.length()).trim());
-										else
-											nodeCommentMap.put(v, s);
-									}
-								});
+						newickIO.parseBracketNotation(tree, treeLine, true);
 						if (newickIO.isInputHasMultiLabels())
 							throw new IOException("Tree contains multiple copies of the same label");
 						setupEdgeConfidenceFromComments(tree, nodeCommentMap);
