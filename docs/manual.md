@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.7.0, built 11 Jan 2026)
+SplitsTree App (version 6.7.4, built 18 Feb 2026)
 
 ---
 author:
@@ -265,7 +265,7 @@ be used to navigate through the pages.
 
 The *Tanglegram tab* shows a tanglegram of trees or rooted networks,
 which is calculated based on the objective of displacement optimization
-[@Huson2025Tanglegrams] .
+[@Huson2026Tanglegrams] .
 
 ![The tanglegram tab for comparing two phylogenetic trees or rooted
 networks.](figs/tanglegram-tab.png)
@@ -1362,9 +1362,9 @@ either be a number or a string.
       [TITLE {title};]
       DIMENSIONS [NTAX=number-of-taxa] NTRAITS=number-of-traits;
       [FORMAT
-        [LABELS={YES|NO}]
-        [MISSING=symbol]
-        [SEPARATOR={COMMA|SEMICOLON|WHITESPACE}]
+        [Labels={YES|NO}]
+        [Missing=character]
+        [Separator={COMMA|SEMICOLON|WHITESPACE}]
       ;]
       [TRAITLATITUDE  latitude-trait-1  latitude-trait-2 ...  latitude-trait-n;
        TRAITLONGITUDE longitude-trait-1 longitude-trait-2 ... longitude-trait-n;]
@@ -1389,16 +1389,16 @@ both characters and their states can have labels.
       [LINK {type} = {title};]
       DIMENSIONS [NTAX=number-of-taxa] NCHAR=number-of-characters;
       [FORMAT
-        [DATATYPE={STANDARD|DNA|RNA|PROTEIN|MICROSAT}]
-        [RESPECTCASE]
-        [MISSING=symbol]
+        [Datatype={STANDARD|DNA|RNA|PROTEIN|MICROSAT}]
+        [RespectCase]
+        [Missing=symbol]
         [GAP=symbol]
         [MatchChar=symbol]
-        [SYMBOLS="symbol symbol ..."]
-        [LABELS={NO|LEFT}]
-        [TRANSPOSE={NO|YES}]
-        [INTERLEAVE={NO|YES}]
-        [TOKENS=NO]
+        [Symbols="symbol symbol ..."]
+        [Labels={NO|LEFT}]
+        [Transpose={NO|YES}]
+        [Interleave={NO|YES}]
+        [Tokens=NO]
       ;]
       [CHARWEIGHTS wgt_1 wgt_2 ... wgt_nchar;]
       [CHARSTATELABELS character-number [ character-name ][ /state-name [ state-name... ] ], ...;]
@@ -1417,9 +1417,9 @@ This block maintains a distance matrix of size nTax times nTax.
       [LINK {type} = {title};]
       [DIMENSIONS NTAX=number-of-taxa;]
       [FORMAT
-        [TRIANGLE={LOWER|UPPER|BOTH}]
-        [[NO] DIAGONAL]
-        [LABELS={LEFT|NO}]
+        [TRIANGLE={Lower|Upper|Both}]
+        [[NO] Diagonal]
+        [Labels={LEFT|NO}]
       ;]
       MATRIX
     distance data in specified format
@@ -1429,13 +1429,13 @@ This block maintains a distance matrix of size nTax times nTax.
 ## Trees block
 
 This block maintains a list of trees. These can be rooted or unrooted
-phylogenetic trees, or rooted phylogenetic networks. Trees can partial
-in the sense that they need to contain all taxa.
+phylogenetic trees, or rooted phylogenetic networks (reticulated). Trees
+can partial in the sense that they need to contain all taxa.
 
     BEGIN TREES;
         [TITLE {title};]
         [LINK {type} = {title};]
-    [PROPERTIES [PARTIALTREES={YES|NO}] [ROOTED={YES|NO}] [RETICULATED={YES|NO}];]
+    [PROPERTIES [PartialTrees={YES|NO}] [Rooted={YES|NO}] [Reticulated={YES|NO}];]
     [TRANSLATE
         nodeLabel1 taxon1,
         nodeLabel2 taxon2,
@@ -1583,10 +1583,10 @@ This block represents a collection of genomes.
       [LINK {type} = {title};]
       [DIMENSIONS NTAX=number-of-taxa;]
       [FORMAT
-        [LABELS={YES|NO}]
-        [ACCESSIONS={YES|NO}]
-        [MULTIPART={YES|NO}]
-        [FILES={YES|NO}]
+        [Labels={YES|NO}]
+        [Accessions={YES|NO}]
+        [Multipart={YES|NO}]
+        [Files={YES|NO}]
       ;]
       MATRIX
          [label] [accession] length {sequence | [#parts] length {sequence|{file:.. offset}} .. length {sequence|{file offset}}},
@@ -3046,6 +3046,7 @@ to use 1024 random starting configurations, say.
 We thank Daria Evseeva for working on the code with us. This program
 uses the JAMA library in the neighbor-net algorithm.
 
+
 ## References
 
 Bagci, C., D. Bryant, B. Cetinkaya, and DH Huson. 2021. “Microbial
@@ -3066,7 +3067,7 @@ Booth, K. S., and G. S. Lueker. 1976. “Testing for the Consecutive Ones
 Property, Interval Graphs, and Graph Planarity Using PQ-Tree
 Algorithms.” *Journal of Computer and System Sciences* 13 (3): 335–79.
 
-Bouckaert, RR. 2010. “DensiTree: Making Sense of Sets of Phylogenetic
+Bouckaert, R. R. 2010. “DensiTree: Making Sense of Sets of Phylogenetic
 Trees.” *Bioinformatics* 26 (1): 1372–73.
 
 Bruen, TC, H. Philippe, and D. Bryant. 2006. “A Simple and Robust
@@ -3090,9 +3091,9 @@ for Rooted Phylogenetic Trees and Networks.” *Systematic Biology* 61
 Dice, LR. 1945. “Measures of the Amount of Ecologic Association Between
 Species.” *Ecology* 26 (3): 297–302.
 
-Dress, Andreas W M, and Daniel H Huson. 2004. “Constructing Splits
-Graphs.” *IEEE/ACM Transactions on Computational Biology and
-Bioinformatics* 1 (3): 109–15.
+Dress, A. W. M., and D. H Huson. 2004. “Constructing Splits Graphs.”
+*IEEE/ACM Transactions on Computational Biology and Bioinformatics* 1
+(3): 109–15.
 
 Excoffier, L., and PE Smouse. 1994. “Using Allele Frequencies and
 Geographic Subdivision to Reconstruct Gene Trees Within a Species:
@@ -3135,7 +3136,7 @@ Hasegawa, M., H. Kishino, and T. Yano. 1985. “Dating of Human-Ape
 Splitting by a Molecular Clock of Mitochondrial DNA.” *Journal of
 Molecular Evolution* 22 (2): 160–74.
 
-Holland, BR, KT Huber, AWM Dress, and V. Moulton. 2002. “Delta Plots: A
+Holland, BR, KT Huber, AWM Dress, and V Moulton. 2002. “Delta Plots: A
 Tool for Analyzing Phylogenetic Distance Data.” *Molecular Biology and
 Evolution* 19 (12): 2051–59.
 
@@ -3148,15 +3149,15 @@ Hoppe, A., S. Tuerpitz, and MA Steel. 2019. “Species Notions That
 Combine Phylogenetic Trees and Phenotypic Partitions.” *Journal of
 Mathematical Biology* 78: 117–34.
 
-Huson, Daniel H. 2025a. “Displacement Optimized Tanglegrams for Rooted
-Phylogenetic Trees and Networks.”
+Huson, D. H. 2025. “Sketch, Capture and Layout Phylogenies.” *PLOS
+Computational Biology* 21 (12): 1–13.
+<https://doi.org/10.1371/journal.pcbi.1013805>.
 
-———. 2025b. “Sketch, Capture and Layout Phylogenies.”
+———. 2026. “Displacement-Optimized Tanglegrams for Trees and Networks.”
 
-Huson, Daniel H., and David Bryant. 2024. “The SplitsTree App:
-Interactive Analysis and Visualization Using Phylogenetic Trees and
-Networks.” *Nature Methods*.
-<https://doi.org/10.1038/s41592-024-02406-3>.
+Huson, D. H., and D. Bryant. 2024. “The SplitsTree App: Interactive
+Analysis and Visualization Using Phylogenetic Trees and Networks.”
+*Nature Methods*. <https://doi.org/10.1038/s41592-024-02406-3>.
 
 Huson, DH, and D Bryant. 2006. “Application of Phylogenetic Networks in
 Evolutionary Studies.” *Molecular Biology and Evolution* 23 (2): 254–67.
@@ -3204,13 +3205,13 @@ Leigh, J. W., and D. Bryant. 2015. “PopART: Full-Feature Software for
 Haplotype Network Construction.” *Methods in Ecology and Evolution* 6
 (9): 1110–16.
 
-Lemoine, F., JB Entfellner, E Wilkinson, and et al. 2018. “Renewing
+Lemoine, F., J. B. Entfellner, E. Wilkinson, and et al. 2018. “Renewing
 Felsenstein’s Phylogenetic Bootstrap in the Era of Big Data.” *Nature*
 556: 452–56.
 
-Maddison, DR, DL Swofford, and WP Maddison. 1997. “NEXUS: An Extensible
-File Format for Systematic Information.” *Systematic Biology* 46 (4):
-590–621.
+Maddison, D. R., D. L. Swofford, and W. P. Maddison. 1997. “NEXUS: An
+Extensible File Format for Systematic Information.” *Systematic Biology*
+46 (4): 590–621.
 
 Nei, M., and WH Li. 1979. “Mathematical Model for Studying Genetic
 Variation in Terms of Restriction Endonucleases.” *Proceedings of the
@@ -3224,10 +3225,10 @@ Ondov, BD, TJ Treangen, P. Melsted, AB Mallonee, NH Bergman, S. Koren,
 and AM Phillippy. 2016. “Mash: Fast Genome and Metagenome Distance
 Estimation Using MinHash.” *Genome Biol* 17 (132).
 
-Parks, Donovan H., Maria Chuvochina, D. W. Waite, Christian Rinke, A.
-Skarshewski, P. A. Chaumeil, and Phil Hugenholtz. 2018. “A Standardized
-Bacterial Taxonomy Based on Genome Phylogeny Substantially Revises the
-Tree of Life.” *Nature Biotechnology* 36 (10): 996–1004.
+Parks, D. H., M. Chuvochina, D. W. Waite, C. Rinke, A. Skarshewski, P.
+A. Chaumeil, and P. Hugenholtz. 2018. “A Standardized Bacterial Taxonomy
+Based on Genome Phylogeny Substantially Revises the Tree of Life.”
+*Nature Biotechnology* 36 (10): 996–1004.
 
 Redding, D. 2003. “Incorporating Genetic Distinctness and Reserve
 Occupancy into a Conservation Priorisation Approach.” Master’s thesis,
@@ -3240,7 +3241,7 @@ Saitou, N., and M. Nei. 1987. “The Neighbor-Joining Method: A New Method
 for Reconstructing Phylogenetic Trees.” *Molecular Biology and
 Evolution* 4: 406–25.
 
-Scornavacca, C., F. Zickmann, and DH Huson. 2011. “Tanglegrams for
+Scornavacca, C., F. Zickmann, and D. H. Huson. 2011. “Tanglegrams for
 Rooted Phylogenetic Trees and Networks.” *Bioinformatics* 27 (13):
 i248–56.
 
