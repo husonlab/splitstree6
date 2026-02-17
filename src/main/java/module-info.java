@@ -27,6 +27,7 @@ module splitstreesix {
 	requires jdk.compiler;
 
 	requires razornet;
+	requires reactfx;
 
 	opens splitstree6.resources.icons;
 
@@ -171,6 +172,7 @@ module splitstreesix {
 	opens splitstree6.view.network;
 
 	opens splitstree6.view.displaytext;
+	opens splitstree6.view.displaytext.highlighters;
 	opens splitstree6.view.displaydatablock;
 	opens splitstree6.view.inputeditor;
 

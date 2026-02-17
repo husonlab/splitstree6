@@ -19,43 +19,98 @@
 
 package splitstree6.view.displaytext.highlighters;
 
+import javafx.application.Platform;
 import jloda.fx.util.RunAfterAWhile;
+import jloda.util.Basic;
 import jloda.util.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
 
 import java.util.Collection;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * code area highlighter
- * Daniel Huson, 7.2022
- */
 public class Highlighter {
-	public enum Type {
-		Universal, Nexus, XML
-	}
+	public enum Type {Universal, Nexus, XML}
 
 	private Type type;
 	private IHighlighter highlighter;
+
+	// one worker thread for highlighting
+	private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+		var t = new Thread(r, "syntax-highlighter");
+		t.setDaemon(true);
+		return t;
+	});
+
+	// used to cancel / ignore stale runs
+	private final AtomicLong generation = new AtomicLong(0);
 
 	public Highlighter(CodeArea codeArea) {
 		highlighter = new UniversalHighlighter();
 		type = Type.Universal;
 
-		codeArea.textProperty().addListener((v, p, n) -> RunAfterAWhile.applyInFXThread(this, () -> {
-			if (codeArea.getLength() < 100000) {
-				var line = StringUtils.getFirstLine(codeArea.getText()).toLowerCase();
-				if (line.startsWith("#nexus"))
-					setType(Type.Nexus);
-				else if (line.startsWith("<nex:nexml") || line.startsWith("<?xml version="))
-					setType(Type.XML);
-				else
-					setType(Type.Universal);
-				// style everything once changes to text have stopped
-				if (codeArea.getLength() < 10000000)
-					codeArea.setStyleSpans(0, getHighlighter().computeHighlighting(codeArea.getText()));
+		codeArea.textProperty().addListener((v, p, n) ->
+				RunAfterAWhile.applyInFXThread(this, () -> {
+					var len = codeArea.getLength();
+					if (len >= 10_000_000) {
+						// optional: clear styles or keep last styles
+						return;
+					}
+
+					// detect type (debounced by RunAfterAWhile)
+					var line = StringUtils.getFirstLine(codeArea.getText()).trim().toLowerCase();
+
+					if (line.startsWith("#nexus"))
+						setType(Type.Nexus);
+					else if (line.startsWith("<?xml"))
+						setType(Type.XML);
+					else
+						setType(Type.Universal);
+
+					// style once changes to text have stopped (still debounced)
+					if (len < 10_000_000) {
+						scheduleHighlight(codeArea);
+					}
+				})
+		);
+
+		// initial highlight
+		scheduleHighlight(codeArea);
+	}
+
+	private void scheduleHighlight(CodeArea codeArea) {
+		final long myGen = generation.incrementAndGet();
+
+		final String textSnapshot = codeArea.getText();
+		final IHighlighter snapshotHighlighter = this.highlighter;
+
+		executor.execute(() -> {
+			StyleSpans<Collection<String>> spans;
+			try {
+				spans = snapshotHighlighter.computeHighlighting(textSnapshot);
+			} catch (Throwable ex) {
+				Basic.caught(ex);
+				return;
 			}
-		}));
+
+			// apply only if nothing newer has been scheduled
+			if (generation.get() != myGen) return;
+
+			Platform.runLater(() -> {
+				// double-check still latest and text unchanged enough
+				if (generation.get() != myGen) return;
+				if (!Objects.equals(codeArea.getText(), textSnapshot)) return;
+
+				codeArea.setStyleSpans(0, spans);
+			});
+		});
+	}
+
+	public void shutdown() {
+		executor.shutdownNow();
 	}
 
 	public void setType(Type type) {

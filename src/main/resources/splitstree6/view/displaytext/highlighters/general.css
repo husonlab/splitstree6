@@ -1,0 +1,92 @@
+/*
+ * general.css Copyright (C) 2026 Daniel H. Huson
+ *
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+/* general.css — RichTextFX styles for UniversalHighlighter */
+
+/* Base editor styling (RichTextFX) */
+.code-area {
+    -fx-font-family: "Courier New";
+    -fx-font-size: 12px;
+}
+
+.code-area:focused {
+    -fx-font-family: "Courier New";
+    -fx-font-size: 12px;
+}
+
+.virtualized-scroll-pane .scroll-bar:vertical,
+.virtualized-scroll-pane .scroll-bar:horizontal {
+    -fx-opacity: 1.0;
+    -fx-pref-width: 12px;
+    -fx-pref-height: 12px;
+}
+
+/* --- UniversalHighlighter token styles --- */
+
+/* URLs */
+.url {
+    -fx-fill: blue;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+}
+
+/* Numbers and percent */
+.number {
+    -fx-fill: #0b6aa2;
+}
+
+/* () <> | */
+.paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+/* { } */
+.brace {
+    -fx-fill: teal;
+    -fx-font-weight: bold;
+}
+
+/* Lines like "Something:" */
+.heading {
+    -fx-fill: cadetblue;
+    -fx-font-weight: bold;
+}
+
+/* "..." */
+.string {
+    -fx-fill: gray;
+}
+
+/* Hash comments (# ...) */
+.comment {
+    -fx-fill: cadetblue;
+    -fx-font-style: italic;
+}
+
+/* FASTA header line (>...) */
+.fasta {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+/* FASTA comment line (;...) */
+.fasta-comment {
+    -fx-fill: cadetblue;
+}

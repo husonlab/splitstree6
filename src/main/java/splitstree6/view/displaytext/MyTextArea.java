@@ -19,6 +19,7 @@
 
 package splitstree6.view.displaytext;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -31,7 +32,9 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import jloda.fx.find.ITextSearcher;
 import jloda.fx.find.TextAreaSearcher;
@@ -40,6 +43,7 @@ import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import splitstree6.view.displaytext.highlighters.Highlighter;
+
 
 public class MyTextArea {
 	private final CodeArea codeArea;
@@ -50,18 +54,42 @@ public class MyTextArea {
 
 	private final Node enclosingNode;
 
-
 	public MyTextArea() {
 		if (ProgramProperties.isDesktop()) {
 			codeArea = new CodeArea();
+			codeArea.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+			addCss(codeArea, "highlighters/general.css");
+			addCss(codeArea, "highlighters/nexus.css");
+			addCss(codeArea, "highlighters/xml.css");
+
 			codeArea.requestFollowCaret();
 			node = codeArea;
-			enclosingNode = new VirtualizedScrollPane<>(codeArea);
+			var scroller = new VirtualizedScrollPane<>(codeArea);
+			scroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+			scroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+			enclosingNode = scroller;
+			// Constrain the area width to the viewport-ish width of the scroller
+			codeArea.prefWidthProperty().bind(
+					Bindings.createDoubleBinding(
+							() -> {
+								double w = scroller.getWidth()
+										   - scroller.snappedLeftInset()
+										   - scroller.snappedRightInset();
+								return Math.max(0, w);
+							},
+							scroller.widthProperty(),
+							scroller.insetsProperty()
+					)
+			);
+			codeArea.wrapTextProperty().addListener((obs, oldV, newV) -> codeArea.requestLayout());
 
 			textArea = null;
 		} else {
 			codeArea = null;
 			textArea = new TextArea();
+			addCss(textArea, "highlighters/general.css");
+
 			node = textArea;
 			textArea.setPadding(new Insets(5, 2, 5, 2));
 			enclosingNode = textArea;
@@ -153,7 +181,6 @@ public class MyTextArea {
 		else
 			return textArea.getText(start, end);
 	}
-
 
 	public void replaceText(String replacement) {
 		if (codeArea != null)
@@ -338,5 +365,17 @@ public class MyTextArea {
 		if (codeArea != null)
 			codeArea.getUndoManager().forgetHistory();
 		// todo: how to forget history for text area?
+	}
+
+
+	private void addCss(Region region, String path) {
+		var url = getClass().getResource(path);
+		if (url == null)
+			throw new IllegalStateException("Missing CSS: " + path);
+
+		String css = url.toExternalForm();
+		if (!region.getStylesheets().contains(css)) {
+			region.getStylesheets().add(css);
+		}
 	}
 }

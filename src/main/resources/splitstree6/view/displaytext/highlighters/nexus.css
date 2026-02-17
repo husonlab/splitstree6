@@ -1,5 +1,5 @@
 /*
- *  Version.java Copyright (C) 2024 Daniel H. Huson
+ * nexus.css Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -15,17 +15,49 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+/* nexus.css */
 
-package splitstree6.main;
+.code-area .nexus-keyword {
+    -fx-fill: purple;
+    -fx-font-weight: bold;
+}
 
-/**
- * The version string
- * Daniel Huson, 6.2017
- */
-public class Version {
-	static public final String NAME = "SplitsTree App";
-	static public final String SHORT_DESCRIPTION = "SplitsTree App (version 6.7.5, built 18 Feb 2026)";
-	static public final String VERSION = "6.0.0";
+.code-area .nexus-inner-keyword {
+    -fx-fill: #1e88e5;
+    -fx-font-weight: bold;
+}
 
+.code-area .nexus-option {
+    -fx-fill: darkviolet;
+}
+
+.code-area .nexus-block {
+    -fx-fill: darkblue;
+    -fx-font-weight: bold;
+}
+
+.code-area .nexus-block-collapse-able {
+    -fx-fill: darkblue;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+}
+
+.code-area .nexus-collapsed {
+    -fx-fill: blue;
+    -fx-underline: true;
+}
+
+.code-area .nexus-paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+.code-area .nexus-string {
+    -fx-fill: gray;
+}
+
+.code-area .nexus-comment {
+    -fx-fill: cadetblue;
 }

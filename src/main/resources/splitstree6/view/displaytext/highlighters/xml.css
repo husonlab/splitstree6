@@ -1,5 +1,5 @@
 /*
- *  Version.java Copyright (C) 2024 Daniel H. Huson
+ * xml.css Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -15,17 +15,46 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+/* xml.css */
 
-package splitstree6.main;
-
-/**
- * The version string
- * Daniel Huson, 6.2017
- */
-public class Version {
-	static public final String NAME = "SplitsTree App";
-	static public final String SHORT_DESCRIPTION = "SplitsTree App (version 6.7.5, built 18 Feb 2026)";
-	static public final String VERSION = "6.0.0";
-
+.code-area .xml-tagmark {
+    -fx-fill: gray;
 }
+
+.code-area .xml-anytag {
+    -fx-fill: crimson;
+    -fx-font-weight: bold;
+}
+
+/* You don’t currently emit xml-paren in your XMLHighlighter;
+   keep it only if some other XML tokenizer uses it. */
+.code-area .xml-paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+.code-area .xml-attribute {
+    -fx-fill: darkviolet;
+}
+
+.code-area .xml-avalue {
+    -fx-font-weight: bold;
+    -fx-fill: black;
+}
+
+.code-area .xml-namespace {
+    -fx-fill: darkblue;
+    -fx-font-weight: bold;
+}
+
+.code-area .xml-comment {
+    -fx-fill: teal;
+    -fx-font-style: italic;
+}
+
+.code-area .xml-anytag {
+    -fx-fill: magenta !important;
+}
+

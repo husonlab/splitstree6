@@ -23,6 +23,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
@@ -74,14 +75,16 @@ public class DisplayTextViewController {
 		codeArea = new MyTextArea();
 		codeArea.requestFollowCaret();
 
-		codeArea.getStylesheets().add(DisplayTextViewController.class.getResource("display_text_styles.css").toExternalForm());
-
 		codeArea.getStyleClass().add("viewer-background");
 
 		codeArea.setPadding(new Insets(5, 2, 5, 2));
 		scrollPane = codeArea.getEnclosingNode();
+
 		borderPane.setCenter(scrollPane);
-		codeArea.prefWidthProperty().bind(borderPane.widthProperty());
+
+		if (codeArea.getNode() instanceof TextArea textArea) {
+			textArea.prefWidthProperty().bind(borderPane.widthProperty());
+		}
 		highlighter = codeArea.getHighlighter();
 
 		if (!ProgramProperties.isDesktop())

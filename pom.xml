@@ -114,7 +114,13 @@
         <dependency>
             <groupId>org.fxmisc.richtext</groupId>
             <artifactId>richtextfx</artifactId>
-            <version>0.11.2</version>
+            <version>0.11.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fxmisc.flowless</groupId>
+            <artifactId>flowless</artifactId>
+            <version>0.7.4</version>
+            <scope>compile</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/at.favre.lib/bcrypt -->
         <!--

@@ -49,13 +49,6 @@
     -fx-background-radius: 30px;
 }
 
-.scroll-bar .increment-button,
-.scroll-bar .decrement-button {
-    -fx-pref-width: 0;
-    -fx-pref-height: 0;
-    -fx-opacity: 0;
-}
-
 .tool-bar {
     -fx-background-insets: 0;
     -fx-background-color: derive(-fx-base, 0%);
