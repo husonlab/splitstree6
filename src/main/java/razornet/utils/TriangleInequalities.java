@@ -1,5 +1,5 @@
 /*
- * xml.css Copyright (C) 2026 Daniel H. Huson
+ * TriangleInequalities.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,43 +17,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/* xml.css */
 
-.code-area .xml-tagmark {
-    -fx-fill: gray;
+package razornet.utils;
+
+/**
+ * Dummy triangle-inequality utilities.
+ * In the real RazorNet package these would validate/repair a metric.
+ */
+public final class TriangleInequalities {
+
+	private TriangleInequalities() {
+	}
+
+	/**
+	 * Dummy: always returns true.
+	 */
+	public static boolean check(int[][] matrix, boolean verbose) {
+		return true;
+	}
+
+	/**
+	 * Dummy: no-op.
+	 */
+	public static void fix(int[][] matrix) {
+		// no-op
+	}
 }
-
-.code-area .xml-anytag {
-    -fx-fill: crimson;
-    -fx-font-weight: bold;
-}
-
-/* You don’t currently emit xml-paren in your XMLHighlighter;
-   keep it only if some other XML tokenizer uses it. */
-.code-area .xml-paren {
-    -fx-fill: firebrick;
-    -fx-font-weight: bold;
-}
-
-.code-area .xml-attribute {
-    -fx-fill: darkviolet;
-}
-
-.code-area .xml-avalue {
-    -fx-fill: black;
-}
-
-.code-area .xml-namespace {
-    -fx-fill: darkblue;
-    -fx-font-weight: bold;
-}
-
-.code-area .xml-comment {
-    -fx-fill: cadetblue;
-    -fx-font-style: italic;
-}
-
-.code-area .xml-anytag {
-    -fx-fill: purple !important;
-}
-

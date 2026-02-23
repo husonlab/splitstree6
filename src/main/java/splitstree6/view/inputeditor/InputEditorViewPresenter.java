@@ -56,9 +56,6 @@ public class InputEditorViewPresenter {
 		this.displayTextViewPresenter = displayTextViewPresenter;
 		this.view = view;
 
-		view.setShowLineNumbers(true);
-		view.setWrapText(false);
-
 		var tabController = view.getController();
 		var toolBarController = view.getInputEditorViewController();
 
@@ -76,7 +73,6 @@ public class InputEditorViewPresenter {
 				e.consume();
 			}
 		});
-
 
 		Platform.runLater(codeArea::requestFocus);
 

@@ -41,7 +41,7 @@ public class DisplayTextView implements IView {
 
 	private final String name;
 
-	private final BooleanProperty showLineNumbers = new SimpleBooleanProperty(this, "showLineNumbers");
+	private final BooleanProperty showLineNumbers = new SimpleBooleanProperty(this, "showLineNumbers", false);
 	private final BooleanProperty wrapText = new SimpleBooleanProperty(this, "wrapText");
 
 	private final DoubleProperty fontSize = new SimpleDoubleProperty(this, "fontSize");
@@ -51,7 +51,6 @@ public class DisplayTextView implements IView {
 	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
 
 	{
-		ProgramProperties.track(showLineNumbers, false);
 		ProgramProperties.track(wrapText, true);
 		ProgramProperties.track(fontSize, 12.0);
 	}

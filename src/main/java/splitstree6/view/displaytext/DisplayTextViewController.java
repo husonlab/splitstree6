@@ -31,7 +31,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ProgramProperties;
-import splitstree6.view.displaytext.highlighters.Highlighter;
 
 public class DisplayTextViewController {
 
@@ -63,7 +62,6 @@ public class DisplayTextViewController {
 
 	private Node scrollPane;
 
-	private Highlighter highlighter;
 
 	@FXML
 	private void initialize() {
@@ -85,8 +83,6 @@ public class DisplayTextViewController {
 		if (codeArea.getNode() instanceof TextArea textArea) {
 			textArea.prefWidthProperty().bind(borderPane.widthProperty());
 		}
-		highlighter = codeArea.getHighlighter();
-
 		if (!ProgramProperties.isDesktop())
 			toolBar.getItems().remove(lineNumbersToggle);
 	}

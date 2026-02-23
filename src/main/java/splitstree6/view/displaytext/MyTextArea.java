@@ -47,6 +47,7 @@ import splitstree6.view.displaytext.highlighters.Highlighter;
 
 public class MyTextArea {
 	private final CodeArea codeArea;
+	private final Highlighter highlighter;
 
 	private final TextArea textArea;
 
@@ -83,16 +84,19 @@ public class MyTextArea {
 					)
 			);
 			codeArea.wrapTextProperty().addListener((obs, oldV, newV) -> codeArea.requestLayout());
+			highlighter = new Highlighter(codeArea);
 
 			textArea = null;
 		} else {
-			codeArea = null;
 			textArea = new TextArea();
 			addCss(textArea, "highlighters/general.css");
 
 			node = textArea;
 			textArea.setPadding(new Insets(5, 2, 5, 2));
 			enclosingNode = textArea;
+
+			codeArea = null;
+			highlighter = null;
 		}
 	}
 

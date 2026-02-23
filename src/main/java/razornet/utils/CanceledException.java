@@ -1,5 +1,5 @@
 /*
- * xml.css Copyright (C) 2026 Daniel H. Huson
+ * CanceledException.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,43 +17,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-/* xml.css */
 
-.code-area .xml-tagmark {
-    -fx-fill: gray;
+package razornet.utils;
+
+/**
+ * Dummy cancellation exception.
+ * <p>
+ * Note: Must be unchecked because RazorNet.compute(...) does not declare it.
+ */
+public class CanceledException extends RuntimeException {
+	public CanceledException() {
+		super();
+	}
+
+	public CanceledException(String message) {
+		super(message);
+	}
+
+	public CanceledException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public CanceledException(Throwable cause) {
+		super(cause);
+	}
 }
-
-.code-area .xml-anytag {
-    -fx-fill: crimson;
-    -fx-font-weight: bold;
-}
-
-/* You don’t currently emit xml-paren in your XMLHighlighter;
-   keep it only if some other XML tokenizer uses it. */
-.code-area .xml-paren {
-    -fx-fill: firebrick;
-    -fx-font-weight: bold;
-}
-
-.code-area .xml-attribute {
-    -fx-fill: darkviolet;
-}
-
-.code-area .xml-avalue {
-    -fx-fill: black;
-}
-
-.code-area .xml-namespace {
-    -fx-fill: darkblue;
-    -fx-font-weight: bold;
-}
-
-.code-area .xml-comment {
-    -fx-fill: cadetblue;
-    -fx-font-style: italic;
-}
-
-.code-area .xml-anytag {
-    -fx-fill: purple !important;
-}
-

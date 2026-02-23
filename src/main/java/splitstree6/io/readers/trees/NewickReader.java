@@ -23,7 +23,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.DAGTraversals;
-import jloda.graph.NodeArray;
 import jloda.phylo.CommentData;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
@@ -35,7 +34,10 @@ import splitstree6.utils.TreesUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -94,12 +96,9 @@ public class NewickReader extends TreesReader {
 					treeLine = line;
 				final var tree = new PhyloTree();
 				try {
-					try (NodeArray<String> nodeCommentMap = tree.newNodeArray()) {
 						newickIO.parseBracketNotation(tree, treeLine, true);
 						if (newickIO.isInputHasMultiLabels())
 							throw new IOException("Tree contains multiple copies of the same label");
-						setupEdgeConfidenceFromComments(tree, nodeCommentMap);
-					}
 					//System.err.println(tree.toBracketString(false));
 				} catch (Exception ex) {
 					throw new IOExceptionWithLineNumber(lineno, new IOException(ex));
@@ -185,21 +184,6 @@ public class NewickReader extends TreesReader {
 		if (!parts.isEmpty())
 			System.err.println("Ignoring trailing lines at end of file:\n" + StringUtils.abbreviateDotDotDot(StringUtils.toString(parts, "\n"), 400));
 		taxa.addTaxaByNames(orderedTaxonNames);
-	}
-
-	private void setupEdgeConfidenceFromComments(PhyloTree tree, NodeArray<String> nodeCommentMap) {
-		var hasNonNumericalComment = tree.nodeStream().filter(v -> v.getInDegree() == 1).map(nodeCommentMap::get).filter(Objects::nonNull).anyMatch(c -> !NumberUtils.isDouble(c));
-		var hasNumericalComment = tree.nodeStream().filter(v -> v.getInDegree() == 1).map(nodeCommentMap::get).filter(Objects::nonNull).anyMatch(NumberUtils::isDouble);
-		if (hasNumericalComment && !hasNonNumericalComment) {
-			for (var v : tree.nodes()) {
-				if (v.getInDegree() == 1) {
-					var comment = nodeCommentMap.get(v);
-					if (comment != null && NumberUtils.isDouble(comment)) {
-						tree.setConfidence(v.getFirstInEdge(), NumberUtils.parseDouble(comment));
-					}
-				}
-			}
-		}
 	}
 
 	public boolean isOptionConvertMultiLabeledTree() {

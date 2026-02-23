@@ -20,6 +20,7 @@
 package splitstree6.view.displaytext;
 
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -70,7 +71,6 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		codeArea.setEditable(editable);
 
 		controller.getWrapTextToggle().selectedProperty().bindBidirectional(codeArea.wrapTextProperty());
-		codeArea.setWrapText(true);
 
 		controller.getCodeArea().getNode().setOnZoom(e -> {
 			if (e.getZoomFactor() > 1 && view.getFontSize() < maxFontSize || e.getZoomFactor() < 1 && view.getFontSize() > minFontSize) {
@@ -94,6 +94,10 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 
 		controller.getWrapTextToggle().selectedProperty().bindBidirectional(view.wrapTextProperty());
 		controller.getLineNumbersToggle().selectedProperty().bindBidirectional(view.showLineNumbersProperty());
+
+		Platform.runLater(() -> {
+			view.setWrapText(true);
+		});
 
 
 		// prevent double paste:
