@@ -44,6 +44,7 @@ public class NewickWriter extends TreesWriterBase {
 	public void write(Writer w, TaxaBlock taxaBlock, TreesBlock trees) throws IOException {
 		var newickIO = new NewickIO();
 		newickIO.setNewickNodeCommentSupplier(CommentData.createDataNodeSupplier());
+		newickIO.setNewickEdgeCommentSupplier(CommentData.createDataEdgeSupplier());
 
 		var format = new NewickIO.OutputFormat(isOptionEdgeWeights(), isOptionEdgeConfidences(), isOptionEdgeConfidences(), false, false);
 

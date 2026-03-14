@@ -81,6 +81,7 @@ public class NewickReader extends TreesReader {
 		var newickIO = new NewickIO();
 		newickIO.allowMultiLabeledNodes = false;
 		newickIO.setNewickNodeCommentConsumer(CommentData.createDataNodeConsumer());
+		newickIO.setNewickEdgeCommentConsumer(CommentData.createDataEdgeConsumer());
 
 		while (it.hasNext()) {
 			lineno++;

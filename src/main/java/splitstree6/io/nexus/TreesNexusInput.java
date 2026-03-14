@@ -154,7 +154,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 		var newickIO = new NewickIO();
 		newickIO.allowMultiLabeledNodes = true;
 		newickIO.setNewickNodeCommentConsumer(CommentData.createDataNodeConsumer());
-
+		newickIO.setNewickEdgeCommentConsumer(CommentData.createDataEdgeConsumer());
 
 		int treeNumber = 1;
 		while (np.peekMatchIgnoreCase("tree")) {

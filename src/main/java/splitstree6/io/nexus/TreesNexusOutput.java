@@ -73,6 +73,7 @@ public class TreesNexusOutput extends NexusIOBase implements INexusOutput<TreesB
 
 		var newickIO = new NewickIO();
 		newickIO.setNewickNodeCommentSupplier(CommentData.createDataNodeSupplier());
+		newickIO.setNewickEdgeCommentSupplier(CommentData.createDataEdgeSupplier());
 
 		int t = 1;
 		for (var tree : treesBlock.getTrees()) {
