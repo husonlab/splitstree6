@@ -25,7 +25,6 @@ import jloda.fx.util.ProgramProperties;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
-import jloda.phylo.CommentData;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.BitSetUtils;
@@ -182,16 +181,6 @@ public class PhyloFusion extends Trees2Trees {
 			if (network.getRoot().getOutDegree() == 1)
 				network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
 			break; // only copy one
-		}
-
-		// todo: this is just to test storage of tree ids:
-		if (true) {
-			for (var network : outputBlock.getTrees()) {
-				for (var v : network.nodes()) {
-					var set = BitSetUtils.asBitSet(BitSetUtils.range(1, inputTrees.size() + 1));
-					v.setData(new CommentData().put("TM", set));
-				}
-			}
 		}
 	}
 

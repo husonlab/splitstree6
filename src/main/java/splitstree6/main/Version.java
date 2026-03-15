@@ -25,7 +25,7 @@ package splitstree6.main;
  */
 public class Version {
 	static public final String NAME = "SplitsTree App";
-	static public final String SHORT_DESCRIPTION = "SplitsTree App (version 6.7.5, built 18 Feb 2026)";
+	static public final String SHORT_DESCRIPTION = "SplitsTree App (version 6.7.6, built 16 Mar 2026)";
 	static public final String VERSION = "6.0.0";
 
 }
