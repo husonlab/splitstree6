@@ -310,7 +310,6 @@ public class PhyloFusion extends Trees2Trees {
 				}
 				return resultList;
 			}
-
 		} else {
 			var rep = BitSetUtils.min(separator);
 			var networksBelow = computeRec(progress, isOptionMutualRefinement(), computeTreesBelow(trees, taxLabelMap, separator));
@@ -420,7 +419,6 @@ public class PhyloFusion extends Trees2Trees {
 	 * @param trees trees
 	 */
 	private void removeContainedAndRefine(List<PhyloTree> trees, boolean refine) {
-
 		if (refine) {
 			var result = MutualRefinement.apply(trees, MutualRefinement.Strategy.All, false);
 			trees.clear();

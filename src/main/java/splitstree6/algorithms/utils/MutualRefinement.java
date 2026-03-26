@@ -61,7 +61,6 @@ public class MutualRefinement {
 			case Majority -> extract(trees, (int) Math.ceil(0.5 * trees.size()));
 		};
 
-
 		var globalClusterWeights = new HashMap<BitSet, Double>();
 		{
 			var clusterWeightsMap = new HashMap<BitSet, ArrayList<Double>>();
@@ -100,7 +99,6 @@ public class MutualRefinement {
 				}
 			}
 
-
 			for (var cluster : allClusters) {
 				if (BitSetUtils.contains(taxa, cluster) && !treeClusters.contains(cluster) && isCompatibleWithAll(cluster, treeClusters)) {
 					treeClusters.add(cluster);
@@ -138,14 +136,12 @@ public class MutualRefinement {
 					treeClusters.addAll(nodeCluster.values());
 				}
 
-
 				newtree.nodeStream().filter(newtree::hasTaxa).forEach(v -> newtree.setLabel(v, idLabelMap.get(newtree.getTaxon(v))));
 				result.add(newtree);
 			}
 			if (removeDuplicates)
 				seen.add(treeClusters);
 		}
-
 		return result;
 	}
 

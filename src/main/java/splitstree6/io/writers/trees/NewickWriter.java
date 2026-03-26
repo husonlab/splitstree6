@@ -48,7 +48,6 @@ public class NewickWriter extends TreesWriterBase {
 
 		var format = new NewickIO.OutputFormat(isOptionEdgeWeights(), isOptionEdgeConfidences(), isOptionEdgeConfidences(), false, false);
 
-
 		if (trees != null) {
 			for (var i = 1; i <= trees.getNTrees(); i++) {
 				var tree = trees.getTree(i);

@@ -129,7 +129,7 @@ public class TreesEdgesFilter extends Trees2Trees implements IFilter {
 				}
 			}
 		}
-		System.err.println(outputData.getTree(1).toBracketString(false));
+		//System.err.println(outputData.getTree(1).toBracketString(false));
 
 		if (outputData.getNTrees() == inputData.getNTrees())
 			setShortDescription("using all " + inputData.size() + " trees");
