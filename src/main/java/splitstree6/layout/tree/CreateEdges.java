@@ -44,15 +44,16 @@ public class CreateEdges {
 
 	private static final Point2D origin = new Point2D(0, 0);
 
-	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, Type type) {
+	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, Type type, boolean reticulateEdgesAreSpecial) {
 		for (var e : tree.edges()) {
 			var sourceShape = nodeShapeMap.get(e.getSource());
 			var targetShape = nodeShapeMap.get(e.getTarget());
 			var label = (tree.getLabel(e) != null ? new RichTextLabel(tree.getLabel(e)) : null);
 			var path = switch (type) {
-				case Straight -> setupStraightPath(tree, e, sourceShape, targetShape, label);
-				case Circular -> setupCircularPath(tree, e, sourceShape, targetShape, label);
-				case Rectangular -> setupRectangularPath(tree, e, sourceShape, targetShape, label);
+				case Straight -> setupStraightPath(tree, e, sourceShape, targetShape, label, reticulateEdgesAreSpecial);
+				case Circular -> setupCircularPath(tree, e, sourceShape, targetShape, label, reticulateEdgesAreSpecial);
+				case Rectangular ->
+						setupRectangularPath(tree, e, sourceShape, targetShape, label, reticulateEdgesAreSpecial);
 			};
 			edgeShapeMap.put(e, new LabeledEdgeShape(label, path));
 		}
@@ -68,7 +69,7 @@ public class CreateEdges {
 	 * @param label       label
 	 * @return path
 	 */
-	private static Path setupStraightPath(PhyloTree tree, Edge e, LabeledNodeShape sourceShape, LabeledNodeShape targetShape, RichTextLabel label) {
+	private static Path setupStraightPath(PhyloTree tree, Edge e, LabeledNodeShape sourceShape, LabeledNodeShape targetShape, RichTextLabel label, boolean reticulateEdgesAreSpecial) {
 		var path = new Path();
 		path.setFill(Color.TRANSPARENT);
 		path.setStrokeLineCap(StrokeLineCap.ROUND);
@@ -84,16 +85,16 @@ public class CreateEdges {
 		lineTo.setY(targetShape.getTranslateY());
 		path.getElements().addAll(moveTo, lineTo);
 
-		if (tree.isTreeEdge(e))
+		if (tree.isTreeEdge(e) || !reticulateEdgesAreSpecial)
 			path.getStyleClass().add("graph-edge");
 		else
 			path.getStyleClass().add("graph-special-edge");
 
-		if (tree.isTransferEdge(e))
+		if (reticulateEdgesAreSpecial && tree.isTransferEdge(e))
 			addArrowHead(path, moveTo, lineTo);
 
 		if (label != null) {
-			if (!tree.isTreeEdge(e))
+			if (reticulateEdgesAreSpecial && !tree.isTreeEdge(e))
 				label.setTextFill(Color.DARKORANGE);
 			label.translateXProperty().bind((sourceShape.translateXProperty().add(targetShape.translateXProperty())).multiply(0.5));
 			label.translateYProperty().bind(((sourceShape.translateYProperty().add(targetShape.translateYProperty())).multiply(0.5)).subtract(15));
@@ -111,7 +112,7 @@ public class CreateEdges {
 	 * @param label       label
 	 * @return path
 	 */
-	private static Path setupCircularPath(PhyloTree tree, Edge e, LabeledNodeShape sourceShape, LabeledNodeShape targetShape, RichTextLabel label) {
+	private static Path setupCircularPath(PhyloTree tree, Edge e, LabeledNodeShape sourceShape, LabeledNodeShape targetShape, RichTextLabel label, boolean reticulateEdgesAreSpecial) {
 		var source = new Point2D(sourceShape.getTranslateX(), sourceShape.getTranslateY());
 		var sMagnitude = source.magnitude();
 		var target = new Point2D(targetShape.getTranslateX(), targetShape.getTranslateY());
@@ -120,7 +121,7 @@ public class CreateEdges {
 		var path = new Path();
 		path.setPickOnBounds(false);
 
-		if (tree.isTreeEdge(e) || tree.isTransferAcceptorEdge(e)) {
+		if (!reticulateEdgesAreSpecial || tree.isTreeEdge(e) || tree.isTransferAcceptorEdge(e)) {
 			path.getStyleClass().add("graph-edge");
 
 			path.getElements().add(new MoveTo(source.getX(), source.getY()));
@@ -193,7 +194,7 @@ public class CreateEdges {
 	 * @param label       label
 	 * @return path
 	 */
-	private static Path setupRectangularPath(PhyloTree tree, Edge e, LabeledNodeShape sourceShape, LabeledNodeShape targetShape, RichTextLabel label) {
+	private static Path setupRectangularPath(PhyloTree tree, Edge e, LabeledNodeShape sourceShape, LabeledNodeShape targetShape, RichTextLabel label, boolean reticulateEdgesAreSpecial) {
 		var sourceX = sourceShape.getTranslateX();
 		var sourceY = sourceShape.getTranslateY();
 		var targetX = targetShape.getTranslateX();
@@ -208,7 +209,7 @@ public class CreateEdges {
 
 		path.getElements().add(moveTo);
 
-		if (tree.isTreeEdge(e) || tree.isTransferAcceptorEdge(e)) {
+		if (!reticulateEdgesAreSpecial || tree.isTreeEdge(e) || tree.isTransferAcceptorEdge(e)) {
 			path.getStyleClass().add("graph-edge");
 
 			var lineTo1 = new LineTo();

@@ -59,7 +59,7 @@ public class ComputeTreeLayout {
 	 * @return groups and layout consumer
 	 */
 	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, Averaging averaging,
-							   double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges) {
+							   double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges, boolean reticulateEdgesAreSpecial) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
 
@@ -191,11 +191,11 @@ public class ComputeTreeLayout {
 		}
 
 		if (diagram == TreeDiagramType.CircularCladogram || diagram == TreeDiagramType.CircularPhylogram) {
-			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Circular);
+			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Circular, reticulateEdgesAreSpecial);
 		} else if (diagram == TreeDiagramType.TriangularCladogram || diagram == TreeDiagramType.RadialPhylogram || diagram == TreeDiagramType.RadialCladogram) {
-			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Straight);
+			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Straight, reticulateEdgesAreSpecial);
 		} else { // if (diagram == TreePane.TreeDiagramType.Rectangular) {
-			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Rectangular);
+			CreateEdges.apply(tree, nodeShapeMap, edgeShapeMap, CreateEdges.Type.Rectangular, reticulateEdgesAreSpecial);
 		}
 		edgeGroup.getChildren().addAll(edgeShapeMap.values());
 
