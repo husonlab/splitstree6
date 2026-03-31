@@ -136,7 +136,7 @@ public class PhyloFusion extends Trees2Trees {
 		var start = System.currentTimeMillis();
 		var result = computeRec(progress, isOptionMutualRefinement(), inputTrees);
 
-		var hybridizationNumber = result.get(0).nodeStream().filter(v -> v.getInDegree() > 0).mapToInt(v -> v.getInDegree() - 1).sum();
+		var hybridizationNumber = result.get(0).nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
 		System.err.println("Hybridization number: " + hybridizationNumber);
 
 		if (false)
