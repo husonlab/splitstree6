@@ -89,11 +89,20 @@ public class TreeMutualRefinement {
 								var refinementCluster = jNodeClusterMap.get(jChildren.get(jIndex));
 								iClusterNodeMap.put(refinementCluster, refinementNode);
 								iNodeClusterMap.put(refinementNode, refinementCluster);
-								iTree.newEdge(iV, refinementNode);
+								var refinementEdge = iTree.newEdge(iV, refinementNode);
+								if (iTree.hasEdgeWeights())
+									iTree.setWeight(refinementEdge, 0.0);
+								if (iTree.hasEdgeConfidences())
+									iTree.setConfidence(refinementEdge, 0.0);
 								for (var iIndex : iUnionIndices) {
 									var child = iChildren.get(iIndex);
-									iTree.deleteEdge(child.getFirstInEdge());
-									iTree.newEdge(refinementNode, child);
+									var oldInEdge = child.getFirstInEdge();
+									var newInEdge = iTree.newEdge(refinementNode, child);
+									if (iTree.hasEdgeWeights())
+										iTree.setWeight(newInEdge, iTree.getWeight(oldInEdge));
+									if (iTree.hasEdgeConfidences())
+										iTree.setConfidence(newInEdge, iTree.getConfidence(oldInEdge));
+									iTree.deleteEdge(oldInEdge);
 								}
 								count++;
 							}
