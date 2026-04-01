@@ -341,10 +341,6 @@ public class SampleTrees {
 			phyloFusion.setOptionCalculateWeights(false);
 			phyloFusion.setOptionOnlyOneNetwork(true);
 			algorithm = phyloFusion;
-		} else if (algorithmName.equalsIgnoreCase("altsNetwork")) {
-			var alts = new ALTSNetwork();
-			alts.setOptionMutualRefinement(true);
-			algorithm = alts;
 		} else if (algorithmName.equalsIgnoreCase("altsExternal")) {
 			if (inputBlock.isPartial())
 				throw new IOException("--algorithm ALTSExternal not applicable to trees with missing taxa");

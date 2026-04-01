@@ -196,7 +196,7 @@ public class TreeView implements IView {
 				var tree = getTree();
 				text += " v: %,d e: %,d".formatted(tree.getNumberOfNodes(), tree.getNumberOfEdges());
 				if (tree.isReticulated()) {
-					var hybridNumber = tree.nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
+					var hybridNumber = tree.nodeStream().filter(v -> v.getInDegree() >= 2).mapToInt(v -> v.getInDegree() - 1).sum();
 					text += " h: %,d".formatted(hybridNumber);
 				}
 				if (getTrees().size() > 1) {

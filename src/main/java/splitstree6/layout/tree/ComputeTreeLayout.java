@@ -80,8 +80,7 @@ public class ComputeTreeLayout {
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
-		if (optimizeReticulationEdges) {
-			if (true) {
+		if (optimizeReticulationEdges && tree.hasReticulateEdges()) {
 				LSAUtils.setLSAChildrenAndTransfersMap(tree);
 				var reticulateMap = new HashMap<Node, List<Node>>();
 				for (var e : tree.edges()) {
@@ -94,25 +93,7 @@ public class ComputeTreeLayout {
 				tree.getLSAChildrenMap().clear();
 				tree.getLSAChildrenMap().putAll(result);
 				optimizeReticulationEdges = false;
-			} else {
-
-				var childrenMap = new HashMap<Node, List<Node>>();
-				LSAUtils.computeLSAChildrenMap(tree, childrenMap);
-
-				var reticulateMap = new HashMap<Node, List<Node>>();
-				for (var e : tree.edges()) {
-					if (tree.isReticulateEdge(e) && !tree.isTransferAcceptorEdge(e)) {
-						reticulateMap.computeIfAbsent(e.getSource(), k -> new ArrayList<>()).add(e.getTarget());
-						reticulateMap.computeIfAbsent(e.getTarget(), k -> new ArrayList<>()).add(e.getSource());
-					}
-				}
-				var result = NetworkDisplacementOptimization.apply(tree.getRoot(), childrenMap::get, reticulateMap::get, diagram.isRadialOrCircular(), () -> false);
-				tree.getLSAChildrenMap().clear();
-				tree.getLSAChildrenMap().putAll(result);
-				optimizeReticulationEdges = false;
-			}
 		}
-
 
 		LayoutRootedPhylogeny.Layout layout = null;
 		LayoutRootedPhylogeny.Scaling scaling = null;

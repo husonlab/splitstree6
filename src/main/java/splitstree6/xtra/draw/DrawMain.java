@@ -127,7 +127,7 @@ public class DrawMain extends Application {
 			infoLabel.setText("Nodes: %,d Edges: %,d, Leaves: %,d, Roots: %,d, h: %,d, isDag: %s"
 					.formatted(network.getNumberOfNodes(), network.getNumberOfEdges(), network.nodeStream().filter(v -> v.getOutDegree() == 0).count(),
 							network.nodeStream().filter(v -> v.getInDegree() == 0).count(),
-							network.nodeStream().filter(v -> v.getInDegree() > 0).mapToInt(v -> v.getInDegree() - 1).sum(),
+							network.nodeStream().filter(v -> v.getInDegree() >= 2).mapToInt(v -> v.getInDegree() - 1).sum(),
 							IsDAG.apply(network)
 					));
 		});

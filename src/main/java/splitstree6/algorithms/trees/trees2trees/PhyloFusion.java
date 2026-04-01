@@ -31,7 +31,7 @@ import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.MutualRefinement;
+import splitstree6.algorithms.utils.TreeMutualRefinement;
 import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
 import splitstree6.data.TaxaBlock;
@@ -127,9 +127,6 @@ public class PhyloFusion extends Trees2Trees {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
 		progress.setTasks("PhyloFusion", "init");
-
-		if (false)
-			TreesUtils.checkTaxonIntersection(treesBlock.getTrees(), 0.10);
 
 		var inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
 
@@ -420,9 +417,9 @@ public class PhyloFusion extends Trees2Trees {
 	 */
 	private void removeContainedAndRefine(List<PhyloTree> trees, boolean refine) {
 		if (refine) {
-			var result = MutualRefinement.apply(trees, MutualRefinement.Strategy.All, false);
+			var refined = TreeMutualRefinement.apply(trees);
 			trees.clear();
-			trees.addAll(result);
+			trees.addAll(refined);
 		}
 
 		var dataList = new ArrayList<>(trees.stream().map(DataItem::new)
@@ -455,7 +452,6 @@ public class PhyloFusion extends Trees2Trees {
 			if (ok)
 				keep.set(i);
 		}
-
 		trees.addAll(BitSetUtils.asList(keep).stream().map(i -> dataList.get(i).tree()).toList());
 	}
 

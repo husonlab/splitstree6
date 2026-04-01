@@ -22,6 +22,7 @@ package splitstree6.algorithms.utils;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.BitSetUtils;
+import jloda.util.StringUtils;
 import splitstree6.utils.TreesUtils;
 import splitstree6.xtra.kernelize.ClusterIncompatibilityGraph;
 
@@ -32,7 +33,9 @@ import static splitstree6.utils.ClusterUtils.isCompatibleWithAll;
 /**
  * mutually refines a collection of trees and removes any topological duplicates
  * Daniel Huson, 2.2024
+ * @deprecated use TreeMutualRefinement
  */
+@Deprecated
 public class MutualRefinement {
 	public enum Strategy {
 		All, Majority, Compatible
@@ -86,6 +89,8 @@ public class MutualRefinement {
 
 			var taxa = BitSetUtils.asBitSet(tree.getTaxa());
 
+			System.err.println("tree " + tree.getName() + " taxa: " + StringUtils.toString(taxa));
+
 			var treeClusters = new HashSet<BitSet>();
 			var treeClusterWeights = new HashMap<BitSet, Double>();
 
@@ -101,6 +106,7 @@ public class MutualRefinement {
 
 			for (var cluster : allClusters) {
 				if (BitSetUtils.contains(taxa, cluster) && !treeClusters.contains(cluster) && isCompatibleWithAll(cluster, treeClusters)) {
+					System.err.println("adding: " + StringUtils.toString(cluster));
 					treeClusters.add(cluster);
 				}
 			}

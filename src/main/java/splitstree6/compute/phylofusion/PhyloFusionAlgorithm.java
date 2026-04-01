@@ -57,6 +57,7 @@ public class PhyloFusionAlgorithm {
 		var trees = new ArrayList<PhyloTree>();
 		for (var tree : inputTrees) {
 			tree = new PhyloTree(tree);
+
 			if (tree.getRoot().getOutDegree() > 1) {
 				var root = tree.newNode();
 				var e = tree.newEdge(root, tree.getRoot());
@@ -437,29 +438,29 @@ public class PhyloFusionAlgorithm {
 			applyRefinementRule1(hyperSequenceTable, taxonRank);
 		}
 		if (useMissingTaxaHeuristic) { // apply simplification rules in the case of missing taxa
-				if (false) {
-					System.err.println("order: " + StringUtils.toString(inorder(taxonRank), "<"));
-					System.err.println("trees:");
-					for (var tree : trees) {
-						var copy = new PhyloTree(tree);
-						for (var v : copy.nodes()) {
-							if (v.isLeaf())
-								copy.setLabel(v, copy.getLabel(v) + "/" + copy.getTaxon(v));
-						}
-						System.err.println(copy.toBracketString(false) + ";");
+			if (false) {
+				System.err.println("order: " + StringUtils.toString(inorder(taxonRank), "<"));
+				System.err.println("trees:");
+				for (var tree : trees) {
+					var copy = new PhyloTree(tree);
+					for (var v : copy.nodes()) {
+						if (v.isLeaf())
+							copy.setLabel(v, copy.getLabel(v) + "/" + copy.getTaxon(v));
 					}
-					System.err.println("table:");
-					for (var tax : hyperSequenceTable.rowKeySet()) {
-						for (var tree : hyperSequenceTable.columnKeySet()) {
-							var seq = hyperSequenceTable.get(tax, tree);
-							System.err.printf(" (tax=%d,tree=%d)= %s%n", tax, tree, seq != null ? StringUtils.toString(seq.elements(), " ") : "null");
-						}
-						System.err.println();
+					System.err.println(copy.toBracketString(false) + ";");
+				}
+				System.err.println("table:");
+				for (var tax : hyperSequenceTable.rowKeySet()) {
+					for (var tree : hyperSequenceTable.columnKeySet()) {
+						var seq = hyperSequenceTable.get(tax, tree);
+						System.err.printf(" (tax=%d,tree=%d)= %s%n", tax, tree, seq != null ? StringUtils.toString(seq.elements(), " ") : "null");
 					}
 					System.err.println();
 				}
+				System.err.println();
+			}
 
-				applyMissingTaxaRule3(hyperSequenceTable, allTaxa, treeTaxa);
+			applyMissingTaxaRule3(hyperSequenceTable, allTaxa, treeTaxa);
 		}
 		return hyperSequenceTable;
 	}
