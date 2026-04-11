@@ -40,6 +40,7 @@ import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.StatementFilter;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
+import jloda.fx.window.SetupWindowMenu;
 import jloda.util.Basic;
 import jloda.util.FileUtils;
 import jloda.util.Single;
@@ -222,6 +223,8 @@ public class MainWindow implements IMainWindow {
 			stage.setWidth(stage.getWidth() - 1);
 			stage.setWidth(stage.getWidth() + 1);
 		});// this hack ensures that bottom flowpane is shown
+
+		SetupWindowMenu.apply(this, controller.getWindowMenu());
 	}
 
 	@Override

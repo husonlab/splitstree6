@@ -20,23 +20,18 @@
 package splitstree6.window;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.Property;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCharacterCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SwipeUtils;
-import jloda.fx.window.MainWindowManager;
 import jloda.util.Single;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -548,40 +543,6 @@ public class MainWindowController {
 			// windowMenu.getItems().remove(getAboutMenuItem());
 			//editMenu.getItems().remove(getPreferencesMenuItem());
 		}
-
-		final ArrayList<MenuItem> originalWindowMenuItems = new ArrayList<>(windowMenu.getItems());
-
-		final InvalidationListener invalidationListener = observable -> {
-			windowMenu.getItems().setAll(originalWindowMenuItems);
-			var count = 0;
-			for (var mainWindow : MainWindowManager.getInstance().getMainWindows()) {
-				if (mainWindow.getStage() != null) {
-					var title = mainWindow.getStage().getTitle();
-					if (title != null) {
-						var menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
-						menuItem.setOnAction((e) -> mainWindow.getStage().toFront());
-						menuItem.setAccelerator(new KeyCharacterCombination("" + (++count), KeyCombination.SHORTCUT_DOWN));
-						var items = new ArrayList<>(windowMenu.getItems());
-						items.add(menuItem);
-						windowMenu.getItems().setAll(items);
-					}
-				}
-				if (MainWindowManager.getInstance().getAuxiliaryWindows(mainWindow) != null) {
-					for (var auxStage : MainWindowManager.getInstance().getAuxiliaryWindows(mainWindow)) {
-						var title = auxStage.getTitle();
-						if (title != null) {
-							var menuItem = new MenuItem(title.replaceAll("- " + ProgramProperties.getProgramName(), ""));
-							menuItem.setOnAction((e) -> auxStage.toFront());
-							var items = new ArrayList<>(windowMenu.getItems());
-							items.add(menuItem);
-							windowMenu.getItems().setAll(items);
-						}
-					}
-				}
-			}
-		};
-		MainWindowManager.getInstance().changedProperty().addListener(invalidationListener);
-		invalidationListener.invalidated(null);
 
 		var rightWidth = new Single<>(250.0);
 		javafx.application.Platform.runLater(() -> {
