@@ -19,7 +19,7 @@
  */
 
 // splitstree6.algorithms.AlgorithmProvider (new file)
-package splitstree6.algorithms.utils;
+package splitstree6.algorithms;
 
 import splitstree6.workflow.Algorithm;
 
@@ -30,7 +30,7 @@ public interface AlgorithmProvider {
 	/**
 	 * Returns additional algorithms to register with SplitsTree6.
 	 */
-	List<Algorithm> getAlgorithms();
+	List<Algorithm<?, ?>> getAlgorithms();
 
 	/**
 	 * Returns true if this provider contributes an algorithm with the given simple class name.
@@ -44,7 +44,7 @@ public interface AlgorithmProvider {
 	 * Create and configure an algorithm by name. Return null if this provider
 	 * does not handle the given name. Parameters are interpretation-defined.
 	 */
-	default Algorithm createAlgorithm(String simpleClassName, Map<String, String> parameters) {
+	default Algorithm<?, ?> createAlgorithm(String simpleClassName, Map<String, String> parameters) {
 		return null;
 	}
 

@@ -1,5 +1,6 @@
 module splitstreesix {
-	uses splitstree6.algorithms.utils.AlgorithmProvider;
+	uses splitstree6.algorithms.AlgorithmProvider;
+
 	requires transitive jloda_core;
 	requires transitive jloda_fx;
 	requires jloda_connect;
@@ -46,6 +47,8 @@ module splitstreesix {
 	opens splitstree6.algorithms.characters.characters2report;
 
 	exports splitstree6.view.format.edgelabel;
+
+	exports splitstree6.algorithms;
 
 	opens splitstree6.algorithms.genomes.genomes2genomes;
 	opens splitstree6.algorithms.genomes.genome2distances;
@@ -238,4 +241,6 @@ module splitstreesix {
 	opens splitstree6.tools.server;
 	exports splitstree6.tools.server;
 	exports splitstree6.view.trees.tanglegram;
+	opens splitstree6.algorithms;
+
 }

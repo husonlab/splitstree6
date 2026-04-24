@@ -68,7 +68,6 @@ import splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues;
 import splitstree6.algorithms.trees.trees2splits.*;
 import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
-import splitstree6.algorithms.utils.AlgorithmProvider;
 import splitstree6.main.SplitsTree6;
 import splitstree6.workflow.Algorithm;
 
