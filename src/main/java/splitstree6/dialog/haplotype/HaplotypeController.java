@@ -27,9 +27,11 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import jloda.fx.util.ProgramProperties;
-import razornetaccess.RazorNet;
+import splitstree6.algorithms.AlgorithmList;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
+
+import java.util.ArrayList;
 
 public class HaplotypeController {
 
@@ -62,11 +64,13 @@ public class HaplotypeController {
 		distanceChoice.getItems().setAll("Hamming", "TN93");
 		distanceChoice.getSelectionModel().selectFirst();
 
-		if (splitstree6.main.SplitsTree6.allowRazorNet) {
-			methodChoice.getItems().setAll(RazorNet.class.getSimpleName(), MedianJoining.class.getSimpleName(), MinSpanningNetwork.class.getSimpleName());
-		} else {
-			methodChoice.getItems().setAll(MedianJoining.class.getSimpleName(), MinSpanningNetwork.class.getSimpleName());
+		var methods = new ArrayList<String>();
+		if (AlgorithmList.isAvailable("RazorNet")) {
+			methods.add("RazorNet");
 		}
+		methods.add(MedianJoining.class.getSimpleName());
+		methods.add(MinSpanningNetwork.class.getSimpleName());
+		methodChoice.getItems().setAll(methods);
 		methodChoice.getSelectionModel().selectFirst();
 
 		ProgramProperties.track("HaplotypeSequencesFile", sequencesField.textProperty(), "");

@@ -1,4 +1,5 @@
 module splitstreesix {
+	uses splitstree6.algorithms.utils.AlgorithmProvider;
 	requires transitive jloda_core;
 	requires transitive jloda_fx;
 	requires jloda_connect;
@@ -237,6 +238,4 @@ module splitstreesix {
 	opens splitstree6.tools.server;
 	exports splitstree6.tools.server;
 	exports splitstree6.view.trees.tanglegram;
-
-	opens razornetaccess;
 }

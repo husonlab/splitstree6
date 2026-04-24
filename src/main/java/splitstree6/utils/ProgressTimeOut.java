@@ -97,7 +97,12 @@ public class ProgressTimeOut implements ProgressListener {
 
 	@Override
 	public void incrementProgressIgnoreCancel() {
+	}
 
+	@Override
+	public void setProgress(long progress, long max) throws CanceledException {
+		setMaximum(max);
+		setProgress(progress);
 	}
 
 	@Override

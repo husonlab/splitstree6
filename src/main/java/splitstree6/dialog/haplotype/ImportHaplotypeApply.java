@@ -26,7 +26,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
-import razornetaccess.RazorHaplotypeNetwork;
+import splitstree6.algorithms.AlgorithmList;
 import splitstree6.algorithms.characters.characters2distances.Characters2Distances;
 import splitstree6.algorithms.characters.characters2distances.HammingDistance;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.TN93Distance;
@@ -48,6 +48,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.util.Map;
+import java.util.Objects;
 
 
 public class ImportHaplotypeApply {
@@ -148,12 +150,13 @@ public class ImportHaplotypeApply {
 
 						switch (result.method()) {
 							case "RazorNet" -> {
-								var razor = new RazorHaplotypeNetwork();
-								if (result.distanceModel().equalsIgnoreCase("tn93"))
-									razor.optionDistanceMethodProperty().set(RazorHaplotypeNetwork.DistanceMethods.TN93);
-								workflow.newAlgorithmNode(razor, workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), networkNode);
+								var razor = AlgorithmList.create("RazorHaplotypeNetwork",
+										Map.of("distanceModel", result.distanceModel()));
+								workflow.newAlgorithmNode(Objects.requireNonNullElseGet(razor, MedianJoining::new),
+										workflow.getWorkingTaxaNode(),
+										workflow.getWorkingDataNode(),
+										networkNode);
 							}
-
 							case "MinSpanningNetwork" -> {
 								var distancesNode = workflow.newDataNode(new DistancesBlock());
 								Characters2Distances distancesAlgorithm;

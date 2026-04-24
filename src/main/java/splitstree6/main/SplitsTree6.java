@@ -57,7 +57,6 @@ public class SplitsTree6 extends Application {
 	private static final ArrayList<String> inputFiles = new ArrayList<>();
 
 	private static boolean allowExperimental = false;
-	public static boolean allowRazorNet = false;
 
 	private static boolean showSplash;
 
