@@ -37,6 +37,7 @@ import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
+import splitstree6.main.AppProfile;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Consumer;
@@ -62,7 +63,10 @@ public class WorkflowSetup {
 			NotificationManager.showError("No suitable importer found");
 			return workflow;
 		}
-		if (clazz.equals(CharactersBlock.class)) {
+		// Let the host application override the default pipeline
+		if (AppProfile.getProfile().setupWorkflow(workflow, clazz, sourceBlock)) {
+			// profile handled it; skip the built-in defaults
+		} else if (clazz.equals(CharactersBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new CharactersLoader(), new TaxaBlock(), new CharactersBlock());
 			var distancesNode = workflow.newDataNode(new DistancesBlock());
 			workflow.newAlgorithmNode(new PDistance(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);

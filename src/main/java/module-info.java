@@ -242,5 +242,8 @@ module splitstreesix {
 	exports splitstree6.tools.server;
 	exports splitstree6.view.trees.tanglegram;
 	opens splitstree6.algorithms;
+	exports splitstree6.algorithms.source.source2distances;
+	exports splitstree6.algorithms.network.network2view;
+	exports splitstree6.algorithms.source.source2characters;
 
 }

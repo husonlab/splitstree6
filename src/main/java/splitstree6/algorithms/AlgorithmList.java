@@ -214,6 +214,10 @@ public class AlgorithmList {
 			}
 		}
 
+		var filter = splitstree6.main.AppProfile.getProfile().getAlgorithmFilter();
+		if (filter != null) {
+			algorithms.removeIf(a -> !filter.test(a));
+		}
 
 		return algorithms;
 	}
