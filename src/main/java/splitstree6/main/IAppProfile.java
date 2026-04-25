@@ -25,6 +25,7 @@ import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.Workflow;
 
+import java.util.Set;
 import java.util.function.Predicate;
 
 public interface IAppProfile {
@@ -42,5 +43,42 @@ public interface IAppProfile {
 	 */
 	default boolean setupWorkflow(Workflow workflow, Class<? extends DataBlock> inputType, SourceBlock sourceBlock) {
 		return false;
+	}
+
+	/**
+	 * If non-null, restricts which readers ImportManager exposes.
+	 * Narrows the File→Open dialog, determineInputType, and all getReaders variants
+	 * to readers whose target data type matches the predicate.
+	 */
+	default Predicate<Class<? extends DataBlock>> getOpenableInputTypeFilter() {
+		return null;
+	}
+
+	/**
+	 * Given a freshly-loaded workflow (typically from a .stree6 file), returns true
+	 * if the host application wants the pipeline discarded and rebuilt around the
+	 * preserved input data. SplitsTree6 will re-invoke WorkflowSetup on the same
+	 * source file, which rebuilds through setupWorkflow().
+	 */
+	default boolean shouldReplaceWorkflow(Workflow loadedWorkflow) {
+		return false;
+	}
+
+	/**
+	 * are we running an extension of splitstree?
+	 *
+	 * @return true, if this is an extension app
+	 */
+	default boolean isExtension() {
+		return getAlgorithmFilter() != null;
+	}
+
+	/**
+	 * If non-null, restricts the menu bar to items whose fx:id is in this set.
+	 * Empty submenus are hidden; consecutive separators are collapsed; hidden
+	 * items have their accelerators cleared.
+	 */
+	default Set<String> getKeepMenuIds() {
+		return null;
 	}
 }

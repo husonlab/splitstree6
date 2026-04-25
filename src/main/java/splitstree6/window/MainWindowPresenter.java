@@ -206,7 +206,7 @@ public class MainWindowPresenter {
 			}
 		});
 
-		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
+		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
 
 		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
 
@@ -302,24 +302,22 @@ public class MainWindowPresenter {
 		var loadingFile = new SimpleBooleanProperty(this, "loadingFile", false);
 
 		controller.getOpenMenuItem().setOnAction(e -> {
-			{
-				var previousDir = new File(ProgramProperties.get("InputDir", ""));
-				var fileChooser = new FileChooser();
-				if (previousDir.isDirectory())
-					fileChooser.setInitialDirectory(previousDir);
-				fileChooser.setTitle("Open input file");
-				fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
-				var selectedFile = fileChooser.showOpenDialog(stage);
-				if (selectedFile != null) {
-					if (!selectedFile.getParent().isBlank())
-						ProgramProperties.put("InputDir", selectedFile.getParent());
-					if (!loadingFile.get()) {
-						try {
-							loadingFile.set(true);
-							FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
-						} finally {
-							loadingFile.set(false);
-						}
+			var previousDir = new File(ProgramProperties.get("InputDir", ""));
+			var fileChooser = new FileChooser();
+			if (previousDir.isDirectory())
+				fileChooser.setInitialDirectory(previousDir);
+			fileChooser.setTitle("Open input file");
+			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
+			var selectedFile = fileChooser.showOpenDialog(stage);
+			if (selectedFile != null) {
+				if (!selectedFile.getParent().isBlank())
+					ProgramProperties.put("InputDir", selectedFile.getParent());
+				if (!loadingFile.get()) {
+					try {
+						loadingFile.set(true);
+						FileLoader.apply(mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
+					} finally {
+						loadingFile.set(false);
 					}
 				}
 			}

@@ -578,6 +578,11 @@ public class MainWindowController {
 
 			rightBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
 		}
+
+		var keep = splitstree6.main.AppProfile.getProfile().getKeepMenuIds();
+		if (keep != null && !keep.isEmpty()) {
+			splitstree6.utils.MenuFilter.apply(menuBar, keep);
+		}
 	}
 
 	public VBox getTopVBox() {

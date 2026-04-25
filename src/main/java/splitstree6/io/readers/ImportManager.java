@@ -72,6 +72,12 @@ public class ImportManager {
 				return 0;
 		});
 
+		// Apply app-profile filter if one is set
+		var filter = splitstree6.main.AppProfile.getProfile().getOpenableInputTypeFilter();
+		if (filter != null) {
+			readers.removeIf(r -> !filter.test(r.getToClass()));
+		}
+
 		for (var reader : readers)
 			extensions.addAll(reader.getFileExtensions());
 	}

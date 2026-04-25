@@ -318,7 +318,7 @@ public class GenomesAnalyzer {
 		aService.setOnFailed(c -> NotificationManager.showError("Genome import failed: " + aService.getException()));
 		aService.setOnSucceeded(c -> {
 			NotificationManager.showInformation("Imported " + aService.getValue() + " genomes");
-			FileLoader.apply(false, (MainWindow) MainWindowManager.getInstance().getLastFocusedMainWindow(), fileName,
+			FileLoader.apply((MainWindow) MainWindowManager.getInstance().getLastFocusedMainWindow(), fileName,
 					e -> NotificationManager.showError("Genome import failed: " + e));
 		});
 		aService.start();

@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import jloda.fx.util.AService;
 import jloda.fx.window.NotificationManager;
 import jloda.util.Basic;
+import jloda.util.FileUtils;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.Pair;
 import jloda.util.parse.NexusStreamParser;
@@ -33,6 +34,7 @@ import splitstree6.io.nexus.AlgorithmNexusInput;
 import splitstree6.io.nexus.NexusExporter;
 import splitstree6.io.nexus.SplitsTree6NexusInput;
 import splitstree6.io.nexus.TaxaNexusInput;
+import splitstree6.main.AppProfile;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.window.MainWindow;
@@ -62,6 +64,15 @@ public class WorkflowNexusInput {
 	}
 
 	public static void open(MainWindow mainWindow, String fileName, Consumer<Throwable> exceptionHandler, Runnable runOnSuccess) {
+		// Workflow-only files (.wflow6) are a SplitsTree6 power-user feature;
+		// host applications that are extensions of SplitsTree6 don't support them.
+		if (isWorkflowFile(fileName) && AppProfile.getProfile().isExtension()) {
+			NotificationManager.showError(
+					"Workflow files are not supported in " +
+					AppProfile.getProfile().getName() +
+					".\nPlease open a data file (characters, distances, or .stree6) instead.");
+			return;
+		}
 		var workflow = mainWindow.getWorkflow();
 		workflow.clear();
 		mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
@@ -89,42 +100,56 @@ public class WorkflowNexusInput {
 							node.restart();
 						}
 					}
+					// Profile may want to discard and rebuild this workflow
+					if (splitstree6.main.AppProfile.getProfile().shouldReplaceWorkflow(workflow)) {
+						if (!rebuildAroundInput(mainWindow, fileName, exceptionHandler))
+							return;   // failure already reported
+					}
 					if (runOnSuccess != null)
 						runOnSuccess.run();
-				} else
+				} else {
 					NotificationManager.showInformation("Workflow loaded, now use the File-> Replace Data... menu item to load data");
+				}
 			});
 
 			service.setOnFailed(e -> {
-						if (exceptionHandler != null)
-							exceptionHandler.accept(service.getException());
-						else
-							NotificationManager.showError("Open file failed : " + service.getException());
-
-				if (true) {
-					var taxa = newWorkflow.getInputTaxaBlock();
-					var data = (DataBlock) newWorkflow.getInputDataBlock();
-					if (taxa != null && taxa.size() > 0 && data != null) {
-						// open in editor
-						mainWindow.setFileName(fileName);
-						mainWindow.getPresenter().showInputEditor();
-						if (mainWindow.getTabByClass(InputEditorTab.class) instanceof InputEditorTab editorTab) {
-							try {
-								var w = new StringWriter();
-								(new NexusExporter()).export(w, taxa, data);
-
-								Platform.runLater(() -> {
-									if (editorTab.getView() instanceof InputEditorView view) {
-										view.replaceText("#nexus\n\n" + w.toString());
-									}
-								});
-							} catch (IOException ignored) {
-							}
+				// Try to salvage: if we have taxa + an input data block, rebuild from those.
+				var taxa = newWorkflow.getInputTaxaBlock();
+				var data = (DataBlock) newWorkflow.getInputDataBlock();
+				if (taxa != null && taxa.size() > 0 && data != null) {
+					if (splitstree6.main.AppProfile.getProfile().shouldReplaceWorkflow(newWorkflow)) {
+						// The profile would have replaced the workflow anyway — try the rebuild.
+						if (rebuildAroundInput(mainWindow, fileName, exceptionHandler)) {
+							if (runOnSuccess != null)
+								runOnSuccess.run();
+							return;
 						}
 					}
-				}
+					// Default fallback: open in the input editor
+					mainWindow.setFileName(fileName);
+					mainWindow.getPresenter().showInputEditor();
+					if (mainWindow.getTabByClass(InputEditorTab.class) instanceof InputEditorTab editorTab) {
+						try {
+							var w = new StringWriter();
+							(new NexusExporter()).export(w, taxa, data);
+							Platform.runLater(() -> {
+								if (editorTab.getView() instanceof InputEditorView view) {
+									view.replaceText("#nexus\n\n" + w.toString());
+								}
+							});
+						} catch (IOException ignored) {
+						}
 					}
-			);
+				} else {
+					if (exceptionHandler != null) {
+						if (AppProfile.getProfile().isExtension())
+							exceptionHandler.accept(new IOException(AppProfile.getProfile().getName() + ": File not suitable: " + FileUtils.getFileNameWithoutPath(fileName)));
+						else
+							exceptionHandler.accept(service.getException());
+					} else
+						NotificationManager.showError("Open file failed : " + service.getException());
+				}
+			});
 			service.setOnCancelled(e -> NotificationManager.showError("Open file : canceled"));
 			service.start();
 		}
@@ -224,4 +249,33 @@ public class WorkflowNexusInput {
 		return inputFile.toLowerCase().endsWith(WORKFLOW_FILE_SUFFIX) || inputFile.toLowerCase().endsWith(WORKFLOW_FILE_SUFFIX + ".gz");
 	}
 
+	/**
+	 * Inspect the working data block; if it's a CharactersBlock or DistancesBlock,
+	 * tear down any current pipeline and rebuild via WorkflowSetup (which invokes
+	 * the host profile's setupWorkflow). Returns true on success, false if the
+	 * file's contents are not salvageable for this profile (an error is shown).
+	 */
+	private static boolean rebuildAroundInput(MainWindow mainWindow, String fileName,
+											  Consumer<Throwable> exceptionHandler) {
+		var workflow = mainWindow.getWorkflow();
+		var working = workflow.getWorkingDataNode();
+		Class<? extends DataBlock> inputType = null;
+		if (working != null) {
+			var block = working.getDataBlock();
+			if (block instanceof DistancesBlock) inputType = DistancesBlock.class;
+			else if (block instanceof CharactersBlock) inputType = CharactersBlock.class;
+		}
+		if (inputType == null) {
+			NotificationManager.showError(
+					"File does not contain distances or characters — cannot open in " +
+					splitstree6.main.AppProfile.getProfile().getName());
+			workflow.clear();
+			mainWindow.setFileName("");
+			mainWindow.setDirty(false);
+			return false;
+		}
+		splitstree6.workflow.WorkflowSetup.apply(fileName, workflow, exceptionHandler, null, inputType);
+		mainWindow.setDirty(false);
+		return true;
+	}
 }

@@ -170,7 +170,7 @@ public class SplitsTree6 extends Application {
 
 			if (!inputFiles.isEmpty()) {
 				for (var file : inputFiles)
-					Platform.runLater(() -> FileLoader.apply(false, mainWindow, file, e -> NotificationManager.showError("Open file failed: " + e)));
+					Platform.runLater(() -> FileLoader.apply(mainWindow, file, e -> NotificationManager.showError("Open file failed: " + e)));
 			}
 
 		} catch (Exception ex) {
