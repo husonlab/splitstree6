@@ -87,7 +87,6 @@ public class ProgressTimeOut implements ProgressListener {
 
 	@Override
 	public void setUserCancelled(boolean b) {
-
 	}
 
 	@Override
@@ -100,14 +99,7 @@ public class ProgressTimeOut implements ProgressListener {
 	}
 
 	@Override
-	public void setProgress(long progress, long max) throws CanceledException {
-		setMaximum(max);
-		setProgress(progress);
-	}
-
-	@Override
 	public void close() {
-
 	}
 
 	@Override
@@ -117,17 +109,14 @@ public class ProgressTimeOut implements ProgressListener {
 
 	@Override
 	public void reportTaskCompleted() {
-
 	}
 
 	@Override
 	public void setDebug(boolean b) {
-
 	}
 
 	@Override
 	public void setPause(boolean b) {
-
 	}
 
 	@Override
