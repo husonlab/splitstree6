@@ -27,71 +27,71 @@ import java.util.BitSet;
 
 public record HyperSequence(ArrayList<BitSet> elements) {
 
-	/**
-	 * default constructor
-	 */
-	public HyperSequence() {
-		this(new ArrayList<>());
-	}
+    /**
+     * default constructor
+     */
+    public HyperSequence() {
+        this(new ArrayList<>());
+    }
 
-	/**
-	 * parse a string description,
-	 *
-	 * @param values e.g. "1 : 3 : 4 6 : 2 : 5"
-	 * @return hyper sequence
-	 */
-	public static HyperSequence parse(String values) {
-		var sequence = new HyperSequence();
-		for (var word : StringUtils.split(values, ':')) {
-			sequence.add(BitSetUtils.asBitSet(StringUtils.parseArrayOfIntegers(word)));
-		}
-		return sequence;
-	}
-
-
-	/**
-	 * write out in parsable format
-	 *
-	 * @return string, e.g. "1 : 3 : 4 6 : 2 : 5"
-	 */
-	public String toString() {
-		var buf = new StringBuilder();
-		for (var set : elements) {
-			if (!buf.isEmpty())
-				buf.append(" : ");
-			buf.append(StringUtils.toString(set));
-		}
-		return buf.toString();
-	}
+    /**
+     * parse a string description,
+     *
+     * @param values e.g. "1 : 3 : 4 6 : 2 : 5"
+     * @return hyper sequence
+     */
+    public static HyperSequence parse(String values) {
+        var sequence = new HyperSequence();
+        for (var word : StringUtils.split(values, ':')) {
+            sequence.add(BitSetUtils.asBitSet(StringUtils.parseArrayOfIntegers(word)));
+        }
+        return sequence;
+    }
 
 
-	public BitSet get(int i) {
-		return elements.get(i);
-	}
+    /**
+     * write out in parsable format
+     *
+     * @return string, e.g. "1 : 3 : 4 6 : 2 : 5"
+     */
+    public String toString() {
+        var buf = new StringBuilder();
+        for (var set : elements) {
+            if (!buf.isEmpty())
+                buf.append(" : ");
+            buf.append(StringUtils.toString(set));
+        }
+        return buf.toString();
+    }
 
-	public void set(int i, BitSet set) {
-		elements.set(i, set);
-	}
 
-	public void add(BitSet set) {
-		elements.add(set);
-	}
+    public BitSet get(int i) {
+        return elements.get(i);
+    }
 
-	public int size() {
-		return elements.size();
-	}
+    public void set(int i, BitSet set) {
+        elements.set(i, set);
+    }
 
-	public void removeEmptyElements() {
-		elements.removeAll(elements.stream().filter(BitSet::isEmpty).toList());
-	}
+    public void add(BitSet set) {
+        elements.add(set);
+    }
 
-	public HyperSequence induce(BitSet taxa) {
-		var hypersequence = new HyperSequence();
-		for (var element : elements) {
-			var set = BitSetUtils.intersection(element, taxa);
-			if (set.cardinality() > 0 && !hypersequence.elements().contains(set))
-				hypersequence.elements().add(set);
-		}
-		return hypersequence;
-	}
+    public int size() {
+        return elements.size();
+    }
+
+    public void removeEmptyElements() {
+        elements.removeAll(elements.stream().filter(BitSet::isEmpty).toList());
+    }
+
+    public HyperSequence induce(BitSet taxa) {
+        var hypersequence = new HyperSequence();
+        for (var element : elements) {
+            var set = BitSetUtils.intersection(element, taxa);
+            if (set.cardinality() > 0 && !hypersequence.elements().contains(set))
+                hypersequence.elements().add(set);
+        }
+        return hypersequence;
+    }
 }

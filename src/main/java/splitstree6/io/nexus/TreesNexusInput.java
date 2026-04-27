@@ -19,6 +19,8 @@
 
 package splitstree6.io.nexus;
 
+import jloda.graph.Edge;
+import jloda.graph.Node;
 import jloda.phylo.CommentData;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
@@ -36,214 +38,231 @@ import java.util.*;
  * Daniel Huson, 2.2018
  */
 public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlock> {
-	public static final String SYNTAX = """
-			BEGIN TREES;
-			    [TITLE {title};]
-			    [LINK {type} = {title};]
-			[PROPERTIES [PartialTrees={YES|NO}] [Rooted={YES|NO}] [Reticulated={YES|NO}];]
-			[TRANSLATE
-			    nodeLabel1 taxon1,
-			    nodeLabel2 taxon2,
-			        ...
-			    nodeLabelN taxonN
-			;]
-			[TREE name1 = tree1-in-Newick-format;]
-			[TREE name2 = tree2-in-Newick-format;]
-			    ...
-			[TREE nameM = treeM-in-Newick-format;]
-			END;
-			""";
+    public static final String SYNTAX = """
+            BEGIN TREES;
+                [TITLE {title};]
+                [LINK {type} = {title};]
+            [PROPERTIES [PartialTrees={YES|NO}] [Rooted={YES|NO}] [Reticulated={YES|NO}] [HasTreeMemberships={YES|NO}];]
+            [TRANSLATE
+                nodeLabel1 taxon1,
+                nodeLabel2 taxon2,
+                    ...
+                nodeLabelN taxonN
+            ;]
+            [TREE name1 = tree1-in-Newick-format;]
+            [TREE name2 = tree2-in-Newick-format;]
+                ...
+            [TREE nameM = treeM-in-Newick-format;]
+            END;
+            """;
 
-	public static final String DESCRIPTION = """
-			This block maintains a list of trees. These can be rooted or unrooted
-			phylogenetic trees, or rooted phylogenetic networks. Trees can
-			partial in the sense that they need to contain all taxa.
-			""";
+    public static final String DESCRIPTION = """
+            This block maintains a list of trees. These can be rooted or unrooted
+            phylogenetic trees, or rooted phylogenetic networks. Trees can
+            partial in the sense that they need to contain all taxa.
+            """;
 
-	@Override
-	public String getSyntax() {
-		return SYNTAX;
-	}
+    @Override
+    public String getSyntax() {
+        return SYNTAX;
+    }
 
-	/**
-	 * parse a trees block
-	 */
-	@Override
-	public List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, TreesBlock treesBlock) throws IOException {
-		treesBlock.clear();
+    /**
+     * parse a trees block
+     */
+    @Override
+    public List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, TreesBlock treesBlock) throws IOException {
+        treesBlock.clear();
 
-		final var format = treesBlock.getFormat();
+        final var format = treesBlock.getFormat();
 
-		var rootedExplicitySet = false;
+        var rootedExplicitySet = false;
 
-		np.matchBeginBlock("TREES");
-		parseTitleAndLink(np);
+        np.matchBeginBlock("TREES");
+        parseTitleAndLink(np);
 
-		if (np.peekMatchIgnoreCase("PROPERTIES")) {
-			final var tokens = np.getTokensLowerCase("PROPERTIES", ";");
-			treesBlock.setPartial(np.findIgnoreCase(tokens, "partialTrees=no", false, treesBlock.isPartial()));
-			treesBlock.setPartial(np.findIgnoreCase(tokens, "partialTrees=yes", true, treesBlock.isPartial()));
-			// legacy:
-			treesBlock.setPartial(np.findIgnoreCase(tokens, "no partialTrees", false, treesBlock.isPartial()));
-			treesBlock.setPartial(np.findIgnoreCase(tokens, "partialTrees", true, treesBlock.isPartial()));
+        if (np.peekMatchIgnoreCase("PROPERTIES")) {
+            final var tokens = np.getTokensLowerCase("PROPERTIES", ";");
+            treesBlock.setPartial(np.findIgnoreCase(tokens, "partialTrees=no", false, treesBlock.isPartial()));
+            treesBlock.setPartial(np.findIgnoreCase(tokens, "partialTrees=yes", true, treesBlock.isPartial()));
+            // legacy:
+            treesBlock.setPartial(np.findIgnoreCase(tokens, "no partialTrees", false, treesBlock.isPartial()));
+            treesBlock.setPartial(np.findIgnoreCase(tokens, "partialTrees", true, treesBlock.isPartial()));
 
-			if (np.findIgnoreCase(tokens, "rooted=no", true, false)) {
-				treesBlock.setRooted(false);
-				rootedExplicitySet = true;
-			}
-			if (np.findIgnoreCase(tokens, "rooted=yes", true, false)) {
-				treesBlock.setRooted(true);
-				rootedExplicitySet = true;
-			}
+            if (np.findIgnoreCase(tokens, "rooted=no", true, false)) {
+                treesBlock.setRooted(false);
+                rootedExplicitySet = true;
+            }
+            if (np.findIgnoreCase(tokens, "rooted=yes", true, false)) {
+                treesBlock.setRooted(true);
+                rootedExplicitySet = true;
+            }
 
-			treesBlock.setReticulated(np.findIgnoreCase(tokens, "reticulated=no", false, treesBlock.isReticulated()));
-			treesBlock.setReticulated(np.findIgnoreCase(tokens, "reticulated=yes", true, treesBlock.isReticulated()));
+            treesBlock.setReticulated(np.findIgnoreCase(tokens, "reticulated=no", false, treesBlock.isReticulated()));
+            treesBlock.setReticulated(np.findIgnoreCase(tokens, "reticulated=yes", true, treesBlock.isReticulated()));
 
-			// legacy:
-			if (np.findIgnoreCase(tokens, "no rooted", true, false)) {
-				treesBlock.setRooted(false);
-				rootedExplicitySet = true;
-			}
-			if (np.findIgnoreCase(tokens, "rooted", true, false)) {
-				treesBlock.setRooted(true);
-				rootedExplicitySet = true;
-			}
+            // legacy:
+            if (np.findIgnoreCase(tokens, "no rooted", true, false)) {
+                treesBlock.setRooted(false);
+                rootedExplicitySet = true;
+            }
+            if (np.findIgnoreCase(tokens, "rooted", true, false)) {
+                treesBlock.setRooted(true);
+                rootedExplicitySet = true;
+            }
 
-			if (!tokens.isEmpty())
-				throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in PROPERTIES");
-		}
+            treesBlock.setTreeMemberships(np.findIgnoreCase(tokens, "hastreememberships=no", false, treesBlock.hasTreeMemberships()));
+            treesBlock.setTreeMemberships(np.findIgnoreCase(tokens, "hastreememberships=yes", true, treesBlock.hasTreeMemberships()));
 
-		final var taxName2Id = new HashMap<String, Integer>();
-		final var taxonNamesFound = new ArrayList<String>();
-		var haveSetKnownTaxonNames = false;
+            if (!tokens.isEmpty())
+                throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in PROPERTIES");
+        }
 
-		// create translator:
-		final Map<String, String> translator; // maps node labels to taxon labels
+        final var taxName2Id = new HashMap<String, Integer>();
+        final var taxonNamesFound = new ArrayList<String>();
+        var haveSetKnownTaxonNames = false;
 
-		if (np.peekMatchIgnoreCase("TRANSLATE")) {
-			translator = new HashMap<>();
-			format.setOptionTranslate(true);
-			np.matchIgnoreCase("TRANSLATE");
-			while (!np.peekMatchIgnoreCase(";")) {
-				final var nodeLabel = np.getWordRespectCase();
-				final var taxonLabel = np.getWordRespectCase();
-				taxonNamesFound.add(taxonLabel);
-				taxName2Id.put(taxonLabel, taxonNamesFound.size());
-				translator.put(nodeLabel, taxonLabel);
+        // create translator:
+        final Map<String, String> translator; // maps node labels to taxon labels
 
-				if (!np.peekMatchIgnoreCase(";"))
-					np.matchIgnoreCase(",");
-			}
-			np.matchIgnoreCase(";");
-			haveSetKnownTaxonNames = true;
-		} else {
-			translator = null;
-			format.setOptionTranslate(false);
-			if (!taxaBlock.getTaxa().isEmpty()) {
-				for (var t = 1; t <= taxaBlock.getNtax(); t++) {
-					final var taxonLabel = taxaBlock.get(t).getName();
-					taxonNamesFound.add(taxonLabel);
-					taxName2Id.put(taxonLabel, t);
-				}
-				haveSetKnownTaxonNames = true;
-			}
-		}
+        if (np.peekMatchIgnoreCase("TRANSLATE")) {
+            translator = new HashMap<>();
+            format.setOptionTranslate(true);
+            np.matchIgnoreCase("TRANSLATE");
+            while (!np.peekMatchIgnoreCase(";")) {
+                final var nodeLabel = np.getWordRespectCase();
+                final var taxonLabel = np.getWordRespectCase();
+                taxonNamesFound.add(taxonLabel);
+                taxName2Id.put(taxonLabel, taxonNamesFound.size());
+                translator.put(nodeLabel, taxonLabel);
 
-		final var knownTaxonNames = new HashSet<>(taxonNamesFound);
+                if (!np.peekMatchIgnoreCase(";"))
+                    np.matchIgnoreCase(",");
+            }
+            np.matchIgnoreCase(";");
+            haveSetKnownTaxonNames = true;
+        } else {
+            translator = null;
+            format.setOptionTranslate(false);
+            if (!taxaBlock.getTaxa().isEmpty()) {
+                for (var t = 1; t <= taxaBlock.getNtax(); t++) {
+                    final var taxonLabel = taxaBlock.get(t).getName();
+                    taxonNamesFound.add(taxonLabel);
+                    taxName2Id.put(taxonLabel, t);
+                }
+                haveSetKnownTaxonNames = true;
+            }
+        }
 
-		var newickIO = new NewickIO();
-		newickIO.allowMultiLabeledNodes = true;
-		newickIO.setNewickNodeCommentConsumer(CommentData.createDataNodeConsumer());
+        final var knownTaxonNames = new HashSet<>(taxonNamesFound);
+
+        var newickIO = new NewickIO();
+        newickIO.allowMultiLabeledNodes = true;
+        newickIO.setNewickNodeCommentConsumer(CommentData.createDataNodeConsumer());
 		newickIO.setNewickEdgeCommentConsumer(CommentData.createDataEdgeConsumer());
 
-		int treeNumber = 1;
-		while (np.peekMatchIgnoreCase("tree")) {
-			np.matchIgnoreCase("tree");
-			if (np.peekMatchRespectCase("*"))
-				np.matchRespectCase("*"); // don't know why PAUP puts this star in the file....
+        int treeNumber = 1;
+        while (np.peekMatchIgnoreCase("tree")) {
+            np.matchIgnoreCase("tree");
+            if (np.peekMatchRespectCase("*"))
+                np.matchRespectCase("*"); // don't know why PAUP puts this star in the file....
 
-			var name = np.getWordRespectCase();
-			name = name.replaceAll("\\s+", "_");
-			name = name.replaceAll("[:;,]+", ".");
-			name = name.replaceAll("\\[", "(");
-			name = name.replaceAll("]", ")");
-			name = name.trim();
+            var name = np.getWordRespectCase();
+            name = name.replaceAll("\\s+", "_");
+            name = name.replaceAll("[:;,]+", ".");
+            name = name.replaceAll("\\[", "(");
+            name = name.replaceAll("]", ")");
+            name = name.trim();
 
-			if (name.isEmpty())
-				name = "t" + treeNumber;
+            if (name.isEmpty())
+                name = "t" + treeNumber;
 
-			np.matchIgnoreCase("=");
-			np.popComments(); // clears comments
+            np.matchIgnoreCase("=");
+            np.popComments(); // clears comments
 
-			final StringBuilder buf = new StringBuilder();
+            final StringBuilder buf = new StringBuilder();
 
-			{
-				var squareBracketsComments = np.isSquareBracketsSurroundComments();
-				np.setSquareBracketsSurroundComments(false);
-				try {
-					final var tokensToCome = np.getTokensRespectCase(null, ";");
-					for (var s : tokensToCome) {
-						buf.append(s);
-					}
-				} finally {
-					np.setSquareBracketsSurroundComments(squareBracketsComments);
-				}
-			}
+            {
+                var squareBracketsComments = np.isSquareBracketsSurroundComments();
+                np.setSquareBracketsSurroundComments(false);
+                try {
+                    final var tokensToCome = np.getTokensRespectCase(null, ";");
+                    for (var s : tokensToCome) {
+                        buf.append(s);
+                    }
+                } finally {
+                    np.setSquareBracketsSurroundComments(squareBracketsComments);
+                }
+            }
 
-			final boolean isRooted; // In SplitsTree6 we ignore this because trees are now always rooted
-			if (rootedExplicitySet) {
-			} else {
-				String comment = np.popComments();
-			}
+            final boolean isRooted; // In SplitsTree6 we ignore this because trees are now always rooted
+            if (rootedExplicitySet) {
+            } else {
+                String comment = np.popComments();
+            }
 
-			// final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);
-			final var tree = new PhyloTree();
+            // final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);
+            final var tree = new PhyloTree();
 
 
-			{
-				var newickString = buf.toString();
-				newickIO.parseBracketNotation(tree, newickString.endsWith(";") ? newickString : newickString + ";", true);
-			}
+            {
+                var newickString = buf.toString();
+                newickIO.parseBracketNotation(tree, newickString.endsWith(";") ? newickString : newickString + ";", true);
+            }
 
-			if (translator != null)
-				tree.changeLabels(translator, true);
+            for (var v : tree.nodes()) {
+                System.out.print("Node " + v.getId());
 
-			var taxonCount = 0;
-			for (var v : tree.nodes()) {
-				final var label = tree.getLabel(v);
-				if (label != null && !label.isBlank()) {
-					if (NumberUtils.isDouble(label)) {
-						if (v.isLeaf())
-							throw new IOExceptionWithLineNumber(np.lineno(), "Leaf labels must not be numbers");
-						else
-							continue;
-					}
-					if (!knownTaxonNames.contains(label)) {
-						if (haveSetKnownTaxonNames) {
-							System.err.println("Tree '" + name + "' contains unknown taxon: " + label);
-						} else {
-							knownTaxonNames.add(label);
-							taxonNamesFound.add(label);
-							taxName2Id.put(label, taxonNamesFound.size());
-							tree.addTaxon(v, taxName2Id.get(label));
-							taxonCount++;
-						}
-					} else {
-						tree.addTaxon(v, taxName2Id.get(label));
-						taxonCount++;
-					}
-					//System.err.println(v+" -> "+label+" -> "+Basic.toString(tree.getTaxa(v)," "));
-				}
-			}
-			tree.setName(name);
-			treesBlock.getTrees().add(tree);
-			treeNumber++;
-			if (!treesBlock.isPartial() && (taxonCount < taxName2Id.size() || (taxaBlock.getNtax() > 0 && taxonCount < taxaBlock.getNtax()))) {
-				treesBlock.setPartial(true);
-			}
-		}
+                var label = tree.getLabel(v);
+                if (label != null)
+                    System.out.print(" label=" + label);
 
-		np.matchEndBlock();
-		return taxonNamesFound;
-	}
+                var obj = tree.getData(v);
+                if (obj instanceof CommentData data)
+                    System.out.print(" comment=" + data);
+
+                System.out.println();
+            }
+
+            if (translator != null)
+                tree.changeLabels(translator, true);
+
+            var taxonCount = 0;
+            for (var v : tree.nodes()) {
+                final var label = tree.getLabel(v);
+                if (label != null && !label.isBlank()) {
+                    if (NumberUtils.isDouble(label)) {
+                        if (v.isLeaf())
+                            throw new IOExceptionWithLineNumber(np.lineno(), "Leaf labels must not be numbers");
+                        else
+                            continue;
+                    }
+                    if (!knownTaxonNames.contains(label)) {
+                        if (haveSetKnownTaxonNames) {
+                            System.err.println("Tree '" + name + "' contains unknown taxon: " + label);
+                        } else {
+                            knownTaxonNames.add(label);
+                            taxonNamesFound.add(label);
+                            taxName2Id.put(label, taxonNamesFound.size());
+                            tree.addTaxon(v, taxName2Id.get(label));
+                            taxonCount++;
+                        }
+                    } else {
+                        tree.addTaxon(v, taxName2Id.get(label));
+                        taxonCount++;
+                    }
+                    //System.err.println(v+" -> "+label+" -> "+Basic.toString(tree.getTaxa(v)," "));
+                }
+            }
+            tree.setName(name);
+            treesBlock.getTrees().add(tree);
+            treeNumber++;
+            if (!treesBlock.isPartial() && (taxonCount < taxName2Id.size() || (taxaBlock.getNtax() > 0 && taxonCount < taxaBlock.getNtax()))) {
+                treesBlock.setPartial(true);
+            }
+        }
+
+        np.matchEndBlock();
+        return taxonNamesFound;
+    }
 }

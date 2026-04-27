@@ -29,7 +29,7 @@ module splitstreesix {
 	// requires razornet;
 	requires reactfx;
 
-	opens splitstree6.resources.icons;
+    opens splitstree6.resources.icons;
 
 	opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
@@ -238,5 +238,6 @@ module splitstreesix {
 	exports splitstree6.tools.server;
 	exports splitstree6.view.trees.tanglegram;
 
+    exports splitstree6.xtra.phyloFusionTreeTrace;
 	opens razornetaccess;
 }

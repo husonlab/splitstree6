@@ -71,6 +71,7 @@ import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.main.SplitsTree6;
 import splitstree6.workflow.Algorithm;
+import splitstree6.xtra.phyloFusionTreeTrace.PhyloFusionTreeTrace;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -141,7 +142,8 @@ public class AlgorithmList {
 
 		add(algorithms, names, new AutumnAlgorithm());
 		add(algorithms, names, new PhyloFusion());
-
+		add(algorithms, names, new PhyloFusionTreeTrace());
+		//add(algorithms, names, new ALTSNetwork());
 		add(algorithms, names, new ALTSExternal());
 
 		add(algorithms, names, new AverageConsensus());

@@ -37,6 +37,7 @@ public class TreesBlock extends DataBlock {
 	private boolean partial = false; // are partial trees present?
 	private boolean rooted = false; // are the trees explicitly rooted?
 	private boolean reticulated = false;
+    private boolean hasTreeMemberships = false;
 
 	private TreesFormat format = new TreesFormat();
 
@@ -59,6 +60,7 @@ public class TreesBlock extends DataBlock {
 		partial = that.isPartial();
 		rooted = that.isRooted();
 		reticulated = that.isReticulated();
+        hasTreeMemberships = that.hasTreeMemberships();
 		format = new TreesFormat();
 	}
 
@@ -99,8 +101,12 @@ public class TreesBlock extends DataBlock {
 		this.reticulated = reticulated;
 	}
 
+    public boolean hasTreeMemberships() { return hasTreeMemberships; }
+    public void setTreeMemberships(boolean hasTreeMemberships) { this.hasTreeMemberships = hasTreeMemberships; }
 
-	/**
+
+
+    /**
 	 * get t-th tree
 	 *
 	 * @param t index, 1-based
