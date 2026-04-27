@@ -266,7 +266,7 @@ public class GenomeContext {
 									w.write(all.get(i).getFirst());
 									double[] array = matrix[i];
 									for (var j = 0; j < matrix.length; j++) {
-										w.write(StringUtils.removeTrailingZerosAfterDot("\t%.8f", array[j]));
+										w.write(StringUtils.trim("\t%.8f", array[j]));
 									}
 									w.write("\n");
 								}

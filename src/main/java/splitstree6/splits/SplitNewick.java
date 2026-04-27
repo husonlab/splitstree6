@@ -442,11 +442,11 @@ public class SplitNewick {
 									appendAfterTaxon[t].append("|%d>".formatted(splitNumber));
 								} else if (!includeConfidences)
 									appendAfterTaxon[t].append("|%d:%s>".formatted(splitNumber,
-											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
+											StringUtils.trim("%.8f", split.getWeight())));
 								else
 									appendAfterTaxon[t].append("|%d:%s:%s>".formatted(splitNumber,
-											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight()),
-											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getConfidence())));
+											StringUtils.trim("%.8f", split.getWeight()),
+											StringUtils.trim("%.8f", split.getConfidence())));
 							}
 						} else {
 							if (inside) {
@@ -489,7 +489,7 @@ public class SplitNewick {
 						var lines = new TreeSet<String>();
 						for (var split : splits) {
 							if (!backSplits.contains(split) && split.getWeight() > 0)
-								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
+								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.trim("%.8f", split.getWeight())));
 						}
 						if (!lines.isEmpty()) {
 							System.err.println("In input, not in output: " + lines.size());
@@ -500,7 +500,7 @@ public class SplitNewick {
 						var lines = new TreeSet<String>();
 						for (var split : backSplits) {
 							if (!splits.contains(split) && split.getWeight() > 0)
-								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
+								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.trim("%.8f", split.getWeight())));
 						}
 						if (!lines.isEmpty()) {
 							System.err.println("In output, not in input: " + lines.size());

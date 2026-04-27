@@ -123,7 +123,7 @@ public class BasicPieChart extends Pane {
 				arc.setUserData(name);
 				angle += delta;
 				getChildren().add(arc);
-				buf.append("%s: %s%n".formatted(name, StringUtils.removeTrailingZerosAfterDot("%.1f", value)));
+				buf.append("%s: %s%n".formatted(name, StringUtils.trim("%.1f", value)));
 				arc.setOnMouseClicked(e -> {
 					if (getClickOnLabel() != null) {
 						getClickOnLabel().accept(e, name);

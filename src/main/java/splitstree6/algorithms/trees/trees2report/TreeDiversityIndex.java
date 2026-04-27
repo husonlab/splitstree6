@@ -111,7 +111,7 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 			var total = tree.edgeStream().mapToDouble(e -> Math.max(0, tree.getWeight(e))).sum();
 			var totalRounded = NumberUtils.roundSigFig(total, 5);
 
-			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.removeTrailingZerosAfterDot(totalRounded)));
+			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.trim(totalRounded)));
 
 			try (var map = computeFairProportions(tree)) {
 				var entries = new ArrayList<>(map.entrySet());
@@ -120,7 +120,7 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 					var t = tree.getTaxon(entry.getKey());
 					if (selectedTaxa.cardinality() == 0 || selectedTaxa.get(t)) {
 						var valueRounded = NumberUtils.roundSigFig(entry.getValue(), 5);
-						buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(t).getName(), StringUtils.removeTrailingZerosAfterDot(valueRounded), 100.0 * entry.getValue() / total));
+						buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(t).getName(), StringUtils.trim(valueRounded), 100.0 * entry.getValue() / total));
 					}
 				}
 			}
@@ -169,7 +169,7 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 			var total = tree.edgeStream().mapToDouble(e -> Math.max(0, tree.getWeight(e))).sum();
 			var totalRounded = NumberUtils.roundSigFig(total, 5);
 
-			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.removeTrailingZerosAfterDot(totalRounded)));
+			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.trim(totalRounded)));
 			var map = computeEqualSplits(tree);
 			var entries = new ArrayList<>(map.entrySet());
 			entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue())); // by decreasing value
@@ -178,7 +178,7 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 				var t = tree.getTaxon(entry.getKey());
 				if (selectedTaxa.cardinality() == 0 || selectedTaxa.get(t)) {
 					var valueRounded = NumberUtils.roundSigFig(entry.getValue(), 5);
-					buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(t).getName(), StringUtils.removeTrailingZerosAfterDot(valueRounded), 100 * entry.getValue() / total));
+					buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(t).getName(), StringUtils.trim(valueRounded), 100 * entry.getValue() / total));
 				}
 			}
 			progress.incrementProgress();

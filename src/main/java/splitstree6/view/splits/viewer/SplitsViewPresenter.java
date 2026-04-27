@@ -214,7 +214,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			var currentValue = 100.0 / (controller.getScaleBar().getUnitLengthX() * view.getOptionZoomFactor());
 
 			if (ProgramProperties.isDesktop()) {
-				var dialog = new TextInputDialog(StringUtils.removeTrailingZerosAfterDot(currentValue));
+				var dialog = new TextInputDialog(StringUtils.trim(currentValue));
 				dialog.setTitle("Set Scale Ratio - SplitsTree App");
 				dialog.setHeaderText("Define the length representation per 100 pixels");
 				dialog.setContentText("Length per 100 pixels:");
@@ -234,7 +234,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			} else {
 				var overlayPane = controller.getInnerAnchorPane();
 				var prompt = new InlineTextPrompt("Enter the length represented by 100 pixels:",
-						StringUtils.removeTrailingZerosAfterDot(currentValue));
+						StringUtils.trim(currentValue));
 				AnchorPane.setTopAnchor(prompt, 100.0);
 				AnchorPane.setLeftAnchor(prompt, 100.0);
 

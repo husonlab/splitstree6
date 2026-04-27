@@ -159,8 +159,8 @@ public class NetworkLayout {
 					labeledNode.setTranslateX(point.getX());
 					labeledNode.setTranslateY(point.getY());
 					if (!networkBlock.getNode2data().containsKey(v)) {
-						networkBlock.getNodeData(v).put("x", StringUtils.removeTrailingZerosAfterDot("%.4f", point.getX()));
-						networkBlock.getNodeData(v).put("y", StringUtils.removeTrailingZerosAfterDot("%.4f", point.getY()));
+						networkBlock.getNodeData(v).put("x", StringUtils.trim("%.4f", point.getX()));
+						networkBlock.getNodeData(v).put("y", StringUtils.trim("%.4f", point.getY()));
 					}
 
 					if (graph.hasTaxa(v))

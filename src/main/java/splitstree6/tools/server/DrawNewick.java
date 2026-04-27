@@ -81,7 +81,7 @@ public class DrawNewick {
 		}
 		for (var e : graph.edges()) {
 			buf.append("%d\t%d\t%d\t%s\t%d%n".formatted(e.getId(), e.getSource().getId(), e.getTarget().getId(),
-					StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e)), graph.getSplit(e)));
+					StringUtils.trim("%.8f", graph.getWeight(e)), graph.getSplit(e)));
 		}
 		return buf.toString();
 	}
@@ -152,7 +152,7 @@ public class DrawNewick {
 			}
 			for (var e : tree.edges()) {
 				buf.append("%d\t%d\t%d\t\t%s%n".formatted(e.getId(), e.getSource().getId(), e.getTarget().getId(),
-						StringUtils.removeTrailingZerosAfterDot("%.8f", tree.getWeight(e))));
+						StringUtils.trim("%.8f", tree.getWeight(e))));
 			}
 			return buf.toString();
 	}

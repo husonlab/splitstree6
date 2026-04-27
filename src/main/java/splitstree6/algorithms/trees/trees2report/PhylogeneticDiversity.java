@@ -93,9 +93,9 @@ public class PhylogeneticDiversity extends Trees2ReportBase {
 						.mapToDouble(tree::getWeight).sum();
 			}
 			var totalRounded = NumberUtils.roundSigFig(total, 5);
-			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.removeTrailingZerosAfterDot(totalRounded)));
+			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.trim(totalRounded)));
 			var diversityRounded = NumberUtils.roundSigFig(diversity, 5);
-			buf.append("%s Phylogenetic Diversity = %s (%.1f%%)%n".formatted(rooted ? "Rooted" : "Unrooted", StringUtils.removeTrailingZerosAfterDot(diversityRounded), 100.0 * (diversity / total)));
+			buf.append("%s Phylogenetic Diversity = %s (%.1f%%)%n".formatted(rooted ? "Rooted" : "Unrooted", StringUtils.trim(diversityRounded), 100.0 * (diversity / total)));
 			progress.incrementProgress();
 		}
 		buf.append("Computed on %d (of %d) selected taxa:%n".formatted(selectedTaxa.cardinality(), taxaBlock.getNtax()));

@@ -35,7 +35,7 @@ import java.io.IOException;
  * allowing two different transition rates (A↔G vs C↔T),
  * a single transversion rate (purine↔pyrimidine),
  * and unequal base frequencies (π_A, π_C, π_G, π_T)
- * Daniel Huson, 9.2025, using ChatGPT5
+ * Daniel Huson, 9.2025, using ChatGPT5, 4.2026 corrected using Claude OPus 4.7
  */
 public class TN93Distance extends Characters2Distances {
 	@Override
@@ -67,47 +67,27 @@ public class TN93Distance extends Characters2Distances {
 		if (s1.length() != s2.length())
 			throw new IllegalArgumentException("Sequences must have the same length (aligned).");
 
-		// counts for base frequencies per sequence on usable sites
-		int a1 = 0, c1 = 0, g1 = 0, t1 = 0, a2 = 0, c2 = 0, g2 = 0, t2 = 0;
+		int a1 = 0, c1 = 0, g1 = 0, t1 = 0;
+		int a2 = 0, c2 = 0, g2 = 0, t2 = 0;
+		int ag = 0, ct = 0, tv = 0;
+		int compatibleSites = 0;
 
-		// mismatch category counts
-		int ag = 0, ct = 0, tv = 0;  // P1 = ag/L, P2 = ct/L, Q = tv/L
-		var compatibleSites = 0;             // number of comparable sites
+		for (int i = 0; i < s1.length(); i++) {
+			char x = Character.toUpperCase(s1.charAt(i));
+			char y = Character.toUpperCase(s2.charAt(i));
+			if (!isACGT(x) || !isACGT(y)) continue;
 
-		for (var i = 0; i < s1.length(); i++) {
-			var x = Character.toUpperCase(s1.charAt(i));
-			var y = Character.toUpperCase(s2.charAt(i));
-
-			if (!isACGT(x) || !isACGT(y)) continue; // pairwise deletion
-
-			// tally base freqs
 			switch (x) {
-				case 'A':
-					a1++;
-					break;
-				case 'C':
-					c1++;
-					break;
-				case 'G':
-					g1++;
-					break;
-				case 'T':
-					t1++;
-					break;
+				case 'A' -> a1++;
+				case 'C' -> c1++;
+				case 'G' -> g1++;
+				case 'T' -> t1++;
 			}
 			switch (y) {
-				case 'A':
-					a2++;
-					break;
-				case 'C':
-					c2++;
-					break;
-				case 'G':
-					g2++;
-					break;
-				case 'T':
-					t2++;
-					break;
+				case 'A' -> a2++;
+				case 'C' -> c2++;
+				case 'G' -> g2++;
+				case 'T' -> t2++;
 			}
 
 			if (x != y) {
@@ -118,37 +98,36 @@ public class TN93Distance extends Characters2Distances {
 			compatibleSites++;
 		}
 
-		if (compatibleSites == 0) return Double.NaN; // nothing comparable
+		if (compatibleSites == 0) return Double.NaN;
 
-		// average base frequencies over the two sequences
-		var piA = (a1 + a2) / (2.0 * compatibleSites);
-		var piC = (c1 + c2) / (2.0 * compatibleSites);
-		var piG = (g1 + g2) / (2.0 * compatibleSites);
-		var piT = (t1 + t2) / (2.0 * compatibleSites);
+		double piA = (a1 + a2) / (2.0 * compatibleSites);
+		double piC = (c1 + c2) / (2.0 * compatibleSites);
+		double piG = (g1 + g2) / (2.0 * compatibleSites);
+		double piT = (t1 + t2) / (2.0 * compatibleSites);
+		double piR = piA + piG;
+		double piY = piC + piT;
 
-		var piR = piA + piG;
-		var piY = piC + piT;
+		if (piA == 0 || piC == 0 || piG == 0 || piT == 0 || piR == 0 || piY == 0)
+			return Double.NaN;
 
-		// proportions
-		var P1 = ag / (double) compatibleSites;  // A<->G transitions
-		var P2 = ct / (double) compatibleSites;  // C<->T transitions
-		var Q = tv / (double) compatibleSites;  // transversions
+		double P1 = ag / (double) compatibleSites;
+		double P2 = ct / (double) compatibleSites;
+		double Q = tv / (double) compatibleSites;
 
-		// guard against zero frequencies that would break the formula
-		if (piA == 0 || piG == 0 || piC == 0 || piT == 0 || piR == 0 || piY == 0)
-			return -1.0;
+		// Standard TN93 (Tamura & Nei 1993)
+		double w1 = 1.0 - piR * P1 / (2.0 * piA * piG) - Q / (2.0 * piR);
+		double w2 = 1.0 - piY * P2 / (2.0 * piC * piT) - Q / (2.0 * piY);
+		double w3 = 1.0 - Q / (2.0 * piR * piY);
 
-		// compute the three log terms
-		var term1 = 1.0 - (P1 / (piA * piG)) - (Q / (2.0 * piR));
-		var term2 = 1.0 - (P2 / (piC * piT)) - (Q / (2.0 * piY));
-		var term3 = 1.0 - 2.0 * Q;
+		if (w1 <= 0 || w2 <= 0 || w3 <= 0) return Double.NaN;
 
-		// if divergence is too high, these can go <= 0
-		if (term1 <= 0 || term2 <= 0 || term3 <= 0) return Double.NaN;
+		double k1 = 2.0 * piA * piG / piR;
+		double k2 = 2.0 * piC * piT / piY;
+		double k3 = 2.0 * (piR * piY
+						   - piA * piG * piY / piR
+						   - piC * piT * piR / piY);
 
-		return -(piA * piG / piR) * Math.log(term1)
-			   - (piC * piT / piY) * Math.log(term2)
-			   - 0.5 * Math.log(term3);
+		return -k1 * Math.log(w1) - k2 * Math.log(w2) - k3 * Math.log(w3);
 	}
 
 	private static boolean isACGT(char b) {
@@ -177,6 +156,4 @@ public class TN93Distance extends Characters2Distances {
 	public String getShortDescription() {
 		return "Calculates distances under the Tamura & Nei 1993 model.";
 	}
-
-
 }

@@ -231,7 +231,7 @@ public class SitesFormat extends Group {
 					if (sitesStyle == SitesStyle.Counts) {
 						text = String.valueOf(Math.round(networkBlock.getGraph().getWeight(e)));
 					} else {
-						text = StringUtils.removeTrailingZerosAfterDot(networkBlock.getGraph().getWeight(e));
+						text = StringUtils.trim(networkBlock.getGraph().getWeight(e));
 					}
 
 					var label = new CopyableLabel(text);

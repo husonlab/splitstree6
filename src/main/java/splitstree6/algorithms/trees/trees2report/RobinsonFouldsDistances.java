@@ -76,7 +76,7 @@ public class RobinsonFouldsDistances extends Trees2ReportBase {
 					symm /= (IteratorUtils.size(SetUtils.union(splitsList.get(i), splitsList.get(j))) - taxaBlock.getNtax());
 				}
 				buf.append("D(%s,%s) = %s%n".formatted(treesBlock.getTree(i + 1).getName(), treesBlock.getTree(j + 1).getName(),
-						StringUtils.removeTrailingZerosAfterDot(symm)));
+						StringUtils.trim(symm)));
 			}
 		}
 		return buf.toString();

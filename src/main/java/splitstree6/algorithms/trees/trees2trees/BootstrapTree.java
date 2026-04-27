@@ -257,7 +257,7 @@ public class BootstrapTree extends Trees2Trees {
 				} else if (PhyloTree.SUPPORT_RICH_NEWICK) {
 					tree.setConfidence(e, Double.parseDouble("%.1f".formatted(value)));
 				} else {
-					tree.setLabel(v, StringUtils.removeTrailingZerosAfterDot("%.1f", value));
+					tree.setLabel(v, StringUtils.trim("%.1f", value));
 				}
 			}
 		}

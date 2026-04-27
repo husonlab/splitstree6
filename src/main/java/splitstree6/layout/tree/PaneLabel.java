@@ -87,7 +87,7 @@ public enum PaneLabel {
 	public static void setLabel(SplitsBlock splits, PaneLabel paneLabel, TextInputControl label) {
 		String text;
 		if (splits != null && paneLabel.showScaleBar() && splits.getFit() > 0.0) {
-			text = "Fit: " + StringUtils.removeTrailingZerosAfterDot("%.1f", splits.getFit());
+			text = "Fit: " + StringUtils.trim("%.1f", splits.getFit());
 		} else
 			text = "   ";
 		label.setText(text);

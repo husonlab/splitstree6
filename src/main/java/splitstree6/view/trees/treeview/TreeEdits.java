@@ -129,7 +129,7 @@ public class TreeEdits {
 
 		public String toString() {
 			if (NumberUtils.isDouble(parameter))
-				return String.format("%c:%d:%s", code, edgeId, StringUtils.removeTrailingZerosAfterDot("%.2f", NumberUtils.parseDouble(parameter)));
+				return String.format("%c:%d:%s", code, edgeId, StringUtils.trim("%.2f", NumberUtils.parseDouble(parameter)));
 			else
 				return String.format("%c:%d:%s", code, edgeId, parameter);
 		}

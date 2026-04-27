@@ -19,6 +19,7 @@
 
 package splitstree6.io.writers.view;
 
+import jloda.fx.util.ProgramProperties;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.io.GraphGML;
@@ -56,17 +57,17 @@ public class GMLWriter extends ViewWriterBase {
 				BiFunction<String, Node, String> labelNodeValue = (label, v) ->
 						switch (label) {
 							case "label" -> (graph.hasTaxa(v) ? taxaBlock.getLabel(graph.getTaxon(v)) : null);
-							case "x" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getX());
-							case "y" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getY());
+							case "x" -> StringUtils.trim("%.4f", nodePointMap.get(v).getX());
+							case "y" -> StringUtils.trim("%.4f", nodePointMap.get(v).getY());
 							default -> null;
 						};
 				var labelEdges = List.of("split", "weight");
 				BiFunction<String, Edge, String> labelEdgeValue = (label, e) -> switch (label) {
 					case "split" -> String.valueOf(graph.getSplit(e));
-					case "weight" -> StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e));
+					case "weight" -> StringUtils.trim("%.8f", graph.getWeight(e));
 					default -> null;
 				};
-				var comment = "Exported from SplitsTree: %,d nodes, %,d edges, %,d splits".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges(), splitsView.getSplitsBlock().getNsplits());
+				var comment = "Exported from %s: %,d nodes, %,d edges, %,d splits".formatted(ProgramProperties.getProgramName(), graph.getNumberOfNodes(), graph.getNumberOfEdges(), splitsView.getSplitsBlock().getNsplits());
 				var graphLabel = (graph.getName() != null ? graph.getName() : splitsView.getName());
 				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
 						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
@@ -88,10 +89,8 @@ public class GMLWriter extends ViewWriterBase {
 						switch (label) {
 							case "label" ->
 									nodeShapeMap.get(v).getLabel() != null ? nodeShapeMap.get(v).getLabel().getRawText() : null;
-							case "x" ->
-									StringUtils.removeTrailingZerosAfterDot("%.4f", nodeShapeMap.get(v).getTranslateX());
-							case "y" ->
-									StringUtils.removeTrailingZerosAfterDot("%.4f", nodeShapeMap.get(v).getTranslateY());
+							case "x" -> StringUtils.trim("%.4f", nodeShapeMap.get(v).getTranslateX());
+							case "y" -> StringUtils.trim("%.4f", nodeShapeMap.get(v).getTranslateY());
 							default -> networkBlock.getNodeData(v).get(label);
 						};
 				var labelEdges = new TreeSet<String>();
@@ -102,10 +101,10 @@ public class GMLWriter extends ViewWriterBase {
 				labelEdges.add("weight");
 				BiFunction<String, Edge, String> labelEdgeValue = (label, e) ->
 						switch (label) {
-							case "weight" -> StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e));
+							case "weight" -> StringUtils.trim("%.8f", graph.getWeight(e));
 							default -> networkView.getNetworkBlock().getEdgeData(e).get(label);
 						};
-				var comment = "Exported from SplitsTree: %,d nodes, %,d edges,".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges());
+				var comment = "Exported from %s: %,d nodes, %,d edges,".formatted(ProgramProperties.getProgramName(), graph.getNumberOfNodes(), graph.getNumberOfEdges());
 				var graphLabel = (graph.getName() != null ? graph.getName() : networkView.getName());
 				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
 						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);

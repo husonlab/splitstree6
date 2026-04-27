@@ -65,31 +65,29 @@ public class InputOutput {
 						case "size" -> {
 							var buf = new StringBuilder();
 							if (shape instanceof Rectangle rectangle) {
-								buf.append(StringUtils.removeTrailingZerosAfterDot("%.1f", rectangle.getWidth()));
+								buf.append(StringUtils.trim("%.1f", rectangle.getWidth()));
 								buf.append(",");
-								buf.append(StringUtils.removeTrailingZerosAfterDot("%.1f", rectangle.getHeight()));
+								buf.append(StringUtils.trim("%.1f", rectangle.getHeight()));
 							} else if (shape instanceof Circle circle) {
-								buf.append(StringUtils.removeTrailingZerosAfterDot("%.1f", circle.getRadius()));
+								buf.append(StringUtils.trim("%.1f", circle.getRadius()));
 							} else {
-								buf.append(StringUtils.removeTrailingZerosAfterDot("%.1f", shape.getBoundsInLocal().getWidth()));
+								buf.append(StringUtils.trim("%.1f", shape.getBoundsInLocal().getWidth()));
 								buf.append(",");
-								buf.append(StringUtils.removeTrailingZerosAfterDot("%.1f", shape.getBoundsInLocal().getHeight()));
+								buf.append(StringUtils.trim("%.1f", shape.getBoundsInLocal().getHeight()));
 							}
 							yield buf.toString();
 						}
 						case "fill" -> (shape.getFill() != null
 										&& !(!MainWindowManager.isUseDarkTheme() && shape.getFill() == Color.BLACK)
 										&& !(MainWindowManager.isUseDarkTheme() && shape.getFill() == Color.WHITE)) ? shape.getFill() : "";
-						case "x" -> StringUtils.removeTrailingZerosAfterDot("%.1f", shape.getTranslateX());
-						case "y" -> StringUtils.removeTrailingZerosAfterDot("%.1f", shape.getTranslateY());
+						case "x" -> StringUtils.trim("%.1f", shape.getTranslateX());
+						case "y" -> StringUtils.trim("%.1f", shape.getTranslateY());
 						case "label" -> network.getLabel(v) != null ? network.getLabel(v) : "";
 						case "label_stroke" -> (label != null && label.getTextFill() != null
 												&& !(!MainWindowManager.isUseDarkTheme() && label.getTextFill() == Color.BLACK)
 												&& !(MainWindowManager.isUseDarkTheme() && label.getTextFill() == Color.WHITE)) ? label.getTextFill() : "";
-						case "label_dx" ->
-								label != null ? StringUtils.removeTrailingZerosAfterDot("%.1f", label.getLayoutX()) : "";
-						case "label_dy" ->
-								label != null ? StringUtils.removeTrailingZerosAfterDot("%.1f", label.getLayoutY()) : "";
+						case "label_dx" -> label != null ? StringUtils.trim("%.1f", label.getLayoutX()) : "";
+						case "label_dy" -> label != null ? StringUtils.trim("%.1f", label.getLayoutY()) : "";
 						default -> "";
 					});
 					return (value.isBlank() ? null : value);
@@ -230,9 +228,9 @@ public class InputOutput {
 			var point = DrawUtils.getCoordinates(item);
 			if (!buf.isEmpty())
 				buf.append(",");
-			buf.append(StringUtils.removeTrailingZerosAfterDot("%.1f", point.getX()));
+			buf.append(StringUtils.trim("%.1f", point.getX()));
 			buf.append(",");
-			buf.append(StringUtils.removeTrailingZerosAfterDot("%.1f", point.getY()));
+			buf.append(StringUtils.trim("%.1f", point.getY()));
 		}
 		return buf.toString();
 	}

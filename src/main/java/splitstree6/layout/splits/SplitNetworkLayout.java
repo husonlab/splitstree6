@@ -342,7 +342,7 @@ public class SplitNetworkLayout {
 						var label = splitLabelMap.get(id);
 						label.setVisible(true);
 						var weight = splitsBlock.get(id).getWeight();
-						label.setText(StringUtils.removeTrailingZerosAfterDot(weight > 0 ? "%.2f" : "%.6f", splitsBlock.get(id).getWeight()));
+						label.setText(StringUtils.trim(weight > 0 ? "%.2f" : "%.6f", splitsBlock.get(id).getWeight()));
 					}
 				}
 				case Confidence -> {
@@ -351,7 +351,7 @@ public class SplitNetworkLayout {
 						var label = splitLabelMap.get(id);
 						if (id <= splitsBlock.getNsplits() && splitsBlock.get(id).getConfidence() > 0.01 && !splitsWithConfidenceLabels.get(id)) {
 							label.setVisible(true);
-							label.setText(StringUtils.removeTrailingZerosAfterDot("%.6f", splitsBlock.get(id).getConfidence()));
+							label.setText(StringUtils.trim("%.6f", splitsBlock.get(id).getConfidence()));
 						} else
 							label.setVisible(false);
 					}
@@ -362,7 +362,7 @@ public class SplitNetworkLayout {
 						var label = splitLabelMap.get(id);
 						if (id <= splitsBlock.getNsplits() && splitsBlock.get(id).getConfidence() > 0.05 && !splitsWithConfidenceLabels.get(id)) {
 							label.setVisible(true);
-							label.setText(StringUtils.removeTrailingZerosAfterDot("%.1f", 100d * splitsBlock.get(id).getConfidence()));
+							label.setText(StringUtils.trim("%.1f", 100d * splitsBlock.get(id).getConfidence()));
 						} else
 							label.setVisible(false);
 					}

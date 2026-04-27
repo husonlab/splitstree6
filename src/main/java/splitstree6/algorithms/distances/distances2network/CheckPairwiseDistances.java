@@ -58,23 +58,23 @@ public class CheckPairwiseDistances {
 					totalDifference += diff;
 					if (false) {
 						System.err.println("'" + RichTextLabel.getRawText(graph.getLabel(a.getValue())) + "' - '" + RichTextLabel.getRawText(graph.getLabel(b.getValue())) + "': in=%s, out=%s, diff=%s".formatted(
-								StringUtils.removeTrailingZerosAfterDot(inputDistance),
-								StringUtils.removeTrailingZerosAfterDot(outputDistance),
-								StringUtils.removeTrailingZerosAfterDot(diff)));
+								StringUtils.trim(inputDistance),
+								StringUtils.trim(outputDistance),
+								StringUtils.trim(diff)));
 					}
 					differences++;
 				}
 			}
 		}
 
-		System.err.printf("Total input length:  %s output length: %s %n", StringUtils.removeTrailingZerosAfterDot("%.8f", totalInput), StringUtils.removeTrailingZerosAfterDot("%.8f", totalOutput));
+		System.err.printf("Total input length:  %s output length: %s %n", StringUtils.trim("%.8f", totalInput), StringUtils.trim("%.8f", totalOutput));
 		if (differences == 0)
 			System.err.println("All path distances correct");
 		else {
-			System.err.printf("Path distances incorrect, difference: %s%%%n", StringUtils.removeTrailingZerosAfterDot("%.1f", 100 * (totalDifference / totalInput)));
+			System.err.printf("Path distances incorrect, difference: %s%%%n", StringUtils.trim("%.1f", 100 * (totalDifference / totalInput)));
 			// System.err.println("Incorrect path distances: " + differences);
 		}
-		System.err.printf("Total network length: %s%n", StringUtils.removeTrailingZerosAfterDot("%.8f", graph.edgeStream().mapToDouble(graph::getWeight).sum()));
+		System.err.printf("Total network length: %s%n", StringUtils.trim("%.8f", graph.edgeStream().mapToDouble(graph::getWeight).sum()));
 	}
 
 	public static double graphDistance(PhyloGraph graph, Node v, Node w) {

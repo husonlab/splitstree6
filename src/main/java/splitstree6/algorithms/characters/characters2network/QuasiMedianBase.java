@@ -97,7 +97,6 @@ public abstract class QuasiMedianBase {
 
 		computeGraph(progress, condensedInputSet, weights, graph);
 
-
 		final var originalNodes = graph.getNodesAsList();
 		for (var v : originalNodes) {
 			graph.setLabel(v, null);
@@ -126,13 +125,16 @@ public abstract class QuasiMedianBase {
 			}
 		}
 
+		var differences = 0;
 		for (var e : graph.edges()) {
 			if (e.getSource().getInfo() instanceof String conA && e.getTarget().getInfo() instanceof String conB) {
 				var label = computeEdgeLabel(characterLabels, conA, conB, orig2CondensedPos, translator);
 				networkBlock.getEdgeData(e).put(NetworkBlock.EDGE_SITES_KEY, label);
+				differences += countDifferences(conA, conB, orig2CondensedPos, translator);
 			}
 		}
 		networkBlock.setNetworkType(NetworkBlock.Type.HaplotypeNetwork);
+		networkBlock.setInfoString("Total state changes: %,d".formatted(differences));
 	}
 
 	/**
@@ -245,27 +247,18 @@ public abstract class QuasiMedianBase {
 		return buf.toString();
 	}
 
-	/**
-	 * gets the differences in display coordinates 1--length
-	 *
-	 * @return length
-	 */
-	private int[] getDifferences(String conA, String conB, int[] orig2CondensedPos, Translator translator) {
+	private int countDifferences(String conA, String conB, int[] orig2CondensedPos, Translator translator) {
+		var differences = 0;
 		var seqA = expandCondensed(conA, orig2CondensedPos, translator);
 		var seqB = expandCondensed(conB, orig2CondensedPos, translator);
-		var list = new ArrayList<Integer>();
 		for (var i = 0; i < seqA.length(); i++) {
 			if (seqA.charAt(i) != seqB.charAt(i)) {
-				list.add(i + 1);
+				differences++;
 			}
 		}
-		var result = new int[list.size()];
-		var count = 0;
-		for (var value : list) {
-			result[count++] = value;
-		}
-		return result;
+		return differences;
 	}
+
 
 	/**
 	 * invert the orig 2 new mapping
@@ -320,8 +313,6 @@ public abstract class QuasiMedianBase {
 			var conChar = condensed.charAt(conPos);
 			var origChar = translator.get(origPos, conPos, conChar);
 			buf.append(origChar);
-
-
 		}
 		return buf.toString();
 	}

@@ -86,8 +86,8 @@ public class IncompatibilityScore extends Splits2ReportBase {
 					}
 				}
 			}
-			return String.format("%s of %s (%.2f%%)", StringUtils.removeTrailingZerosAfterDot(area),
-					StringUtils.removeTrailingZerosAfterDot(total), area * 100.0 / total);
+			return String.format("%s of %s (%.2f%%)", StringUtils.trim(area),
+					StringUtils.trim(total), area * 100.0 / total);
 		}
 	}
 

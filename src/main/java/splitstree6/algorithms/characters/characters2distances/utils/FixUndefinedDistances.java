@@ -63,7 +63,7 @@ public class FixUndefinedDistances {
 				}
 			}
 			NotificationManager.showWarning("Distance calculation produced " + numUndefined + " saturated or missing entries.\n" +
-											"These have been replaced by the value '" + StringUtils.removeTrailingZerosAfterDot(largeValue) + "'.");
+											"These have been replaced by the value '" + StringUtils.trim(largeValue) + "'.");
 		}
 
 	}

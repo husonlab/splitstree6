@@ -177,7 +177,7 @@ public class MinSpanningNetwork extends Distances2Network {
 			networkBlock.setInfoString("Minimum spanning tree");
 		else
 			networkBlock.setInfoString("Minimum spanning network" + (getOptionEpsilon() > 0 ?
-					", epsilon=" + StringUtils.removeTrailingZerosAfterDot(getOptionEpsilon()) : ""));
+					", epsilon=" + StringUtils.trim(getOptionEpsilon()) : ""));
 	}
 
 	private static String computeEdgeLabel(String sequence1, String sequence2) {

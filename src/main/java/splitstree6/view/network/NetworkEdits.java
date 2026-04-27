@@ -161,7 +161,7 @@ public class NetworkEdits {
 
 	public record Edit(String code, int id, String parameter) {
 		public static Edit createEdgeWidthEdit(int id, double strokeWidth) {
-			return new Edit("ew", id, StringUtils.removeTrailingZerosAfterDot("%.1f", strokeWidth));
+			return new Edit("ew", id, StringUtils.trim("%.1f", strokeWidth));
 		}
 
 		public static Edit createEdgeStrokeEdit(int id, Color color) {
@@ -169,13 +169,13 @@ public class NetworkEdits {
 		}
 
 		public static Edit createTranslateNodeEdit(int id, double translateX, double translateY) {
-			return new Edit("mn", id, "%s,%s".formatted(StringUtils.removeTrailingZerosAfterDot("%.2f", translateX),
-					StringUtils.removeTrailingZerosAfterDot("%.2f", translateY)));
+			return new Edit("mn", id, "%s,%s".formatted(StringUtils.trim("%.2f", translateX),
+					StringUtils.trim("%.2f", translateY)));
 		}
 
 		public static Edit createLayoutNodeLabelEdit(int id, double layoutX, double layoutY) {
-			return new Edit("ml", id, "%s,%s".formatted(StringUtils.removeTrailingZerosAfterDot("%.2f", layoutX),
-					StringUtils.removeTrailingZerosAfterDot("%.2f", layoutY)));
+			return new Edit("ml", id, "%s,%s".formatted(StringUtils.trim("%.2f", layoutX),
+					StringUtils.trim("%.2f", layoutY)));
 		}
 
 		public static Edit parse(String editString) {

@@ -98,7 +98,7 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 					w.write("\n\t");
 					count = 0;
 				}
-				var string = " [%d] %s".formatted(i + 1, StringUtils.removeTrailingZerosAfterDot(value));
+				var string = " [%d] %s".formatted(i + 1, StringUtils.trim(value));
 				w.write(string);
 				count += string.length();
 			}

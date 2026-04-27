@@ -25,6 +25,7 @@ import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Node;
 import jloda.graph.algorithms.Dijkstra;
 import jloda.util.IteratorUtils;
+import jloda.util.StringUtils;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.NetworkBlock;
@@ -46,7 +47,7 @@ public class AdditionalConsoleOutput {
 		selectedItems.addListener((InvalidationListener) e -> {
 			RunAfterAWhile.applyInFXThread(sync, () -> {
 				if (selectedItems.size() == 2) {
-					if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock distancesBlock) {
+					if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock) {
 						System.err.println(view.getNetworkBlock().getNode().getPreferredParent().getAlgorithm().getName() + ":");
 						var taxaBlock = view.getMainWindow().getWorkingTaxa();
 						var s = taxaBlock.indexOf(IteratorUtils.getFirst(selectedItems));
@@ -191,14 +192,14 @@ public class AdditionalConsoleOutput {
 					}
 					prev = q;
 				}
-				System.err.printf("Input distance %s - %s: %f%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), inputDistance);
-				System.err.printf("Path distance  %s - %s: %f%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), pathDistance);
+				System.err.printf("Input distance %s - %s: %s%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), StringUtils.trim(inputDistance));
+				System.err.printf("Path distance  %s - %s: %s%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), StringUtils.trim(pathDistance));
 
 				diff = pathDistance - inputDistance;
 				if (diff > 0) {
-					System.err.println("Path distance larger:  " + pathDistance + " > " + inputDistance);
+					System.err.println("Path distance larger:  " + StringUtils.trim(pathDistance) + " > " + StringUtils.trim(inputDistance));
 				} else if (diff < 0) {
-					System.err.println("Path distance smaller: " + pathDistance + " < " + inputDistance);
+					System.err.println("Path distance smaller: " + StringUtils.trim(pathDistance) + " < " + StringUtils.trim(inputDistance));
 				}
 			}
 		}

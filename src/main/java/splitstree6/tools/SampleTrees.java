@@ -455,8 +455,8 @@ public class SampleTrees {
 							double timeInSeconds) {
 		public String toString() {
 			return "%s\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%d\t%d\t%.1f%n".formatted(algorithmName, replicate, nTaxa, nTrees,
-					StringUtils.removeTrailingZerosAfterDot(contractedEdges), StringUtils.removeTrailingZerosAfterDot(missingTaxa),
-					StringUtils.removeTrailingZerosAfterDot(requestedSPRs), totalSPRs, h, Math.max(totalSPRs, h), timeInSeconds);
+					StringUtils.trim(contractedEdges), StringUtils.trim(missingTaxa),
+					StringUtils.trim(requestedSPRs), totalSPRs, h, Math.max(totalSPRs, h), timeInSeconds);
 		}
 
 		public static String header() {
@@ -477,8 +477,8 @@ public class SampleTrees {
 			var time = data.stream().mapToDouble(DataPoint::timeInSeconds).average().orElse(0.0);
 
 			return "av\t%s\t%.1f\t%.0f\t%s\t%s\t%s\t%s\t%.1f\t%.1f\t%.1f%n".formatted(algorithmName, nTaxa, nTrees,
-					StringUtils.removeTrailingZerosAfterDot(contractedEdges), StringUtils.removeTrailingZerosAfterDot(missingTaxa),
-					StringUtils.removeTrailingZerosAfterDot(nSPR), StringUtils.removeTrailingZerosAfterDot(totalSPRs), h, max, time);
+					StringUtils.trim(contractedEdges), StringUtils.trim(missingTaxa),
+					StringUtils.trim(nSPR), StringUtils.trim(totalSPRs), h, max, time);
 		}
 	}
 }

@@ -119,7 +119,7 @@ public class ExternalDistance2Network extends Distances2Network { // implements 
 							first = false;
 						else
 							w.write(",");
-						w.write(StringUtils.removeTrailingZerosAfterDot(val));
+						w.write(StringUtils.trim(val));
 					}
 					w.write("\n");
 				}
@@ -182,7 +182,7 @@ public class ExternalDistance2Network extends Distances2Network { // implements 
 		}
 
 		for (var e : graph.edges()) {
-			networkBlock.getEdgeData(e).put("weight", StringUtils.removeTrailingZerosAfterDot(graph.getWeight(e)));
+			networkBlock.getEdgeData(e).put("weight", StringUtils.trim(graph.getWeight(e)));
 		}
 
 		CheckPairwiseDistances.apply(graph, distancesBlock, 0.000001);

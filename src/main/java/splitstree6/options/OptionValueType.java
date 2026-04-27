@@ -152,16 +152,16 @@ public enum OptionValueType {
 			case Integer:
 				return "%d".formatted((Integer) object);
 			case Float:
-				return StringUtils.removeTrailingZerosAfterDot("%.6f", (Float) object);
+				return StringUtils.trim("%.6f", (Float) object);
 			case Double:
-				return StringUtils.removeTrailingZerosAfterDot("%.8f", (Double) object);
+				return StringUtils.trim("%.8f", (Double) object);
 			case intArray: {
 				var buf = new StringBuilder();
 				var array = (int[]) object;
 				for (var value : array) {
 					if (!buf.isEmpty())
 						buf.append(" ");
-					buf.append(StringUtils.removeTrailingZerosAfterDot("%d", value));
+					buf.append(StringUtils.trim("%d", value));
 				}
 				return buf.toString();
 			}
@@ -171,7 +171,7 @@ public enum OptionValueType {
 				for (double value : array) {
 					if (!buf.isEmpty())
 						buf.append(" ");
-					buf.append(StringUtils.removeTrailingZerosAfterDot("%.4f", value));
+					buf.append(StringUtils.trim("%.4f", value));
 				}
 				return buf.toString();
 			}
@@ -182,7 +182,7 @@ public enum OptionValueType {
 					for (var j = 0; j < matrix.length; j++) {
 						if (j > 0)
 							buf.append(" ");
-						buf.append(StringUtils.removeTrailingZerosAfterDot("%.4f", row[j]));
+						buf.append(StringUtils.trim("%.4f", row[j]));
 					}
 					buf.append(" "); // could also put \n here
 				}

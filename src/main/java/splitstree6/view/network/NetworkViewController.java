@@ -33,6 +33,7 @@ import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
+import jloda.fx.util.DraggableUtils;
 import splitstree6.layout.network.DiagramType;
 
 public class NetworkViewController {
@@ -118,13 +119,13 @@ public class NetworkViewController {
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);
 
-		AnchorPane.setTopAnchor(infoLabel, 5.0);
+		AnchorPane.setBottomAnchor(infoLabel, 20.0);
 		AnchorPane.setLeftAnchor(infoLabel, 20.0);
 		innerAnchorPane.getChildren().add(infoLabel);
 		infoLabel.setFont(Font.font(infoLabel.getFont().getFamily(), 16));
 
-		DraggableLabel.makeDraggable(infoLabel);
-		infoLabel.setVisible(false);
+		DraggableUtils.makeDraggableInAnchorPane(infoLabel);
+		infoLabel.visibleProperty().bind(infoLabel.textProperty().isNotEmpty());
 
 		settingsToggleButton.setSelected(false);
 

@@ -64,7 +64,7 @@ public class PhylipWriter extends DistancesWriterBase {
 			for (var i = 1; i <= distances.getDistances().length; i++) {
 				var buf = new StringBuilder();
 				for (int j = 1; j <= distances.getDistances()[i - 1].length; j++) {
-					buf.append(StringUtils.removeTrailingZerosAfterDot("%.5f ", distances.get(i, j)));
+					buf.append(StringUtils.trim("%.9f ", distances.get(i, j)));
 				}
 				w.write(getPhylipTaxonLabel(taxa.getLabel(i), optionTruncateLabels.get()));
 				w.write(buf + "\n");
@@ -74,7 +74,7 @@ public class PhylipWriter extends DistancesWriterBase {
 			for (var i = 1; i <= distances.getDistances().length; i++) {
 				var buf = new StringBuilder();
 				for (var j = 1; j <= i - 1; j++) {
-					buf.append(StringUtils.removeTrailingZerosAfterDot("%.5f ", distances.get(i, j)));
+					buf.append(StringUtils.trim("%.9f ", distances.get(i, j)));
 				}
 				w.write(getPhylipTaxonLabel(taxa.getLabel(i), optionTruncateLabels.get()));
 				w.write(buf + "\n");

@@ -59,10 +59,13 @@ public class PlainTextWriter extends DistancesWriterBase {
 					w.write("\n");
 				}
 				for (var i = 1; i <= ntax; i++) {
+					if (optionLabels.get()) {
+						w.write(taxa.get(i).getName() + "\t");
+					}
 					for (var j = 1; j <= ntax; j++) {
 						if (j > 1)
 							w.write("\t");
-						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))));
+						w.write(StringUtils.trim(String.format("%.8f", distances.get(i, j))));
 					}
 					w.write("\n");
 				}
@@ -75,7 +78,7 @@ public class PlainTextWriter extends DistancesWriterBase {
 						if (optionLabels.get()) {
 							w.write(taxa.get(i).getName() + "\t" + taxa.get(j) + "\t");
 						}
-						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))) + "\n");
+						w.write(StringUtils.trim(String.format("%.8f", distances.get(i, j))) + "\n");
 					}
 				}
 				w.write("\n");
@@ -88,7 +91,7 @@ public class PlainTextWriter extends DistancesWriterBase {
 						if (optionLabels.get()) {
 							w.write(taxa.get(i).getName() + "\t" + taxa.get(j) + "\t");
 						}
-						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))) + "\n");
+						w.write(StringUtils.trim(String.format("%.8f", distances.get(i, j))) + "\n");
 					}
 				}
 				w.write("\n");

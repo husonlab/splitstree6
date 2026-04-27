@@ -116,7 +116,7 @@ public class TraitsNexusOutput extends NexusIOBase implements INexusOutput<Trait
 					if (value == Integer.MAX_VALUE)
 						w.write(format.getOptionMissingCharacter());
 					else if (traitsBlock.isNumerical(tr))
-						w.write(StringUtils.removeTrailingZerosAfterDot(traitsBlock.getTraitValueLabel(t, tr)));
+						w.write(StringUtils.trim(traitsBlock.getTraitValueLabel(t, tr)));
 					else
 						w.write("'" + traitsBlock.getTraitValueLabel(t, tr) + "'");
 

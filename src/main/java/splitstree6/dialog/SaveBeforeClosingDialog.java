@@ -47,6 +47,7 @@ public class SaveBeforeClosingDialog {
 		} else {
 			mainWindow.getStage().toFront();
 			var alert = new Alert(Alert.AlertType.CONFIRMATION);
+			alert.setResizable(false);
 			alert.initOwner(mainWindow.getStage());
 			if (MainWindowManager.isUseDarkTheme()) {
 				alert.getDialogPane().getScene().getWindow().getScene().getStylesheets().add("jloda/resources/css/dark.css");

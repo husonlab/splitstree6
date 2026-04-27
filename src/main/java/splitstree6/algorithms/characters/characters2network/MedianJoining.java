@@ -21,7 +21,6 @@ package splitstree6.algorithms.characters.characters2network;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.NetworkBlock;
@@ -61,8 +60,6 @@ public class MedianJoining extends Characters2Network {
 		var medianJoiningCalculator = new MedianJoiningCalculator();
 		medianJoiningCalculator.setOptionEpsilon(getOptionEpsilon());
 		medianJoiningCalculator.apply(progress, taxaBlock, charactersBlock, networkBlock);
-		networkBlock.setInfoString("Median-joining network" + (getOptionEpsilon() > 0 ?
-				", epsilon=" + StringUtils.removeTrailingZerosAfterDot(getOptionEpsilon()) : ""));
 	}
 
 	/**

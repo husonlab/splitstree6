@@ -184,8 +184,8 @@ public class PCOA extends Distances2Network {
 		progress.incrementProgress();
 
 		networkBlock.setInfoString("PCOA on %,d taxa,  PC-%d (%s%%) vs PC-%d (%s%%)".formatted(taxaBlock.getNtax(),
-				getOptionFirstCoordinate(), StringUtils.removeTrailingZerosAfterDot("%.1f", percentExplained[getOptionFirstCoordinate() - 1]),
-				getOptionSecondCoordinate(), StringUtils.removeTrailingZerosAfterDot("%.1f", percentExplained[getOptionSecondCoordinate() - 1])));
+				getOptionFirstCoordinate(), StringUtils.trim("%.1f", percentExplained[getOptionFirstCoordinate() - 1]),
+				getOptionSecondCoordinate(), StringUtils.trim("%.1f", percentExplained[getOptionSecondCoordinate() - 1])));
 	}
 
 

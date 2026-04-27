@@ -79,7 +79,7 @@ public class TSne extends Distances2Network {
 			case ParallelBarnesHutSne -> new ParallelBHTsne();
 		};
 
-		var perplexity = (getOptionPerplexity() <= 0 ? Double.parseDouble(StringUtils.removeTrailingZerosAfterDot("%.1f", Math.sqrt(taxaBlock.getNtax()))) : getOptionPerplexity());
+		var perplexity = (getOptionPerplexity() <= 0 ? Double.parseDouble(StringUtils.trim("%.1f", Math.sqrt(taxaBlock.getNtax()))) : getOptionPerplexity());
 
 		//    public static TSneConfiguration buildConfig(double[][] xin, int outputDims, int initial_dims, double perplexity, int max_iter, boolean use_pca, double theta, boolean silent, boolean printError) {
 
@@ -98,7 +98,7 @@ public class TSne extends Distances2Network {
 			networkBlock.getNodeData(v).put(NetworkBlock.NodeData.BasicKey.y.name(), String.valueOf(points[t - 1][1]));
 		}
 
-		networkBlock.setInfoString("tSNE on %,d taxa,  perplexity=".formatted(taxaBlock.getNtax()) + StringUtils.removeTrailingZerosAfterDot("%.1f", perplexity));
+		networkBlock.setInfoString("tSNE on %,d taxa,  perplexity=".formatted(taxaBlock.getNtax()) + StringUtils.trim("%.1f", perplexity));
 	}
 
 	public double getOptionPerplexity() {

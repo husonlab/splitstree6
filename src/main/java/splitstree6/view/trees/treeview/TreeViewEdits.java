@@ -150,7 +150,7 @@ public class TreeViewEdits {
 
 		public String toString() {
 			if (NumberUtils.isDouble(parameter))
-				return String.format("%c:%d:%s", code, split, StringUtils.removeTrailingZerosAfterDot("%.2f", NumberUtils.parseDouble(parameter)));
+				return String.format("%c:%d:%s", code, split, StringUtils.trim("%.2f", NumberUtils.parseDouble(parameter)));
 			else
 				return String.format("%c:%d:%s", code, split, parameter);
 		}
