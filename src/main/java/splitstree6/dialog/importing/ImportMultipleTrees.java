@@ -101,7 +101,7 @@ public class ImportMultipleTrees {
 						}
 					}
 				}
-				FileLoader.apply(false, mainWindow, tmpFile.getPath(), ex -> {
+				FileLoader.apply(mainWindow, tmpFile.getPath(), ex -> {
 					NotificationManager.showError("Import trees failed: " + ex);
 				});
 			} catch (IOException ex) {

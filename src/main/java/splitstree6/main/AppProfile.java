@@ -1,5 +1,5 @@
 /*
- * TriangleInequalities.java Copyright (C) 2026 Daniel H. Huson
+ * AppProfile.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -18,28 +18,29 @@
  *
  */
 
-package razornet.utils;
+package splitstree6.main;
 
 /**
- * Dummy triangle-inequality utilities.
- * In the real RazorNet package these would validate/repair a metric.
+ * Static holder for the currently active {@link IAppProfile}.
+ * Host applications call {@link #setProfile(IAppProfile)} once at startup,
+ * before the main window opens. If no profile is set, a default profile
+ * returning "SplitsTree6" is used.
  */
-public final class TriangleInequalities {
+public class AppProfile {
+	private static IAppProfile profile = new DefaultProfile();
 
-	private TriangleInequalities() {
+	public static void setProfile(IAppProfile p) {
+		profile = (p != null) ? p : new DefaultProfile();
 	}
 
-	/**
-	 * Dummy: always returns true.
-	 */
-	public static boolean check(int[][] matrix, boolean verbose) {
-		return true;
+	public static IAppProfile getProfile() {
+		return profile;
 	}
 
-	/**
-	 * Dummy: no-op.
-	 */
-	public static void fix(int[][] matrix) {
-		// no-op
+	private static class DefaultProfile implements IAppProfile {
+		@Override
+		public String getName() {
+			return "SplitsTree6";
+		}
 	}
 }

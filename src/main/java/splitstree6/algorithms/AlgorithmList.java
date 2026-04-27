@@ -19,8 +19,7 @@
 
 package splitstree6.algorithms;
 
-import razornetaccess.RazorHaplotypeNetwork;
-import razornetaccess.RazorNet;
+
 import splitstree6.algorithms.characters.characters2characters.CharactersFilter;
 import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter;
 import splitstree6.algorithms.characters.characters2distances.*;
@@ -73,14 +72,15 @@ import splitstree6.main.SplitsTree6;
 import splitstree6.workflow.Algorithm;
 import splitstree6.xtra.phyloFusionTreeTrace.PhyloFusionTreeTrace;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+
 /**
  * list all algorithms
  * Daniel Huson, 12.2023
  */
 public class AlgorithmList {
+	private static List<AlgorithmProvider> providers;
+
 	/**
 	 * create a list of algorithm options
 	 *
@@ -130,11 +130,6 @@ public class AlgorithmList {
 
 		add(algorithms, names, new MinSpanningNetwork());
 		add(algorithms, names, new ExternalDistance2Network());
-
-		if (splitstree6.main.SplitsTree6.allowRazorNet) {
-			add(algorithms, names, new RazorHaplotypeNetwork());
-			add(algorithms, names, new RazorNet());
-		}
 
 		add(algorithms, names, new MinSpanningTree());
 
@@ -214,6 +209,17 @@ public class AlgorithmList {
 		add(algorithms, names, new LooseAndLacy());
 		add(algorithms, names, new ListOneRSPRTrees());
 
+		// Pluggable algorithms contributed by optional modules on the classpath
+		for (var provider : getProviders()) {
+			for (var algorithm : provider.getAlgorithms()) {
+				add(algorithms, names, algorithm);
+			}
+		}
+
+		var filter = splitstree6.main.AppProfile.getProfile().getAlgorithmFilter();
+		if (filter != null) {
+			algorithms.removeIf(a -> !filter.test(a));
+		}
 
 		return algorithms;
 	}
@@ -224,5 +230,30 @@ public class AlgorithmList {
 			if (names == null || names.isEmpty() || names.contains(aname))
 				algorithms.add(algorithm);
 		}
+	}
+
+	public static List<AlgorithmProvider> getProviders() {
+		if (providers == null) {
+			providers = new ArrayList<>();
+			ServiceLoader.load(AlgorithmProvider.class).forEach(providers::add);
+		}
+		return providers;
+	}
+
+	public static boolean isAvailable(String simpleClassName) {
+		if (list().stream().anyMatch(a -> a.getClass().getSimpleName().equals(simpleClassName)))
+			return true;
+		for (var provider : getProviders()) {
+			if (provider.provides(simpleClassName)) return true;
+		}
+		return false;
+	}
+
+	public static Algorithm create(String simpleClassName, Map<String, String> parameters) {
+		for (var provider : getProviders()) {
+			var a = provider.createAlgorithm(simpleClassName, parameters);
+			if (a != null) return a;
+		}
+		return null;
 	}
 }

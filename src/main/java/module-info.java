@@ -1,4 +1,6 @@
 module splitstreesix {
+	uses splitstree6.algorithms.AlgorithmProvider;
+
 	requires transitive jloda_core;
 	requires transitive jloda_fx;
 	requires jloda_connect;
@@ -29,7 +31,7 @@ module splitstreesix {
 	// requires razornet;
 	requires reactfx;
 
-    opens splitstree6.resources.icons;
+	opens splitstree6.resources.icons;
 
 	opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
@@ -45,6 +47,8 @@ module splitstreesix {
 	opens splitstree6.algorithms.characters.characters2report;
 
 	exports splitstree6.view.format.edgelabel;
+
+	exports splitstree6.algorithms;
 
 	opens splitstree6.algorithms.genomes.genomes2genomes;
 	opens splitstree6.algorithms.genomes.genome2distances;
@@ -237,7 +241,9 @@ module splitstreesix {
 	opens splitstree6.tools.server;
 	exports splitstree6.tools.server;
 	exports splitstree6.view.trees.tanglegram;
+	opens splitstree6.algorithms;
+	exports splitstree6.algorithms.source.source2distances;
+	exports splitstree6.algorithms.network.network2view;
+	exports splitstree6.algorithms.source.source2characters;
 
-    exports splitstree6.xtra.phyloFusionTreeTrace;
-	opens razornetaccess;
 }

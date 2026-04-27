@@ -42,7 +42,7 @@ public class FileLoader {
 	/**
 	 * open the named file
 	 */
-	public static void apply(boolean reload, MainWindow mainWindow, String fileName, Consumer<Throwable> exceptionHandler) {
+	public static void apply(MainWindow mainWindow, String fileName, Consumer<Throwable> exceptionHandler) {
 		var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
 
 		if (!(new File(fileName)).canRead())
@@ -51,15 +51,6 @@ public class FileLoader {
 			editorTab.importFromFile(fileName);
 			mainWindow.setFileName(fileName);
 			RecentFilesManager.getInstance().insertRecentFile(fileName);
-			/* todo: should use source node
-			var sourceNode = mainWindow.getWorkflow().getSourceNode();
-			if (sourceNode != null) {
-				var sourceDataBlock = sourceNode.getDataBlock();
-				if (sourceDataBlock.isUsingInputEditor()) {
-					inputEditor.importFromFile(fileName);
-				}
-			}
-			 */
 		} else {
 			if (editorTab != null) {
 				NotificationManager.showWarning("Input editor is not empty, will open in new Window");
@@ -76,7 +67,6 @@ public class FileLoader {
 					newWindow.setFileName(fileName);
 					newWindow.setDirty(true);
 				} else {
-					// ImportDialog.show(mainWindow, fileName);
 					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 					ImportDialog.show(newWindow, fileName);
 				}
