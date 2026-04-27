@@ -238,6 +238,8 @@ module splitstreesix {
 	opens splitstree6.xtra;
 	opens splitstree6.layout;
 
+	exports splitstree6.xtra.phyloFusionTreeTrace;
+
 	opens splitstree6.tools.server;
 	exports splitstree6.tools.server;
 	exports splitstree6.view.trees.tanglegram;
