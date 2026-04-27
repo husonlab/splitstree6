@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import jloda.graph.Edge;
 
 /**
- * the PhyloFusion algorithm in a metadata-aware environment
  * Taxa drive all combinatorial logic; tree ids are traced as metadata
  */
 public class PhyloFusionAlgorithmTreeTrace {
