@@ -134,7 +134,6 @@ public abstract class QuasiMedianBase {
 			}
 		}
 		networkBlock.setNetworkType(NetworkBlock.Type.HaplotypeNetwork);
-		networkBlock.setInfoString("Total state changes: %,d".formatted(differences));
 	}
 
 	/**

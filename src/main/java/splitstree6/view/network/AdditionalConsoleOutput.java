@@ -39,6 +39,16 @@ public class AdditionalConsoleOutput {
 				reportAllDifferentDistances(view);
 				reportAllDifferencesCharacters(view);
 			}
+			if (n != null && view.getNetworkBlock().getInfoString().isBlank()) {
+				var totalDistances = NetworkUtils.computeTotalLength(view.getNetworkBlock());
+				var inducedDistances = NetworkUtils.computeExcessLength(view.getNetworkBlock());
+
+				var info = "Total length: %s, excess: %s".formatted(StringUtils.trim(totalDistances), StringUtils.trim(inducedDistances));
+				System.out.println(info);
+				if (totalDistances != -1 && inducedDistances != -1) {
+					view.getNetworkBlock().setInfoString(info);
+				}
+			}
 		});
 
 		var sync = new Object();
@@ -68,7 +78,7 @@ public class AdditionalConsoleOutput {
 	public static void reportAllDifferencesCharacters(NetworkView view) {
 		if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock) {
 			var label = view.getNetworkBlock().getNode().getPreferredParent().getAlgorithm().getName();
-			System.err.println(label + ":");
+			System.err.println("\n\n" + label + ":");
 
 			var surplusCharacterDistance = 0;
 			var surplusPathDistance = 0;
@@ -135,7 +145,7 @@ public class AdditionalConsoleOutput {
 					}
 					prev = q;
 				}
-				System.err.printf("Path differences %s - %s: %,d%n%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), pathDifferences);
+				System.err.printf("Path differences %s - %s: %,d%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), pathDifferences);
 
 				diff = (pathDifferences - characterDifferences);
 				if (diff > 0) {
@@ -147,6 +157,7 @@ public class AdditionalConsoleOutput {
 		}
 		return diff;
 	}
+
 
 	public static void reportAllDifferentDistances(NetworkView view) {
 		if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock) {
