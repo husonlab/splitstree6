@@ -124,7 +124,11 @@ public class NetworkPane extends StackPane {
 
 		service.setOnSucceeded(a -> {
 			try {
-				if (zoomFactor.get() != 1) {
+				if (true) { // todo: remove zoomFactor from interface
+					setScaleX(1.0);
+					setScaleY(1.0);
+				} else if (zoomFactor.get() != 1) {
+					System.err.println("ZOOM: " + zoomFactor);
 					setScaleX(zoomFactor.get());
 					setScaleY(zoomFactor.get());
 				}
@@ -145,7 +149,6 @@ public class NetworkPane extends StackPane {
 
 		service.setOnFailed(a -> System.err.println("Draw network failed: " + service.getException()));
 	}
-
 
 	public void updateScale(double factor, Pane pane) {
 		for (var node : BasicFX.getAllChildrenRecursively(pane.getChildren())) {

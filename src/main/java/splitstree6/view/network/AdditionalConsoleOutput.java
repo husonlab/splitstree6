@@ -101,7 +101,7 @@ public class AdditionalConsoleOutput {
 
 	public static int reportAllDifferencesCharacters(NetworkView view, int s, int t) {
 		var diff = 0;
-		if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock) {
+		if (s >= 1 && t >= 1 && view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock) {
 			var taxaBlock = view.getMainWindow().getWorkingTaxa();
 
 			var characterDifferences = 0;
