@@ -161,7 +161,7 @@ public enum OptionValueType {
 				for (var value : array) {
 					if (!buf.isEmpty())
 						buf.append(" ");
-					buf.append(StringUtils.trim("%d", value));
+					buf.append("%d".formatted(value));
 				}
 				return buf.toString();
 			}

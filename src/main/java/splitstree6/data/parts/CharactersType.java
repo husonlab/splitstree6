@@ -76,9 +76,6 @@ public enum CharactersType {
 	public static CharactersType guessType(Set<Character> set) {
 		var alphabet = StringUtils.toString(set, "").toLowerCase();
 
-		var result = Unknown;
-		var best = 0.0;
-
 		if (DNAwithAmbiguityCodes.containsAllLetters(alphabet))
 			return DNAwithAmbiguityCodes;
 		else if (RNAwithAmbiguityCodes.containsAllLetters(alphabet))

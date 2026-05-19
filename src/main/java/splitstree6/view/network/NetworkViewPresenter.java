@@ -81,7 +81,9 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		this.view = view;
 		this.controller = view.getController();
 
-		if (false) {
+		BasicFX.reportChanges(updateCounter);
+
+		if (true) {
 			targetBounds.addListener(e -> System.err.println("target bounds: " + targetBounds.get()));
 		}
 
@@ -105,6 +107,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		var paneWidth = new SimpleDoubleProperty();
 		var paneHeight = new SimpleDoubleProperty();
+
 		targetBounds.addListener((v, o, n) -> {
 			paneWidth.set(n.getWidth() - 40);
 			paneHeight.set(n.getHeight() - 80);

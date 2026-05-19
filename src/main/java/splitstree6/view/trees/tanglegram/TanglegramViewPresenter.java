@@ -182,7 +182,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		controller.getReticulateDisplacementFirstCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings1Property());
 		controller.getTaxonDisplacementSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeTanglegramCrossings2Property());
 		controller.getReticulateDisplacementSecondCBox().selectedProperty().bindBidirectional(view.optionOptimizeReticulateCrossings2Property());
-		controller.getUseNNPresortingCBox().selectedProperty().bindBidirectional(view.optionUsePQTreeProperty());
+		controller.getUseNNPresortingCBox().selectedProperty().bindBidirectional(view.optionNNPresortProperty());
+
 		tree1.addListener((v, o, n) -> {
 			controller.getTaxonDisplacementFirstCBox().setDisable(n == null || n == tree2.get());
 			controller.getReticulateDisplacementFirstCBox().setDisable(n == null || n == tree2.get() || !n.hasReticulateEdges());
@@ -206,7 +207,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 							view.getOptionOptimizeReticulateCrossings1(),
 							view.getOptionOptimizeTanglegramCrossings2(),
 							view.getOptionOptimizeReticulateCrossings2(),
-							view.getOptionUsePQTree(),
+							view.getOptionNNPresort(),
 							r -> controller.getBorderPane().setDisable(r), () -> {
 								updateRequested1.set(updateRequested1.get() + 1);
 								updateRequested2.set(updateRequested2.get() + 1);
@@ -244,17 +245,21 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				});
 			}
 
-			view.optionOptimizeReticulateCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
-			view.optionOptimizeTanglegramCrossings1Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
-			view.optionOptimizeReticulateCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
-			view.optionOptimizeTanglegramCrossings2Property().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
-			view.optionUsePQTreeProperty().addListener(e -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization));
+			view.optionOptimizeReticulateCrossings1Property().addListener((v, o, n) ->
+					RunAfterAWhile.applyInFXThread(runOptimization, runOptimization,
+							() -> view.getUndoManager().add("reticulate crossings", view.optionOptimizeReticulateCrossings1Property(), o, n)));
+			view.optionOptimizeTanglegramCrossings1Property().addListener((v, o, n) ->
+					RunAfterAWhile.applyInFXThread(runOptimization, runOptimization,
+							() -> view.getUndoManager().add("tanglegram crossings", view.optionOptimizeTanglegramCrossings1Property(), o, n)));
+			view.optionOptimizeReticulateCrossings2Property().addListener((v, o, n) ->
+					RunAfterAWhile.applyInFXThread(runOptimization, runOptimization,
+							() -> view.getUndoManager().add("reticulate crossings", view.optionOptimizeReticulateCrossings2Property(), o, n)));
+			view.optionOptimizeTanglegramCrossings2Property().addListener((v, o, n) ->
+					RunAfterAWhile.applyInFXThread(runOptimization, runOptimization,
+							() -> view.getUndoManager().add("tanglegram crossings", view.optionOptimizeTanglegramCrossings2Property(), o, n)));
+			view.optionNNPresortProperty().addListener((v, o, n) -> RunAfterAWhile.applyInFXThread(runOptimization, runOptimization,
+					() -> view.getUndoManager().add("NN-presort", view.optionNNPresortProperty(), o, n)));
 			controller.getUseNNPresortingCBox().disableProperty().bind((view.optionOptimizeReticulateCrossings1Property().not().and(view.optionOptimizeTanglegramCrossings1Property().not())).or(view.optionOptimizeReticulateCrossings2Property().not().and(view.optionOptimizeTanglegramCrossings2Property().not())));
-
-			view.optionOptimizeReticulateCrossings1Property().addListener((v, o, n) -> view.getUndoManager().add("reticulate crossings", view.optionOptimizeReticulateCrossings1Property(), o, n));
-			view.optionOptimizeTanglegramCrossings1Property().addListener((v, o, n) -> view.getUndoManager().add("tanglegram crossings", view.optionOptimizeTanglegramCrossings1Property(), o, n));
-			view.optionOptimizeReticulateCrossings2Property().addListener((v, o, n) -> view.getUndoManager().add("reticulate crossings", view.optionOptimizeReticulateCrossings2Property(), o, n));
-			view.optionOptimizeTanglegramCrossings2Property().addListener((v, o, n) -> view.getUndoManager().add("tanglegram crossings", view.optionOptimizeTanglegramCrossings2Property(), o, n));
 
 			view.optionShowTreeNamesProperty().addListener(e -> {
 				setLabel(tree1.get(), view.isOptionShowTreeNames(), view.isOptionShowTreeInfo(), controller.getTree1NameLabel());

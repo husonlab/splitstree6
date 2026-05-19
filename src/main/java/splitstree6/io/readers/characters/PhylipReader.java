@@ -30,6 +30,7 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * phylip sequence import
@@ -139,7 +140,23 @@ public class PhylipReader extends CharactersReader {
 				}
 				taxaBlock.addTaxaByNames(taxonNames);
 				characters.setDimension(nTax, nChar);
-				characters.setDataType(CharactersType.guessType(CharactersType.union(sequences.toArray(new String[0]))));
+
+				String states;
+				{
+					var stateSet = new TreeSet<Character>();
+					for (var seq : sequences) {
+						for (var i = 0; i < seq.length(); i++) {
+							var ch = seq.charAt(i);
+							if (ch != getMissing() && ch != getGap()) {
+								stateSet.add(ch);
+							}
+						}
+					}
+					states = StringUtils.toString(stateSet, "");
+				}
+
+				characters.setDataType(CharactersType.guessType(states));
+				characters.setSymbols(states);
 				characters.setGapCharacter(getGap());
 				characters.setMissingCharacter(getMissing());
 

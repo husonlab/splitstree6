@@ -27,6 +27,7 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.view.network.NetworkSequencesAnalyzer;
 
 import java.util.*;
 
@@ -125,12 +126,12 @@ public abstract class QuasiMedianBase {
 			}
 		}
 
-		var differences = 0;
+		var analyzer = new NetworkSequencesAnalyzer(networkBlock);
+
 		for (var e : graph.edges()) {
 			if (e.getSource().getInfo() instanceof String conA && e.getTarget().getInfo() instanceof String conB) {
-				var label = computeEdgeLabel(characterLabels, conA, conB, orig2CondensedPos, translator);
+				var label = computeEdgeLabel(characterLabels, conA, conB, orig2CondensedPos, translator, analyzer);
 				networkBlock.getEdgeData(e).put(NetworkBlock.EDGE_SITES_KEY, label);
-				differences += countDifferences(conA, conB, orig2CondensedPos, translator);
 			}
 		}
 		networkBlock.setNetworkType(NetworkBlock.Type.HaplotypeNetwork);
@@ -224,7 +225,7 @@ public abstract class QuasiMedianBase {
 	 *
 	 * @return positions at which orig sequences differ
 	 */
-	private String computeEdgeLabel(String[] labels, String conA, String conB, int[] orig2CondensedPos, Translator translator) {
+	private String computeEdgeLabel(String[] labels, String conA, String conB, int[] orig2CondensedPos, Translator translator, NetworkSequencesAnalyzer analyzer) {
 		var buf = new StringBuilder();
 
 		var seqA = expandCondensed(conA, orig2CondensedPos, translator);
@@ -232,7 +233,7 @@ public abstract class QuasiMedianBase {
 
 		var first = true;
 		for (var i = 0; i < seqA.length(); i++) {
-			if (seqA.charAt(i) != seqB.charAt(i)) {
+			if (analyzer.differ(seqA.charAt(i), seqB.charAt(i))) {
 				if (first)
 					first = false;
 				else
@@ -245,19 +246,6 @@ public abstract class QuasiMedianBase {
 		}
 		return buf.toString();
 	}
-
-	private int countDifferences(String conA, String conB, int[] orig2CondensedPos, Translator translator) {
-		var differences = 0;
-		var seqA = expandCondensed(conA, orig2CondensedPos, translator);
-		var seqB = expandCondensed(conB, orig2CondensedPos, translator);
-		for (var i = 0; i < seqA.length(); i++) {
-			if (seqA.charAt(i) != seqB.charAt(i)) {
-				differences++;
-			}
-		}
-		return differences;
-	}
-
 
 	/**
 	 * invert the orig 2 new mapping

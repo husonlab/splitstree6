@@ -79,7 +79,7 @@ public class TanglegramView implements IView {
 	private final BooleanProperty optionOptimizeReticulateCrossings1 = new SimpleBooleanProperty(this, "optionOptimizeReticulateCrossings1", true);
 	private final BooleanProperty optionOptimizeTanglegramCrossings2 = new SimpleBooleanProperty(this, "optionOptimizeTanglegramCrossings2", true);
 	private final BooleanProperty optionOptimizeReticulateCrossings2 = new SimpleBooleanProperty(this, "optionOptimizeReticulateCrossings2", true);
-	private final BooleanProperty optionUsePQTree = new SimpleBooleanProperty(this, "optionUsePQTree", true);
+	private final BooleanProperty optionNNPresort = new SimpleBooleanProperty(this, "optionNNPresort", true);
 
 	private final StringProperty optionOrientation = new SimpleStringProperty(this, "optionOrientation", LayoutOrientation.Rotate0Deg.toString());
 
@@ -113,7 +113,7 @@ public class TanglegramView implements IView {
 				optionTree2.getName(), optionDiagram2.getName(), optionAveraging2.getName(),
 				optionOptimizeTanglegramCrossings1.getName(), optionOptimizeReticulateCrossings1.getName(),
 				optionOptimizeTanglegramCrossings2.getName(), optionOptimizeReticulateCrossings2.getName(),
-				optionUsePQTree.getName(),
+				optionNNPresort.getName(),
 				optionOrientation.getName(), optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName(),
 				optionShowTreeNames.getName(), optionShowTreeInfo.getName(), optionShowInternalLabels.getName(), optionLabelEdgesBy.getName());
 	}
@@ -429,12 +429,12 @@ public class TanglegramView implements IView {
 		return optionOptimizeReticulateCrossings2;
 	}
 
-	public boolean getOptionUsePQTree() {
-		return optionUsePQTree.get();
+	public boolean getOptionNNPresort() {
+		return optionNNPresort.get();
 	}
 
-	public BooleanProperty optionUsePQTreeProperty() {
-		return optionUsePQTree;
+	public BooleanProperty optionNNPresortProperty() {
+		return optionNNPresort;
 	}
 
 	@Override

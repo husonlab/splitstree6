@@ -73,14 +73,15 @@ public class DoTanglegram {
 		var bestChildrenMap2 = new Single<>(new HashMap<Node, List<Node>>());
 		bestChildrenMap2.get().putAll(childrenMap2);
 
-		var bestScore = new Single<>(Double.MAX_VALUE);
 
 		var finalOptimizeReticulateDisplacement1 = optimizeReticulateDisplacement1 && network1.hasReticulateEdges();
 		var finalOptimizeReticulateDisplacement2 = optimizeReticulateDisplacement2 && network2.hasReticulateEdges();
 
-		{
-			System.err.printf("Initial score: %.1f%n", computeScore(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2));
-		}
+		var initialScore = computeScore(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2);
+
+		System.err.printf("Initial score: %.1f%n", initialScore);
+
+		var bestScore = new Single<>(initialScore);
 
 		if (optimizeTaxonDisplacement1 || finalOptimizeReticulateDisplacement1 || optimizeTaxonDisplacement2 || finalOptimizeReticulateDisplacement2) {
 			int rounds;
@@ -99,7 +100,7 @@ public class DoTanglegram {
 			service.setCallable(() -> {
 				var progress = service.getProgressListener();
 
-				bestScore.set(computeScore(network1, childrenMap1, network2, childrenMap2, optimizeTaxonDisplacement1, finalOptimizeReticulateDisplacement1, optimizeTaxonDisplacement2, finalOptimizeReticulateDisplacement2));
+				bestScore.set(initialScore);
 				bestChildrenMap1.get().clear();
 				bestChildrenMap1.get().putAll(childrenMap1);
 				bestChildrenMap2.get().clear();

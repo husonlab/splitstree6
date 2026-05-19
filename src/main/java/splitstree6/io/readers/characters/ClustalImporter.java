@@ -28,10 +28,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static splitstree6.io.readers.characters.FastAReader.checkIfCharactersValid;
 
@@ -125,7 +122,21 @@ public class ClustalImporter extends CharactersReader {
 		taxa.addTaxaByNames(labels);
 
 		characters.setDimension(ntax, nchar);
-		characters.setDataType(CharactersType.guessType(CharactersType.union(taxa2seq.values().toArray(new String[0]))));
+		String states;
+		{
+			var stateSet = new TreeSet<Character>();
+			for (var seq : taxa2seq.values()) {
+				for (var i = 0; i < seq.length(); i++) {
+					var ch = seq.charAt(i);
+					if (ch != getMissing() && ch != getGap()) {
+						stateSet.add(ch);
+					}
+				}
+			}
+			states = StringUtils.toString(stateSet, "");
+		}
+		characters.setDataType(CharactersType.guessType(states));
+		characters.setSymbols(states);
 		characters.setGapCharacter(getGap());
 		characters.setMissingCharacter(getMissing());
 

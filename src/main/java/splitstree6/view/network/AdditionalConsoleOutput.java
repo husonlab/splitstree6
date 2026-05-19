@@ -22,31 +22,36 @@ package splitstree6.view.network;
 
 import javafx.beans.InvalidationListener;
 import jloda.fx.util.RunAfterAWhile;
-import jloda.graph.Node;
-import jloda.graph.algorithms.Dijkstra;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
-import splitstree6.data.CharactersBlock;
-import splitstree6.data.DistancesBlock;
-import splitstree6.data.NetworkBlock;
-import splitstree6.data.parts.AmbiguityCodes;
 
 public class AdditionalConsoleOutput {
 	public static void setup(NetworkView view) {
 
-		view.networkBlockProperty().addListener((v, o, n) -> {
-			if (n != null && false) {
+		view.networkBlockProperty().addListener((v, o, networkBlock) -> {
+			if (networkBlock != null && true) {
 				reportAllDifferentDistances(view);
 				reportAllDifferencesCharacters(view);
 			}
-			if (n != null && view.getNetworkBlock().getInfoString().isBlank()) {
-				var totalDistances = NetworkUtils.computeTotalLength(view.getNetworkBlock());
-				var inducedDistances = NetworkUtils.computeExcessLength(view.getNetworkBlock());
-
-				var info = "Total length: %s, excess: %s".formatted(StringUtils.trim(totalDistances), StringUtils.trim(inducedDistances));
-				System.out.println(info);
-				if (totalDistances != -1 && inducedDistances != -1) {
-					view.getNetworkBlock().setInfoString(info);
+			if (networkBlock != null && networkBlock.getInfoString().isBlank()) {
+				String info = "";
+				if (NetworkSequencesAnalyzer.isApplicable(networkBlock)) {
+					var analyzer = new NetworkSequencesAnalyzer(networkBlock);
+					var totalEdgeDistances = analyzer.totalEdgeDistances(networkBlock);
+					var realizedPairwiseDistances = analyzer.realizedPairwiseDistances(networkBlock);
+					var inputPairwiseDistances = analyzer.inputPairwiseDistances(networkBlock);
+					;
+					var excessDistance = realizedPairwiseDistances - inputPairwiseDistances;
+					info = "Total length: %d, excess: %d".formatted(totalEdgeDistances, excessDistance);
+				} else if (NetworkDistancesAnalyzer.isApplicable(networkBlock)) {
+					var analyzer = new NetworkDistancesAnalyzer();
+					var totalDistances = analyzer.inputPairwiseDistances(networkBlock);
+					var excessDistance = analyzer.inputPairwiseDistances(networkBlock) - totalDistances;
+					info = "Length: %s, excess: %s".formatted(StringUtils.trim(totalDistances), StringUtils.trim(excessDistance));
+				}
+				if (!info.isBlank()) {
+					System.err.println(info);
+					networkBlock.setInfoString(info);
 				}
 			}
 		});
@@ -57,18 +62,24 @@ public class AdditionalConsoleOutput {
 		selectedItems.addListener((InvalidationListener) e -> {
 			RunAfterAWhile.applyInFXThread(sync, () -> {
 				if (selectedItems.size() == 2) {
-					if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock) {
-						System.err.println(view.getNetworkBlock().getNode().getPreferredParent().getAlgorithm().getName() + ":");
+					var networkBlock = view.getNetworkBlock();
+					if (NetworkSequencesAnalyzer.isApplicable(networkBlock)) {
+						System.err.println(networkBlock.getNode().getPreferredParent().getAlgorithm().getName() + ":");
 						var taxaBlock = view.getMainWindow().getWorkingTaxa();
 						var s = taxaBlock.indexOf(IteratorUtils.getFirst(selectedItems));
 						var t = taxaBlock.indexOf(IteratorUtils.getLast(selectedItems));
-						reportDifferentDistances(view, s, t);
-					} else if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof CharactersBlock) {
-						System.err.println(view.getNetworkBlock().getNode().getPreferredParent().getAlgorithm().getName() + ":");
+						var charactersBlock = NetworkSequencesAnalyzer.findCharactersBlock(networkBlock);
+						if (charactersBlock != null) {
+							var analyzer = new NetworkSequencesAnalyzer(networkBlock);
+							analyzer.reportAllDifferences(s, t, taxaBlock, charactersBlock, networkBlock);
+						}
+					} else if (NetworkDistancesAnalyzer.isApplicable(networkBlock)) {
+						System.err.println(networkBlock.getNode().getPreferredParent().getAlgorithm().getName() + ":");
 						var taxaBlock = view.getMainWindow().getWorkingTaxa();
 						var s = taxaBlock.indexOf(IteratorUtils.getFirst(selectedItems));
 						var t = taxaBlock.indexOf(IteratorUtils.getLast(selectedItems));
-						reportAllDifferencesCharacters(view, s, t);
+						var analyzer = new NetworkDistancesAnalyzer();
+						analyzer.reportDifferentDistances(s, t, taxaBlock, networkBlock);
 					}
 				}
 			});
@@ -76,101 +87,54 @@ public class AdditionalConsoleOutput {
 	}
 
 	public static void reportAllDifferencesCharacters(NetworkView view) {
-		if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock) {
+		var networkBlock = view.getNetworkBlock();
+		if (NetworkSequencesAnalyzer.isApplicable(networkBlock)) {
+			var charactersBlock = NetworkSequencesAnalyzer.findCharactersBlock(networkBlock);
 			var label = view.getNetworkBlock().getNode().getPreferredParent().getAlgorithm().getName();
 			System.err.println("\n\n" + label + ":");
 
 			var surplusCharacterDistance = 0;
 			var surplusPathDistance = 0;
 
+			var analyzer = new NetworkSequencesAnalyzer(networkBlock);
 			var taxaBlock = view.getMainWindow().getWorkingTaxa();
+			var buf = new StringBuilder();
 			for (var s = 1; s <= taxaBlock.getNtax(); s++) {
 				for (var t = s + 1; t <= taxaBlock.getNtax(); t++) {
-					var diff = reportAllDifferencesCharacters(view, s, t);
+					var diff = analyzer.reportAllDifferences(s, t, taxaBlock, charactersBlock, networkBlock);
 					if (diff > 0)
 						surplusPathDistance += diff;
 					else if (diff < 0)
 						surplusCharacterDistance += Math.abs(diff);
+					if (!buf.isEmpty())
+						buf.append("+");
+					buf.append(diff);
 				}
 			}
 
 			System.err.println(label + ": surplusInputDistance: " + surplusCharacterDistance);
 			System.err.println(label + ": surplusPathDistance:  " + surplusPathDistance);
+
+			System.err.println(surplusPathDistance + "=" + buf);
 		}
 	}
 
-	public static int reportAllDifferencesCharacters(NetworkView view, int s, int t) {
-		var diff = 0;
-		if (s >= 1 && t >= 1 && view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock) {
-			var taxaBlock = view.getMainWindow().getWorkingTaxa();
-
-			var characterDifferences = 0;
-			{
-				var topBuf = new StringBuilder();
-				var midBuf = new StringBuilder();
-				var botBuf = new StringBuilder();
-				for (var pos = 1; pos <= charactersBlock.getNchar(); pos++) {
-					var cs = charactersBlock.get(s, pos);
-					var ct = charactersBlock.get(t, pos);
-					if (!AmbiguityCodes.codesOverlap(cs, ct)) {
-						characterDifferences++;
-						topBuf.append("%5d".formatted(pos));
-						midBuf.append("  %c  ".formatted(cs));
-						botBuf.append("  %s  ".formatted(ct));
-					}
-				}
-				System.err.printf("Input differences %s - %s: %,d%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), characterDifferences);
-				System.err.println(topBuf);
-				System.err.println(midBuf);
-				System.err.println(botBuf);
-			}
-
-			var network = view.getNetworkBlock().getGraph();
-
-			var v = network.nodeStream().filter(u -> network.getTaxon(u) == s).findAny().orElse(null);
-			var w = network.nodeStream().filter(u -> network.getTaxon(u) == t).findAny().orElse(null);
-			if (v != null && w != null) {
-				var shortestPath = Dijkstra.compute(network, v, w, network::getWeight, true);
-				Node prev = null;
-				var pathDifferences = 0;
-				for (var q : shortestPath) {
-					if (prev != null) {
-						var sp = view.getNetworkBlock().getNodeData(prev).get(NetworkBlock.NODE_STATES_KEY);
-						var sq = view.getNetworkBlock().getNodeData(q).get(NetworkBlock.NODE_STATES_KEY);
-						for (var i = 0; i < Math.max(sp.length(), sq.length()); i++) {
-							if (i >= sp.length() || i >= sq.length() || sp.charAt(i) != sq.charAt(i)) {
-								pathDifferences++;
-							}
-						}
-					}
-					prev = q;
-				}
-				System.err.printf("Path differences %s - %s: %,d%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), pathDifferences);
-
-				diff = (pathDifferences - characterDifferences);
-				if (diff > 0) {
-					System.err.println("Path differences larger:  " + pathDifferences + " > " + characterDifferences);
-				} else if (diff < 0) {
-					System.err.println("Path differences smaller: " + pathDifferences + " < " + characterDifferences);
-				}
-			}
-		}
-		return diff;
-	}
 
 
 	public static void reportAllDifferentDistances(NetworkView view) {
-		if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock) {
-			var label = view.getNetworkBlock().getNode().getPreferredParent().getAlgorithm().getName();
+		var networkBlock = view.getNetworkBlock();
+		if (NetworkDistancesAnalyzer.isApplicable(networkBlock)) {
+			var label = networkBlock.getNode().getPreferredParent().getAlgorithm().getName();
 			System.err.println(label + ":");
 
 			var surplusDistances = 0.0;
 			var surplusPathDistances = 0.0;
 
 			var taxaBlock = view.getMainWindow().getWorkingTaxa();
+			var analyzer = new NetworkDistancesAnalyzer();
 			for (var s = 1; s <= taxaBlock.getNtax(); s++) {
 				for (var t = s + 1; t <= taxaBlock.getNtax(); t++) {
-					var diff = reportDifferentDistances(view, s, t);
+					var diff = analyzer.reportDifferentDistances(s, t, taxaBlock, networkBlock);
 					if (diff > 0)
 						surplusPathDistances += diff;
 					else if (diff < 0)
@@ -180,40 +144,5 @@ public class AdditionalConsoleOutput {
 			System.err.println(label + ": surplusInputDistance: " + surplusDistances);
 			System.err.println(label + ": surplusPathDistance:  " + surplusPathDistances);
 		}
-
-	}
-
-	public static double reportDifferentDistances(NetworkView view, int s, int t) {
-		var diff = 0.0;
-		if (view.getNetworkBlock().getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock distancesBlock) {
-			var taxaBlock = view.getMainWindow().getWorkingTaxa();
-			var inputDistance = distancesBlock.get(s, t);
-			var pathDistance = 0.0;
-			var network = view.getNetworkBlock().getGraph();
-
-			var v = network.nodeStream().filter(u -> network.getTaxon(u) == s).findAny().orElse(null);
-			var w = network.nodeStream().filter(u -> network.getTaxon(u) == t).findAny().orElse(null);
-			if (v != null && w != null) {
-				var shortestPath = Dijkstra.compute(network, v, w, network::getWeight, true);
-				Node prev = null;
-				for (var q : shortestPath) {
-					if (prev != null) {
-						var e = q.getCommonEdge(prev);
-						pathDistance += network.getWeight(e);
-					}
-					prev = q;
-				}
-				System.err.printf("Input distance %s - %s: %s%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), StringUtils.trim(inputDistance));
-				System.err.printf("Path distance  %s - %s: %s%n", taxaBlock.getLabel(s), taxaBlock.getLabel(t), StringUtils.trim(pathDistance));
-
-				diff = pathDistance - inputDistance;
-				if (diff > 0) {
-					System.err.println("Path distance larger:  " + StringUtils.trim(pathDistance) + " > " + StringUtils.trim(inputDistance));
-				} else if (diff < 0) {
-					System.err.println("Path distance smaller: " + StringUtils.trim(pathDistance) + " < " + StringUtils.trim(inputDistance));
-				}
-			}
-		}
-		return diff;
 	}
 }

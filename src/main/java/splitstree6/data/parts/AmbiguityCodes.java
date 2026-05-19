@@ -28,10 +28,11 @@ public class AmbiguityCodes {
 	 * gets all nucleotides associated with a given code
 	 *
 	 * @param code a character coding an ambiguous state
-	 * @return all (lowercase) letters associated with the given code, or the nucleotide it self, if not a code
+	 * @return all (lowercase) letters associated with the given code, or the nucleotide itself, if not a code
 	 */
 	public static String getNucleotides(char code) {
-		return switch (Character.toLowerCase(code)) {
+		code = Character.toLowerCase(code);
+		return switch (code) {
 			case 'w' -> "at";
 			case 'r' -> "ag";
 			case 'k' -> "gt";
@@ -43,7 +44,7 @@ public class AmbiguityCodes {
 			case 'd' -> "agt";
 			case 'v' -> "acg";
 			case 'n' -> "acgt";
-			default -> "" + Character.toLowerCase(code); // this is not a code, but a nucleotide
+			default -> String.valueOf(code); // this is not a code
 		};
 	}
 

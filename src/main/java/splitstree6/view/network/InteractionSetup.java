@@ -141,7 +141,7 @@ public class InteractionSetup {
 								var shape = entry.getValue();
 								if (shape.getTaxa() != null) {
 									for (var t : BitSetUtils.members(shape.getTaxa())) {
-										if (idTaxonMap.apply(t).equals(taxon)) {
+										if (idTaxonMap.apply(t) != null && idTaxonMap.apply(t).equals(taxon)) {
 											// not sure why this is necessary, without, selection can flicker
 											RunAfterAWhile.applyInFXThread(shape, () -> nodeSelectionModel.clearSelection(node));
 											return;

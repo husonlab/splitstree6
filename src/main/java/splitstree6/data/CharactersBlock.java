@@ -262,13 +262,15 @@ public class CharactersBlock extends DataBlock {
 
 	public void setDataType(CharactersType dataType) {
 		this.dataType = dataType;
-		resetSymbols();
-		if (dataType == CharactersType.DNA || dataType == CharactersType.RNA)
-			setMissingCharacter('n');
-		else if (dataType == CharactersType.Protein)
-			setMissingCharacter('x');
-		else
-			setMissingCharacter('?');
+		if (false) {
+			resetSymbols();
+			if (dataType == CharactersType.DNA || dataType == CharactersType.RNA)
+				setMissingCharacter('n');
+			else if (dataType == CharactersType.Protein)
+				setMissingCharacter('x');
+			else
+				setMissingCharacter('?');
+		}
 	}
 
 	public boolean isDiploid() {

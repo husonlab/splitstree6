@@ -87,7 +87,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 	public List<String> parse(NexusStreamParser np, TaxaBlock taxa, CharactersBlock charactersBlock) throws IOException {
 		charactersBlock.clear();
 
-		final boolean hasTaxonNames = taxa.getLabels().size() > 0;
+		final boolean hasTaxonNames = !taxa.getLabels().isEmpty();
 
 		final var format = charactersBlock.getFormat();
 
@@ -134,6 +134,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 			final var formatTokens = np.getTokensLowerCase("FORMAT", ";");
 			{
 				final var dataType = np.findIgnoreCase(formatTokens, "dataType=", StringUtils.toString(CharactersType.values(), " ") + " nucleotide", CharactersType.Unknown.toString());
+
 				charactersBlock.setDataType(dataType.equalsIgnoreCase("nucleotide") ? CharactersType.DNA : CharactersType.valueOfIgnoreCase(dataType));
 			}
 
@@ -159,9 +160,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 
 			{
 				var symbols = np.findIgnoreCase(formatTokens, "symbols=", "\"", "\"", charactersBlock.getSymbols());
-				if (charactersBlock.getDataType() == CharactersType.Standard || charactersBlock.getDataType() == CharactersType.Microsat || charactersBlock.getDataType() == CharactersType.Unknown) {
-					charactersBlock.setSymbols(symbols.replaceAll("\\s", "").toLowerCase());
-				}
+				charactersBlock.setSymbols(symbols.replaceAll("\\s", "").toLowerCase());
 			}
 
 			{

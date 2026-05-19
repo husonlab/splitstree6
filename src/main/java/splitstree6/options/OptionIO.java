@@ -60,10 +60,15 @@ public class OptionIO {
 							final var type = option.getOptionValueType();
 							switch (type) {
 								case intArray -> {
-									final var array = (int[]) option.getProperty().getValue();
-									for (var i = 0; i < array.length; i++) {
-										array[i] = np.getInt();
+									var list = new ArrayList<Integer>();
+									while (!np.peekMatchIgnoreCase(";")) {
+										list.add(np.getInt());
 									}
+									var array = new int[list.size()];
+									for (int i = 0; i < array.length; i++) {
+										array[i] = list.get(i);
+									}
+									option.getProperty().setValue(array);
 								}
 								case doubleArray -> {
 									final var array = (double[]) option.getProperty().getValue();

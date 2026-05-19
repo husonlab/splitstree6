@@ -33,6 +33,7 @@ import splitstree6.data.parts.CharactersType;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,6 +111,8 @@ public class FastAReader extends CharactersReader {
 						tmpLine = line.substring(0, line.length() - 1); // cut the last symbol
 					else
 						tmpLine = line;
+					if (getMissing() == 0 && tmpLine.contains("?"))
+						setMissing('?');
 					var allowedChars = "" + getMissing() + getGap();
 					checkIfCharactersValid(tmpLine, counter, allowedChars);
 					var add = tmpLine.replaceAll("\\s+", "");
@@ -134,17 +137,19 @@ public class FastAReader extends CharactersReader {
 	}
 
 	private void readMatrix(ArrayList<String> matrix, CharactersBlock characters) {
-		StringBuilder foundSymbols = new StringBuilder();
+		var stateSet = new TreeSet<Character>();
 		for (int i = 1; i <= characters.getNtax(); i++) {
 			for (int j = 1; j <= characters.getNchar(); j++) {
 				char symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));
-				if (foundSymbols.toString().indexOf(symbol) == -1) {
-					foundSymbols.append(symbol);
+				if (symbol != characters.getGapCharacter() && symbol != characters.getMissingCharacter()) {
+					stateSet.add(symbol);
 				}
 				characters.set(i, j, symbol);
 			}
 		}
-		characters.setDataType(CharactersType.guessType(CharactersType.union(foundSymbols.toString())));
+		var states = StringUtils.toString(stateSet, "");
+		characters.setDataType(CharactersType.guessType(CharactersType.union(states)));
+		characters.setSymbols(states);
 	}
 
 	private static String cutLabel(String infoLine) {
@@ -165,7 +170,7 @@ public class FastAReader extends CharactersReader {
 			}
 		}
 
-		if (!foundID.equals("")) {
+		if (!foundID.isBlank()) {
 			String afterID = infoLine.substring(infoLine.indexOf(foundID) + foundID.length());
 			int index1;
 			int index2;

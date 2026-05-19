@@ -29,6 +29,7 @@ import splitstree6.data.parts.CharactersType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import static splitstree6.io.readers.characters.FastAReader.checkIfCharactersValid;
 
@@ -96,17 +97,18 @@ public class StockholmReader extends CharactersReader {
 	}
 
 	private void readMatrix(ArrayList<String> matrix, CharactersBlock characters) {
-		StringBuilder foundSymbols = new StringBuilder();
-		for (int i = 1; i <= characters.getNtax(); i++) {
-			for (int j = 1; j <= characters.getNchar(); j++) {
-				char symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));
-				if (foundSymbols.toString().indexOf(symbol) == -1) {
-					foundSymbols.append(symbol);
-				}
+		var stateSet = new TreeSet<Character>();
+		for (var i = 1; i <= characters.getNtax(); i++) {
+			for (var j = 1; j <= characters.getNchar(); j++) {
+				var symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));
+				if (symbol != characters.getGapCharacter() && symbol != characters.getMissingCharacter())
+					stateSet.add(symbol);
 				characters.set(i, j, matrix.get(i - 1).charAt(j - 1));
 			}
 		}
-		characters.setDataType(CharactersType.guessType(CharactersType.union(foundSymbols.toString())));
+		var states = StringUtils.toString(stateSet, "");
+		characters.setDataType(CharactersType.guessType(states));
+		characters.setSymbols(states);
 	}
 
 	@Override
