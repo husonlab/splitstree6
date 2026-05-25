@@ -1,5 +1,6 @@
 package splitstree6.xtra.phyloFusionTreeTrace;
 
+import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
@@ -11,7 +12,6 @@ import splitstree6.utils.PathMultiplicityDistance;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import jloda.graph.Edge;
 
 /**
  * Taxa drive all combinatorial logic; tree ids are traced as metadata
@@ -87,7 +87,7 @@ public class PhyloFusionAlgorithmTreeTrace {
             var one = best.get(0);
             best.clear();
             best.add(one);
-            System.err.println("Tree Trace Rank: " + inorder(one.getFirst()));
+            if (false) System.err.println("Tree Trace Rank: " + inorder(one.getFirst()));
         }
 
         progress.setSubtask("creating networks");

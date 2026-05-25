@@ -105,7 +105,6 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		var c = 0;
 		for (int which = start; which < top; which++) {
 			var tree = trees.get(which);
-			var name = (tree.getName() != null ? tree.getName() : "tree-" + (which + 1));
 
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
@@ -116,8 +115,8 @@ public class TreePageFactory implements Callback<Integer, Node> {
 				treePane.changingOrientationProperty().addListener((v, o, n) -> numberChangingOrientation.set(numberChangingOrientation.get() + (n ? 1 : -1)));
 				treePane.setRunAfterUpdate(() -> {
 					for (var treeViewPane : BasicFX.findRecursively(treePane, p -> p.getId() != null && p.getId().equals("treeView"))) {
-						treeViewPane.setScaleX(treeViewPane.getScaleX() * treePagesView.getOptionZoomFactor());
-						treeViewPane.setScaleY(treeViewPane.getScaleY() * treePagesView.getOptionZoomFactor());
+						treeViewPane.setScaleX(0.7 * treeViewPane.getScaleX() * treePagesView.getOptionZoomFactor());
+						treeViewPane.setScaleY(0.7 * treeViewPane.getScaleY() * treePagesView.getOptionZoomFactor());
 					}
 				});
 				treePane.drawTree();
