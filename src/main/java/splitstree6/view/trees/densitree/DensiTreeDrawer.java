@@ -362,6 +362,8 @@ public class DensiTreeDrawer {
 					label.widthProperty(), label.heightProperty(), a -> label.setTranslateX(x + a), a -> label.setTranslateY(point.getY() + a));
 			labelGroup.getChildren().add(label);
 		}
+		if (true) // todo: the consensus sometimes appears to far to the right, this hack attempts to fix that...
+			edgesGroup.setTranslateX(-20);
 		pane.getChildren().addAll(edgesGroup, labelGroup);
 	}
 
