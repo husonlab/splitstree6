@@ -1,8 +1,5 @@
 package splitstree6.xtra.phyloFusionTreeTrace;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import jloda.fx.util.ProgramProperties;
 import jloda.graph.Edge;
 import jloda.graph.Graph;
 import jloda.graph.Node;
@@ -15,7 +12,7 @@ import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.trees.trees2trees.Trees2Trees;
+import splitstree6.algorithms.trees.trees2trees.PhyloFusion;
 import splitstree6.algorithms.utils.TreeMutualRefinement;
 import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.data.TaxaBlock;
@@ -35,28 +32,7 @@ import java.util.stream.Collectors;
  * same recursive logic as original PhyloFusion,
  * but uses PhyloFusionAlgorithmTreeTrace for the SCS-based core step
  */
-public class PhyloFusionTreeTrace extends Trees2Trees {
-    private boolean verbose = false;
-    private boolean checkAllPartialResults = false;
-
-    private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
-    private final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
-    private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
-    private final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
-    private final BooleanProperty optionGroupNonSeparated = new SimpleBooleanProperty(this, "optionGroupNonSeparated");
-    private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
-    private final BooleanProperty optionRefinementHeuristic = new SimpleBooleanProperty(this, "optionRefinementHeuristic");
-    private final BooleanProperty optionMissingTaxaHeuristic = new SimpleBooleanProperty(this, "optionMissingTaxaHeuristic");
-
-    {
-        ProgramProperties.track(optionMutualRefinement, true);
-        ProgramProperties.track(optionCladeReduction, true);
-        ProgramProperties.track(optionOnlyOneNetwork, true);
-        ProgramProperties.track(optionGroupNonSeparated, true);
-        ProgramProperties.track(optionRefinementHeuristic, true);
-        ProgramProperties.track(optionMissingTaxaHeuristic, true);
-    }
-
+public class PhyloFusionTreeTrace extends PhyloFusion {
     /**
      * one active tree/network plus the original input tree ids that it represents
      */
@@ -67,44 +43,6 @@ public class PhyloFusionTreeTrace extends Trees2Trees {
         public DataItem(PhyloTree tree) {
             this(new PhyloTree(tree), BitSetUtils.asBitSet(tree.getTaxa()), TreesUtils.collectAllHardwiredClusters(tree));
         }
-    }
-
-    @Override
-    public String getCitation() {
-        return "Zhang et al 2023; L. Zhang, N. Abhari, C. Colijn and Y Wu."
-                + " A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023.;"
-                + "Zhang et al 2024; L. Zhang, B. Cetinkaya and D.H. Huson. PhyloFusion- Fast and easy fusion of rooted phylogenetic trees into a network, PLoS CompBio, 2026.";
-    }
-
-    @Override
-    public String getShortDescription() {
-        return "Combines multiple rooted phylogenetic trees into a rooted network.";
-    }
-
-    @Override
-    public List<String> listOptions() {
-        return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(),
-                optionRefinementHeuristic.getName(), optionMissingTaxaHeuristic.getName(), optionNormalizeEdgeWeights.getName(),
-                optionGroupNonSeparated.getName(), optionCladeReduction.getName());
-    }
-
-    @Override
-    public String getToolTip(String optionName) {
-        if (!optionName.startsWith("option")) {
-            optionName = "option" + optionName;
-        }
-        return switch (optionName) {
-            case "optionOnlyOneNetwork" -> "Report only one network";
-            case "optionSearchHeuristic" -> "Fast, Medium, or Thorough search";
-            case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
-            case "optionMutualRefinement" -> "mutually refine input trees";
-            case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
-            case "optionCladeReduction" -> "improve performance using clade reduction";
-            case "optionRefinementHeuristic" -> "apply refinement heuristic to reduce hybridization number";
-            case "optionMissingTaxaHeuristic" -> "apply missing-taxa heuristic to reduce hybridization number";
-            case "optionGroupNonSeparated" -> "improve performance by grouping taxa that are not separated by a non-trivial edge";
-            default -> super.getToolTip(optionName);
-        };
     }
 
     @Override
@@ -237,7 +175,7 @@ public class PhyloFusionTreeTrace extends Trees2Trees {
     }
 
     private static String toExtendedNewickWithTT(PhyloTree network) throws IOException {
-        PhyloTree.SUPPORT_RICH_NEWICK = true;
+        //PhyloTree.SUPPORT_RICH_NEWICK = true;
 
         transferTraceInfoToCommentData(network);
 
@@ -1099,95 +1037,5 @@ public class PhyloFusionTreeTrace extends Trees2Trees {
             list.add(i + 1);
         }
         return list.toString();
-    }
-
-
-    @Override
-    public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
-        return !datablock.isReticulated() && datablock.getNTrees() > 1;
-    }
-
-    public boolean isOptionMutualRefinement() {
-        return optionMutualRefinement.get();
-    }
-
-    public BooleanProperty optionMutualRefinementProperty() {
-        return optionMutualRefinement;
-    }
-
-    public void setOptionMutualRefinement(boolean optionMutualRefinement) {
-        this.optionMutualRefinement.set(optionMutualRefinement);
-    }
-
-    public boolean isOptionNormalizeEdgeWeights() {
-        return optionNormalizeEdgeWeights.get();
-    }
-
-    public BooleanProperty optionNormalizeEdgeWeightsProperty() {
-        return optionNormalizeEdgeWeights;
-    }
-
-    public void setOptionNormalizeEdgeWeights(boolean optionNormalizeEdgeWeights) {
-        this.optionNormalizeEdgeWeights.set(optionNormalizeEdgeWeights);
-    }
-
-    public boolean isOptionCalculateWeights() {
-        return optionCalculateWeights.get();
-    }
-
-    public BooleanProperty optionCalculateWeightsProperty() {
-        return optionCalculateWeights;
-    }
-
-    public void setOptionCalculateWeights(boolean optionCalculateWeights) {
-        this.optionCalculateWeights.set(optionCalculateWeights);
-    }
-
-    public boolean isOptionCladeReduction() {
-        return optionCladeReduction.get();
-    }
-
-    public BooleanProperty optionCladeReductionProperty() {
-        return optionCladeReduction;
-    }
-
-    public void setOptionCladeReduction(boolean cladeReduction) {
-        this.optionCladeReduction.set(cladeReduction);
-    }
-
-    public boolean isOptionOnlyOneNetwork() {
-        return optionOnlyOneNetwork.get();
-    }
-
-    public BooleanProperty optionOnlyOneNetworkProperty() {
-        return optionOnlyOneNetwork;
-    }
-
-    public void setOptionOnlyOneNetwork(boolean onlyOneNetwork) {
-        optionOnlyOneNetwork.set(onlyOneNetwork);
-    }
-
-    public boolean getOptionGroupNonSeparated() {
-        return optionGroupNonSeparated.get();
-    }
-
-    public BooleanProperty optionGroupNonSeparatedProperty() {
-        return optionGroupNonSeparated;
-    }
-
-    public boolean isOptionRefinementHeuristic() {
-        return optionRefinementHeuristic.get();
-    }
-
-    public BooleanProperty optionRefinementHeuristicProperty() {
-        return optionRefinementHeuristic;
-    }
-
-    public boolean isOptionMissingTaxaHeuristic() {
-        return optionMissingTaxaHeuristic.get();
-    }
-
-    public BooleanProperty optionMissingTaxaHeuristicProperty() {
-        return optionMissingTaxaHeuristic;
     }
 }

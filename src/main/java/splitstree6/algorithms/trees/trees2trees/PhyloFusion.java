@@ -36,6 +36,7 @@ import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.main.SplitsTree6;
 import splitstree6.splits.GraphUtils;
 import splitstree6.utils.ClusterUtils;
 import splitstree6.utils.MaxCliqueUtilities;
@@ -52,24 +53,26 @@ import java.util.stream.Collectors;
  * Daniel Huson, 5.2024
  */
 public class PhyloFusion extends Trees2Trees {
-	private boolean verbose = false; // for debugging
-	private boolean checkAllPartialResults = false; // for debugging
+	protected boolean verbose = false; // for debugging
+	protected boolean checkAllPartialResults = false; // for debugging
 
-	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
+	protected final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
 
-	private final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
+	protected final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
 
-	private final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
+	protected final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
 
-	private final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
+	protected final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
 
-	private final BooleanProperty optionGroupNonSeparated = new SimpleBooleanProperty(this, "optionGroupNonSeparated");
+	protected final BooleanProperty optionGroupNonSeparated = new SimpleBooleanProperty(this, "optionGroupNonSeparated");
 
-	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
+	protected final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
 
-	private final BooleanProperty optionRefinementHeuristic = new SimpleBooleanProperty(this, "optionRefinementHeuristic");
+	/* todo: optionRefinementHeuristic is broken, don't allow in public UI (unless option -x) */
+	protected final BooleanProperty optionRefinementHeuristic = new SimpleBooleanProperty(this, "optionRefinementHeuristic");
+	private final boolean ALLOW_OPTION_REFINEMENT_HEURISTIC = SplitsTree6.isAllowExperimental();
 
-	private final BooleanProperty optionMissingTaxaHeuristic = new SimpleBooleanProperty(this, "optionMissingTaxaHeuristic");
+	protected final BooleanProperty optionMissingTaxaHeuristic = new SimpleBooleanProperty(this, "optionMissingTaxaHeuristic");
 
 	{
 		ProgramProperties.track(optionMutualRefinement, true);
@@ -79,6 +82,9 @@ public class PhyloFusion extends Trees2Trees {
 		ProgramProperties.track(optionRefinementHeuristic, true);
 		ProgramProperties.track(optionMissingTaxaHeuristic, true);
 
+		if (!ALLOW_OPTION_REFINEMENT_HEURISTIC) {
+			ProgramProperties.track(optionRefinementHeuristic, false);
+		}
 	}
 
 	@Override
@@ -95,9 +101,13 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(),
+		var list = new ArrayList<>(List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(),
 				optionRefinementHeuristic.getName(), optionMissingTaxaHeuristic.getName(), optionNormalizeEdgeWeights.getName(),
-				optionGroupNonSeparated.getName(), optionCladeReduction.getName()); //, optionCalculateWeights.getName());
+				optionGroupNonSeparated.getName(), optionCladeReduction.getName())); //, optionCalculateWeights.getName());
+		if (!ALLOW_OPTION_REFINEMENT_HEURISTIC) {
+			list.remove(optionRefinementHeuristic.getName());
+		}
+		return list;
 	}
 	// cladeReduction is not optional, there is a bug when it is not set ;-(
 

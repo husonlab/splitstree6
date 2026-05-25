@@ -68,11 +68,12 @@ import splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues;
 import splitstree6.algorithms.trees.trees2splits.*;
 import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
-import splitstree6.main.SplitsTree6;
 import splitstree6.workflow.Algorithm;
 import splitstree6.xtra.phyloFusionTreeTrace.PhyloFusionTreeTrace;
 
 import java.util.*;
+
+import static splitstree6.main.SplitsTree6.isAllowExperimental;
 
 /**
  * list all algorithms
@@ -137,7 +138,7 @@ public class AlgorithmList {
 
 		add(algorithms, names, new AutumnAlgorithm());
 		add(algorithms, names, new PhyloFusion());
-		add(algorithms, names, new PhyloFusionTreeTrace());
+		if (isAllowExperimental()) add(algorithms, names, new PhyloFusionTreeTrace());
 		//add(algorithms, names, new ALTSNetwork());
 		add(algorithms, names, new ALTSExternal());
 
@@ -225,7 +226,7 @@ public class AlgorithmList {
 	}
 
 	private static void add(Collection<Algorithm> algorithms, Collection<String> names, Algorithm algorithm) {
-		if (SplitsTree6.isAllowExperimental() || !(algorithm instanceof IExperimental)) {
+		if (isAllowExperimental() || !(algorithm instanceof IExperimental)) {
 			var aname = algorithm.getClass().getSimpleName();
 			if (names == null || names.isEmpty() || names.contains(aname))
 				algorithms.add(algorithm);

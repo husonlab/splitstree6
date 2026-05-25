@@ -109,7 +109,6 @@ import splitstree6.view.network.NetworkViewPresenter;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.workflow.*;
 import splitstree6.xtra.latex.MenusToLaTeX;
-import splitstree6.xtra.phyloFusionTreeTrace.PhyloFusionTreeTrace;
 
 import java.io.File;
 import java.io.IOException;
@@ -630,7 +629,6 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getMinSpanningNetworkMenuItem(), new MinSpanningNetwork());
 		setupAlgorithmMenuItem(controller.getHybridizationNetworkMenuItem(), new PhyloFusion());
 		setupAlgorithmMenuItem(controller.getClusterNetworkMenuItem(), new ClusterNetwork());
-		setupAlgorithmMenuItem(controller.getHybridizationNetworkMenuItem(), new PhyloFusionTreeTrace());
 
 		setupAlgorithmMenuItem(controller.getPcoaMenuItem(), new PCOA());
 		//setupAlgorithmMenuItem(controller.getTsneMenuItem(), new TSne());
