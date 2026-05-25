@@ -334,7 +334,7 @@ public class SampleTrees {
 			var external = new ExternalTrees2Trees();
 			external.setOptionExecutable(algorithmName);
 			algorithm = external;
-		} else if (algorithmName.equalsIgnoreCase("phylofusion")) {
+		} else if (algorithmName.equalsIgnoreCase("phylocompare")) {
 			var phyloFusion = new PhyloFusion();
 			phyloFusion.setOptionMutualRefinement(true);
 			phyloFusion.setOptionNormalizeEdgeWeights(true);
