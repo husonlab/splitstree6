@@ -70,8 +70,6 @@ public class NewickReader extends TreesReader {
 
 		final var parts = new ArrayList<String>();
 
-		final var GENE_NAME_TAG = "&&NHX:GN=";
-
 		treesBlock.clear();
 		treesBlock.setReticulated(false);
 		treesBlock.setPartial(false);
@@ -86,7 +84,7 @@ public class NewickReader extends TreesReader {
 		while (it.hasNext()) {
 			lineno++;
 			// var line = StringUtils.removeComments(it.next(), '[', ']');
-			var line = it.next();
+			var line = it.next().trim();
 			if (line.endsWith(";")) {
 				final String treeLine;
 				if (!parts.isEmpty()) {
