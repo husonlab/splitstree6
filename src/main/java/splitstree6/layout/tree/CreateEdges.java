@@ -44,6 +44,8 @@ public class CreateEdges {
 
 	private static final Point2D origin = new Point2D(0, 0);
 
+	public static boolean ALLOW_ARROW_HEADS = true;
+
 	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, Type type, boolean reticulateEdgesAreSpecial) {
 		for (var e : tree.edges()) {
 			var sourceShape = nodeShapeMap.get(e.getSource());
@@ -249,7 +251,8 @@ public class CreateEdges {
 
 			lineTo1.setX(targetX);
 			lineTo1.setY(targetY);
-			addArrowHead(path, moveTo, lineTo1);
+			if (ALLOW_ARROW_HEADS)
+				addArrowHead(path, moveTo, lineTo1);
 
 			if (label != null) {
 				label.setTextFill(Color.DARKORANGE);
@@ -277,17 +280,19 @@ public class CreateEdges {
 	}
 
 	public static void addArrowHead(Path path, MoveTo moveto, LineTo lineTo) {
-		var radian = GeometryUtilsFX.deg2rad(GeometryUtilsFX.computeAngle(lineTo.getX() - moveto.getX(), lineTo.getY() - moveto.getY()));
-		var dx = 10 * Math.cos(radian);
-		var dy = 10 * Math.sin(radian);
+		if (ALLOW_ARROW_HEADS) {
+			var radian = GeometryUtilsFX.deg2rad(GeometryUtilsFX.computeAngle(lineTo.getX() - moveto.getX(), lineTo.getY() - moveto.getY()));
+			var dx = 10 * Math.cos(radian);
+			var dy = 10 * Math.sin(radian);
 
-		var head = new Point2D(lineTo.getX(), lineTo.getY());
-		var one = head.add(-dx - dy, dx - dy);
-		var two = head.add(-dx + dy, -dx - dy);
+			var head = new Point2D(lineTo.getX(), lineTo.getY());
+			var one = head.add(-dx - dy, dx - dy);
+			var two = head.add(-dx + dy, -dx - dy);
 
-		path.getElements().add(new LineTo(one.getX(), one.getY()));
-		path.getElements().add(new MoveTo(head.getX(), head.getY()));
-		path.getElements().add(new LineTo(two.getX(), two.getY()));
+			path.getElements().add(new LineTo(one.getX(), one.getY()));
+			path.getElements().add(new MoveTo(head.getX(), head.getY()));
+			path.getElements().add(new LineTo(two.getX(), two.getY()));
+		}
 	}
 
 
