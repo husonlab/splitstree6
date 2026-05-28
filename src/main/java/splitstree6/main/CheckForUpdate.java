@@ -51,7 +51,7 @@ public class CheckForUpdate {
 					NotificationManager.showInformation("New version available: " + possibleUpdate.getNewVersion() + "\nPlease download from: " + programURL);
 				} else {
 					final Runnable runnable = () -> {
-						System.err.println("Launching update dialog");
+						System.err.println("Launching privateupdater dialog");
 						ApplicationLauncher.launchApplicationInProcess(applicationId, null,
 								new ApplicationLauncher.Callback() {
 									public void exited(int exitValue) {
