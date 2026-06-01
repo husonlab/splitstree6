@@ -21,6 +21,8 @@ package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import jloda.graph.Graph;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import jloda.util.ExecuteInParallel;
@@ -29,10 +31,12 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.utils.ClusterUtils;
 import splitstree6.utils.TreesUtils;
 
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * filters tree edges by concordance (that is, number of input trees that contain them)
@@ -48,14 +52,14 @@ public class TreesConcordanceFilter extends Trees2Trees implements IFilter {
 	@Override
 	public String getToolTip(String optionName) {
 		return switch (optionName) {
-			case "optionMinConcordance" -> "Minimum percentage of trees that must contain an edge for it remain";
+			case "optionMinConcordance" -> "Minimum percentage of trees that any must be compatible with to remain";
 			default -> optionName;
 		};
 	}
 
 	@Override
 	public String getShortDescription() {
-		return "Filter edges in trees by concordance (percentage of trees that must contain an edge for it remain)";
+		return "Filter edges in trees by concordance (minimum percentage of trees that any must be compatible with to remain)";
 	}
 
 	@Override
@@ -77,25 +81,51 @@ public class TreesConcordanceFilter extends Trees2Trees implements IFilter {
 			outputData.setPartial(inputData.isPartial());
 			outputData.setReticulated(inputData.isReticulated());
 
-			var clusterCountMap = trees.parallelStream()
-					.flatMap(tree -> TreesUtils.collectAllHardwiredClusters(tree).stream())
-					.filter(c -> c.cardinality() > 1 && c.cardinality() < taxaBlock.getNtax())
-					.collect(Collectors.toConcurrentMap(c -> c, c -> 1, Integer::sum));
+			var clusterTreesMaps = new HashMap<BitSet, BitSet>();
+			for (var t = 1; t <= inputData.getNTrees(); t++) {
+				var tree = inputData.getTree(t);
+				for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
+					clusterTreesMaps.computeIfAbsent(cluster, k -> new BitSet()).set(t);
+				}
+			}
 
 			try {
-				var threshold = outputData.getNTrees() * Math.min(1.0, optionMinConcordance.get() / 100.0);
+				var threshold = (int) (inputData.getNTrees() * Math.min(1, Math.max(0, 1.0 - (optionMinConcordance.get() / 100.0))));
+				System.err.printf("Keeping all edges that are compatible with at least %d input trees%n", (inputData.getNTrees() - threshold));
+
+				var clusterGraph = new Graph();
+				var clusterNodeClusterGraphMap = new HashMap<BitSet, Node>();
+				for (var entry : clusterTreesMaps.entrySet()) {
+					var v = clusterGraph.newNode();
+					v.setInfo(entry.getKey());
+					v.setData(entry.getValue());
+					clusterNodeClusterGraphMap.put(entry.getKey(), v);
+				}
+				for (var v : clusterGraph.nodes()) {
+					if (v.getInfo() instanceof BitSet clusterV) {
+						for (var w : clusterGraph.nodes(v)) {
+							if (w.getInfo() instanceof BitSet clusterW) {
+								if (!ClusterUtils.compatible(clusterV, clusterW)) {
+									clusterGraph.newEdge(v, w);
+								}
+							}
+						}
+					}
+				}
 				ExecuteInParallel.apply(outputData.getTrees(), tree -> {
 					try (var nodeClusterMap = TreesUtils.extractClusters(tree);
 						 var toContract = tree.newEdgeSet()) {
 						tree.edgeStream().filter(e -> !e.getTarget().isLeaf())
 								.forEach(e -> {
 									var w = e.getTarget();
-									if (nodeClusterMap.containsKey(w)) {
-										var cluster = nodeClusterMap.get(w);
-										if (clusterCountMap.containsKey(cluster) && clusterCountMap.get(cluster) < threshold) {
-											toContract.add(e);
-										}
-									}
+									var cluster = nodeClusterMap.get(w);
+									var clustGraphNode = clusterNodeClusterGraphMap.get(cluster);
+
+									var treeSet = new BitSet();
+									clusterNodeClusterGraphMap.get(cluster).adjacentEdgesStream(false).
+											map(f -> (BitSet) f.getOpposite(clustGraphNode).getData()).forEach(treeSet::or);
+									if (treeSet.cardinality() >= threshold)
+										toContract.add(e);
 								});
 						RootedNetworkProperties.contractEdges(tree, toContract, null);
 					}
@@ -124,7 +154,7 @@ public class TreesConcordanceFilter extends Trees2Trees implements IFilter {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock treesBlock) {
-		return treesBlock.size() > 1 && !treesBlock.isPartial() && !treesBlock.isReticulated();
+		return treesBlock.size() > 1 && !treesBlock.isReticulated();
 	}
 
 	@Override
