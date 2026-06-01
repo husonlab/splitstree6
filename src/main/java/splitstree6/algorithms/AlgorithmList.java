@@ -164,6 +164,7 @@ public class AlgorithmList {
 		add(algorithms, names, new SuperNetwork());
 		add(algorithms, names, new TreesFilter());
 		add(algorithms, names, new TreesFilterMore());
+		add(algorithms, names, new TreesConcordanceFilter());
 		add(algorithms, names, new TreesEdgesFilter());
 
 		add(algorithms, names, new TreeSelector());
