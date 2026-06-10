@@ -19,9 +19,12 @@
 
 package splitstree6.view.format.taxlabel;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.scene.layout.Pane;
+import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import splitstree6.data.parts.Taxon;
 import splitstree6.window.MainWindow;
 
 /**
@@ -33,10 +36,21 @@ public class TaxonLabelFormat extends Pane {
 	private final TaxonLabelFormatPresenter presenter;
 
 	public TaxonLabelFormat(MainWindow mainWindow, UndoManager undoManager) {
+		this(mainWindow.getTaxonSelectionModel(), mainWindow.dirtyProperty(), undoManager);
+	}
+
+	public TaxonLabelFormat(SelectionModel<Taxon> selectionModel, BooleanProperty dirty, UndoManager undoManager) {
 		var loader = new ExtendedFXMLLoader<TaxonLabelFormatController>(TaxonLabelFormatController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
+		presenter = new TaxonLabelFormatPresenter(selectionModel, dirty::set, controller, undoManager);
+	}
 
-		presenter = new TaxonLabelFormatPresenter(mainWindow, controller, undoManager);
+	public TaxonLabelFormatController getController() {
+		return controller;
+	}
+
+	public TaxonLabelFormatPresenter getPresenter() {
+		return presenter;
 	}
 }

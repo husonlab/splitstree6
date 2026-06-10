@@ -29,12 +29,14 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import jloda.fx.control.EditableMenuButton;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.util.NumberUtils;
-import splitstree6.window.MainWindow;
+import splitstree6.data.parts.Taxon;
 
 import java.util.HashSet;
+import java.util.function.Consumer;
 
 public class TaxonLabelFormatPresenter {
 	private final InvalidationListener selectionListener;
@@ -43,8 +45,7 @@ public class TaxonLabelFormatPresenter {
 
 	private boolean inUpdatingDefaults = false;
 
-	public TaxonLabelFormatPresenter(MainWindow mainWindow, TaxonLabelFormatController controller, UndoManager undoManager) {
-		var selectionModel = mainWindow.getTaxonSelectionModel();
+	public TaxonLabelFormatPresenter(SelectionModel<Taxon> selectionModel, Consumer<Boolean> dirty, TaxonLabelFormatController controller, UndoManager undoManager) {
 
 		var fontFamily = EditableMenuButton.setup(controller.getFontFamilyMenuButton(), fontFamilies, true, null);
 
@@ -63,7 +64,7 @@ public class TaxonLabelFormatPresenter {
 				}
 				if (undoList.size() > 0) {
 					undoManager.add(undoList);
-					mainWindow.setDirty(true);
+					dirty.accept(true);
 				}
 			}
 		});
@@ -82,7 +83,7 @@ public class TaxonLabelFormatPresenter {
 				}
 				if (undoList.size() > 0) {
 					undoManager.add(undoList);
-					mainWindow.setDirty(true);
+					dirty.accept(true);
 				}
 			}
 		});
@@ -100,7 +101,7 @@ public class TaxonLabelFormatPresenter {
 				}
 				if (undoList.size() > 0) {
 					undoManager.add(undoList);
-					mainWindow.setDirty(true);
+					dirty.accept(true);
 				}
 			}
 		});
@@ -118,7 +119,7 @@ public class TaxonLabelFormatPresenter {
 				}
 				if (undoList.size() > 0) {
 					undoManager.add(undoList);
-					mainWindow.setDirty(true);
+					dirty.accept(true);
 				}
 			}
 		});
@@ -136,7 +137,7 @@ public class TaxonLabelFormatPresenter {
 				}
 				if (undoList.size() > 0) {
 					undoManager.add(undoList);
-					mainWindow.setDirty(true);
+					dirty.accept(true);
 				}
 			}
 		});
@@ -154,7 +155,7 @@ public class TaxonLabelFormatPresenter {
 				}
 				if (undoList.size() > 0) {
 					undoManager.add(undoList);
-					mainWindow.setDirty(true);
+					dirty.accept(true);
 				}
 			}
 		});
@@ -176,7 +177,7 @@ public class TaxonLabelFormatPresenter {
 				}
 				if (undoList.size() > 0) {
 					undoManager.add(undoList);
-					mainWindow.setDirty(true);
+					dirty.accept(true);
 				}
 			}
 		});
@@ -203,7 +204,7 @@ public class TaxonLabelFormatPresenter {
 				}
 				if (undoList.size() > 0) {
 					undoManager.add(undoList);
-					mainWindow.setDirty(true);
+					dirty.accept(true);
 				}
 			}
 		});
