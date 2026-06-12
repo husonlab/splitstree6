@@ -34,6 +34,7 @@ import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.phylogeny.layout.Averaging;
+import jloda.phylogeny.layout.LayoutRootedPhylogeny;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledNodeShape;
@@ -65,7 +66,8 @@ public class TanglegramTreePane extends Group {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
 						treePane = new TreePane(mainWindow, scrollPane, undoManager, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), labelByEdges.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
+								optionDiagram.get(), labelByEdges.get(), optionAveraging.get(), LayoutRootedPhylogeny.Scaling.LateBranching,
+								optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
 								null, nodeShapeMap, FXCollections.observableHashMap(), false);
 
 						changingOrientation.bind(treePane.changingOrientationProperty());

@@ -43,6 +43,7 @@ import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import jloda.phylogeny.layout.Averaging;
+import jloda.phylogeny.layout.LayoutRootedPhylogeny;
 import jloda.util.ProgramExecutorService;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
@@ -86,7 +87,7 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(MainWindow mainWindow, ScrollPane scrollPane, UndoManager undoManager, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, Averaging averaging, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
+					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, Averaging averaging, LayoutRootedPhylogeny.Scaling scaling, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<PaneLabel> showTreeLabels, DoubleProperty unitLengthX,
 					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges) {
 		nodeShapeMap.clear();
@@ -174,7 +175,7 @@ public class TreePane extends StackPane {
 
 			var optimizeReticulationEdgesFinal = (optimizeReticulationEdges || (phyloTree.hasReticulateEdges() && !phyloTree.hasLSAChildrenMap()));
 
-			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap, optimizeReticulationEdgesFinal, true);
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, scaling, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap, optimizeReticulationEdgesFinal, true);
 		});
 
 		service.setOnSucceeded(a -> {

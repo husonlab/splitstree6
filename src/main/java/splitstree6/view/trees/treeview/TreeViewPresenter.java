@@ -46,6 +46,7 @@ import jloda.fx.util.SwipeUtils;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.phylogeny.layout.Averaging;
+import jloda.phylogeny.layout.LayoutRootedPhylogeny;
 import jloda.util.Basic;
 import jloda.util.Single;
 import jloda.util.StringUtils;
@@ -282,8 +283,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 						if (!view.emptyProperty().get()) {
 							var pane = new TreePane(mainWindow, controller.getScrollPane(), view.getUndoManager(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
-									view.getOptionDiagram(), view.getOptionLabelEdgesBy(), view.getOptionAveraging(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(), null,
-									controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap(), optimize);
+									view.getOptionDiagram(), view.getOptionLabelEdgesBy(), view.getOptionAveraging(), LayoutRootedPhylogeny.Scaling.LateBranching, view.optionOrientationProperty(), view.optionFontScaleFactorProperty(),
+									null, controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap(), optimize);
 							view.setEdgeSelectionModel(pane.getEdgeSelectionModel());
 							treePane.set(pane);
 							pane.setRunAfterUpdate(() -> {

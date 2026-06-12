@@ -34,6 +34,7 @@ import javafx.util.Callback;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.phylo.PhyloTree;
+import jloda.phylogeny.layout.LayoutRootedPhylogeny;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.view.trees.treeview.TreePane;
 import splitstree6.window.MainWindow;
@@ -109,8 +110,8 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
 				var treePane = new TreePane(mainWindow, null, treePagesView.getUndoManager(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-						treePagesView.getOptionDiagram(), treePagesView.getOptionLabelEdgesBy(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(),
-						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), null,
+						treePagesView.getOptionDiagram(), treePagesView.getOptionLabelEdgesBy(), treePagesView.getOptionAveraging(), LayoutRootedPhylogeny.Scaling.LateBranching,
+						treePagesView.optionOrientationProperty(), treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), null,
 						FXCollections.observableHashMap(), FXCollections.observableHashMap(), true);
 				treePane.changingOrientationProperty().addListener((v, o, n) -> numberChangingOrientation.set(numberChangingOrientation.get() + (n ? 1 : -1)));
 				treePane.setRunAfterUpdate(() -> {

@@ -59,7 +59,8 @@ public class ComputeTreeLayout {
 	 * @return groups and layout consumer
 	 */
 	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, Averaging averaging,
-							   double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges, boolean reticulateEdgesAreSpecial) {
+							   LayoutRootedPhylogeny.Scaling cladogramScaling, double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap,
+							   Map<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges, boolean reticulateEdgesAreSpecial) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
 
@@ -96,40 +97,40 @@ public class ComputeTreeLayout {
 		}
 
 		LayoutRootedPhylogeny.Layout layout = null;
-		LayoutRootedPhylogeny.Scaling scaling = null;
+		LayoutRootedPhylogeny.Scaling scalingChoice = null;
 
 		switch (diagram) {
 			case RectangularPhylogram -> {
 				layout = LayoutRootedPhylogeny.Layout.Rectangular;
-				scaling = LayoutRootedPhylogeny.Scaling.ToScale;
+				scalingChoice = LayoutRootedPhylogeny.Scaling.ToScale;
 			}
 			case RectangularCladogram -> {
 				layout = LayoutRootedPhylogeny.Layout.Rectangular;
-				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+				scalingChoice = cladogramScaling;
 			}
 			case TriangularCladogram -> {
 				layout = LayoutRootedPhylogeny.Layout.Triangular;
-				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+				scalingChoice = LayoutRootedPhylogeny.Scaling.LateBranching;
 			}
 			case RadialPhylogram -> {
 				layout = LayoutRootedPhylogeny.Layout.Radial;
-				scaling = LayoutRootedPhylogeny.Scaling.ToScale;
+				scalingChoice = LayoutRootedPhylogeny.Scaling.ToScale;
 			}
 			case RadialCladogram -> {
 				layout = LayoutRootedPhylogeny.Layout.Radial;
-				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+				scalingChoice = cladogramScaling;
 			}
 			case CircularCladogram -> {
 				layout = LayoutRootedPhylogeny.Layout.Circular;
-				scaling = LayoutRootedPhylogeny.Scaling.LateBranching;
+				scalingChoice = cladogramScaling;
 			}
 			case CircularPhylogram -> {
 				layout = LayoutRootedPhylogeny.Layout.Circular;
-				scaling = LayoutRootedPhylogeny.Scaling.ToScale;
+				scalingChoice = LayoutRootedPhylogeny.Scaling.ToScale;
 			}
 		}
 
-		splitstree6.layout.tree.LayoutRootedPhylogeny.apply(tree, layout, scaling, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
+		splitstree6.layout.tree.LayoutRootedPhylogeny.apply(tree, layout, scalingChoice, averaging, optimizeReticulationEdges, new Random(666), nodeAngleMap, nodePointMap);
 
 		var unitLengthX = LayoutUtils.normalize(dimensions.width(), dimensions.height(), nodePointMap, diagram.isRadialOrCircular());
 
