@@ -80,6 +80,7 @@ public class NexusExporter {
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
 			final var newBlock = new CharactersBlock();
+			newBlock.setSymbols(block.getSymbols());
 			newBlock.setDataType(block.getDataType());
 			newBlock.setFormat(block.getFormat());
 			output.write(w, new TaxaBlock(), new CharactersBlock());

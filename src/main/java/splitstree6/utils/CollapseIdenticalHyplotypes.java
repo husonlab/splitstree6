@@ -112,6 +112,7 @@ public class CollapseIdenticalHyplotypes {
 		outputCharacters.setDimension(outputNTax, nchar);
 		outputCharacters.setFormat(inputCharacters.getFormat());
 		outputCharacters.setStateLabeler(inputCharacters.getStateLabeler());
+		outputCharacters.setSymbols(inputCharacters.getSymbols());
 		outputCharacters.setDataType(inputCharacters.getDataType());
 		outputCharacters.setDiploid(inputCharacters.isDiploid());
 		outputCharacters.setGapCharacter(inputCharacters.getGapCharacter());

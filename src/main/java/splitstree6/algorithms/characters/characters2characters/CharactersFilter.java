@@ -112,6 +112,7 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 		child.setDimension(taxa.getNtax(), parent.getNchar() - columnMask.cardinality());
 		// set this after setting the dimension:
 		child.setStateLabeler(parent.getStateLabeler());
+		child.setSymbols(parent.getSymbols());
 		child.setDataType(parent.getDataType());
 		child.setDiploid(parent.isDiploid());
 		child.setGapCharacter(parent.getGapCharacter());

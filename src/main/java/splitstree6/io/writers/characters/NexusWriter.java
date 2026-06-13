@@ -79,6 +79,7 @@ public class NexusWriter extends CharactersWriterBase implements IHasPrependTaxa
 			output.setTitleAndLink(getTitle(), getLink());
 			if (asWorkflowOnly) {
 				var newBlock = new CharactersBlock();
+				newBlock.setSymbols(characters.getSymbols());
 				newBlock.setDataType(characters.getDataType());
 				newBlock.setFormat(characters.getFormat());
 				output.write(w, new TaxaBlock(), new CharactersBlock());

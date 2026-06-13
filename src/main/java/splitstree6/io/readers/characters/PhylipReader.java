@@ -29,6 +29,7 @@ import splitstree6.data.parts.CharactersType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -141,22 +142,9 @@ public class PhylipReader extends CharactersReader {
 				taxaBlock.addTaxaByNames(taxonNames);
 				characters.setDimension(nTax, nChar);
 
-				String states;
-				{
-					var stateSet = new TreeSet<Character>();
-					for (var seq : sequences) {
-						for (var i = 0; i < seq.length(); i++) {
-							var ch = seq.charAt(i);
-							if (ch != getMissing() && ch != getGap()) {
-								stateSet.add(ch);
-							}
-						}
-					}
-					states = StringUtils.toString(stateSet, "");
-				}
-
-				characters.setDataType(CharactersType.guessType(states));
+				var states = computeStates(sequences, getMissing(), getGap());
 				characters.setSymbols(states);
+				characters.setDataType(CharactersType.guessType(states));
 				characters.setGapCharacter(getGap());
 				characters.setMissingCharacter(getMissing());
 
@@ -228,7 +216,10 @@ public class PhylipReader extends CharactersReader {
 					sequences.add(sequence);
 				}
 				characters.setDimension(nTax, nChar);
-				characters.setDataType(CharactersType.guessType(CharactersType.union(sequences.toArray(new String[0]))));
+
+				var states = computeStates(sequences, getMissing(), getGap());
+				characters.setSymbols(states);
+				characters.setDataType(CharactersType.guessType(states));
 				characters.setGapCharacter(getGap());
 				characters.setMissingCharacter(getMissing());
 
@@ -268,6 +259,19 @@ public class PhylipReader extends CharactersReader {
 		var line = StringUtils.getFirstLine(text);
 		var tokens = line.trim().split("\\s+");
 		return tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]);
+	}
+
+	public static String computeStates(Collection<String> sequences, char missing, char gap) {
+		var stateSet = new TreeSet<Character>();
+		for (var seq : sequences) {
+			for (var i = 0; i < seq.length(); i++) {
+				var ch = seq.charAt(i);
+				if (ch != missing && ch != gap) {
+					stateSet.add(ch);
+				}
+			}
+		}
+		return StringUtils.toString(stateSet, "");
 	}
 }
 

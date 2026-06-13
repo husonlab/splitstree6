@@ -76,7 +76,11 @@ public enum CharactersType {
 	public static CharactersType guessType(Set<Character> set) {
 		var alphabet = StringUtils.toString(set, "").toLowerCase();
 
-		if (DNAwithAmbiguityCodes.containsAllLetters(alphabet))
+		if (DNA.containsAllLetters(alphabet))
+			return DNA;
+		else if (RNA.containsAllLetters(alphabet))
+			return RNA;
+		else if (DNAwithAmbiguityCodes.containsAllLetters(alphabet))
 			return DNAwithAmbiguityCodes;
 		else if (RNAwithAmbiguityCodes.containsAllLetters(alphabet))
 			return RNAwithAmbiguityCodes;
@@ -89,7 +93,7 @@ public enum CharactersType {
 		var matches = 0;
 		for (var ch : alphabet.toCharArray()) {
 			ch = Character.toLowerCase(ch);
-			if (Character.isLetter(ch) && ch != 'x' && ch != 'n') {
+			if (Character.isLetter(ch)) {
 				if (symbols.indexOf(ch) == -1)
 					return false;
 				else matches++;

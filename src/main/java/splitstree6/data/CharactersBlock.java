@@ -262,8 +262,9 @@ public class CharactersBlock extends DataBlock {
 
 	public void setDataType(CharactersType dataType) {
 		this.dataType = dataType;
-		if (false) {
+		if (symbols.isBlank())
 			resetSymbols();
+		if (false) {
 			if (dataType == CharactersType.DNA || dataType == CharactersType.RNA)
 				setMissingCharacter('n');
 			else if (dataType == CharactersType.Protein)
@@ -312,7 +313,7 @@ public class CharactersBlock extends DataBlock {
 	}
 
 	public void setSymbols(String symbols) {
-		this.symbols = symbols;
+		this.symbols = symbols.toLowerCase();
 		computeColors();
 	}
 

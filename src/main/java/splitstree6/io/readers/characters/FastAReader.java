@@ -148,8 +148,8 @@ public class FastAReader extends CharactersReader {
 			}
 		}
 		var states = StringUtils.toString(stateSet, "");
-		characters.setDataType(CharactersType.guessType(CharactersType.union(states)));
 		characters.setSymbols(states);
+		characters.setDataType(CharactersType.guessType(CharactersType.union(states)));
 	}
 
 	private static String cutLabel(String infoLine) {

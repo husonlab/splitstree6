@@ -107,8 +107,8 @@ public class StockholmReader extends CharactersReader {
 			}
 		}
 		var states = StringUtils.toString(stateSet, "");
-		characters.setDataType(CharactersType.guessType(states));
 		characters.setSymbols(states);
+		characters.setDataType(CharactersType.guessType(states));
 	}
 
 	@Override

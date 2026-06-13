@@ -81,6 +81,7 @@ public class CharactersTaxaFilter extends DataTaxaFilter<CharactersBlock, Charac
 			}
 
 		}
+		workingCharacters.setSymbols(inputCharacters.getSymbols());
 		workingCharacters.setDataType(inputCharacters.getDataType());
 
 		workingCharacters.setFormat(new CharactersFormat(inputCharacters.getFormat()));

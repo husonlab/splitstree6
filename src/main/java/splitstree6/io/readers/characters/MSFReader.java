@@ -62,7 +62,6 @@ public class MSFReader extends CharactersReader {
 				dataType = CharactersType.Standard;
 
 			while (it.hasNext()) {
-
 				linesCounter += 1;
 				final String line = it.next();
 				final String line_no_spaces = line.replaceAll("\\s", "");
@@ -107,14 +106,20 @@ public class MSFReader extends CharactersReader {
 
 	private void setCharacters(Map<String, String> taxa2seq, int ntax, int nchar, CharactersBlock characters) throws IOException {
 		characters.setDimension(ntax, nchar);
-		characters.setDataType(this.dataType);
 		// todo check valid characters
 		characters.setMissingCharacter(getMissing());
 		characters.setGapCharacter(getGap());
 
 		int labelsCounter = 1;
 
-		for (String label : taxa2seq.keySet()) {
+		var states = PhylipReader.computeStates(taxa2seq.values(), getMissing(), getGap());
+		characters.setSymbols(states);
+		if (dataType == CharactersType.Standard || dataType == CharactersType.Protein)
+			characters.setDataType(dataType);
+		else // find out whether DNA or RNA
+			characters.setDataType(CharactersType.guessType(states));
+
+		for (var label : taxa2seq.keySet()) {
 			if (taxa2seq.get(label).length() != nchar)
 				throw new IOException("The sequences in the alignment have different lengths! " +
 									  "Length of sequence: " + label + " differ from the length of previous sequences :" + nchar);
@@ -125,6 +130,7 @@ public class MSFReader extends CharactersReader {
 			}
 			labelsCounter++;
 		}
+
 	}
 
 	private String cutTaxonFromLine(String line, Set<String> taxaKeys) {
