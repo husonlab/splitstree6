@@ -32,7 +32,7 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Neig
 //TODO: There is something odd which is allowing entries in old_x to be positive even though active is true.
 //Need to figure out how to fix this.
 
-
+@Deprecated
 public class NeighborNetSplitstree4 {
 
 

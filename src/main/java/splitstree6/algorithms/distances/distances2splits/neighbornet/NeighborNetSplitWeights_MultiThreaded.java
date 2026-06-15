@@ -37,6 +37,7 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Incr
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 //import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean.NNLSParams;
 
+@Deprecated
 public class NeighborNetSplitWeights_MultiThreaded {
 	static ExecutorService service = Executors.newFixedThreadPool(16); // todo: fixme
 	static int countCalls = 0;
