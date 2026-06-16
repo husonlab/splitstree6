@@ -30,8 +30,9 @@ module splitstreesix {
 
 	// requires razornet;
 	requires reactfx;
+    requires ojalgo;
 
-	opens splitstree6.resources.icons;
+    opens splitstree6.resources.icons;
 
 	opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
