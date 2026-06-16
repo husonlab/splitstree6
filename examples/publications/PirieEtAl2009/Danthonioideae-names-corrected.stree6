@@ -1,0 +1,394 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=6 nAlgorithms=4;
+PROGRAM version='SplitsTree App (version 6.7.9, built 25 May 2026)';
+WORKFLOW creationDate='1781414937655'; [Sun Jun 14 07:28:57 CEST 2026]
+END; [SPLITSTREE6]
+
+[!
+Pirie, M.D., Humphreys, A.M., Barker, N.P. & Linder, H.P. (2009).
+Reticulation, data combination, and inferring evolutionary history:
+an example from Danthonioideae (Poaceae). Systematic Biology 58: 612-628.
+https://academic.oup.com/sysbio/article/58/6/612/1635430
+]
+
+[
+Methods:
+Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2024).
+The original input consisted of 69 taxa and 2 trees, partial.
+The Show Trees method was used (View=Tanglegram) so as to obtain a Tanglegram visualization (Huson 2025).
+
+References:
+Huson 2025: D.H. Huson. Displacement-Optimized Tanglegrams for Trees and Networks. Manuscript in preparation (2025).
+Huson and Bryant 2024: D.H. Huson and D. Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=69;
+TAXLABELS
+	[1] 'Centropodia_glauca'
+	[2] 'Merxmuellera_papposa_NPB1759'
+	[3] 'Merxmuellera_rangei_NPB960'
+	[4] 'Austrodanthonia_clavata_MDP454'
+	[5] 'Austrodanthonia_mera_AMH125'
+	[6] 'Notodanthonia_longifolia_MDP305'
+	[7] 'Rytidosperma_australe_MDP418'
+	[8] 'Rytidosperma_setifolium_AMH121'
+	[9] 'Rytidosperma_lechleri_CMB4256'
+	[10] 'Austrodanthonia_eriantha_AMH43'
+	[11] 'Joycea_lepidopoda_MDP285'
+	[12] 'Rytidosperma_pumilum_NGW'
+	[13] 'Rytidosperma_thomsonii_AMH118'
+	[14] 'Karroochloa_curva_GAV604'
+	[15] 'Tribolium_brachystachyum_GAV593'
+	[16] 'Karroochloa_schismoides_GAV562'
+	[17] 'Schismus_barbartus_GAV503'
+	[18] 'Merxmuellera_disticha_NPB1002'
+	[19] 'Merxmuellera_dura_NPB983'
+	[20] 'Cortaderia_fulvida_G5088'
+	[21] 'Cortaderia_toetoe_G5042'
+	[22] 'Cortaderia_richardii_G3816'
+	[23] 'Cortaderia_turbaria_G17358'
+	[24] 'Cortaderia_splendens_G10872'
+	[25] 'Plinthanthesis_paradoxa_HPL5638'
+	[26] 'Plinthanthesis_rodwayi_MDP415'
+	[27] 'Cortaderia_pilosa_MDP345'
+	[28] 'Notochloe_microdon_Watson_sn'
+	[29] 'Cortaderia_archboldii_JM115'
+	[30] 'Danthonia_alpina_MDP480'
+	[31] 'Danthonia_alpina_MDP481'
+	[32] 'Danthonia_decumbens_MDP312'
+	[33] 'Danthonia_domingensis_AA373'
+	[34] 'Danthonia_spicata_Kellogg_sn'
+	[35] 'Danthonia_californica_amer_MDP330'
+	[36] 'Danthonia_araucana_MDP337'
+	[37] 'Danthonia_chilensis_aureo_MDP340'
+	[38] 'Danthonia_secundiflora_ML1617'
+	[39] 'Danthonia_malacantha_MDP339'
+	[40] 'Danthonia_chilensis_chile_MDP342'
+	[41] 'Chaetobromus_involucratus_inv_NPB1715'
+	[42] 'Pseudopentameris_macrantha_HPL5470'
+	[43] 'Cortaderia_columbiana_ML920'
+	[44] 'Cortaderia_hapalotricha_ML1525'
+	[45] 'Lamprothyrsus_peruvianus_G11154'
+	[46] 'Cortaderia_araucana_G7162'
+	[47] 'Cortaderia_jubata_ML1515'
+	[48] 'Cortaderia_rudiuscula_G11157'
+	[49] 'Cortaderia_selloana_Robinson'
+	[50] 'Cortaderia_nitida_ML1434'
+	[51] 'Cortaderia_boliviensis_ML672'
+	[52] 'Lamprothyrsus_hieronymi_OM3534'
+	[53] 'Cortaderia_bifida_ML1497'
+	[54] 'Cortaderia_sericantha_ML1128'
+	[55] 'Chionochloa_antarctica_OTA57955'
+	[56] 'Chionochloa_flavescens_CHR475418'
+	[57] 'Chionochloa_macra_CHR475278'
+	[58] 'Chionochloa_frigida_MDP417'
+	[59] 'Chionochloa_rubra_OTA57960'
+	[60] 'Pentameris_thuarii_HPL5456'
+	[61] 'Pentaschistis_airoides_jugorum_CG81'
+	[62] 'Prionanthium_dentatum_HPL5430'
+	[63] 'Pentaschistis_aurea_pilosogluma_CG47'
+	[64] 'Merxmuellera_cincta_sericea_NPB1545'
+	[65] 'Merxmuellera_decora_NPB1168'
+	[66] 'Merxmuellera_lupulina_HPL7004'
+	[67] 'Merxmuellera_arundinacea_NPB1017'
+	[68] 'Merxmuellera_drakensbergensis_PM4'
+	[69] 'Merxmuellera_macowanii_NPB1008'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=69;
+TAXLABELS
+	[1] 'Centropodia_glauca'
+	[2] 'Merxmuellera_papposa_NPB1759'
+	[3] 'Merxmuellera_rangei_NPB960'
+	[4] 'Austrodanthonia_clavata_MDP454'
+	[5] 'Austrodanthonia_mera_AMH125'
+	[6] 'Notodanthonia_longifolia_MDP305'
+	[7] 'Rytidosperma_australe_MDP418'
+	[8] 'Rytidosperma_setifolium_AMH121'
+	[9] 'Rytidosperma_lechleri_CMB4256'
+	[10] 'Austrodanthonia_eriantha_AMH43'
+	[11] 'Joycea_lepidopoda_MDP285'
+	[12] 'Rytidosperma_pumilum_NGW'
+	[13] 'Rytidosperma_thomsonii_AMH118'
+	[14] 'Karroochloa_curva_GAV604'
+	[15] 'Tribolium_brachystachyum_GAV593'
+	[16] 'Karroochloa_schismoides_GAV562'
+	[17] 'Schismus_barbartus_GAV503'
+	[18] 'Merxmuellera_disticha_NPB1002'
+	[19] 'Merxmuellera_dura_NPB983'
+	[20] 'Cortaderia_fulvida_G5088'
+	[21] 'Cortaderia_toetoe_G5042'
+	[22] 'Cortaderia_richardii_G3816'
+	[23] 'Cortaderia_turbaria_G17358'
+	[24] 'Cortaderia_splendens_G10872'
+	[25] 'Plinthanthesis_paradoxa_HPL5638'
+	[26] 'Plinthanthesis_rodwayi_MDP415'
+	[27] 'Cortaderia_pilosa_MDP345'
+	[28] 'Notochloe_microdon_Watson_sn'
+	[29] 'Cortaderia_archboldii_JM115'
+	[30] 'Danthonia_alpina_MDP480'
+	[31] 'Danthonia_alpina_MDP481'
+	[32] 'Danthonia_decumbens_MDP312'
+	[33] 'Danthonia_domingensis_AA373'
+	[34] 'Danthonia_spicata_Kellogg_sn'
+	[35] 'Danthonia_californica_amer_MDP330'
+	[36] 'Danthonia_araucana_MDP337'
+	[37] 'Danthonia_chilensis_aureo_MDP340'
+	[38] 'Danthonia_secundiflora_ML1617'
+	[39] 'Danthonia_malacantha_MDP339'
+	[40] 'Danthonia_chilensis_chile_MDP342'
+	[41] 'Chaetobromus_involucratus_inv_NPB1715'
+	[42] 'Pseudopentameris_macrantha_HPL5470'
+	[43] 'Cortaderia_columbiana_ML920'
+	[44] 'Cortaderia_hapalotricha_ML1525'
+	[45] 'Lamprothyrsus_peruvianus_G11154'
+	[46] 'Cortaderia_araucana_G7162'
+	[47] 'Cortaderia_jubata_ML1515'
+	[48] 'Cortaderia_rudiuscula_G11157'
+	[49] 'Cortaderia_selloana_Robinson'
+	[50] 'Cortaderia_nitida_ML1434'
+	[51] 'Cortaderia_boliviensis_ML672'
+	[52] 'Lamprothyrsus_hieronymi_OM3534'
+	[53] 'Cortaderia_bifida_ML1497'
+	[54] 'Cortaderia_sericantha_ML1128'
+	[55] 'Chionochloa_antarctica_OTA57955'
+	[56] 'Chionochloa_flavescens_CHR475418'
+	[57] 'Chionochloa_macra_CHR475278'
+	[58] 'Chionochloa_frigida_MDP417'
+	[59] 'Chionochloa_rubra_OTA57960'
+	[60] 'Pentameris_thuarii_HPL5456'
+	[61] 'Pentaschistis_airoides_jugorum_CG81'
+	[62] 'Prionanthium_dentatum_HPL5430'
+	[63] 'Pentaschistis_aurea_pilosogluma_CG47'
+	[64] 'Merxmuellera_cincta_sericea_NPB1545'
+	[65] 'Merxmuellera_decora_NPB1168'
+	[66] 'Merxmuellera_lupulina_HPL7004'
+	[67] 'Merxmuellera_arundinacea_NPB1017'
+	[68] 'Merxmuellera_drakensbergensis_PM4'
+	[69] 'Merxmuellera_macowanii_NPB1008'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
+[Number of trees: 2]
+PROPERTIES partialTrees=yes rooted=yes;
+TRANSLATE
+	1 'Centropodia_glauca',
+	2 'Merxmuellera_papposa_NPB1759',
+	3 'Merxmuellera_rangei_NPB960',
+	4 'Austrodanthonia_clavata_MDP454',
+	5 'Austrodanthonia_mera_AMH125',
+	6 'Notodanthonia_longifolia_MDP305',
+	7 'Rytidosperma_australe_MDP418',
+	8 'Rytidosperma_setifolium_AMH121',
+	9 'Rytidosperma_lechleri_CMB4256',
+	10 'Austrodanthonia_eriantha_AMH43',
+	11 'Joycea_lepidopoda_MDP285',
+	12 'Rytidosperma_pumilum_NGW',
+	13 'Rytidosperma_thomsonii_AMH118',
+	14 'Karroochloa_curva_GAV604',
+	15 'Tribolium_brachystachyum_GAV593',
+	16 'Karroochloa_schismoides_GAV562',
+	17 'Schismus_barbartus_GAV503',
+	18 'Merxmuellera_disticha_NPB1002',
+	19 'Merxmuellera_dura_NPB983',
+	20 'Cortaderia_fulvida_G5088',
+	21 'Cortaderia_toetoe_G5042',
+	22 'Cortaderia_richardii_G3816',
+	23 'Cortaderia_turbaria_G17358',
+	24 'Cortaderia_splendens_G10872',
+	25 'Plinthanthesis_paradoxa_HPL5638',
+	26 'Plinthanthesis_rodwayi_MDP415',
+	27 'Cortaderia_pilosa_MDP345',
+	28 'Notochloe_microdon_Watson_sn',
+	29 'Cortaderia_archboldii_JM115',
+	30 'Danthonia_alpina_MDP480',
+	31 'Danthonia_alpina_MDP481',
+	32 'Danthonia_decumbens_MDP312',
+	33 'Danthonia_domingensis_AA373',
+	34 'Danthonia_spicata_Kellogg_sn',
+	35 'Danthonia_californica_amer_MDP330',
+	36 'Danthonia_araucana_MDP337',
+	37 'Danthonia_chilensis_aureo_MDP340',
+	38 'Danthonia_secundiflora_ML1617',
+	39 'Danthonia_malacantha_MDP339',
+	40 'Danthonia_chilensis_chile_MDP342',
+	41 'Chaetobromus_involucratus_inv_NPB1715',
+	42 'Pseudopentameris_macrantha_HPL5470',
+	43 'Cortaderia_columbiana_ML920',
+	44 'Cortaderia_hapalotricha_ML1525',
+	45 'Lamprothyrsus_peruvianus_G11154',
+	46 'Cortaderia_araucana_G7162',
+	47 'Cortaderia_jubata_ML1515',
+	48 'Cortaderia_rudiuscula_G11157',
+	49 'Cortaderia_selloana_Robinson',
+	50 'Cortaderia_nitida_ML1434',
+	51 'Cortaderia_boliviensis_ML672',
+	52 'Lamprothyrsus_hieronymi_OM3534',
+	53 'Cortaderia_bifida_ML1497',
+	54 'Cortaderia_sericantha_ML1128',
+	55 'Chionochloa_antarctica_OTA57955',
+	56 'Chionochloa_flavescens_CHR475418',
+	57 'Chionochloa_macra_CHR475278',
+	58 'Chionochloa_frigida_MDP417',
+	59 'Chionochloa_rubra_OTA57960',
+	60 'Pentameris_thuarii_HPL5456',
+	61 'Pentaschistis_airoides_jugorum_CG81',
+	62 'Prionanthium_dentatum_HPL5430',
+	63 'Pentaschistis_aurea_pilosogluma_CG47',
+	64 'Merxmuellera_cincta_sericea_NPB1545',
+	65 'Merxmuellera_decora_NPB1168',
+	66 'Merxmuellera_lupulina_HPL7004',
+	67 'Merxmuellera_arundinacea_NPB1017',
+	68 'Merxmuellera_drakensbergensis_PM4',
+	69 'Merxmuellera_macowanii_NPB1008',
+;
+[TREES]
+		[1] tree 'Chloroplast'=[&R] (1:0.521273,(2:0.100432,3:0.087657):0.361039,((((((((((((((((4:0.036744,5:0.034563):0.051975,6:0.045753):0.029504,((7:0.119878,8:0.066731):0.036804,9:0.072316):0.016468):0.01411,(10:0.08936,11:0.067158):0.02344):0.009021,(12:0.051636,13:0.030129):0.053185):0.060928,(14:0.347282,15:0.244553):0.045652):0.059444,(16:0.186666,17:0.196477):0.199465):0.240609,(18:0.383695,19:0.329249):0.015217):0.137999,((((20:0.044628,21:0.020834,22:0.073458,23:0.032931):0.017979,24:0.023316):0.110207,(25:0.086031,26:0.239907):0.068258):0.076608,((27:0.07314,28:0.100366,29:0.122066):0.02066,(((((30:0.01322,31:0.011785):0.026976,32:0.023542):0.016342,33:0.139648):0.01598,34:0.124942):0.015563,((35:0.010279,36:0.010853,37:0.017052):0.030008,(38:0.01192,39:0.053247):0.044901,40:0.011833):0.022873):0.061148):0.099332):0.05597):0.059795,(41:0.445784,42:0.299682):0.262945):0.015947,((43:0.106836,44:0.140065):0.054721,((45:0.040167,((46:0.065096,47:0.029286,(48:0.011105,49:0.062224):0.019733):0.020423,50:0.045449):0.022553,(51:0.079466,52:0.025784):0.023521):0.023634,(53:0.105617,54:0.101861):0.025865):0.031786):0.059946):0.235225,((55:0.082101,((56:0.041778,57:0.010079):0.052526,58:0.09478):0.020668):0.043181,59:0.12574):0.057909):0.079673,(60:0.26043,((61:0.392225,62:0.359494):0.074769,63:0.133191):0.496549):0.484866):0.063643,(64:0.102874,(65:0.065967,66:0.04002):0.042524):0.03586):0.026688,67:0.116248):0.27519,(68:0.0427,69:0.049167):0.156439):0.561916)[&&NHX:GN=Chloroplast];
+		[2] tree 'ITS'=[&R] (1:0.231153,(2:0.061818,3:0.084984):0.106825,(((((((4:0.024644,5:0.010143,((11:0.083075,6:0.03619):0.016696,14:0.041171,7:0.009402,9:0.020081,(12:0.019224,13:0.004896):0.008954,8:0.01527):0.010737):0.026057,15:0.085111):0.093828,((16:0.118504,17:0.055746):0.120551,(18:0.116102,19:0.08835):0.024171):0.045697):0.039209,(((41:0.187722,42:0.046025):0.228832,((20:0.00437,21:0.004458,22:0.004514,24:0.01349,23:0.004544):0.059592,(28:0.031345,(25:0.023249,26:0.005782):0.010684):0.021152):0.020972):0.020162,(((43:0.016222,44:0.024142):0.048764,53:0.005271,50:0.028702,54:0.056564):0.011103,(27:0.047275,((((30:0.004987,32:0.008156):0.017958,31:0.005355):0.011037,33:0.029031):0.015535,((((((35:0.015447,40:0.010682):0.008814,39:0.016332):0.013209,37:0.005691):0.02596,36:0.017391):0.041369,34:0.117698):0.014185,38:0.018476):0.019975,29:0.016894):0.017646):0.015865,(45:0.008156,(46:0.008628,47:0.00499,48:0.019349):0.057561):0.01536,51:0.016708,52:0.034565):0.029871):0.027449):0.020044,(((55:0.005205,58:0.004607,57:0.004557,59:0.004645):0.008721,56:0.009581):0.031,(67:0.039116,64:0.052833):0.032705,(65:0.014828,66:0.005367):0.058438,(61:0.051013,(63:0.066341,62:0.033442):0.013053):0.124511):0.023429):0.144956,68:0.018615):0.01916,69:0.015511):0.088485)[&&NHX:GN=ITS];
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 2]
+PROPERTIES partialTrees=yes rooted=yes;
+TRANSLATE
+	1 'Centropodia_glauca',
+	2 'Merxmuellera_papposa_NPB1759',
+	3 'Merxmuellera_rangei_NPB960',
+	4 'Austrodanthonia_clavata_MDP454',
+	5 'Austrodanthonia_mera_AMH125',
+	6 'Notodanthonia_longifolia_MDP305',
+	7 'Rytidosperma_australe_MDP418',
+	8 'Rytidosperma_setifolium_AMH121',
+	9 'Rytidosperma_lechleri_CMB4256',
+	10 'Austrodanthonia_eriantha_AMH43',
+	11 'Joycea_lepidopoda_MDP285',
+	12 'Rytidosperma_pumilum_NGW',
+	13 'Rytidosperma_thomsonii_AMH118',
+	14 'Karroochloa_curva_GAV604',
+	15 'Tribolium_brachystachyum_GAV593',
+	16 'Karroochloa_schismoides_GAV562',
+	17 'Schismus_barbartus_GAV503',
+	18 'Merxmuellera_disticha_NPB1002',
+	19 'Merxmuellera_dura_NPB983',
+	20 'Cortaderia_fulvida_G5088',
+	21 'Cortaderia_toetoe_G5042',
+	22 'Cortaderia_richardii_G3816',
+	23 'Cortaderia_turbaria_G17358',
+	24 'Cortaderia_splendens_G10872',
+	25 'Plinthanthesis_paradoxa_HPL5638',
+	26 'Plinthanthesis_rodwayi_MDP415',
+	27 'Cortaderia_pilosa_MDP345',
+	28 'Notochloe_microdon_Watson_sn',
+	29 'Cortaderia_archboldii_JM115',
+	30 'Danthonia_alpina_MDP480',
+	31 'Danthonia_alpina_MDP481',
+	32 'Danthonia_decumbens_MDP312',
+	33 'Danthonia_domingensis_AA373',
+	34 'Danthonia_spicata_Kellogg_sn',
+	35 'Danthonia_californica_amer_MDP330',
+	36 'Danthonia_araucana_MDP337',
+	37 'Danthonia_chilensis_aureo_MDP340',
+	38 'Danthonia_secundiflora_ML1617',
+	39 'Danthonia_malacantha_MDP339',
+	40 'Danthonia_chilensis_chile_MDP342',
+	41 'Chaetobromus_involucratus_inv_NPB1715',
+	42 'Pseudopentameris_macrantha_HPL5470',
+	43 'Cortaderia_columbiana_ML920',
+	44 'Cortaderia_hapalotricha_ML1525',
+	45 'Lamprothyrsus_peruvianus_G11154',
+	46 'Cortaderia_araucana_G7162',
+	47 'Cortaderia_jubata_ML1515',
+	48 'Cortaderia_rudiuscula_G11157',
+	49 'Cortaderia_selloana_Robinson',
+	50 'Cortaderia_nitida_ML1434',
+	51 'Cortaderia_boliviensis_ML672',
+	52 'Lamprothyrsus_hieronymi_OM3534',
+	53 'Cortaderia_bifida_ML1497',
+	54 'Cortaderia_sericantha_ML1128',
+	55 'Chionochloa_antarctica_OTA57955',
+	56 'Chionochloa_flavescens_CHR475418',
+	57 'Chionochloa_macra_CHR475278',
+	58 'Chionochloa_frigida_MDP417',
+	59 'Chionochloa_rubra_OTA57960',
+	60 'Pentameris_thuarii_HPL5456',
+	61 'Pentaschistis_airoides_jugorum_CG81',
+	62 'Prionanthium_dentatum_HPL5430',
+	63 'Pentaschistis_aurea_pilosogluma_CG47',
+	64 'Merxmuellera_cincta_sericea_NPB1545',
+	65 'Merxmuellera_decora_NPB1168',
+	66 'Merxmuellera_lupulina_HPL7004',
+	67 'Merxmuellera_arundinacea_NPB1017',
+	68 'Merxmuellera_drakensbergensis_PM4',
+	69 'Merxmuellera_macowanii_NPB1008',
+;
+[TREES]
+		[1] tree 'Chloroplast'=[&R] (1:0.521273,(2:0.100432,3:0.087657):0.361039,((((((((((((((((4:0.036744,5:0.034563):0.051975,6:0.045753):0.029504,((7:0.119878,8:0.066731):0.036804,9:0.072316):0.016468):0.01411,(10:0.08936,11:0.067158):0.02344):0.009021,(12:0.051636,13:0.030129):0.053185):0.060928,(14:0.347282,15:0.244553):0.045652):0.059444,(16:0.186666,17:0.196477):0.199465):0.240609,(18:0.383695,19:0.329249):0.015217):0.137999,((((20:0.044628,21:0.020834,22:0.073458,23:0.032931):0.017979,24:0.023316):0.110207,(25:0.086031,26:0.239907):0.068258):0.076608,((27:0.07314,28:0.100366,29:0.122066):0.02066,(((((30:0.01322,31:0.011785):0.026976,32:0.023542):0.016342,33:0.139648):0.01598,34:0.124942):0.015563,((35:0.010279,36:0.010853,37:0.017052):0.030008,(38:0.01192,39:0.053247):0.044901,40:0.011833):0.022873):0.061148):0.099332):0.05597):0.059795,(41:0.445784,42:0.299682):0.262945):0.015947,((43:0.106836,44:0.140065):0.054721,((45:0.040167,((46:0.065096,47:0.029286,(48:0.011105,49:0.062224):0.019733):0.020423,50:0.045449):0.022553,(51:0.079466,52:0.025784):0.023521):0.023634,(53:0.105617,54:0.101861):0.025865):0.031786):0.059946):0.235225,((55:0.082101,((56:0.041778,57:0.010079):0.052526,58:0.09478):0.020668):0.043181,59:0.12574):0.057909):0.079673,(60:0.26043,((61:0.392225,62:0.359494):0.074769,63:0.133191):0.496549):0.484866):0.063643,(64:0.102874,(65:0.065967,66:0.04002):0.042524):0.03586):0.026688,67:0.116248):0.27519,(68:0.0427,69:0.049167):0.156439):0.561916)[&&NHX:GN=Chloroplast];
+		[2] tree 'ITS'=[&R] (1:0.231153,(2:0.061818,3:0.084984):0.106825,(((((((4:0.024644,5:0.010143,((11:0.083075,6:0.03619):0.016696,14:0.041171,7:0.009402,9:0.020081,(12:0.019224,13:0.004896):0.008954,8:0.01527):0.010737):0.026057,15:0.085111):0.093828,((16:0.118504,17:0.055746):0.120551,(18:0.116102,19:0.08835):0.024171):0.045697):0.039209,(((41:0.187722,42:0.046025):0.228832,((20:0.00437,21:0.004458,22:0.004514,24:0.01349,23:0.004544):0.059592,(28:0.031345,(25:0.023249,26:0.005782):0.010684):0.021152):0.020972):0.020162,(((43:0.016222,44:0.024142):0.048764,53:0.005271,50:0.028702,54:0.056564):0.011103,(27:0.047275,((((30:0.004987,32:0.008156):0.017958,31:0.005355):0.011037,33:0.029031):0.015535,((((((35:0.015447,40:0.010682):0.008814,39:0.016332):0.013209,37:0.005691):0.02596,36:0.017391):0.041369,34:0.117698):0.014185,38:0.018476):0.019975,29:0.016894):0.017646):0.015865,(45:0.008156,(46:0.008628,47:0.00499,48:0.019349):0.057561):0.01536,51:0.016708,52:0.034565):0.029871):0.027449):0.020044,(((55:0.005205,58:0.004607,57:0.004557,59:0.004645):0.008721,56:0.009581):0.031,(67:0.039116,64:0.052833):0.032705,(65:0.014828,66:0.005367):0.058438,(61:0.051013,(63:0.066341,62:0.033442):0.013053):0.124511):0.023429):0.144956,68:0.018615):0.01916,69:0.015511):0.088485)[&&NHX:GN=ITS];
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'Tanglegram';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Tanglegram';
+LINK ALGORITHM = 'Show Trees';
+NAME 'TanglegramView';
+INPUT 'TREES';
+OPTIONS
+	Tree1 = 1,
+	Diagram1 = 'RectangularPhylogram',
+	Averaging1 = 'ChildAverage',
+	Tree2 = 2,
+	Diagram2 = 'RectangularPhylogram',
+	Averaging2 = 'ChildAverage',
+	OptimizeTanglegramCrossings1 = 'true',
+	OptimizeReticulateCrossings1 = 'true',
+	OptimizeTanglegramCrossings2 = 'true',
+	OptimizeReticulateCrossings2 = 'true',
+	NNPresort = 'true',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 0.62092132,
+	VerticalZoomFactor = 1,
+	FontScaleFactor = 1,
+	ShowTreeNames = 'true',
+	ShowTreeInfo = 'false',
+	ShowInternalLabels = 'false',
+	LabelEdgesBy = 'None';
+END; [VIEW]
