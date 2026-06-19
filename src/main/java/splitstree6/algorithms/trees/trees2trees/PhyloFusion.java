@@ -182,11 +182,11 @@ public class PhyloFusion extends Trees2Trees {
 				network.delDivertex(v);
 			}
 
-			if (count <= 20 && isOptionCalculateWeights()) {
+			if (count <= 10 && isOptionCalculateWeights()) {
 				progress.setSubtask("Edge weights");
 				progress.setMaximum(-1);
 				progress.setProgress(-1);
-				NetworkUtils.setEdgeWeights(treesBlock.getTrees(), network, isOptionNormalizeEdgeWeights(), 60000);
+				NetworkUtils.setEdgeWeights(treesBlock.getTrees(), network, isOptionNormalizeEdgeWeights(), 3000);
 			}
 			if (network.getRoot().getOutDegree() == 1)
 				network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
