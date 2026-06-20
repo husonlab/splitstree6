@@ -36,7 +36,6 @@ import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.main.SplitsTree6;
 import splitstree6.splits.GraphUtils;
 import splitstree6.utils.ClusterUtils;
 import splitstree6.utils.MaxCliqueUtilities;
@@ -70,7 +69,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	/* todo: optionRefinementHeuristic is broken, don't allow in public UI (unless option -x) */
 	protected final BooleanProperty optionRefinementHeuristic = new SimpleBooleanProperty(this, "optionRefinementHeuristic");
-	private final boolean ALLOW_OPTION_REFINEMENT_HEURISTIC = SplitsTree6.isAllowExperimental();
+	private final boolean ALLOW_OPTION_REFINEMENT_HEURISTIC = false;
 
 	protected final BooleanProperty optionMissingTaxaHeuristic = new SimpleBooleanProperty(this, "optionMissingTaxaHeuristic");
 
@@ -79,12 +78,9 @@ public class PhyloFusion extends Trees2Trees {
 		ProgramProperties.track(optionCladeReduction, true);
 		ProgramProperties.track(optionOnlyOneNetwork, true);
 		ProgramProperties.track(optionGroupNonSeparated, true);
-		ProgramProperties.track(optionRefinementHeuristic, true);
 		ProgramProperties.track(optionMissingTaxaHeuristic, true);
 
-		if (!ALLOW_OPTION_REFINEMENT_HEURISTIC) {
-			ProgramProperties.track(optionRefinementHeuristic, false);
-		}
+		ProgramProperties.track(optionRefinementHeuristic, ALLOW_OPTION_REFINEMENT_HEURISTIC);
 	}
 
 	@Override
@@ -303,7 +299,7 @@ public class PhyloFusion extends Trees2Trees {
 				if (verbose)
 					System.err.println("Running on " + taxa.cardinality() + " taxa");
 				var resultList = PhyloFusionAlgorithm.apply(trees, isOptionOnlyOneNetwork(),
-						isOptionRefinementHeuristic(), isOptionMissingTaxaHeuristic(), progress);
+						ALLOW_OPTION_REFINEMENT_HEURISTIC && isOptionRefinementHeuristic(), isOptionMissingTaxaHeuristic(), progress);
 
 				// var resultList = PhyloFusionAlgorithmMay2024.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
 
