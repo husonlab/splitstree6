@@ -34,7 +34,8 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Squa
 
 /**
  * Neighbor-net weights computation
- * Dave Bryant, 2024, 2026 performance improvements
+ * Dave Bryant, 2024
+ * 2026 performance improvements with the help of Claude
  */
 public class NeighborNetSplitWeightsClean {
 
@@ -206,7 +207,7 @@ public class NeighborNetSplitWeightsClean {
 	 * @param d         square array of distances
 	 * @param activeSet square array of boolean: specifying active (zero) set.
 	 * @param params    parameters - uses params.cgnrIterations for max number of iterations
-	 *                  and params.tolerance for bound on gradient at convergence
+	 *                  and params.cgnrTolerance for bound on gradient at convergence
 	 * @return int          number of iterations
 	 */
 	static public int cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params, ProgressListener progress) throws CanceledException {
@@ -357,7 +358,7 @@ public class NeighborNetSplitWeightsClean {
 
 		//xstar is infeasible.
 		//Store values in a structure for sorting
-		SortedPairs sortedPairs = new SortedPairs(n);
+		var sortedPairs = new SortedPairs(n);
 		for (var i = 1; i <= n; i++)
 			for (var j = i + 1; j <= n; j++)
 				if (xstar[i][j] < 0)
@@ -482,7 +483,6 @@ public class NeighborNetSplitWeightsClean {
 			vals[b] = tv;
 		}
 	}
-
 
 	/**
 	 * gradient Projection algorithm
