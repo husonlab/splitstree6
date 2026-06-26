@@ -82,6 +82,7 @@ public class DoTanglegram {
 		System.err.printf("Initial score: %.1f%n", initialScore);
 
 		var bestScore = new Single<>(initialScore);
+		var bestJobId = new Single<>(Integer.MAX_VALUE);
 
 		if (optimizeTaxonDisplacement1 || finalOptimizeReticulateDisplacement1 || optimizeTaxonDisplacement2 || finalOptimizeReticulateDisplacement2) {
 			int rounds;
@@ -125,21 +126,20 @@ public class DoTanglegram {
 
 				progress.setTasks("Tanglegram", "optimizing");
 
-				var nJobs = ((!network1.hasReticulateEdges() && !network2.hasReticulateEdges()) ? 1 : PARALLEL_JOBS);
-				nJobs = 32;
+				var nJobs = 32; //((!network1.hasReticulateEdges() && !network2.hasReticulateEdges()) ? 1 : PARALLEL_JOBS);
 				var jobs = new ArrayList<>(IteratorUtils.asList(BitSetUtils.range(0, nJobs)));
 
 				progress.setMaximum(jobs.size());
-				ExecuteInParallel.apply(jobs, job -> {
-					if (false) System.err.println("Job: " + job);
-					var jobRandom = new Random(13L * job);
+				ExecuteInParallel.apply(jobs, jobId -> {
+					if (false) System.err.println("Job: " + jobId);
+					var jobRandom = new Random(13L * jobId);
 					var jobNetwork1 = new PhyloTree();
 					var jobChildrenMap1 = new HashMap<Node, List<Node>>();
 					var jobBackMap1 = new HashMap<Node, Node>();
 					try (NodeArray<Node> srcTarMap1 = network1.newNodeArray()) {
 						jobNetwork1.copy(network1, srcTarMap1, null);
 						jobBackMap1 = invert(srcTarMap1);
-						var randomize = (job == 0 ? Randomize.None : (network1.hasReticulateEdges() ? Randomize.LSANodes : Randomize.All));
+						var randomize = (jobId == 0 ? Randomize.None : (network1.hasReticulateEdges() ? Randomize.LSANodes : Randomize.All));
 						jobChildrenMap1 = copyAndPermuteLSAChildren(childrenMap1, srcTarMap1, randomize, jobRandom);
 					}
 					var jobNetwork2 = new PhyloTree();
@@ -148,7 +148,7 @@ public class DoTanglegram {
 					try (NodeArray<Node> srcTarMap2 = network2.newNodeArray()) {
 						jobNetwork2.copy(network2, srcTarMap2, null);
 						jobBackMap2 = invert(srcTarMap2);
-						var randomize = (job == 0 ? Randomize.None : (network2.hasReticulateEdges() ? Randomize.LSANodes : Randomize.All));
+						var randomize = (jobId == 0 ? Randomize.None : (network2.hasReticulateEdges() ? Randomize.LSANodes : Randomize.All));
 						jobChildrenMap2 = copyAndPermuteLSAChildren(childrenMap2, srcTarMap2, randomize, jobRandom);
 					}
 
@@ -183,7 +183,7 @@ public class DoTanglegram {
 					}
 
 					//need to map back to original networks:
-					if (jobBestScore < bestScore.get()) {
+					if (jobBestScore < bestScore.get() || jobBestScore == bestScore.get() && jobId < bestJobId.get()) {
 						var entries1 = new ArrayList<>(jobBestChildrenMap1.entrySet());
 						jobBestChildrenMap1.clear();
 						for (var entry : entries1) {
@@ -201,9 +201,10 @@ public class DoTanglegram {
 						}
 
 						synchronized (bestScore) {
-							if (jobBestScore < bestScore.get()) {
+							if (jobBestScore < bestScore.get() || jobBestScore == bestScore.get() && jobId < bestJobId.get()) {
 								if (false) System.err.println(bestScore.get() + " -> " + jobBestScore);
 								bestScore.set(jobBestScore);
+								bestJobId.set(jobId);
 								bestChildrenMap1.get().clear();
 								bestChildrenMap1.get().putAll(jobBestChildrenMap1);
 								bestChildrenMap2.get().clear();
@@ -264,16 +265,17 @@ public class DoTanglegram {
 
 	private static HashMap<Node, List<Node>> copyAndPermuteLSAChildren(HashMap<Node, List<Node>> childrenMap, Map<Node, Node> srcTarMap, Randomize randomize, Random random) {
 		var copyChildrenMap = new HashMap<Node, List<Node>>();
-		for (var entry : childrenMap.entrySet()) {
-			var key = srcTarMap.get(entry.getKey());
-			var values = new ArrayList<>(entry.getValue().stream().map(srcTarMap::get).toList());
+		var keys = new ArrayList<>(childrenMap.keySet());
+		keys.sort(Comparator.comparingInt(Node::getId));
+		for (var key : keys) {
+			var values = new ArrayList<>(childrenMap.get(key).stream().map(srcTarMap::get).toList());
 			if (values.size() > 1) {
 				var networkChildren = IteratorUtils.asSet(key.children());
 				if (randomize == Randomize.All || (randomize == Randomize.LSANodes && !networkChildren.containsAll(values))) {
 					Collections.shuffle(values, random);
 				}
 			}
-			copyChildrenMap.put(key, values);
+			copyChildrenMap.put(srcTarMap.get(key), values);
 		}
 		return copyChildrenMap;
 	}
