@@ -122,6 +122,11 @@
                 <version>2.6.4</version>
         </dependency>
             -->
+        <dependency>
+            <groupId>org.ojalgo</groupId>
+            <artifactId>ojalgo</artifactId>
+            <version>55.2.0</version>
+        </dependency>
     </dependencies>
 
     <build>

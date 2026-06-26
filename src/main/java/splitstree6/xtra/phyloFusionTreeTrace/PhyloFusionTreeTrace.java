@@ -45,6 +45,19 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
         }
     }
 
+    public enum EdgeWeightMethod {
+        AVERAGE,
+        LP,
+        LP_RETICULATES_ZERO,
+        NNLS
+    }
+
+    private EdgeWeightMethod edgeWeightMethod = EdgeWeightMethod.AVERAGE;
+
+    public void setEdgeWeightMethod(EdgeWeightMethod edgeWeightMethod) {
+        this.edgeWeightMethod = edgeWeightMethod;
+    }
+
     @Override
     public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
         progress.setTasks("PhyloFusionTreeTrace", "init");
@@ -113,11 +126,24 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
                 network.delDivertex(v);
             }
 
-            if (count <= 10 && isOptionCalculateWeights()) {
+            /**if (count <= 10 && isOptionCalculateWeights()) {
                 NetworkUtils.setEdgeWeights(treesBlock.getTrees(), network, isOptionNormalizeEdgeWeights(), 3000);
-            }
+            }**/
             if (network.getRoot().getOutDegree() == 1)
                 network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
+
+            switch (edgeWeightMethod) {
+                case AVERAGE ->
+                    NetworkEdgeWeightsComputation.mean(treesBlock.getTrees(), network);
+                case LP ->
+                        NetworkEdgeWeightsComputation.LP(treesBlock.getTrees(), network);
+                case NNLS ->
+                        NetworkEdgeWeightsComputation.NNLS(treesBlock.getTrees(), network);
+                case LP_RETICULATES_ZERO ->
+                        NetworkEdgeWeightsComputation.LPReticulatesZero(treesBlock.getTrees(), network);
+            }
+
+            NetworkEdgesWeightHelpers.printFitStatistics(edgeWeightMethod, treesBlock.getTrees(), network);
 
             //debugPrintNetworkTrace(network);
             System.err.println(toExtendedNewickWithTT(network));
