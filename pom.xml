@@ -84,11 +84,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.install4j</groupId>
-            <artifactId>install4j-runtime</artifactId>
-            <version>11.0.4</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math4-legacy</artifactId>
             <version>4.0-beta1</version>
@@ -125,7 +120,7 @@
         <dependency>
             <groupId>org.ojalgo</groupId>
             <artifactId>ojalgo</artifactId>
-            <version>55.2.0</version>
+            <version>57.0.0</version>
         </dependency>
     </dependencies>
 
@@ -191,13 +186,5 @@
 
     </build>
     <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>ej-technologies</id>
-            <url>https://maven.ej-technologies.com/repository</url>
-        </repository>
     </repositories>
 </project>

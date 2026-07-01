@@ -28,6 +28,7 @@ import javafx.collections.*;
 import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
@@ -552,4 +553,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		return true;
 	}
 
+	@Override
+	public ScrollPane getScrollPane() {
+		return controller.getScrollPane();
+	}
 }

@@ -32,6 +32,7 @@ import javafx.geometry.Dimension2D;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -555,5 +556,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public boolean allowFindReplace() {
 		return true;
+	}
+
+
+	@Override
+	public ScrollPane getScrollPane() {
+		return controller.getScrollPane();
 	}
 }

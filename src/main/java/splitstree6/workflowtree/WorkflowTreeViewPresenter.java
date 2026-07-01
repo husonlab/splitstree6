@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import jloda.fx.find.FindToolBar;
@@ -51,11 +52,12 @@ import static splitstree6.contextmenus.datanode.DataNodeContextMenuPresenter.cre
 public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 	private final WorkflowTreeView workflowTreeView;
+	private final WorkflowTreeViewController controller;
 
 	public WorkflowTreeViewPresenter(MainWindow mainWindow, WorkflowTreeView workflowTreeView) {
 		this.mainWindow = mainWindow;
 		this.workflowTreeView = workflowTreeView;
-		var controller = workflowTreeView.getController();
+		this.controller = workflowTreeView.getController();
 		var workflow = mainWindow.getWorkflow();
 		var treeView = controller.getWorkflowTreeView();
 
@@ -189,5 +191,10 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public boolean allowFindReplace() {
 		return false;
+	}
+
+	@Override
+	public ScrollPane getScrollPane() {
+		return null;
 	}
 }

@@ -20,7 +20,6 @@
 
 package splitstree6.view.trees.tanglegram;
 
-import jloda.graph.DAGTraversals;
 import jloda.graph.Node;
 import jloda.graph.algorithms.PQTree;
 import jloda.phylo.PhyloTree;
@@ -29,7 +28,10 @@ import jloda.util.IteratorUtils;
 import jloda.util.SetUtils;
 import splitstree6.utils.TreesUtils;
 
-import java.util.*;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Deprecated
@@ -85,47 +87,12 @@ public class PQTreeHeuristic {
 			taxonRankMap.put(ordering.get(r), r);
 		}
 
-		sortByRank(network1, childMap1, commonTaxa, taxonRankMap);
-		sortByRank(network2, childMap2, commonTaxa, taxonRankMap);
+		NNCircularOrderingHeuristic.sortByRank(network1, childMap1, commonTaxa, taxonRankMap);
+		NNCircularOrderingHeuristic.sortByRank(network2, childMap2, commonTaxa, taxonRankMap);
 
 		System.err.printf("PQ-tree presort: %d offered, %d accepted%n", offered, accepted);
 
 		return offered == accepted;
 	}
 
-	public static void sortByRank(PhyloTree network, Map<Node, List<Node>> childMap, BitSet commonTaxa, Map<Integer, Integer> taxonRankMap) {
-		try (var nodeLowestMap = network.newNodeIntArray()) {
-			DAGTraversals.postOrderTraversal(network.getRoot(), childMap::get, v -> {
-				var children = childMap.get(v);
-				if (children.isEmpty() || v.isLeaf()) {
-					if (network.hasTaxa(v)) {
-						var t = network.getTaxon(v);
-						if (commonTaxa.get(t)) {
-							nodeLowestMap.put(v, taxonRankMap.get(t));
-						}
-					}
-				} else {
-					var av = 0;
-					var count = 0;
-					var childrenToSort = new ArrayList<Node>();
-					for (var child : children) {
-						if (nodeLowestMap.get(child) != null) { // ignore unsortable children
-							childrenToSort.add(child);
-							av += nodeLowestMap.get(child);
-							count++;
-						}
-					}
-					if (count > 0)
-						nodeLowestMap.put(v, av / count);
-					childrenToSort.sort(Comparator.comparingInt(nodeLowestMap::get));
-					var pos = 0;
-					for (int i = 0; i < children.size(); i++) {
-						var child = children.get(i);
-						if (nodeLowestMap.get(child) != null) // ignore unsortable children
-							children.set(i, childrenToSort.get(pos++));
-					}
-				}
-			});
-		}
-	}
 }

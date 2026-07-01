@@ -20,14 +20,13 @@
 
 package splitstree6.view.trees.tanglegram;
 
+import jloda.graph.DAGTraversals;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
 
 import java.util.*;
-
-import static splitstree6.view.trees.tanglegram.PQTreeHeuristic.sortByRank;
 
 /**
  * NNet-presorting heuristic for tanglegrams
@@ -122,5 +121,41 @@ public class NNCircularOrderingHeuristic {
 				distances[i][j] = distances[j][i] = weight;
 			}
 		return distances;
+	}
+
+	public static void sortByRank(PhyloTree network, Map<Node, List<Node>> childMap, BitSet commonTaxa, Map<Integer, Integer> taxonRankMap) {
+		try (var nodeLowestMap = network.newNodeIntArray()) {
+			DAGTraversals.postOrderTraversal(network.getRoot(), childMap::get, v -> {
+				var children = childMap.get(v);
+				if (children.isEmpty() || v.isLeaf()) {
+					if (network.hasTaxa(v)) {
+						var t = network.getTaxon(v);
+						if (commonTaxa.get(t)) {
+							nodeLowestMap.put(v, taxonRankMap.get(t));
+						}
+					}
+				} else {
+					var av = 0;
+					var count = 0;
+					var childrenToSort = new ArrayList<Node>();
+					for (var child : children) {
+						if (nodeLowestMap.get(child) != null) { // ignore unsortable children
+							childrenToSort.add(child);
+							av += nodeLowestMap.get(child);
+							count++;
+						}
+					}
+					if (count > 0)
+						nodeLowestMap.put(v, av / count);
+					childrenToSort.sort(Comparator.comparingInt(nodeLowestMap::get));
+					var pos = 0;
+					for (int i = 0; i < children.size(); i++) {
+						var child = children.get(i);
+						if (nodeLowestMap.get(child) != null) // ignore unsortable children
+							children.set(i, childrenToSort.get(pos++));
+					}
+				}
+			});
+		}
 	}
 }

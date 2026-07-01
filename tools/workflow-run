@@ -25,14 +25,12 @@ fi
 bin_dir=$(dirname "$0")       # may be relative path
 bin_dir=$(cd "$bin_dir" && pwd)    # ensureNode absolute path
 jars_dir="$bin_dir/../jars"
-jars2_dir="$bin_dir/../jars2"
 
 jre_dir=${installer:sys.preferredJre}
 
 java=$jre_dir/bin/java
 vmOptions=$(grep "^-" $bin_dir/../SplitsTree.vmoptions)
-modulepath="$jars_dir:$jars2_dir"
 
 java_flags="-server -Duser.language=en -Duser.region=US $vmOptions"
 
-$java $java_flags --module-path=$modulepath --add-modules=splitstreesix splitstree6.tools.RunWorkflow  $options
+$java $java_flags --module-path=$jars_dir --add-modules=splitstreesix splitstree6.tools.RunWorkflow  $options

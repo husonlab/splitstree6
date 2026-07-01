@@ -26,6 +26,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.MultiTouchGestureMonitor;
 import jloda.fx.find.FindToolBar;
@@ -193,5 +194,11 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 		if (workflow.getSelectionModel().getSelectedItems().size() < workflow.getNumberOfNodes()) {
 			workflow.getSelectionModel().selectAll(workflow.nodes());
 		} else workflow.getSelectionModel().clearSelection();
+	}
+
+
+	@Override
+	public ScrollPane getScrollPane() {
+		return controller.getScrollPane();
 	}
 }

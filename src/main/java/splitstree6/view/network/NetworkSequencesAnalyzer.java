@@ -29,6 +29,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.AmbiguityCodes;
 
 import java.util.HashMap;
+import java.util.function.IntFunction;
 
 public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean useAmbiguityCodes,
 									   boolean ambiguityCharsAreStates) {
@@ -141,13 +142,13 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 		return sum;
 	}
 
-	public String computeEdgeLabel(String sequence1, String sequence2) {
+	public String computeEdgeLabel(String sequence1, String sequence2, IntFunction<Integer> mapBackIndex) {
 		var buf = new StringBuilder();
 		for (var i = 0; i < sequence1.length(); i++) {
 			if (differ(sequence1.charAt(i), sequence2.charAt(i))) {
 				if (!buf.isEmpty())
 					buf.append(",");
-				buf.append(i + 1);
+				buf.append(mapBackIndex.apply(i));
 			}
 		}
 		return buf.toString();

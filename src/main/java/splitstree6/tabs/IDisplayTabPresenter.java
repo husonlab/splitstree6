@@ -19,6 +19,7 @@
 
 package splitstree6.tabs;
 
+import javafx.scene.control.ScrollPane;
 import jloda.fx.find.FindToolBar;
 
 public interface IDisplayTabPresenter {
@@ -27,4 +28,8 @@ public interface IDisplayTabPresenter {
 	FindToolBar getFindToolBar();
 
 	boolean allowFindReplace();
+
+	default ScrollPane getScrollPane() {
+		return null;
+	}
 }

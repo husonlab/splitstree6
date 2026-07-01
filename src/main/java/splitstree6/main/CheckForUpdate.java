@@ -1,5 +1,5 @@
 /*
- *  CheckForUpdate.java Copyright (C) 2024 Daniel H. Huson
+ * CheckForUpdate.java Copyright (C) 2025 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -15,62 +15,28 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package splitstree6.main;
 
-import com.install4j.api.launcher.ApplicationLauncher;
-import com.install4j.api.update.ApplicationDisplayMode;
-import com.install4j.api.update.UpdateChecker;
-import jloda.fx.util.ProgramProperties;
-import jloda.fx.window.NotificationManager;
-import jloda.util.Basic;
-
-import java.util.concurrent.Executors;
+import jloda.fx.dialog.MessageInternalDialog;
+import splitstree6.window.MainWindow;
 
 /**
  * check for update
- * Daniel Huson, 5.2018
+ * Daniel Huson, 6.2026
  */
 public class CheckForUpdate {
-	public static String programURL = "https://software-ab.cs.uni-tuebingen.de/download/splitstree6";
-	public static String applicationId = "1691242391";
-
 	/**
 	 * check for update, download and install, if present
 	 */
-	public static void apply() {
-		try {
-			final var applicationDisplayMode = ProgramProperties.isUseGUI() ? ApplicationDisplayMode.GUI : ApplicationDisplayMode.CONSOLE;
-			final var updateDescriptor = UpdateChecker.getUpdateDescriptor(programURL + "/updates.xml", applicationDisplayMode);
-			final var possibleUpdate = updateDescriptor.getPossibleUpdateEntry();
-			if (possibleUpdate == null) {
-				NotificationManager.showInformation("Installed version is up-to-date");
-			} else {
-				if (!ProgramProperties.isUseGUI()) {
-					NotificationManager.showInformation("New version available: " + possibleUpdate.getNewVersion() + "\nPlease download from: " + programURL);
-				} else {
-					final Runnable runnable = () -> {
-						System.err.println("Launching privateupdater dialog");
-						ApplicationLauncher.launchApplicationInProcess(applicationId, null,
-								new ApplicationLauncher.Callback() {
-									public void exited(int exitValue) {
-										System.err.println("Exit value: " + exitValue);
-									}
-
-									public void prepareShutdown() {
-										ProgramProperties.store();
-									}
-								},
-								ApplicationLauncher.WindowMode.FRAME, null);
-					};
-					//SwingUtilities.invokeLater(runnable);
-					Executors.newSingleThreadExecutor().submit(runnable);
-				}
-			}
-		} catch (Exception e) {
-			Basic.caught(e);
-			NotificationManager.showInformation("Failed to check for updates: " + e);
-		}
+	public static void apply(MainWindow mainWindow) {
+		var text = """
+				%s updates have moved to GitHub.
+				Please download the latest release from: %s
+				""".formatted(Version.NAME, Version.HOME_URL);
+		var dialog = new MessageInternalDialog(mainWindow.getController().getRightAnchorPane(), "Updates have moved", text);
+		dialog.show();
 	}
 }

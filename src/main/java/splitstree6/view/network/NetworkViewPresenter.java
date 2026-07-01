@@ -24,6 +24,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
+import javafx.scene.control.ScrollPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.selection.SelectionModel;
@@ -305,5 +306,10 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public boolean allowFindReplace() {
 		return true;
+	}
+
+	@Override
+	public ScrollPane getScrollPane() {
+		return controller.getScrollPane();
 	}
 }

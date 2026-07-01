@@ -765,4 +765,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				menuItem.setSelected(true);
 		}
 	}
+
+	@Override
+	public ScrollPane getScrollPane() {
+		return controller.getScrollPane();
+	}
 }

@@ -14,8 +14,8 @@ module splitstreesix {
 	requires org.apache.commons.collections4;
 	requires org.apache.commons.math4.legacy;
 	requires org.apache.commons.math4.legacy.exception;
+	requires org.apache.commons.numbers.gamma;
 
-	requires com.install4j.runtime;
 	requires java.sql;
 	requires java.sql.rowset;
 	requires java.desktop;
@@ -25,10 +25,8 @@ module splitstreesix {
 	requires org.xerial.sqlitejdbc;
 	requires com.fasterxml.jackson.databind;
 	requires jdk.httpserver;
-	requires org.apache.commons.numbers.gamma;
 	requires jdk.compiler;
 
-	// requires razornet;
 	requires reactfx;
     requires ojalgo;
 
@@ -250,5 +248,6 @@ module splitstreesix {
 	exports splitstree6.algorithms.source.source2characters;
 	exports splitstree6.view.network;
 	exports splitstree6.view.format.taxlabel;
+	exports splitstree6.view.alignment;
 
 }

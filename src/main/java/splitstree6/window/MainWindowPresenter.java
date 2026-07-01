@@ -431,12 +431,14 @@ public class MainWindowPresenter {
 
 		controller.getCopyImageMenuItem().setOnAction(e -> {
 			if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
-				ClipboardUtils.putImage(focusedDisplayTab.get().getMainNode());
+				var scrollPane = focusedDisplayTab.get().getPresenter().getScrollPane();
+				ClipboardUtils.putImage(focusedDisplayTab.get().getMainNode(), scrollPane);
 			}
 		});
 		controller.getPrintMenuItem().setOnAction(e -> {
 			if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
-				Print.printNode(mainWindow.getStage(), focusedDisplayTab.get().getMainNode());
+				var scrollPane = focusedDisplayTab.get().getPresenter().getScrollPane();
+				Print.printNode(mainWindow.getStage(), focusedDisplayTab.get().getMainNode(), scrollPane);
 			}
 		});
 		controller.getCopyImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
@@ -447,8 +449,10 @@ public class MainWindowPresenter {
 		controller.getPasteMenuItem().setDisable(true);
 
 		controller.getExportImageMenuItem().setOnAction(e -> {
-			if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null)
-				ExportImageDialog.show(mainWindow.getFileName(), mainWindow.getStage(), focusedDisplayTab.get().getMainNode());
+			if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
+				var scrollPane = focusedDisplayTab.get().getPresenter().getScrollPane();
+				ExportImageDialog.show(mainWindow.getFileName(), mainWindow.getStage(), focusedDisplayTab.get().getMainNode(), true, scrollPane);
+			}
 		});
 		controller.getExportImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
 
@@ -716,7 +720,7 @@ public class MainWindowPresenter {
 
 		controller.getAboutMenuItem().setOnAction((e) -> SplashScreen.showSplash(Duration.ofMinutes(1)));
 
-		controller.getCheckForUpdatesMenuItem().setOnAction(e -> CheckForUpdate.apply());
+		controller.getCheckForUpdatesMenuItem().setOnAction(e -> CheckForUpdate.apply(mainWindow));
 		controller.getCheckForUpdatesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not().or(MainWindowManager.getInstance().sizeProperty().greaterThan(1)));
 
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(a -> updateEnableStateAlgorithms());

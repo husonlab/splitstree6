@@ -32,6 +32,7 @@ import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.util.StringConverter;
@@ -564,5 +565,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		return true;
 	}
 
-	private final ImageView qrImageView = new ImageView();
+	@Override
+	public ScrollPane getScrollPane() {
+		return controller.getScrollPane();
+	}
 }

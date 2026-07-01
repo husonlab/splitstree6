@@ -24,8 +24,18 @@ package splitstree6.main;
  * Daniel Huson, 6.2017
  */
 public class Version {
-	static public final String NAME = "SplitsTree App";
-	static public final String SHORT_DESCRIPTION = "SplitsTree App (version 6.7.9, built 25 May 2026)";
-	static public final String VERSION = "6.0.0";
+	static public final String NAME = "SplitsTree";
+	public static final String SUFFIX = ".stree6";
+	static public String HOME_URL = "https://github.com/husonlab/splitstree6";
 
+	public static final String VERSION = resolveVersion();
+	public static final String SHORT_DESCRIPTION = NAME + " (version 6.8.0, built 01 Jul 2026) - License GPL v3";
+
+	static public final String WEBSITE_URL = "https://husonlab.github.io/splitstree6/doc/manual.html";
+
+	public static String resolveVersion() {
+		var pkg = Version.class.getPackage();
+		var v = (pkg != null) ? pkg.getImplementationVersion() : null;
+		return (v != null && !v.isBlank()) ? v : "dev";
+	}
 }

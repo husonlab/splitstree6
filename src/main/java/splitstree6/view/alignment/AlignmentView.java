@@ -90,7 +90,7 @@ public class AlignmentView implements IView {
 	private final ObjectProperty<BitSet> selectedSites = new SimpleObjectProperty<>(this, "selectedSites", new BitSet()); // selected sites, based input characters
 
 	private final ObjectProperty<BitSet> activeTaxa = new SimpleObjectProperty<>(this, "activeTaxa", new BitSet()); // active taxa ids, based on input taxa
-	private final ObjectProperty<BitSet> activeSites = new SimpleObjectProperty<>(this, "activeSites", new BitSet()); // active sites, based input characters
+	private final ObjectProperty<BitSet> activeSites = new SimpleObjectProperty<>(this, "activeSites", new BitSet()); // active sites, based on input characters
 
 	private final BooleanProperty nucleotideData = new SimpleBooleanProperty(this, "nucleotideData");
 
@@ -487,6 +487,11 @@ public class AlignmentView implements IView {
 	}
 
 
+	/**
+	 * set active sites, 1-based
+	 *
+	 * @param activeSites
+	 */
 	public void setActiveSites(BitSet activeSites) {
 		if (!activeSites.equals(getActiveSites()))
 			this.activeSites.set(activeSites);
@@ -505,6 +510,10 @@ public class AlignmentView implements IView {
 		return selectedSites;
 	}
 
+	/**
+	 * get active sites, 1-based
+	 * @return active sites
+	 */
 	public BitSet getActiveSites() {
 		return activeSites.get();
 	}
