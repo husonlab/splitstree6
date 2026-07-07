@@ -36,6 +36,13 @@
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
 
         <main.class>splitstree6.main.SplitsTree6</main.class>
+
+        <!-- Group IDs excluded from the copied runtime dependencies (target/dependency).
+             Empty by default, so JavaFX IS copied - required to run the app on a plain
+             JDK, e.g. the standalone command-line tools. The installer build overrides
+             this with -Dcopy.dependencies.excludeGroupIds=org.openjfx, since there JavaFX
+             is supplied by the jlinked runtime and must be kept off the classpath. -->
+        <copy.dependencies.excludeGroupIds></copy.dependencies.excludeGroupIds>
     </properties>
 
     <dependencies>
@@ -80,7 +87,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.21.2</version>
+            <version>2.21.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -162,7 +169,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <excludeGroupIds>org.openjfx</excludeGroupIds>
+                            <excludeGroupIds>${copy.dependencies.excludeGroupIds}</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
