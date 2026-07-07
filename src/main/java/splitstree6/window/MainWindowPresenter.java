@@ -38,6 +38,7 @@ import jloda.fx.dialog.ExportImageDialog;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
 import jloda.fx.print.Print;
+import jloda.fx.service.UpdateService;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.*;
 import jloda.fx.window.MainWindowManager;
@@ -97,7 +98,7 @@ import splitstree6.io.nexus.TaxaNexusOutput;
 import splitstree6.io.nexus.TraitsNexusOutput;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.utils.ReaderWriterBase;
-import splitstree6.main.CheckForUpdate;
+import splitstree6.main.Version;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -720,8 +721,9 @@ public class MainWindowPresenter {
 
 		controller.getAboutMenuItem().setOnAction((e) -> SplashScreen.showSplash(Duration.ofMinutes(1)));
 
-		controller.getCheckForUpdatesMenuItem().setOnAction(e -> CheckForUpdate.apply(mainWindow));
-		controller.getCheckForUpdatesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not().or(MainWindowManager.getInstance().sizeProperty().greaterThan(1)));
+		var updaterService = UpdateService.get();
+		controller.getCheckForUpdatesMenuItem().setOnAction(e -> updaterService.checkForUpdates(mainWindow.getStage(), Version.HOME_URL, Version.NAME, Version.VERSION));
+		controller.getCheckForUpdatesMenuItem().disableProperty().bind(updaterService.disabledProperty().or(MainWindowManager.getInstance().sizeProperty().greaterThan(1)).or(mainWindow.dirtyProperty()));
 
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(a -> updateEnableStateAlgorithms());
 
