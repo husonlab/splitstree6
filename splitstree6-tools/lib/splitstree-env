@@ -1,0 +1,202 @@
+#!/usr/bin/env bash
+
+#
+# splitstree-env Copyright (C) 2026 Daniel H. Huson
+#
+#  (Some files contain contributions from other authors, who are then mentioned separately.)
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+
+# Shared SplitsTree6 tools environment.
+#
+# Supported layouts:
+#
+# 1. Standalone tools package (the intended layout, mirroring megan7-tools):
+#
+#    splitstree6-tools/
+#      tools/                  the launchers (splitstree6, workflow-run, ...)
+#      lib/
+#        splitstree-env
+#        jars/                 <- COMPLETE module path, INCLUDING JavaFX (see note below)
+#
+# 2. Maven source checkout with a tools directory:
+#
+#    splitstree6/
+#      splitstree6-tools/
+#        tools/
+#        lib/
+#          splitstree-env
+#      target/
+#        <app>.jar
+#        dependency/           <- must also include the JavaFX jars
+#
+# This file sets:
+#
+#   ST_TOOLS_DIR
+#   ST_SOURCE_DIR
+#   ST_JAVA
+#   ST_MODULE_PATH
+#   ST_MODULE
+#   ST_UPDATER_MODULE
+#
+# NOTE ON JavaFX: these tools deliberately run on the *system* Java, not the
+# runtime jpackage bundles into the app. A system JDK does not contain JavaFX,
+# and the splitstreesix module requires JavaFX, so the jars directory used below
+# MUST contain the JavaFX jars for the module graph to resolve. This is the one
+# way the tools' jar set differs from the app's own Contents/app directory, which
+# excludes JavaFX (JavaFX is jlinked into the app's bundled runtime instead).
+
+set -euo pipefail
+
+lib_dir=$(dirname "${BASH_SOURCE[0]}")
+lib_dir=$(cd "$lib_dir" && pwd)
+
+ST_TOOLS_DIR=$(cd "$lib_dir/.." && pwd)
+ST_SOURCE_DIR="$ST_TOOLS_DIR"
+
+tools_basename=$(basename "$ST_TOOLS_DIR")
+
+# In a source checkout, ST_TOOLS_DIR is usually <source>/splitstree6-tools.
+if [[ "$tools_basename" == "splitstree6-tools" ]]; then
+    parent_dir=$(cd "$ST_TOOLS_DIR/.." && pwd)
+    if [[ -d "$parent_dir/target" || -f "$parent_dir/pom.xml" ]]; then
+        ST_SOURCE_DIR="$parent_dir"
+    fi
+fi
+
+# --- Locate Java. Installed tools intentionally use the system Java (a JavaFX-capable JDK). ---
+# Set this to match your splitstree6 maven.compiler.release.
+MIN_JAVA_VERSION=17
+
+if [[ -n "${JAVA_HOME:-}" && -x "$JAVA_HOME/bin/java" ]]; then
+    ST_JAVA="$JAVA_HOME/bin/java"
+elif command -v java >/dev/null 2>&1; then
+    ST_JAVA="$(command -v java)"
+else
+    echo "ERROR: Java not found." >&2
+    echo "Please install a Java $MIN_JAVA_VERSION+ JDK (with JavaFX) and make sure java is on your PATH." >&2
+    exit 1
+fi
+
+JAVA_ARCH=$("$ST_JAVA" -XshowSettings:properties -version 2>&1 \
+    | awk -F= '/os.arch/ {gsub(/[ \t]/,"",$2); print $2; exit}')
+
+UNAME_ARCH=$(uname -m)
+
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    if [[ "$UNAME_ARCH" == "arm64" && "$JAVA_ARCH" != "aarch64" ]]; then
+        echo "ERROR: You are running an Intel/x86_64 Java on an Apple Silicon Mac." >&2
+        echo "The SplitsTree6 tools for macos-aarch64 require an ARM64 Java $MIN_JAVA_VERSION or later." >&2
+        echo >&2
+        echo "Install an ARM64 JDK, then run for example:" >&2
+        echo "  export JAVA_HOME=\$(/usr/libexec/java_home -v $MIN_JAVA_VERSION -a arm64)" >&2
+        echo "  export PATH=\"\$JAVA_HOME/bin:\$PATH\"" >&2
+        exit 1
+    fi
+fi
+
+version_output=$("$ST_JAVA" -version 2>&1 | head -1 || true)
+if [[ "$version_output" =~ version\ \"([0-9]+) ]]; then
+    java_major="${BASH_REMATCH[1]}"
+elif [[ "$version_output" =~ openjdk\ ([0-9]+) ]]; then
+    java_major="${BASH_REMATCH[1]}"
+else
+    java_major="$MIN_JAVA_VERSION"
+fi
+
+if (( java_major < MIN_JAVA_VERSION )); then
+    echo "ERROR: Java $MIN_JAVA_VERSION or later is required." >&2
+    echo "Found: $version_output" >&2
+    echo "Using: $ST_JAVA" >&2
+    exit 1
+fi
+
+# Installed layout: <install-dir>/lib/jars/*.jar (a complete module path, incl JavaFX).
+installed_jars_dir="$ST_TOOLS_DIR/lib/jars"
+
+if [[ -d "$installed_jars_dir" ]]; then
+    jars=()
+    while IFS= read -r -d '' f; do
+        jars+=("$f")
+    done < <(find "$installed_jars_dir" -maxdepth 1 -type f -name '*.jar' -print0 | sort -z)
+
+    if [[ ${#jars[@]} -eq 0 ]]; then
+        echo "ERROR: no jars found in:" >&2
+        echo "  $installed_jars_dir" >&2
+        exit 1
+    fi
+
+    ST_MODULE_PATH=$(IFS=: ; echo "${jars[*]}")
+else
+    # Maven checkout layout: <source>/target/<app>.jar and <source>/target/dependency/*.jar.
+    # The single jar directly in target/ (not under dependency/) is the application jar,
+    # so we do not need to know its exact artifactId.
+    target_dir="$ST_SOURCE_DIR/target"
+    dependency_dir="$target_dir/dependency"
+
+    MAIN_JAR=$(find "$target_dir" -maxdepth 1 -type f -name '*.jar' \
+        ! -name '*sources.jar' \
+        ! -name '*javadoc.jar' \
+        2>/dev/null | head -1)
+
+    if [[ -z "${MAIN_JAR:-}" ]]; then
+        echo "ERROR: could not find the SplitsTree6 application jar in:" >&2
+        echo "  $target_dir" >&2
+        echo >&2
+        echo "Run Maven first, for example:" >&2
+        echo "  mvn clean package dependency:copy-dependencies -DincludeScope=runtime" >&2
+        echo "(make sure JavaFX is NOT excluded from dependency/ for the tools to run on system Java)" >&2
+        exit 1
+    fi
+
+    if [[ ! -d "$dependency_dir" ]]; then
+        echo "ERROR: dependency directory not found:" >&2
+        echo "  $dependency_dir" >&2
+        echo >&2
+        echo "Run:" >&2
+        echo "  mvn dependency:copy-dependencies -DincludeScope=runtime" >&2
+        exit 1
+    fi
+
+    jars=("$MAIN_JAR")
+    while IFS= read -r -d '' f; do
+        jars+=("$f")
+    done < <(find "$dependency_dir" -maxdepth 1 -type f -name '*.jar' -print0 | sort -z)
+
+    ST_MODULE_PATH=$(IFS=: ; echo "${jars[*]}")
+fi
+
+# The application module. Note this is NOT derived from the tools-directory name:
+# the SplitsTree6 JPMS module is "splitstreesix" (as the existing tools already use
+# via --add-modules=splitstreesix), while the jar/artifact and directory use SplitsTree6.
+ST_MODULE="splitstreesix"
+
+# The GitHub updater is a service-provider module that ships only in installed
+# packages, not in a Maven/source build. Rooting it via --add-modules places it
+# in the module graph so ServiceLoader can discover its update-check provider.
+# Leave it empty when its jar is absent, so update-checking launchers (splitstree6-cli)
+# run with update checks disabled rather than failing to start on a missing module.
+ST_UPDATER_MODULE=""
+if echo "$ST_MODULE_PATH" | tr ':' '\n' | grep -q 'github-updater-.*\.jar'; then
+    ST_UPDATER_MODULE="org.husonlab.github_updater"
+fi
+
+export ST_MODULE
+export ST_UPDATER_MODULE
+export ST_TOOLS_DIR
+export ST_SOURCE_DIR
+export ST_JAVA
+export ST_MODULE_PATH

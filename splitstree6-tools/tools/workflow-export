@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+#
+# workflow-export Copyright (C) 2026 Daniel H. Huson
+#
+#  (Some files contain contributions from other authors, who are then mentioned separately.)
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+
+set -euo pipefail
+
+# Exports nodes from a workflow.
+
+if [[ $# -eq 0 ]]; then
+    set -- -h
+fi
+
+bin_dir=$(dirname "$0")
+bin_dir=$(cd "$bin_dir" && pwd)
+
+source "$bin_dir/../lib/splitstree-env"
+
+# Adjust -Xmx to match what your old SplitsTree.vmoptions used.
+JAVA_OPTIONS=(
+    -Xmx8G
+    -Dfile.encoding=UTF8
+    -Duser.language=en
+    -Duser.region=US
+)
+
+exec "$ST_JAVA" "${JAVA_OPTIONS[@]}" \
+    --module-path "$ST_MODULE_PATH" \
+    --add-modules "$ST_MODULE" \
+    splitstree6.tools.ExportWorkflow \
+    "$@"
