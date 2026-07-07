@@ -58,6 +58,11 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
         this.edgeWeightMethod = edgeWeightMethod;
     }
 
+    private boolean trace = false;
+    public boolean isTrace() {return trace;}
+    public void setTrace(boolean trace) {this.trace = trace;}
+
+
     @Override
     public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
         progress.setTasks("PhyloFusionTreeTrace", "init");
@@ -146,7 +151,17 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
             NetworkEdgesWeightHelpers.printFitStatistics(edgeWeightMethod, treesBlock.getTrees(), network);
 
             //debugPrintNetworkTrace(network);
-            System.err.println(toExtendedNewickWithTT(network));
+            if (isTrace()) {
+                System.err.println(toExtendedNewickWithTT(network));
+            } else {
+                for (var v : network.nodes()) {
+                    v.setData(null);
+                }
+                for (var e : network.edges()) {
+                    e.setData(null);
+                }
+                System.err.println(network.toBracketString() + ";");
+            }
             break;
         }
     }
