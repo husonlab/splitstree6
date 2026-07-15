@@ -16,6 +16,11 @@ body {
     line-height: 1.65;
 }
 
+img.graphics {
+    max-width: 100%;
+    height: auto;
+}
+
 /* Main manual content */
 body > *:not(.tableofcontents) {
     max-width: 900px;
