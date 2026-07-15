@@ -29,7 +29,7 @@ public class Version {
 	static public String HOME_URL = "https://github.com/husonlab/splitstree6";
 
 	public static final String VERSION = resolveVersion();
-	public static final String SHORT_DESCRIPTION = NAME + " (version 6.8.0, built 01 Jul 2026) - License GPL v3";
+	public static final String SHORT_DESCRIPTION = NAME + " (version " + VERSION + ") - License GPL v3";
 
 	static public final String WEBSITE_URL = "https://husonlab.github.io/splitstree6/doc/manual.html";
 
