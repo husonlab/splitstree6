@@ -24,7 +24,7 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21.0.0" xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.window.MainWindowController">
     <BorderPane fx:id="outsideBorderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -524,6 +524,13 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="aboutMenuItem" text="About..."
                                   userData="Show splash screen (authors, version number and license).">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="H" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="openManualInBrowserMenuItem" text="Open User Manual..."
+                                  userData="Open user manual in a browser.">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="H" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>

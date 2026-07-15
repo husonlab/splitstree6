@@ -31,7 +31,7 @@ public class Version {
 	public static final String VERSION = resolveVersion();
 	public static final String SHORT_DESCRIPTION = NAME + " (version " + VERSION + ") - License GPL v3";
 
-	static public final String WEBSITE_URL = "https://husonlab.github.io/splitstree6/doc/manual.html";
+	static public final String WEBSITE_URL = "https://husonlab.github.io/splitstree6";
 
 	public static String resolveVersion() {
 		var pkg = Version.class.getPackage();

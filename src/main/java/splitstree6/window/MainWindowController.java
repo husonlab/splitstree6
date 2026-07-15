@@ -415,6 +415,9 @@ public class MainWindowController {
 	private MenuItem aboutMenuItem;
 
 	@FXML
+	private MenuItem openManualInBrowserMenuItem;
+
+	@FXML
 	private SplitPane mainSplitPane;
 
 	@FXML
@@ -1180,6 +1183,10 @@ public class MainWindowController {
 
 	public GridPane getToolbarGrid() {
 		return toolbarGrid;
+	}
+
+	public MenuItem getOpenManualInBrowserMenuItem() {
+		return openManualInBrowserMenuItem;
 	}
 
 	private final Map<Property, Property> bidirectionalBoundPairs = new HashMap<>();
