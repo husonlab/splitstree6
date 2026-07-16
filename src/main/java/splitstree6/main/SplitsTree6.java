@@ -20,7 +20,6 @@
 package splitstree6.main;
 
 import javafx.application.Application;
-import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.stage.Stage;
@@ -60,8 +59,6 @@ public class SplitsTree6 extends Application {
 	private static boolean allowExperimental = false;
 
 	private static boolean showSplash;
-
-	private static HostServices hostServices;
 
 	/**
 	 * main
@@ -154,7 +151,7 @@ public class SplitsTree6 extends Application {
 	@Override
 	public void init() throws Exception {
 		PhyloTree.SUPPORT_RICH_NEWICK = true;
-		hostServices = getHostServices();
+		ProgramProperties.setHostServices(getHostServices());
 	}
 
 	@Override
@@ -193,9 +190,5 @@ public class SplitsTree6 extends Application {
 		return allowExperimental;
 	}
 
-	public static void openInBrowser(String url) {
-		if (hostServices != null)
-			hostServices.showDocument(url);
-	}
 }
 

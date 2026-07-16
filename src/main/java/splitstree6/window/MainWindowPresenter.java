@@ -98,7 +98,6 @@ import splitstree6.io.nexus.TaxaNexusOutput;
 import splitstree6.io.nexus.TraitsNexusOutput;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.utils.ReaderWriterBase;
-import splitstree6.main.SplitsTree6;
 import splitstree6.main.Version;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
@@ -725,7 +724,7 @@ public class MainWindowPresenter {
 
 		controller.getAboutMenuItem().setOnAction(e -> SplashScreen.showSplash(Duration.ofMinutes(1)));
 
-		controller.getOpenManualInBrowserMenuItem().setOnAction(e -> SplitsTree6.openInBrowser(Version.WEBSITE_URL));
+		controller.getOpenManualInBrowserMenuItem().setOnAction(e -> ProgramProperties.getHostServices().showDocument(Version.WEBSITE_URL));
 
 		var updaterService = UpdateService.get();
 		controller.getCheckForUpdatesMenuItem().setOnAction(e -> updaterService.checkForUpdates(mainWindow.getStage(), Version.HOME_URL, Version.NAME, Version.VERSION));
