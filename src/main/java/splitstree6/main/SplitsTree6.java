@@ -23,6 +23,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.stage.Stage;
+import jloda.fx.message.MessageWindow;
 import jloda.fx.util.ArgsOptions;
 import jloda.fx.util.Icebergs;
 import jloda.fx.util.ProgramProperties;
@@ -157,6 +158,9 @@ public class SplitsTree6 extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		try {
+			MessageWindow.getInstance().setVisible(true);
+			MessageWindow.getInstance().setVisible(false);
+
 			if (showSplash)
 				SplashScreen.showSplash(Duration.ofSeconds(5));
 			stage.setTitle("Untitled - " + ProgramProperties.getProgramName());

@@ -679,9 +679,6 @@ public class MainWindowPresenter {
 
 		controller.getShowWorkflowMenuItem().setOnAction(e -> controller.getMainTabPane().getSelectionModel().select(mainWindow.getTabByClass(WorkflowTab.class)));
 
-		MessageWindow.getInstance().setVisible(true);
-		MessageWindow.getInstance().setVisible(false);
-
 		controller.getShowMessageWindowMenuItem().setOnAction(e -> MessageWindow.getInstance().setVisible(!MessageWindow.getInstance().isVisible()));
 		MessageWindow.visibleProperty().addListener((v, o, n) -> controller.getShowMessageWindowMenuItem().setSelected(n));
 
