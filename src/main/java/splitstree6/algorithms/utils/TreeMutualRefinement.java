@@ -77,16 +77,21 @@ public class TreeMutualRefinement {
 					for (var cluster : jClusterNodeMap.keySet()) {
 						var iV = iClusterNodeMap.get(cluster);
 						var jV = jClusterNodeMap.get(cluster);
-						if (iV != null && jV != null && iV.getOutDegree() > jV.getOutDegree()) { // will try to refine iV
+						// no out-degree gate: findUnions is the arbiter. A grouping can exist even when
+						// iV has no more children than jV, e.g. A=[{1,2},{3,4},{5,6},{7,8}] against
+						// B=[{1,2,3,4},{5},{6},{7},{8}], where {1,2,3,4} refines iV but 4 > 5 is false.
+						if (iV != null && jV != null) { // will try to refine iV
 							var iChildren = IteratorUtils.asList(iV.children());
 							var iChildClusters = iChildren.stream().map(iNodeClusterMap::get).toList();
 							var jChildren = IteratorUtils.asList(jV.children());
 							var jChildClusters = jChildren.stream().map(jNodeClusterMap::get).toList();
-							for (var entry : findUnions(iChildClusters, jChildClusters).entrySet()) {
-								var jIndex = entry.getKey();
-								var iUnionIndices = entry.getValue();
+							for (var iUnionIndices : findUnions(iChildClusters, jChildClusters)) {
 								var refinementNode = iTree.newNode();
-								var refinementCluster = jNodeClusterMap.get(jChildren.get(jIndex));
+								// built from iV's own child clusters: a fresh BitSet owned by tree i, and
+								// correct by construction rather than by trusting findUnions. Equals the
+								// motivating member of jChildClusters, but must not alias it: that object
+								// belongs to tree j's maps.
+								var refinementCluster = BitSetUtils.union(iUnionIndices.stream().map(iChildClusters::get).toList());
 								iClusterNodeMap.put(refinementCluster, refinementNode);
 								iNodeClusterMap.put(refinementNode, refinementCluster);
 								var refinementEdge = iTree.newEdge(iV, refinementNode);
@@ -97,6 +102,8 @@ public class TreeMutualRefinement {
 								for (var iIndex : iUnionIndices) {
 									var child = iChildren.get(iIndex);
 									var oldInEdge = child.getFirstInEdge();
+									if (oldInEdge.getSource() != iV) // cannot happen: findUnions returns disjoint groups
+										throw new IllegalStateException("TreeMutualRefinement: child already moved");
 									var newInEdge = iTree.newEdge(refinementNode, child);
 									if (iTree.hasEdgeWeights())
 										iTree.setWeight(newInEdge, iTree.getWeight(oldInEdge));
@@ -116,27 +123,32 @@ public class TreeMutualRefinement {
 	}
 
 	/**
-	 * Returns a map from index j in B to the list of indices i in A such that
-	 * B[j] is the union of two or more members of A.
+	 * Returns, for each member of B that is exactly the union of two or more members of A, the list
+	 * of indices of those members of A.
 	 * Assumptions:
 	 * - sets in A are pairwise disjoint
 	 * - sets in B are pairwise disjoint
 	 * - union(A) == union(B)
+	 * The returned groups are pairwise disjoint, so no member of A is reported twice.
 	 */
-	private static Map<Integer, List<Integer>> findUnions(List<BitSet> A, List<BitSet> B) {
-		var result = new LinkedHashMap<Integer, List<Integer>>();
+	private static List<List<Integer>> findUnions(List<BitSet> A, List<BitSet> B) {
+		var result = new ArrayList<List<Integer>>();
 
-		for (var j = 0; j < B.size(); j++) {
-			var b = B.get(j);
+		for (BitSet b : B) {
 			var parts = new ArrayList<Integer>();
 			for (var i = 0; i < A.size(); i++) {
 				var a = A.get(i);
-				if (BitSetUtils.contains(b, a)) {
+				if (!a.isEmpty() && BitSetUtils.contains(b, a)) { // an empty a lies inside every b
 					parts.add(i);
 				}
 			}
-			if (parts.size() >= 2) {
-				result.put(j, parts);
+			// b must be EXACTLY the union of the parts: containment alone lets a b that also crosses
+			// some other member of A through, and the resulting node then holds less than b.
+			// And it must leave at least one member of A outside, otherwise b == union(A) and the
+			// "refinement" only inserts a degree-2 node above all of iV's children.
+			if (parts.size() >= 2 && parts.size() < A.size()
+				&& BitSetUtils.union(parts.stream().map(A::get).toList()).equals(b)) {
+				result.add(parts);
 			}
 		}
 		return result;

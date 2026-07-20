@@ -154,6 +154,10 @@ public class AlgorithmList {
 		add(algorithms, names, new ConsensusSplits());
 		add(algorithms, names, new FilteredSuperNetwork());
 		add(algorithms, names, new GreedyTree());
+
+		if (isAllowExperimental())
+			add(algorithms, names, new ILSContractor());
+
 		add(algorithms, names, new LSATree());
 
 		add(algorithms, names, new NormalizeRootedNetworks());
