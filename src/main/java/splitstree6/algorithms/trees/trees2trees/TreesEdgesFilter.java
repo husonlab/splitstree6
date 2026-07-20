@@ -47,7 +47,6 @@ public class TreesEdgesFilter extends Trees2Trees implements IFilter {
 
 	private final BooleanProperty optionRescale = new SimpleBooleanProperty(this, "optionRescale", false);
 
-
 	public List<String> listOptions() {
 		return List.of(optionMinConfidence.getName(), optionMinEdgeLength.getName(), optionUniformEdgeLengths.getName(), optionRescale.getName());
 	}
@@ -74,6 +73,7 @@ public class TreesEdgesFilter extends Trees2Trees implements IFilter {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputData, TreesBlock outputData) {
 		if (!isActive()) {
+			outputData.setRooted(inputData.isRooted());
 			outputData.getTrees().addAll(inputData.getTrees());
 			outputData.setPartial(inputData.isPartial());
 		} else {

@@ -36,10 +36,7 @@ import java.util.List;
  */
 public class ConsensusTree extends Trees2Trees {
 	public enum Consensus {Majority, Greedy, Strict}
-
 	public enum EdgeWeights {Mean, TreeSizeWeightedMean}
-
-	;
 
 	private final SimpleObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", Consensus.Majority);
 
