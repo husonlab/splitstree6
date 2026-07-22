@@ -84,7 +84,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		BasicFX.reportChanges(updateCounter);
 
-		if (true) {
+		if (false) {
 			targetBounds.addListener(e -> System.err.println("target bounds: " + targetBounds.get()));
 		}
 
