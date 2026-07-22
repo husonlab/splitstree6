@@ -58,14 +58,20 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
         this.edgeWeightMethod = edgeWeightMethod;
     }
 
-    private boolean trace = false;
-    public boolean isTrace() {return trace;}
-    public void setTrace(boolean trace) {this.trace = trace;}
+    private boolean optionReportTraces = false;
+
+    public boolean isOptionReportTraces() {
+        return optionReportTraces;
+    }
+
+    public void setOptionReportTraces(boolean optionReportTraces) {
+        this.optionReportTraces = optionReportTraces;
+    }
 
 
     @Override
     public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
-        progress.setTasks("PhyloFusionTreeTrace", "init");
+        progress.setTasks("PhyloFusion", "init");
 
         var inputTrees = new ArrayList<TraceTree>();
         var taxonToTreeIds = new HashMap<Integer, BitSet>();
@@ -81,6 +87,8 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
                 taxonToTreeIds.computeIfAbsent(taxon, k -> new BitSet()).set(i);
             }
         }
+        progress.setTasks("PhyloFusion", "hybridization number");
+
         var start = System.currentTimeMillis();
         var result = computeRec(progress, isOptionMutualRefinement(), inputTrees);
 
@@ -137,6 +145,7 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
             if (network.getRoot().getOutDegree() == 1)
                 network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
 
+            progress.setSubtask("edge weights");
             switch (edgeWeightMethod) {
                 case AVERAGE ->
                     NetworkEdgeWeightsComputation.mean(treesBlock.getTrees(), network);
@@ -151,7 +160,7 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
             NetworkEdgesWeightHelpers.printFitStatistics(edgeWeightMethod, treesBlock.getTrees(), network);
 
             //debugPrintNetworkTrace(network);
-            if (isTrace()) {
+            if (isOptionReportTraces()) {
                 System.err.println(toExtendedNewickWithTT(network));
             } else {
                 for (var v : network.nodes()) {
@@ -164,6 +173,7 @@ public class PhyloFusionTreeTrace extends PhyloFusion {
             }
             break;
         }
+        progress.reportTaskCompleted();
     }
 
     private void debugPrintNetworkTrace(PhyloTree network) {
