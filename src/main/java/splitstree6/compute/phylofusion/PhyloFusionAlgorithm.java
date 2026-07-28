@@ -145,7 +145,8 @@ public class PhyloFusionAlgorithm {
 			var one = best.get(0);
 			best.clear();
 			best.add(one);
-            System.err.println("PhyloFusion Ranking: " + inorder(one.getFirst()));
+			if (false)
+				System.err.println("PhyloFusion Ranking: " + inorder(one.getFirst()));
 		}
 
 		progress.setSubtask("creating networks");
