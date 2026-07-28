@@ -249,9 +249,15 @@ public class PhyloFusion extends Trees2Trees {
 					if (verbose)
 						TracedEdgeWeights.printFitStatistics(getOptionEdgeWeights().method(), treesBlock.getTrees(), network);
 				}
-				if (treeTracing)
-					System.err.println(TreeTracing.toExtendedNewick(network));
-				TreeTracing.clear(network);
+				if (treeTracing) {
+					// move the trace ids into TT node/edge comments and LEAVE them on the reported network, so that
+					// downstream tools (PhyloParallelograms) can read them
+					var tt = TreeTracing.toExtendedNewick(network);
+					if (verbose)
+						System.err.println(tt);
+				} else {
+					TreeTracing.clear(network); // the traces were needed only for edge-weight fitting
+				}
 			} else if (network.getRoot().getOutDegree() == 1) {
 				network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
 			}

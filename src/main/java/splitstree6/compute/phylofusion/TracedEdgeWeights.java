@@ -39,7 +39,7 @@ import java.util.*;
  * Banu Cetinkaya, 2026
  */
 public class TracedEdgeWeights {
-	public enum Method {AVERAGE, LP, NNLS, LP_RETICULATES_ZERO}
+	public enum Method {NNLS, AVERAGE, LP, LP_RETICULATES_ZERO}
 
 	private TracedEdgeWeights() {
 	}

@@ -48,7 +48,7 @@ public class PhyloFusionAlgorithm {
 	 *     <li>Normal: avoid reticulate edges whose source is an ancestor of their target (shortcut edges)</li>
 	 * </ul>
 	 */
-	public enum ReticulationPreference {None, Smallest, Largest, Normal}
+	public enum ReticulationPreference {Normal, Smallest, Largest, None}
 
 	/**
 	 * run the algorithm
