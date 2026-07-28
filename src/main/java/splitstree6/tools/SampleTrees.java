@@ -337,8 +337,7 @@ public class SampleTrees {
 		} else if (algorithmName.equalsIgnoreCase("phyloparallelograms")) {
 			var phyloFusion = new PhyloFusion();
 			phyloFusion.setOptionMutualRefinement(true);
-			phyloFusion.setOptionNormalizeEdgeWeights(true);
-			phyloFusion.setOptionCalculateWeights(false);
+			phyloFusion.setOptionEdgeWeights(PhyloFusion.EdgeWeights.None);
 			phyloFusion.setOptionOnlyOneNetwork(true);
 			algorithm = phyloFusion;
 		} else if (algorithmName.equalsIgnoreCase("altsExternal")) {

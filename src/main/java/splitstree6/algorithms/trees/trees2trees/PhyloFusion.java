@@ -20,8 +20,11 @@
 package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import jloda.fx.util.ProgramProperties;
+import jloda.graph.Edge;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -34,6 +37,9 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreeMutualRefinement;
 import splitstree6.compute.phylofusion.NetworkUtils;
 import splitstree6.compute.phylofusion.PhyloFusionAlgorithm;
+import splitstree6.compute.phylofusion.PhyloFusionAlgorithm.ReticulationPreference;
+import splitstree6.compute.phylofusion.TracedEdgeWeights;
+import splitstree6.compute.phylofusion.TreeTracing;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.splits.GraphUtils;
@@ -52,20 +58,48 @@ import java.util.stream.Collectors;
  * Daniel Huson, 5.2024
  */
 public class PhyloFusion extends Trees2Trees {
+	/**
+	 * method for fitting the network branch lengths from the input-tree branch lengths, via tree tracing (Banu
+	 * Cetinkaya). None leaves the branch lengths unset. LeastSquares falls back to Average if the solver cannot solve.
+	 */
+	public enum EdgeWeights {
+		None(null),
+		Average(TracedEdgeWeights.Method.AVERAGE),
+		LeastSquares(TracedEdgeWeights.Method.NNLS),
+		LeastAbsolute(TracedEdgeWeights.Method.LP),
+		LeastAbsoluteZeroReticulations(TracedEdgeWeights.Method.LP_RETICULATES_ZERO);
+
+		private final TracedEdgeWeights.Method method;
+
+		EdgeWeights(TracedEdgeWeights.Method method) {
+			this.method = method;
+		}
+
+		public TracedEdgeWeights.Method method() {
+			return method;
+		}
+	}
+
 	protected boolean verbose = false; // for debugging
 	protected boolean checkAllPartialResults = false; // for debugging
 
+	// tree tracing (Banu Cetinkaya): an internal (non-user) switch. When on, each reticulate edge of the reported
+	// network is annotated with the input trees that use it, and node ids are completed for TT-comment output.
+	public boolean treeTracing = false;
+	// during tracing: the original input-tree ids that each current working tree represents (keyed by tree identity)
+	private Map<PhyloTree, BitSet> tracedTreeIds;
+
 	protected final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
 
-	protected final BooleanProperty optionNormalizeEdgeWeights = new SimpleBooleanProperty(this, "optionNormalizeEdgeWeights", true);
-
-	protected final BooleanProperty optionCalculateWeights = new SimpleBooleanProperty(this, "optionCalculateWeights", true);
+	protected final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", EdgeWeights.LeastSquares);
 
 	protected final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
 
 	protected final BooleanProperty optionGroupNonSeparated = new SimpleBooleanProperty(this, "optionGroupNonSeparated");
 
 	protected final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
+
+	protected final ObjectProperty<ReticulationPreference> optionReticulatePlacement = new SimpleObjectProperty<>(this, "optionReticulatePlacement", ReticulationPreference.None);
 
 	/* todo: optionRefinementHeuristic is broken, don't allow in public UI (unless option -x) */
 	protected final BooleanProperty optionRefinementHeuristic = new SimpleBooleanProperty(this, "optionRefinementHeuristic");
@@ -77,6 +111,8 @@ public class PhyloFusion extends Trees2Trees {
 		ProgramProperties.track(optionMutualRefinement, true);
 		ProgramProperties.track(optionCladeReduction, true);
 		ProgramProperties.track(optionOnlyOneNetwork, true);
+		ProgramProperties.track(optionReticulatePlacement, ReticulationPreference::valueOf, ReticulationPreference.Normal);
+		ProgramProperties.track(optionEdgeWeights, EdgeWeights::valueOf, EdgeWeights.LeastSquares);
 		ProgramProperties.track(optionGroupNonSeparated, true);
 		ProgramProperties.track(optionMissingTaxaHeuristic, true);
 
@@ -85,9 +121,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public String getCitation() {
-		return "Zhang et al 2023; L. Zhang, N. Abhari, C. Colijn and Y Wu." +
-			   " A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023.;"
-			   + "Zhang et al 2024; L. Zhang, B. Cetinkaya and D.H. Huson. PhyloFusion- Fast and easy fusion of rooted phylogenetic trees into a network, PLoS CompBio, 2026.";
+		return "Zhang et al 2024; L. Zhang, B. Cetinkaya and D.H. Huson. PhyloFusion- Fast and easy fusion of rooted phylogenetic trees into a network, PLoS CompBio, 2026.";
 	}
 
 	@Override
@@ -97,9 +131,9 @@ public class PhyloFusion extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		var list = new ArrayList<>(List.of(optionOnlyOneNetwork.getName(), optionMutualRefinement.getName(),
-				optionRefinementHeuristic.getName(), optionMissingTaxaHeuristic.getName(), optionNormalizeEdgeWeights.getName(),
-				optionGroupNonSeparated.getName(), optionCladeReduction.getName())); //, optionCalculateWeights.getName());
+		var list = new ArrayList<>(List.of(optionOnlyOneNetwork.getName(), optionReticulatePlacement.getName(), optionEdgeWeights.getName(),
+				optionMutualRefinement.getName(), optionRefinementHeuristic.getName(), optionMissingTaxaHeuristic.getName(),
+				optionGroupNonSeparated.getName(), optionCladeReduction.getName()));
 		if (!ALLOW_OPTION_REFINEMENT_HEURISTIC) {
 			list.remove(optionRefinementHeuristic.getName());
 		}
@@ -114,10 +148,12 @@ public class PhyloFusion extends Trees2Trees {
 		}
 		return switch (optionName) {
 			case "optionOnlyOneNetwork" -> "Report only one network";
+			case "optionReticulatePlacement" ->
+					"When several subnetworks are equally good, which to prefer: None (first found), Smallest or Largest subnetwork below each reticulate node, or Normal (avoid shortcut reticulate edges)";
 			case "optionSearchHeuristic" -> "Fast, Medium, or Thorough search";
-			case "optionCalculateWeights" -> "Calculate edge weights using brute-force algorithm";
+			case "optionEdgeWeights" ->
+					"How to fit network branch lengths from the input trees: None, Average, LeastSquares (recommended), LeastAbsolute, or LeastAbsoluteZeroReticulations (forces reticulate edges to length 0)";
 			case "optionMutualRefinement" -> "mutually refine input trees";
-			case "optionNormalizeEdgeWeights" -> "normalize input edge weights";
 			case "optionCladeReduction" -> "improve performance using clade reduction";
 			case "optionRefinementHeuristic" -> "apply refinement heuristic to reduce hybridization number";
 			case "optionMissingTaxaHeuristic" -> "apply missing-taxa heuristic to reduce hybridization number";
@@ -136,8 +172,28 @@ public class PhyloFusion extends Trees2Trees {
 
 		var inputTrees = new ArrayList<>(treesBlock.getTrees().stream().map(PhyloTree::new).toList());
 
+		// each original taxon initially represents exactly itself:
+		var taxonWeight = new HashMap<Integer, Integer>();
+		for (var tree : inputTrees) {
+			for (var t : tree.getTaxa()) {
+				taxonWeight.putIfAbsent(t, 1);
+			}
+		}
+
+		// tree tracing (Banu Cetinkaya): needed for the TT output and for the trace-based edge-weight fitting.
+		// Input tree i starts out representing itself; record which trees hold each taxon.
+		var taxonToTreeIds = new HashMap<Integer, BitSet>();
+		if (needsTreeTracing()) {
+			tracedTreeIds = new IdentityHashMap<>();
+			for (var i = 0; i < inputTrees.size(); i++) {
+				tracedTreeIds.put(inputTrees.get(i), BitSetUtils.asBitSet(i));
+				for (var t : inputTrees.get(i).getTaxa())
+					taxonToTreeIds.computeIfAbsent(t, k -> new BitSet()).set(i);
+			}
+		}
+
 		var start = System.currentTimeMillis();
-		var result = computeRec(progress, isOptionMutualRefinement(), inputTrees);
+		var result = computeRec(progress, isOptionMutualRefinement(), inputTrees, taxonWeight);
 
 		var hybridizationNumber = result.get(0).nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
 		System.err.println("Hybridization number: " + hybridizationNumber);
@@ -178,14 +234,27 @@ public class PhyloFusion extends Trees2Trees {
 				network.delDivertex(v);
 			}
 
-			if (count <= 10 && isOptionCalculateWeights()) {
-				progress.setSubtask("Edge weights");
-				progress.setMaximum(-1);
-				progress.setProgress(-1);
-				NetworkUtils.setEdgeWeights(treesBlock.getTrees(), network, isOptionNormalizeEdgeWeights(), 3000);
-			}
-			if (network.getRoot().getOutDegree() == 1)
+			if (needsTreeTracing()) {
+				// tree tracing (Banu Cetinkaya): reticulate edges are already tagged; complete the node ids by upward
+				// closure, then fit branch lengths from the input trees and/or report the network as extended Newick
+				// with TT comments (as consumed by PhyloParallelograms)
+				var allTreeIds = new BitSet();
+				allTreeIds.set(0, treesBlock.getNTrees());
+				TreeTracing.complete(network, taxonToTreeIds, allTreeIds);
+				if (network.getRoot().getOutDegree() == 1)
+					network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
+				if (getOptionEdgeWeights() != EdgeWeights.None) {
+					progress.setSubtask("edge weights");
+					TracedEdgeWeights.apply(getOptionEdgeWeights().method(), treesBlock.getTrees(), network);
+					if (verbose)
+						TracedEdgeWeights.printFitStatistics(getOptionEdgeWeights().method(), treesBlock.getTrees(), network);
+				}
+				if (treeTracing)
+					System.err.println(TreeTracing.toExtendedNewick(network));
+				TreeTracing.clear(network);
+			} else if (network.getRoot().getOutDegree() == 1) {
 				network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
+			}
 			break; // only copy one
 		}
 	}
@@ -198,7 +267,7 @@ public class PhyloFusion extends Trees2Trees {
 	 * @return networks
 	 * @throws IOException something went wrong
 	 */
-	private List<PhyloTree> computeRec(ProgressListener progress, boolean mutualRefinement, List<PhyloTree> trees) throws IOException {
+	private List<PhyloTree> computeRec(ProgressListener progress, boolean mutualRefinement, List<PhyloTree> trees, Map<Integer, Integer> taxonWeight) throws IOException {
 		removeContainedAndRefine(trees, mutualRefinement);
 
 		if (trees.size() == 1) {
@@ -223,7 +292,27 @@ public class PhyloFusion extends Trees2Trees {
 
 		var repGroupMap = new HashMap<Integer, BitSet>();
 		if (getOptionGroupNonSeparated()) {
+			// tree tracing (Banu Cetinkaya): grouping keeps tree order and count but may replace the tree objects,
+			// so carry the represented ids across positionally
+			var idsBefore = tracedTreeIds != null ? trees.stream().map(this::idsOf).toList() : null;
 			repGroupMap.putAll(groupNonSeparatedTaxa(taxa, trees, taxLabelMap));
+			if (tracedTreeIds != null) {
+				for (var i = 0; i < trees.size(); i++)
+					tracedTreeIds.put(trees.get(i), idsBefore.get(i));
+			}
+		}
+
+		// each representative of a group of non-separated taxa now also represents all its grouped taxa:
+		var effectiveWeight = taxonWeight;
+		if (usesTaxonWeights() && !repGroupMap.isEmpty()) {
+			effectiveWeight = new HashMap<>(taxonWeight);
+			for (var entry : repGroupMap.entrySet()) {
+				var weight = effectiveWeight.getOrDefault(entry.getKey(), 1);
+				for (var grouped : BitSetUtils.members(entry.getValue())) {
+					weight += effectiveWeight.getOrDefault(grouped, 1);
+				}
+				effectiveWeight.put(entry.getKey(), weight);
+			}
 		}
 
 		Graph incompatibityGraph;
@@ -298,10 +387,11 @@ public class PhyloFusion extends Trees2Trees {
 				// run the algorithm
 				if (verbose)
 					System.err.println("Running on " + taxa.cardinality() + " taxa");
+				// tree tracing (Banu Cetinkaya): tell the core which original trees each of its input trees represents
+				var representedTreeIds = needsTreeTracing() ? trees.stream().map(t -> tracedTreeIds.getOrDefault(t, new BitSet())).toList() : null;
 				var resultList = PhyloFusionAlgorithm.apply(trees, isOptionOnlyOneNetwork(),
-						ALLOW_OPTION_REFINEMENT_HEURISTIC && isOptionRefinementHeuristic(), isOptionMissingTaxaHeuristic(), progress);
-
-				// var resultList = PhyloFusionAlgorithmMay2024.apply(numberOfRandomOrderings, trees, isOptionOnlyOneNetwork(), progress);
+						ALLOW_OPTION_REFINEMENT_HEURISTIC && isOptionRefinementHeuristic(), isOptionMissingTaxaHeuristic(),
+						getOptionReticulatePlacement(), effectiveWeight, needsTreeTracing(), representedTreeIds, progress);
 
 				restoreGroupedTaxa(repGroupMap, taxLabelMap, resultList);
 
@@ -318,14 +408,25 @@ public class PhyloFusion extends Trees2Trees {
 			}
 		} else {
 			var rep = BitSetUtils.min(separator);
-			var networksBelow = computeRec(progress, isOptionMutualRefinement(), computeTreesBelow(trees, taxLabelMap, separator));
+			var networksBelow = computeRec(progress, isOptionMutualRefinement(), computeTreesBelow(trees, taxLabelMap, separator), effectiveWeight);
 			if (checkAllPartialResults) {
 				for (var network : networksBelow) {
 					NetworkUtils.check(network);
 				}
 			}
 
-			var networksAbove = computeRec(progress, isOptionMutualRefinement(), computeTreesAbove(trees, taxLabelMap, separator, rep));
+			// above the separator, the representative stands for the whole collapsed cluster:
+			var aboveWeight = effectiveWeight;
+			if (usesTaxonWeights()) {
+				aboveWeight = new HashMap<>(effectiveWeight);
+				var repWeight = 0;
+				for (var t : BitSetUtils.members(separator)) {
+					repWeight += effectiveWeight.getOrDefault(t, 1);
+				}
+				aboveWeight.put(rep, repWeight);
+			}
+
+			var networksAbove = computeRec(progress, isOptionMutualRefinement(), computeTreesAbove(trees, taxLabelMap, separator, rep), aboveWeight);
 
 			if (checkAllPartialResults) {
 				for (var networkA : networksAbove) {
@@ -427,41 +528,63 @@ public class PhyloFusion extends Trees2Trees {
 	private void removeContainedAndRefine(List<PhyloTree> trees, boolean refine) {
 		if (refine) {
 			var refined = TreeMutualRefinement.apply(trees);
+			if (tracedTreeIds != null) { // tree tracing (Banu Cetinkaya): carry ids across refinement positionally
+				for (var i = 0; i < refined.size(); i++)
+					tracedTreeIds.put(refined.get(i), i < trees.size() ? idsOf(trees.get(i)) : new BitSet());
+			}
 			trees.clear();
 			trees.addAll(refined);
 		}
 
-		var dataList = new ArrayList<>(trees.stream().map(DataItem::new)
-				.sorted(Comparator.comparingInt(a -> a.taxa().cardinality())).toList());
+		// pair each (copied) DataItem with the ids of the tree it came from, so ids survive the sort and dedup below
+		var dataList = new ArrayList<Map.Entry<DataItem, BitSet>>();
+		for (var tree : trees)
+			dataList.add(new AbstractMap.SimpleEntry<>(new DataItem(tree), tracedTreeIds != null ? idsOf(tree) : null));
+		dataList.sort(Comparator.comparingInt(a -> a.getKey().taxa().cardinality()));
 		trees.clear();
 
 		var keep = new BitSet();
 
 		for (var i = 0; i < dataList.size(); i++) {
-			var iTaxa = dataList.get(i).taxa();
-			var iClusters = dataList.get(i).clusters();
+			var iTaxa = dataList.get(i).getKey().taxa();
+			var iClusters = dataList.get(i).getKey().clusters();
 
 			var ok = true;
 			for (var j = i + 1; ok && j < dataList.size(); j++) {
-				var jTaxa = dataList.get(j).taxa();
-				var jClusters = dataList.get(j).clusters();
+				var jTaxa = dataList.get(j).getKey().taxa();
+				var jClusters = dataList.get(j).getKey().clusters();
 				if (BitSetUtils.contains(jTaxa, iTaxa)) {
+					boolean contained;
 					if (iTaxa.cardinality() == jTaxa.cardinality()) {
-						if (jClusters.containsAll(iClusters)) {
-							ok = false;
-						}
+						contained = jClusters.containsAll(iClusters);
 					} else { // iTaxa is subset
 						var jInduced = jClusters.stream().map(s -> BitSetUtils.intersection(s, iTaxa)).filter(s -> s.cardinality() > 0).collect(Collectors.toSet());
-						if (jInduced.containsAll(iClusters)) {
-							ok = false;
-						}
+						contained = jInduced.containsAll(iClusters);
+					}
+					if (contained) {
+						ok = false;
+						if (tracedTreeIds != null) // the container j now also represents the trees of the removed tree i
+							dataList.get(j).getValue().or(dataList.get(i).getValue());
 					}
 				}
 			}
 			if (ok)
 				keep.set(i);
 		}
-		trees.addAll(BitSetUtils.asList(keep).stream().map(i -> dataList.get(i).tree()).toList());
+		for (var i : BitSetUtils.members(keep)) {
+			var tree = dataList.get(i).getKey().tree();
+			trees.add(tree);
+			if (tracedTreeIds != null)
+				tracedTreeIds.put(tree, dataList.get(i).getValue());
+		}
+	}
+
+	/**
+	 * tree tracing (Banu Cetinkaya): a fresh copy of the original input-tree ids a working tree represents
+	 */
+	private BitSet idsOf(PhyloTree tree) {
+		var ids = tracedTreeIds.get(tree);
+		return ids != null ? (BitSet) ids.clone() : new BitSet();
 	}
 
 	public record DataItem(PhyloTree tree, BitSet taxa, Set<BitSet> clusters) {
@@ -675,6 +798,9 @@ public class PhyloFusion extends Trees2Trees {
 	 */
 	private List<PhyloTree> computeTreesBelow(List<PhyloTree> trees, Map<Integer, String> taxonLabelMap, BitSet taxa) {
 		var clusterSets = new HashSet<HashSet<BitSet>>();
+		// tree tracing (Banu Cetinkaya): trees that induce the same clusters below the separator merge into one,
+		// so the resulting tree represents the union of their ids
+		var clusterSetIds = tracedTreeIds != null ? new HashMap<HashSet<BitSet>, BitSet>() : null;
 		for (var tree : trees) {
 			var clusters = new HashSet<BitSet>();
 			for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
@@ -682,8 +808,11 @@ public class PhyloFusion extends Trees2Trees {
 				if (cluster.cardinality() > 0)
 					clusters.add(cluster);
 			}
-			if (!clusters.isEmpty())
+			if (!clusters.isEmpty()) {
 				clusterSets.add(clusters);
+				if (clusterSetIds != null)
+					clusterSetIds.computeIfAbsent(clusters, k -> new BitSet()).or(idsOf(tree));
+			}
 		}
 		var result = new ArrayList<PhyloTree>();
 		for (var clusters : clusterSets) {
@@ -691,6 +820,8 @@ public class PhyloFusion extends Trees2Trees {
 			ClusterPoppingAlgorithm.apply(clusters, tree);
 			tree.nodeStream().filter(Node::isLeaf).forEach(v -> tree.setLabel(v, taxonLabelMap.get(tree.getTaxon(v))));
 			result.add(tree);
+			if (clusterSetIds != null)
+				tracedTreeIds.put(tree, clusterSetIds.get(clusters));
 		}
 		return result;
 	}
@@ -706,6 +837,8 @@ public class PhyloFusion extends Trees2Trees {
 	 */
 	private List<PhyloTree> computeTreesAbove(List<PhyloTree> trees, Map<Integer, String> taxonLabelMap, BitSet taxa, int rep) {
 		var clusterSets = new HashSet<HashSet<BitSet>>();
+		// tree tracing (Banu Cetinkaya): trees that induce the same clusters above the separator merge into one
+		var clusterSetIds = tracedTreeIds != null ? new HashMap<HashSet<BitSet>, BitSet>() : null;
 		for (var tree : trees) {
 			var clusters = new HashSet<BitSet>();
 			for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
@@ -715,8 +848,11 @@ public class PhyloFusion extends Trees2Trees {
 				}
 				clusters.add(cluster);
 			}
-			if (!clusters.isEmpty())
+			if (!clusters.isEmpty()) {
 				clusterSets.add(clusters);
+				if (clusterSetIds != null)
+					clusterSetIds.computeIfAbsent(clusters, k -> new BitSet()).or(idsOf(tree));
+			}
 		}
 		var result = new ArrayList<PhyloTree>();
 		for (var clusters : clusterSets) {
@@ -724,6 +860,8 @@ public class PhyloFusion extends Trees2Trees {
 			ClusterPoppingAlgorithm.apply(clusters, tree);
 			tree.nodeStream().filter(Node::isLeaf).forEach(v -> tree.setLabel(v, taxonLabelMap.get(tree.getTaxon(v))));
 			result.add(tree);
+			if (clusterSetIds != null)
+				tracedTreeIds.put(tree, clusterSetIds.get(clusters));
 		}
 
 		if (checkAllPartialResults) {
@@ -750,12 +888,14 @@ public class PhyloFusion extends Trees2Trees {
 		var targetTree = (PhyloTree) targetNode.getOwner();
 		try (NodeArray<Node> old2new = sourceTree.newNodeArray()) {
 			old2new.put(sourceRoot, targetNode);
+			copyInfo(sourceRoot, targetNode); // tree tracing (Banu Cetinkaya): keep any trace annotation
 			var allBelow = new HashSet<Node>();
 			sourceTree.postorderTraversal(sourceRoot, v -> !allBelow.contains(v), allBelow::add);
 			for (var v : allBelow) {
 				if (v != sourceRoot) {
 					var w = targetTree.newNode();
 					old2new.put(v, w);
+					copyInfo(v, w);
 					for (var t : sourceTree.getTaxa(v)) {
 						targetTree.addTaxon(w, t);
 					}
@@ -765,9 +905,23 @@ public class PhyloFusion extends Trees2Trees {
 				if (old2new.containsKey(e.getSource()) && old2new.containsKey(e.getTarget())) {
 					var f = targetTree.newEdge(old2new.get(e.getSource()), old2new.get(e.getTarget()));
 					targetTree.setWeight(f, sourceTree.getWeight(e));
+					copyInfo(e, f); // tree tracing (Banu Cetinkaya): keep the reticulate-edge tree ids
 				}
 			}
 		}
+	}
+
+	/**
+	 * tree tracing (Banu Cetinkaya): copy a node's trace annotation, cloning the id set so copies stay independent
+	 */
+	private static void copyInfo(Node source, Node target) {
+		var info = source.getInfo();
+		target.setInfo(info instanceof BitSet ids ? ids.clone() : info);
+	}
+
+	private static void copyInfo(Edge source, Edge target) {
+		var info = source.getInfo();
+		target.setInfo(info instanceof BitSet ids ? ids.clone() : info);
 	}
 
 	public boolean isOptionMutualRefinement() {
@@ -782,33 +936,21 @@ public class PhyloFusion extends Trees2Trees {
 		this.optionMutualRefinement.set(optionMutualRefinement);
 	}
 
-	public boolean isOptionNormalizeEdgeWeights() {
-		return optionNormalizeEdgeWeights.get();
+	public EdgeWeights getOptionEdgeWeights() {
+		return optionEdgeWeights.get();
 	}
 
-	public BooleanProperty optionNormalizeEdgeWeightsProperty() {
-		return optionNormalizeEdgeWeights;
+	public ObjectProperty<EdgeWeights> optionEdgeWeightsProperty() {
+		return optionEdgeWeights;
 	}
 
-	public void setOptionNormalizeEdgeWeights(boolean optionNormalizeEdgeWeights) {
-		this.optionNormalizeEdgeWeights.set(optionNormalizeEdgeWeights);
+	public void setOptionEdgeWeights(EdgeWeights optionEdgeWeights) {
+		this.optionEdgeWeights.set(optionEdgeWeights);
 	}
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
 		return !datablock.isReticulated() && datablock.getNTrees() > 1;
-	}
-
-	public boolean isOptionCalculateWeights() {
-		return optionCalculateWeights.get();
-	}
-
-	public BooleanProperty optionCalculateWeightsProperty() {
-		return optionCalculateWeights;
-	}
-
-	public void setOptionCalculateWeights(boolean optionCalculateWeights) {
-		this.optionCalculateWeights.set(optionCalculateWeights);
 	}
 
 	public boolean isOptionCladeReduction() {
@@ -833,6 +975,43 @@ public class PhyloFusion extends Trees2Trees {
 
 	public void setOptionOnlyOneNetwork(boolean onlyOneNetwork) {
 		optionOnlyOneNetwork.set(onlyOneNetwork);
+	}
+
+	public ReticulationPreference getOptionReticulatePlacement() {
+		return optionReticulatePlacement.get();
+	}
+
+	public ObjectProperty<ReticulationPreference> optionReticulatePlacementProperty() {
+		return optionReticulatePlacement;
+	}
+
+	public void setOptionReticulatePlacement(ReticulationPreference reticulatePlacement) {
+		optionReticulatePlacement.set(reticulatePlacement);
+	}
+
+	public boolean isTreeTracing() {
+		return treeTracing;
+	}
+
+	public void setTreeTracing(boolean treeTracing) {
+		this.treeTracing = treeTracing;
+	}
+
+	/**
+	 * tree tracing is computed whenever the TT output is requested or a trace-based edge-weight method is selected
+	 */
+	private boolean needsTreeTracing() {
+		return treeTracing || getOptionEdgeWeights() != EdgeWeights.None;
+	}
+
+	/**
+	 * does the active preference need the represented-taxa weights threaded through the recursion?
+	 * Smallest and Largest use them directly; Normal uses them as a secondary criterion (smallest below reticulations).
+	 *
+	 * @return true if taxon weights need to be tracked through the recursion
+	 */
+	private boolean usesTaxonWeights() {
+		return getOptionReticulatePlacement() != ReticulationPreference.None;
 	}
 
 	public boolean getOptionGroupNonSeparated() {

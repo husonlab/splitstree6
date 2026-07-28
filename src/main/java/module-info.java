@@ -45,6 +45,8 @@ module splitstreesix {
 	opens splitstree6.algorithms.characters.characters2trees;
 	opens splitstree6.algorithms.characters.characters2report;
 
+	exports splitstree6.compute.phylofusion;
+
 	exports splitstree6.view.format.edgelabel;
 
 	exports splitstree6.algorithms;

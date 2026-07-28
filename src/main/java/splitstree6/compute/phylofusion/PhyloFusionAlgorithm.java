@@ -22,6 +22,7 @@ package splitstree6.compute.phylofusion;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
+import jloda.phylo.algorithms.RootedNetworkProperties;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.utils.PathMultiplicityDistance;
@@ -38,15 +39,33 @@ import java.util.stream.Collectors;
  */
 public class PhyloFusionAlgorithm {
 	/**
+	 * when several networks are equally optimal, which one to prefer, based on the subnetworks placed below
+	 * reticulate nodes:
+	 * <ul>
+	 *     <li>None: report the first one found</li>
+	 *     <li>Smallest: place the subnetwork with the fewest (represented) taxa below each reticulate node</li>
+	 *     <li>Largest: place the subnetwork with the most (represented) taxa below each reticulate node</li>
+	 *     <li>Normal: avoid reticulate edges whose source is an ancestor of their target (shortcut edges)</li>
+	 * </ul>
+	 */
+	public enum ReticulationPreference {None, Smallest, Largest, Normal}
+
+	/**
 	 * run the algorithm
 	 *
-	 * @param inputTrees input rooted trees
-	 * @param progress   progress listener
+	 * @param inputTrees             input rooted trees
+	 * @param reticulationPreference when several networks are equally optimal, which one to prefer
+	 * @param taxonWeight            number of original taxa represented by each (possibly grouped) taxon, or null for 1 each
+	 * @param treeTracing            annotate reticulate edges with the input trees that use them (Banu Cetinkaya)
+	 * @param representedTreeIds     for tree tracing: original input-tree ids represented by each input tree (parallel to inputTrees)
+	 * @param progress               progress listener
 	 * @return the computed networks
 	 * @throws IOException user canceled
 	 */
 	public static List<PhyloTree> apply(List<PhyloTree> inputTrees, boolean onlyOneNetwork,
 										boolean useRefinementHeuristic, boolean useMissingTaxaHeuristic,
+										ReticulationPreference reticulationPreference, Map<Integer, Integer> taxonWeight,
+										boolean treeTracing, List<BitSet> representedTreeIds,
 										ProgressListener progress) throws IOException {
 		if (inputTrees.size() == 1) {
 			return List.of(new PhyloTree(inputTrees.get(0)));
@@ -111,6 +130,17 @@ public class PhyloFusionAlgorithm {
 			}
 		}
 
+		if (reticulationPreference != ReticulationPreference.None && best.size() > 1) {
+			// among equally optimal networks, prefer one according to the requested reticulation preference;
+			// taxonWeight accounts for taxa that stand for groups identified in a preceding step
+			var keyMap = new IdentityHashMap<Pair<int[], Map<Integer, HyperSequence>>, int[]>();
+			for (var pair : best) {
+				keyMap.put(pair, preferenceKey(reticulationPreference, computeNetwork(pair.getFirst(), pair.getSecond()), taxonWeight));
+			}
+			best.sort(Comparator.comparingInt((Pair<int[], Map<Integer, HyperSequence>> pair) -> keyMap.get(pair)[0])
+					.thenComparingInt(pair -> keyMap.get(pair)[1]));
+		}
+
 		if (onlyOneNetwork && best.size() > 1) {
 			var one = best.get(0);
 			best.clear();
@@ -123,7 +153,13 @@ public class PhyloFusionAlgorithm {
 		progress.setProgress(0);
 
 		var result = new ArrayList<PhyloTree>();
-		for (var network : best.stream().map(pair -> computeNetwork(pair.getFirst(), pair.getSecond())).toList()) {
+		for (var pair : best) {
+			// tree tracing (Banu Cetinkaya): rebuild the network for this ranking with per-tree metadata, so every
+			// reticulate edge carries the ids of the input trees that route a lineage through it
+			var network = treeTracing
+					? TracedNetwork.build(progress, multifurcating && useRefinementHeuristic, missingTaxa && useMissingTaxaHeuristic,
+					allTaxa, pair.getFirst(), treeTaxa, trees, representedTreeIds)
+					: computeNetwork(pair.getFirst(), pair.getSecond());
 			if (result.stream().noneMatch(other -> PathMultiplicityDistance.compute(network, other) == 0)) {
 				result.add(network);
 			}
@@ -321,6 +357,52 @@ public class PhyloFusionAlgorithm {
 		network.edgeStream().forEach(e -> network.setReticulate(e, e.getTarget().getInDegree() > 1));
 
 		return network;
+	}
+
+	/**
+	 * two-level sort key used to rank equally optimal networks; compared lexicographically, smaller is preferred
+	 *
+	 * @param preference  the requested preference (never None here)
+	 * @param network     the network
+	 * @param taxonWeight taxon to number-of-represented-taxa map, or null to weight each taxon as 1
+	 * @return {primary, secondary} key to be minimized
+	 */
+	private static int[] preferenceKey(ReticulationPreference preference, PhyloTree network, Map<Integer, Integer> taxonWeight) {
+		return switch (preference) {
+			case Smallest -> new int[]{reticulateLeafLoad(network, taxonWeight), 0};
+			case Largest -> new int[]{-reticulateLeafLoad(network, taxonWeight), 0};
+			// primary: fewest shortcut edges (reticulate edges whose source is an ancestor of their target; 0 means
+			// normal); secondary: smallest subnetworks below the reticulate nodes
+			case Normal -> new int[]{(int) network.edgeStream().filter(RootedNetworkProperties::isShortCut).count(),
+					reticulateLeafLoad(network, taxonWeight)};
+			case None -> new int[]{0, 0};
+		};
+	}
+
+	/**
+	 * total number of (represented) taxa that lie below reticulate nodes, summed over all reticulate nodes.
+	 * A network leaf may represent several original taxa that were identified with each other in a preceding
+	 * step; taxonWeight maps each taxon to that count (default 1). Minimizing this value places the smallest
+	 * subnetworks below the reticulate nodes.
+	 *
+	 * @param network     the network
+	 * @param taxonWeight taxon to number-of-represented-taxa map, or null to weight each taxon as 1
+	 * @return weighted leaf count below all reticulate nodes
+	 */
+	public static int reticulateLeafLoad(PhyloTree network, Map<Integer, Integer> taxonWeight) {
+		var total = 0;
+		for (var reticulateNode : network.nodeStream().filter(v -> v.getInDegree() > 1).toList()) {
+			var below = new HashSet<Node>();
+			network.postorderTraversal(reticulateNode, v -> !below.contains(v), below::add);
+			for (var v : below) {
+				if (network.hasTaxa(v)) {
+					for (var t : network.getTaxa(v)) {
+						total += (taxonWeight != null ? taxonWeight.getOrDefault(t, 1) : 1);
+					}
+				}
+			}
+		}
+		return total;
 	}
 
 	/**

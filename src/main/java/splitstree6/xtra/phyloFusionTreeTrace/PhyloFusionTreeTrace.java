@@ -31,7 +31,9 @@ import java.util.stream.Collectors;
  * recursive version of the PhyloFusion algorithm
  * same recursive logic as original PhyloFusion,
  * but uses PhyloFusionAlgorithmTreeTrace for the SCS-based core step
+ * @deprecated has been integrated into PhyloFusion
  */
+@Deprecated
 public class PhyloFusionTreeTrace extends PhyloFusion {
     /**
      * one active tree/network plus the original input tree ids that it represents

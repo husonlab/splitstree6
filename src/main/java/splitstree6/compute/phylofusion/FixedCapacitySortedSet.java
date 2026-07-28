@@ -50,9 +50,14 @@ public class FixedCapacitySortedSet<E> extends TreeSet<E> {
 					return false;
 				}
 			}
+		}
+		// add first, then trim: if e is a duplicate, super.add is a no-op and we must not evict anything,
+		// otherwise the retained set would depend on insertion order (and hence on thread timing).
+		var added = super.add(e);
+		if (added && size() > capacity) {
 			this.pollLast();
 		}
-		return super.add(e);
+		return added;
 	}
 
 	public void changeCapacity(int capacity) {
