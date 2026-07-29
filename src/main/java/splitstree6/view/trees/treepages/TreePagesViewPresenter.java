@@ -44,6 +44,7 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.TreesUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
@@ -314,7 +315,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			var top = Math.min(view.getTrees().size(), page * count);
 			var buf = new StringBuilder();
 			for (var t = bot; t < top; t++) {
-				buf.append(view.getTrees().get(t).toBracketString(true)).append(";\n");
+				buf.append(TreesUtils.toBracketStringWithComments(view.getTrees().get(t), true)).append(";\n");
 			}
 			ClipboardUtils.putString(buf.toString());
 		});

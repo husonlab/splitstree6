@@ -45,6 +45,7 @@ import jloda.phylogeny.layout.Averaging;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.TreesUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
@@ -250,7 +251,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			var tree = this.drawer.getConsensusTree();
 			if (tree != null)
-				ClipboardUtils.putString(tree.toBracketString(true) + ";\n");
+				ClipboardUtils.putString(TreesUtils.toBracketStringWithComments(tree, true) + ";\n");
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty().or(controller.getShowConsensusMenuItem().selectedProperty().not()));
 

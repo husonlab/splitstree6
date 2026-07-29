@@ -22,6 +22,7 @@ package splitstree6.utils;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.phylo.CommentData;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
@@ -46,6 +47,24 @@ import java.util.stream.Collectors;
  * Daniel Huson, 1.2024
  */
 public class TreesUtils {
+	/**
+	 * returns the tree or network in Newick format, always including any Newick comments, i.e. the tree name (GN)
+	 * and PhyloFusion tree-tracing (TT) annotations. Unlike PhyloTree.toBracketString(), which uses a bare NewickIO
+	 * with no comment suppliers, this attaches the comment suppliers so annotations are preserved. Used by the
+	 * Copy Newick menu items, which should always copy the full annotated network.
+	 *
+	 * @param tree        the tree or network
+	 * @param showWeights whether to write edge weights
+	 * @return Newick string (without trailing ';')
+	 */
+	public static String toBracketStringWithComments(PhyloTree tree, boolean showWeights) {
+		var newickIO = new NewickIO();
+		newickIO.setNewickNodeCommentSupplier(CommentData.createDataNodeSupplier());
+		newickIO.setNewickEdgeCommentSupplier(CommentData.createDataEdgeSupplier());
+		var format = new NewickIO.OutputFormat(showWeights, false, tree.hasEdgeConfidences(), tree.hasEdgeProbabilities(), false);
+		return newickIO.toBracketString(tree, format);
+	}
+
 	/**
 	 * gets all taxa in tree, if node to taxa mapping has been set
 	 *

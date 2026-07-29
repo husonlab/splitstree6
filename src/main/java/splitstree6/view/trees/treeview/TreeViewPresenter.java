@@ -57,6 +57,7 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.TreesUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.utils.ExportUtils;
@@ -493,7 +494,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			var tree = this.tree.get();
 			if (tree != null)
-				ClipboardUtils.putString(tree.toBracketString(true) + ";\n");
+				ClipboardUtils.putString(TreesUtils.toBracketStringWithComments(tree, true) + ";\n");
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
 

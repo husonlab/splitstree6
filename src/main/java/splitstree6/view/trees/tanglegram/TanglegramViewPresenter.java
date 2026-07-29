@@ -54,6 +54,7 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.TreesUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
@@ -519,9 +520,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			var buf = new StringBuilder();
 			if (tree1.get() != null)
-				buf.append(tree1.get().toBracketString(true)).append(";\n");
+				buf.append(TreesUtils.toBracketStringWithComments(tree1.get(), true)).append(";\n");
 			if (tree2.get() != null)
-				buf.append(tree2.get().toBracketString(true)).append(";\n");
+				buf.append(TreesUtils.toBracketStringWithComments(tree2.get(), true)).append(";\n");
 			ClipboardUtils.putString(buf.toString());
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
