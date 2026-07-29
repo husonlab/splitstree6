@@ -60,8 +60,15 @@ public class ViewBlock extends DataBlock {
 	@Override
 	public void setNode(DataNode node) {
 		super.setNode(node);
-		if (getNode().getOwner() != null) {
-			var mainWindow = ((Workflow) getNode().getOwner()).getMainWindow();
+		var owner = (Workflow) getNode().getOwner();
+		var mainWindow = (owner != null ? owner.getMainWindow() : null);
+		// Only wire up the UI (create the view tab, listen for add/remove) when this block belongs to the
+		// main window's live workflow. When a document is opened, a throwaway workflow is built first and then
+		// shallow-copied into the live one (Workflow.shallowCopy reuses the same block instances, so setNode is
+		// called a second time). Doing UI work for the throwaway workflow would bind the tab to a node that is
+		// about to be discarded and could leave a second, empty tab behind. A null main window (headless / tool
+		// use) likewise gets no UI.
+		if (mainWindow != null && mainWindow.getWorkflow() == owner) {
 			if (viewTab == null)
 				Platform.runLater(() -> viewTab = new ViewTab(mainWindow, getNode(), false));
 

@@ -272,7 +272,13 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 					view.setOptionDiagram(TreeDiagramType.RectangularCladogram);
 				}
 
-				RunAfterAWhile.apply(tree.get().getName(), () -> Platform.runLater(() -> {
+				// Key the debounce by this presenter instance, NOT by the tree's name. RunAfterAWhile keeps a single
+				// static key->job map, so using the tree name as key made independent TreeView panes that happen to
+				// show equally-named trees (e.g. several PhyloFusion networks all called "N1") overwrite each other's
+				// pending layout job - only the last survived and the other panes came up blank. The other tree views
+				// (Tanglegram, TreePages, DensiTree) all key by a per-instance object, which is why only TreeView was
+				// affected. A per-instance key still coalesces this pane's own rapid updates, which is all we want.
+				RunAfterAWhile.apply(this, () -> Platform.runLater(() -> {
 					var tree = this.tree.get();
 					var bounds = targetBounds.get();
 					if (bounds != null) {
