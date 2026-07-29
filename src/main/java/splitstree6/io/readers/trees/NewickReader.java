@@ -57,6 +57,20 @@ public class NewickReader extends TreesReader {
 		try (var it = new FileLineIterator(inputFile)) {
 			read(progress, it, taxa, treesBlock);
 		}
+		// Name trees after the source file, so that e.g. opening "input.tre" yields input-1, input-2, ... rather than
+		// the generic tree-1, tree-2. Only auto-numbered trees (name null/blank or "tree-...") are renamed; trees that
+		// carried an explicit name in the file (e.g. via an [&&NHX:GN=...] comment) are left untouched. Trees read from
+		// a non-file source (pasted text, the input editor) go through the other read() overload and keep tree-N.
+		var base = FileUtils.getFileNameWithoutPathOrSuffix(inputFile);
+		if (base != null && !base.isBlank() && !base.equals("tree")) {
+			var i = 0;
+			for (var tree : treesBlock.getTrees()) {
+				i++;
+				var name = tree.getName();
+				if (name == null || name.isBlank() || name.startsWith("tree-"))
+					tree.setName(base + "-" + i);
+			}
+		}
 	}
 
 	public void read(ProgressListener progress, ICloseableIterator<String> it, TaxaBlock taxa, TreesBlock treesBlock) throws IOException {

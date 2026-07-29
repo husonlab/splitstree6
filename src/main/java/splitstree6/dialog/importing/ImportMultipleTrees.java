@@ -24,6 +24,7 @@ import jloda.fx.util.AllFileFilter;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.NotificationManager;
+import jloda.phylo.CommentData;
 import jloda.phylo.NewickIO;
 import jloda.util.FileUtils;
 import jloda.util.progress.ProgressSilent;
@@ -35,7 +36,8 @@ import splitstree6.io.readers.trees.NexusReader;
 import splitstree6.window.MainWindow;
 
 import java.io.*;
-import java.nio.file.Files;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * import multiple trees dialog
@@ -65,33 +67,43 @@ public class ImportMultipleTrees {
 		var files = fileChooser.showOpenMultipleDialog(mainWindow.getStage());
 		if (files != null && !files.isEmpty()) {
 			try {
-				var tmpFile = FileUtils.getUniqueFileName(System.getProperty("user.dir"), "Untitled", "tmp");
+				// Write the concatenated trees into the system temp directory, NOT user.dir: when the app is
+				// launched by double-clicking (macOS .app), the working directory is "/" (read-only), so creating
+				// "/Untitled.tmp" fails with "Read-only file system". java.io.tmpdir is always writable.
+				var tmpFile = FileUtils.getUniqueFileName(System.getProperty("java.io.tmpdir"), "Untitled", "tmp");
 				tmpFile.deleteOnExit();
+				// Read the trees from every selected file and give each a name derived from its source file, so it is
+				// clear inside the app which file a tree came from: <basename>-<i>, with i restarting at 1 per file
+				// (basename = file name without path or extension). Clashes (e.g. two files with the same base name
+				// but different extensions) are disambiguated with a "(k)" suffix. The name travels into the merged
+				// file as an [&&NHX:GN=...] comment (CommentData.createDataNodeSupplier), which NewickReader reads back.
+				var newickIO = new NewickIO();
+				newickIO.setNewickNodeCommentSupplier(CommentData.createDataNodeSupplier());
+				var usedNames = new HashSet<String>();
 				var first = true;
 				try (var w = new BufferedWriter(new FileWriter(tmpFile))) {
 					for (var file : files) {
-						System.err.println(file.getName());
 						if (first) {
 							ProgramProperties.put("TreeImportDirectory", file.getParent());
 							first = false;
 						}
+						var taxaBlock = new TaxaBlock();
+						var treesBlock = new TreesBlock();
 						if (newickReader.accepts(file.getPath())) {
-							for (var line : Files.lines(file.toPath()).toList()) {
-								w.write(line);
-								w.newLine();
-							}
+							newickReader.read(new ProgressSilent(), file.getPath(), taxaBlock, treesBlock);
 						} else if (nexusReader.accepts(file.getPath())) {
-							var taxaBlock = new TaxaBlock();
-							var treesBlock = new TreesBlock();
-							var newickIO = new NewickIO();
 							nexusReader.read(new ProgressSilent(), file.getPath(), taxaBlock, treesBlock);
-							for (var tree : treesBlock.getTrees()) {
-								var format = new NewickIO.OutputFormat(tree.hasEdgeWeights(), false, tree.hasEdgeConfidences(), false, false);
-								newickIO.write(tree, w, format);
-								w.write(";\n");
-							}
 						} else
 							throw new IOException("File not in Newick or Nexus format: " + file.getName());
+
+						var base = FileUtils.getFileNameWithoutPathOrSuffix(file.getName());
+						var i = 0;
+						for (var tree : treesBlock.getTrees()) {
+							tree.setName(uniqueName(base + "-" + (++i), usedNames));
+							var format = new NewickIO.OutputFormat(tree.hasEdgeWeights(), false, tree.hasEdgeConfidences(), tree.hasEdgeProbabilities(), false);
+							newickIO.write(tree, w, format);
+							w.write(";\n");
+						}
 					}
 				}
 				if (false) {
@@ -109,5 +121,16 @@ public class ImportMultipleTrees {
 
 			}
 		}
+	}
+
+	/**
+	 * returns name if it is not yet in used, otherwise appends "(2)", "(3)", ... until unique; records the result in used
+	 */
+	private static String uniqueName(String name, Set<String> used) {
+		var unique = name;
+		var k = 1;
+		while (!used.add(unique))
+			unique = name + "(" + (++k) + ")";
+		return unique;
 	}
 }
