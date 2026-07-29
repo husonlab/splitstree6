@@ -63,11 +63,11 @@ public class PhyloFusion extends Trees2Trees {
 	 * Cetinkaya). None leaves the branch lengths unset. LeastSquares falls back to Average if the solver cannot solve.
 	 */
 	public enum EdgeWeights {
-		None(null),
-		Average(TracedEdgeWeights.Method.AVERAGE),
 		LeastSquares(TracedEdgeWeights.Method.NNLS),
 		LeastAbsolute(TracedEdgeWeights.Method.LP),
-		LeastAbsoluteZeroReticulations(TracedEdgeWeights.Method.LP_RETICULATES_ZERO);
+		LeastAbsoluteZeroReticulations(TracedEdgeWeights.Method.LP_RETICULATES_ZERO),
+		Average(TracedEdgeWeights.Method.AVERAGE),
+		None(null);
 
 		private final TracedEdgeWeights.Method method;
 
@@ -149,7 +149,7 @@ public class PhyloFusion extends Trees2Trees {
 		return switch (optionName) {
 			case "optionOnlyOneNetwork" -> "Report only one network";
 			case "optionReticulatePlacement" ->
-					"When several subnetworks are equally good, which to prefer: None (first found), Smallest or Largest subnetwork below each reticulate node, or Normal (avoid shortcut reticulate edges)";
+					"Prefer reticulations that are closer to the root (Earlier), closer to leaves (Later) or avoid short-cut edges (Normal)";
 			case "optionSearchHeuristic" -> "Fast, Medium, or Thorough search";
 			case "optionEdgeWeights" ->
 					"How to fit network branch lengths from the input trees: None, Average, LeastSquares (recommended), LeastAbsolute, or LeastAbsoluteZeroReticulations (forces reticulate edges to length 0)";

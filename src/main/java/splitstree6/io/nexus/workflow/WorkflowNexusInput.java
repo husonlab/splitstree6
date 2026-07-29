@@ -41,6 +41,7 @@ import splitstree6.window.MainWindow;
 import splitstree6.workflow.*;
 
 import java.io.*;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -213,13 +214,25 @@ public class WorkflowNexusInput {
 			titleNodeMap.put(workingTaxaTitle, workflow.getWorkingTaxaNode());
 			titleNodeMap.put(workingDataTitle, workflow.getWorkingDataNode());
 
-			final var title2algorithmAndLink = new HashMap<String, Pair<Algorithm, String>>();
+			// Algorithms are keyed by title so that a data block's LINK can locate its parent algorithm.
+			// A well-formed workflow uses unique titles, but if a file accidentally holds several algorithms
+			// with the same title we must NOT collapse them onto a single shared Algorithm instance: that
+			// leaves several workflow nodes pointing at one stateful algorithm object, which then clear and
+			// corrupt each other's output when they recompute in parallel (leaving downstream views empty).
+			// Instead keep the algorithms per title in file order and hand each linking data node its own
+			// instance. The writer emits an algorithm and its output data node in the same (BFS) order, so
+			// consuming them in FIFO order also restores the correct algorithm-to-output pairing.
+			final var title2algorithmsAndLinks = new HashMap<String, ArrayDeque<Pair<Algorithm, String>>>();
 
 			while (np.peekMatchIgnoreCase("begin")) {
 				if (np.peekMatchBeginBlock("algorithm")) {
 					final AlgorithmNexusInput algorithmInput = new AlgorithmNexusInput();
 					final Algorithm algorithm = algorithmInput.parse(np);
-					title2algorithmAndLink.put(algorithmInput.getTitle(), new Pair<>(algorithm, algorithmInput.getLink().getSecond()));
+					final var title = algorithmInput.getTitle();
+					final var queue = title2algorithmsAndLinks.computeIfAbsent(title, k -> new ArrayDeque<>());
+					if (!queue.isEmpty())
+						System.err.println("Warning: duplicate algorithm title '" + title + "' in workflow (line " + np.lineno() + "): giving each linked output its own algorithm instance");
+					queue.add(new Pair<>(algorithm, algorithmInput.getLink().getSecond()));
 				} else {
 					final DataBlock newDataBlock = dataInput.parse(np, workingTaxaBlock);
 					/*
@@ -229,7 +242,11 @@ public class WorkflowNexusInput {
 					 */
 					final DataNode newDataNode = workflow.newDataNode(newDataBlock);
 					if (dataInput.getLink() != null) {
-						final var algorithmAndLink = title2algorithmAndLink.get(dataInput.getLink().getSecond());
+						final var linkTitle = dataInput.getLink().getSecond();
+						final var queue = title2algorithmsAndLinks.get(linkTitle);
+						if (queue == null || queue.isEmpty())
+							throw new IOExceptionWithLineNumber("Workflow references unknown or already-used algorithm: '" + linkTitle + "'", np.lineno());
+						final var algorithmAndLink = queue.poll();
 						final Algorithm algorithm = algorithmAndLink.getFirst();
 						final DataNode parentDataNode = titleNodeMap.get(algorithmAndLink.getSecond());
 						workflow.newAlgorithmNode(algorithm, workflow.getWorkingTaxaNode(), parentDataNode, newDataNode);

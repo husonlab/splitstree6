@@ -37,13 +37,23 @@ import splitstree6.workflow.Workflow;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * write workflow in nexus
  * Daniel Huson, 2.2018
  */
 public class WorkflowNexusOutput {
+	// Per-save state used to guarantee that every node is written with a title that is unique within its
+	// kind (data vs algorithm). The .stree6 format resolves LINKs by title, so two nodes sharing a title
+	// become indistinguishable on reload (their algorithm instances get shared, later corrupting each other).
+	// We defensively disambiguate here: the first occurrence keeps its title, later clashes get a "-2", "-3",
+	// ... suffix. Nodes are emitted parent-before-child, so a link target's title is always assigned before
+	// the child that references it, keeping titles and links consistent.
+	private final Map<WorkflowNode, String> uniqueTitleMap = new HashMap<>();
+	private final Set<String> usedDataTitles = new HashSet<>();
+	private final Set<String> usedAlgorithmTitles = new HashSet<>();
+
 	/**
 	 * save the workflow in nexus format
 	 *
@@ -65,6 +75,10 @@ public class WorkflowNexusOutput {
 	 * write a workflow
 	 */
 	public int save(Workflow workflow, Writer w, boolean asWorkflowOnly) throws IOException {
+		uniqueTitleMap.clear();
+		usedDataTitles.clear();
+		usedAlgorithmTitles.clear();
+
 		SplitsTree6Block splitsTree6Block = new SplitsTree6Block();
 		splitsTree6Block.setOptionNumberOfDataNodes(workflow.getNumberOfDataNodes());
 		splitsTree6Block.setOptionNumberOfAlgorithms(workflow.getNumberOfAlgorithmNodes());
@@ -145,17 +159,38 @@ public class WorkflowNexusOutput {
 	 * sets up the exporter so that it reports title and links
 	 */
 	private void setupExporter(DataNode dataNode, NexusExporter nexusExporter) {
-		nexusExporter.setTitle(dataNode.getTitle());
+		nexusExporter.setTitle(uniqueTitleFor(dataNode));
 		if (dataNode.getPreferredParent() != null)
-			nexusExporter.setLink(new Pair<>(Algorithm.BLOCK_NAME, dataNode.getPreferredParent().getTitle()));
+			nexusExporter.setLink(new Pair<>(Algorithm.BLOCK_NAME, uniqueTitleFor(dataNode.getPreferredParent())));
 	}
 
 	/**
 	 * sets up the exporter so that it reports title and links
 	 */
 	private void setupExporter(AlgorithmNode algorithmNode, NexusExporter nexusExporter) {
-		nexusExporter.setTitle(algorithmNode.getTitle());
+		nexusExporter.setTitle(uniqueTitleFor(algorithmNode));
 		if (algorithmNode.getPreferredParent() != null)
-			nexusExporter.setLink(new Pair<>(algorithmNode.getPreferredParent().getDataBlock().getBlockName(), algorithmNode.getPreferredParent().getTitle()));
+			nexusExporter.setLink(new Pair<>(algorithmNode.getPreferredParent().getDataBlock().getBlockName(), uniqueTitleFor(algorithmNode.getPreferredParent())));
+	}
+
+	/**
+	 * returns the title under which the given node is written, disambiguated so that it is unique among nodes
+	 * of the same kind (data or algorithm). Idempotent: the first title assigned to a node is reused on later calls.
+	 */
+	private String uniqueTitleFor(WorkflowNode node) {
+		var title = uniqueTitleMap.get(node);
+		if (title == null) {
+			var used = (node instanceof DataNode) ? usedDataTitles : usedAlgorithmTitles;
+			var base = (node instanceof DataNode dataNode) ? dataNode.getTitle() : ((AlgorithmNode) node).getTitle();
+			if (base == null)
+				base = (node instanceof DataNode) ? "Data" : "Algorithm";
+			title = base;
+			var count = 1;
+			while (!used.add(title)) {
+				title = base + "-" + (++count);
+			}
+			uniqueTitleMap.put(node, title);
+		}
+		return title;
 	}
 }

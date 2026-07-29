@@ -43,12 +43,12 @@ public class PhyloFusionAlgorithm {
 	 * reticulate nodes:
 	 * <ul>
 	 *     <li>None: report the first one found</li>
-	 *     <li>Smallest: place the subnetwork with the fewest (represented) taxa below each reticulate node</li>
-	 *     <li>Largest: place the subnetwork with the most (represented) taxa below each reticulate node</li>
+	 *     <li>Later: place reticulations closer to the leaves, i.e. put the subnetwork with the fewest (represented) taxa below each reticulate node</li>
+	 *     <li>Earlier: place reticulations closer to the root, i.e., put the subnetwork with the most (represented) taxa below each reticulate node</li>
 	 *     <li>Normal: avoid reticulate edges whose source is an ancestor of their target (shortcut edges)</li>
 	 * </ul>
 	 */
-	public enum ReticulationPreference {Normal, Smallest, Largest, None}
+	public enum ReticulationPreference {Normal, Earlier, Later, None}
 
 	/**
 	 * run the algorithm
@@ -370,8 +370,8 @@ public class PhyloFusionAlgorithm {
 	 */
 	private static int[] preferenceKey(ReticulationPreference preference, PhyloTree network, Map<Integer, Integer> taxonWeight) {
 		return switch (preference) {
-			case Smallest -> new int[]{reticulateLeafLoad(network, taxonWeight), 0};
-			case Largest -> new int[]{-reticulateLeafLoad(network, taxonWeight), 0};
+			case Later -> new int[]{reticulateLeafLoad(network, taxonWeight), 0};
+			case Earlier -> new int[]{-reticulateLeafLoad(network, taxonWeight), 0};
 			// primary: fewest shortcut edges (reticulate edges whose source is an ancestor of their target; 0 means
 			// normal); secondary: smallest subnetworks below the reticulate nodes
 			case Normal -> new int[]{(int) network.edgeStream().filter(RootedNetworkProperties::isShortCut).count(),
