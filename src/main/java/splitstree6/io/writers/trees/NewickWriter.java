@@ -35,6 +35,7 @@ import java.io.Writer;
 public class NewickWriter extends TreesWriterBase {
 	private final BooleanProperty optionEdgeWeights = new SimpleBooleanProperty(this, "optionEdgeWeights", true);
 	private final BooleanProperty optionEdgeConfidences = new SimpleBooleanProperty(this, "optionEdgeConfidences", false);
+	private final BooleanProperty optionShowComments = new SimpleBooleanProperty(this, "optionShowComments", true);
 
 	public NewickWriter() {
 		setFileExtensions("tree", "tre", "trees", "new", "nwk", "treefile");
@@ -43,8 +44,12 @@ public class NewickWriter extends TreesWriterBase {
 	@Override
 	public void write(Writer w, TaxaBlock taxaBlock, TreesBlock trees) throws IOException {
 		var newickIO = new NewickIO();
-		newickIO.setNewickNodeCommentSupplier(CommentData.createDataNodeSupplier());
-		newickIO.setNewickEdgeCommentSupplier(CommentData.createDataEdgeSupplier());
+		if (isOptionShowComments()) {
+			// Newick comments carry the tree name (GN) and PhyloFusion tree-tracing (TT) annotations. Attach the
+			// comment suppliers only when the user wants them; otherwise the trees are written without any [...] comments.
+			newickIO.setNewickNodeCommentSupplier(CommentData.createDataNodeSupplier());
+			newickIO.setNewickEdgeCommentSupplier(CommentData.createDataEdgeSupplier());
+		}
 
 		var format = new NewickIO.OutputFormat(isOptionEdgeWeights(), isOptionEdgeConfidences(), isOptionEdgeConfidences(), false, false);
 
@@ -71,5 +76,13 @@ public class NewickWriter extends TreesWriterBase {
 
 	public BooleanProperty optionEdgeConfidencesProperty() {
 		return optionEdgeConfidences;
+	}
+
+	public boolean isOptionShowComments() {
+		return optionShowComments.get();
+	}
+
+	public BooleanProperty optionShowCommentsProperty() {
+		return optionShowComments;
 	}
 }

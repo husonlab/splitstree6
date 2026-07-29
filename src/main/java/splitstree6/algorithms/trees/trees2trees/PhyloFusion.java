@@ -85,7 +85,7 @@ public class PhyloFusion extends Trees2Trees {
 
 	// tree tracing (Banu Cetinkaya): an internal (non-user) switch. When on, each reticulate edge of the reported
 	// network is annotated with the input trees that use it, and node ids are completed for TT-comment output.
-	public boolean treeTracing = false;
+	public boolean treeTracing = true;
 	// during tracing: the original input-tree ids that each current working tree represents (keyed by tree identity)
 	private Map<PhyloTree, BitSet> tracedTreeIds;
 
