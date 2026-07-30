@@ -19,11 +19,11 @@
 
 package splitstree6.cite;
 
+import jloda.fx.util.ProgramProperties;
 import jloda.util.Pair;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.CharactersBlock;
-import splitstree6.main.Version;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
@@ -40,7 +40,7 @@ import java.util.TreeSet;
 public class ExtractMethodsText {
 	private static ExtractMethodsText instance;
 
-	public static final String PreambleTemplate = "Analysis was performed using SplitsTree App %s%s.%n";
+	public static final String PreambleTemplate = "Analysis was performed using %s %s.%n";
 	public static final String InputDataTemplate = "The original input consisted of %s and %s.%n";
 	public static final String RemovedCharactersTemplate = "After removal of %s characters, the input had %s characters.%n";
 
@@ -86,9 +86,10 @@ public class ExtractMethodsText {
 
 			buf.append("Methods:\n");
 
-			buf.append(PreambleTemplate.formatted(Version.VERSION, ExtractCitations.getSplitsTreeKeysString()));
+			var keyCitations = " " + StringUtils.toString(ExtractCitations.getKeyCitations(), ", ");
+			buf.append(PreambleTemplate.formatted(ProgramProperties.getProgramVersion().replaceAll(" - License GPL v3", ""), keyCitations));
 
-			final Set<Pair<String, String>> allKeysAndPapers = new TreeSet<>(ExtractCitations.getSplitsTreeKeysAndPapers());
+			final Set<Pair<String, String>> allKeysAndPapers = new TreeSet<>(ExtractCitations.getKeyCitations());
 
 			final Set<String> set = new HashSet<>(); // use this to avoid duplicate lines
 

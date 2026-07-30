@@ -22,12 +22,14 @@ package splitstree6.cite;
 import jloda.util.Pair;
 import jloda.util.StringUtils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class ExtractCitations {
+	private final static List<Pair<String, String>> keyCitations = new ArrayList<>();
+
+	static {
+		keyCitations.add(new Pair<>("(Huson and Bryant 2024)", " The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024."));
+	}
 	/**
 	 * get all the key - paper pairs for an object with citations
 	 *
@@ -48,14 +50,11 @@ public class ExtractCitations {
 		}
 	}
 
-	public static String getSplitsTreeKeysString() {
-		return " (Huson and Bryant 2024)";
+	public static void addKeyCitation(String key, String citation) {
+		ExtractCitations.keyCitations.add(new Pair<>(key, citation));
 	}
 
-	public static Collection<Pair<String, String>> getSplitsTreeKeysAndPapers() {
-		return List.of(new Pair<>("Huson and Bryant 2024",
-				"D.H. Huson and D. Bryant." +
-				" The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks." +
-				" Nature Methods, 2024."));
+	public static List<Pair<String, String>> getKeyCitations() {
+		return keyCitations;
 	}
 }

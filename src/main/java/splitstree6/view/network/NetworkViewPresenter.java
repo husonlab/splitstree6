@@ -82,12 +82,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		this.view = view;
 		this.controller = view.getController();
 
-		BasicFX.reportChanges(updateCounter);
-
-		if (false) {
-			targetBounds.addListener(e -> System.err.println("target bounds: " + targetBounds.get()));
-		}
-
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
 		controller.getScrollPane().setPannable(true);
