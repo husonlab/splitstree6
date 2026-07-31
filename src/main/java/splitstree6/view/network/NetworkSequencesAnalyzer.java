@@ -50,7 +50,12 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 		} else if (a == gapChar || a == missingChar || b == gapChar || b == missingChar) {
 			return false;
 		} else if (useAmbiguityCodes) {
-			return AmbiguityCodes.codesOverlap(a, b);
+			// two positions differ iff their possible bases are DISJOINT; overlapping (compatible) codes --
+			// including two identical bases, which trivially overlap -- are NOT a difference. (Without the
+			// negation, identical bases counted as differences and mismatches as matches: a degenerate,
+			// nearly-constant "distance" ~= nchar. Note 'n' is an ambiguity code, so any alignment with n's
+			// takes this branch.)
+			return !AmbiguityCodes.codesOverlap(a, b);
 		} else return a != b;
 	}
 
