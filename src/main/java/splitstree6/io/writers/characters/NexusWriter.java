@@ -73,7 +73,7 @@ public class NexusWriter extends CharactersWriterBase implements IHasPrependTaxa
 			characters.getFormat().setOptionTokens(isOptionTokens());
 
 			if (isOptionPrependTaxa())
-				new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+				IHasPrependTaxa.writePrependedTaxa(w, taxa);
 
 			final var output = new CharactersNexusOutput();
 			output.setTitleAndLink(getTitle(), getLink());

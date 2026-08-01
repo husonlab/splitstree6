@@ -65,7 +65,7 @@ public class NexusWriter extends SplitsWriterBase implements IHasPrependTaxa {
 			splits.getFormat().setOptionConfidences(isOptionConfidences());
 
 			if (isOptionPrependTaxa())
-				new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+				IHasPrependTaxa.writePrependedTaxa(w, taxa);
 
 			final var output = new SplitsNexusOutput();
 			output.setTitleAndLink(getTitle(), getLink());

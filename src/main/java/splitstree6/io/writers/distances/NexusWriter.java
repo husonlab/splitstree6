@@ -67,7 +67,7 @@ public class NexusWriter extends DistancesWriterBase implements IHasPrependTaxa 
 			distances.getFormat().setOptionTriangle(getOptionTriangle());
 
 			if (isOptionPrependTaxa())
-				new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+				IHasPrependTaxa.writePrependedTaxa(w, taxa);
 
 			final var output = new DistancesNexusOutput();
 			output.setTitleAndLink(getTitle(), getLink());

@@ -20,7 +20,23 @@
 package splitstree6.io.writers;
 
 import javafx.beans.property.BooleanProperty;
+import splitstree6.data.TaxaBlock;
+import splitstree6.io.nexus.TraitsNexusOutput;
+
+import java.io.IOException;
+import java.io.Writer;
 
 public interface IHasPrependTaxa {
 	BooleanProperty optionPrependTaxaProperty();
+
+	/**
+	 * writes the prepended TAXA block (with the #nexus header) and, if it exists, the associated TRAITS block, so
+	 * that trait annotations are not lost when a data block is exported with the "prepend taxa" option turned on.
+	 */
+	static void writePrependedTaxa(Writer w, TaxaBlock taxa) throws IOException {
+		new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+		var traits = taxa.getTraitsBlock();
+		if (traits != null && traits.getNTraits() > 0)
+			new TraitsNexusOutput().write(w, taxa, traits);
+	}
 }

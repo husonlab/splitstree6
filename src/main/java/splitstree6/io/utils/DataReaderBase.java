@@ -44,8 +44,16 @@ public abstract class DataReaderBase<T extends DataBlock> extends ReaderWriterBa
 	abstract public boolean acceptsFirstLine(String text);
 
 	public boolean acceptsFile(String fileName) {
-		var line = FileUtils.getFirstLineFromFile(new File(fileName));
-		return line != null && acceptsFirstLine(line);
+		var file = new File(fileName);
+		var firstLine = FileUtils.getFirstLineFromFile(file);
+		if (firstLine != null && acceptsFirstLine(firstLine))
+			return true;
+		// Fall back to the first non-empty, non-comment ('#') line, so a data file preceded by a leading comment
+		// block (e.g. a Phylip matrix with '# ...' header lines) is still recognized. Formats whose own marker is
+		// itself a '#' line - Nexus '#nexus', Stockholm '# STOCKHOLM' - are already matched above on the literal
+		// first line, so skipping '#' lines here does not affect them.
+		var contentLine = FileUtils.getFirstLineFromFileIgnoreEmptyLines(file, "#", 1000);
+		return contentLine != null && !contentLine.equals(firstLine) && acceptsFirstLine(contentLine);
 	}
 
 }

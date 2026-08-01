@@ -32,6 +32,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.io.readers.ImportManager;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImportDialogPresenter {
@@ -88,11 +89,22 @@ public class ImportDialogPresenter {
 		controller.getBrowseButton().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 
 		fileName.addListener((c, o, n) -> {
-			controller.getDataTypeCBox().getItems().setAll(ImportManager.getInstance().getAllDataTypes(n));
-			var dataType = ImportManager.getInstance().getDataType(n);
-			controller.getDataTypeCBox().setValue(dataType);
-			controller.getFileFormatCBox().getItems().setAll(ImportManager.getInstance().getAllFileFormats(n));
-			controller.getFileFormatCBox().setValue(ImportManager.getInstance().getFileFormat(n));
+			var importManager = ImportManager.getInstance();
+
+			// Data types that match the file; if none match (unrecognized extension, leading comment block, ...),
+			// offer all supported types so the user can still choose one manually.
+			var dataTypes = new ArrayList<>(importManager.getAllDataTypes(n));
+			if (dataTypes.isEmpty())
+				dataTypes.addAll(List.of(CharactersBlock.class, DistancesBlock.class, SplitsBlock.class, TreesBlock.class));
+			controller.getDataTypeCBox().getItems().setAll(dataTypes);
+			controller.getDataTypeCBox().setValue(importManager.getDataType(n));
+
+			// File formats that match; if only "Unknown" was found, offer all known formats instead.
+			var formats = new ArrayList<String>(importManager.getAllFileFormats(n));
+			if (formats.stream().allMatch(ImportManager.UNKNOWN_FORMAT::equals))
+				formats = new ArrayList<>(importManager.getAllFileFormats());
+			controller.getFileFormatCBox().getItems().setAll(formats);
+			controller.getFileFormatCBox().setValue(importManager.getFileFormat(n));
 		});
 
 		controller.getCloseButton().setOnAction((e) -> {

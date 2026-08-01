@@ -44,7 +44,7 @@ public class SaveDialog {
 	 */
 	public static boolean showSaveDialog(MainWindow mainWindow, boolean asWorkflowOnly) {
 		final var fileChooser = new FileChooser();
-		fileChooser.setTitle(asWorkflowOnly ? "Export SplitsTree6 Workflow" : "Save SplitsTree6 file");
+		fileChooser.setTitle(asWorkflowOnly ? "Export SplitsTree6 Workflow" : "Save %s file".formatted(ProgramProperties.getProgramName()));
 
 		final var previousDir = new File(ProgramProperties.get("SaveDir", ""));
 		if (previousDir.isDirectory()) {

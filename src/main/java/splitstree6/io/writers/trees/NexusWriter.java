@@ -62,7 +62,7 @@ public class NexusWriter extends TreesWriterBase implements IHasPrependTaxa {
 			block.getFormat().setOptionWeights(isOptionWeights());
 
 			if (isOptionPrependTaxa())
-				new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+				IHasPrependTaxa.writePrependedTaxa(w, taxa);
 
 			final TreesNexusOutput output = new TreesNexusOutput();
 			output.setTitleAndLink(getTitle(), getLink());

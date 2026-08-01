@@ -47,7 +47,7 @@ public class NexusWriter extends ViewWriterBase implements IHasPrependTaxa {
 	@Override
 	public void write(Writer w, TaxaBlock taxa, ViewBlock block) throws IOException {
 		if (isOptionPrependTaxa())
-			new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+			IHasPrependTaxa.writePrependedTaxa(w, taxa);
 
 		final var output = new ViewNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
