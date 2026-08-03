@@ -160,6 +160,7 @@ public class AlgorithmList {
 
 		add(algorithms, names, new LSATree());
 
+		add(algorithms, names, new NetworkFilter());
 		add(algorithms, names, new NormalizeRootedNetworks());
 		add(algorithms, names, new RootedConsensusTree());
 		add(algorithms, names, new RerootOrReorderTrees());

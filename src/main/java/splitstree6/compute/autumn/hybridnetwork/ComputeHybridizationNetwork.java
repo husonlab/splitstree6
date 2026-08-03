@@ -47,15 +47,23 @@ public class ComputeHybridizationNetwork {
 
 	private ProgressListener progress;
 
+	// when set, non-tree-child networks are filtered out at each recursive step (see filterTreeChild / isTreeChild)
+	private boolean treeChildOnly = false;
+
 	/**
 	 * computes the hybrid number for two multifurcating trees
 	 *
 	 * @return reduced trees
 	 */
 	public static PhyloTree[] apply(TaxaBlock taxaBlock, PhyloTree tree1, PhyloTree tree2, ProgressListener progress, Single<Integer> hybridizationNumber, boolean oneResultOnly) throws IOException {
+		return apply(taxaBlock, tree1, tree2, progress, hybridizationNumber, oneResultOnly, false);
+	}
+
+	public static PhyloTree[] apply(TaxaBlock taxaBlock, PhyloTree tree1, PhyloTree tree2, ProgressListener progress, Single<Integer> hybridizationNumber, boolean oneResultOnly, boolean treeChildOnly) throws IOException {
 		var upperBound = ComputeHybridNumber.apply(tree1, tree2, progress);
 
 		var computeHybridizationNetwork = new ComputeHybridizationNetwork();
+		computeHybridizationNetwork.treeChildOnly = treeChildOnly;
 		var networks = computeHybridizationNetwork.run(tree1, tree2, upperBound, hybridizationNumber, progress, oneResultOnly);
 
 		var label2taxonId = new HashMap<String, Integer>();
@@ -190,6 +198,10 @@ public class ComputeHybridizationNetwork {
 			}
 		}
 
+		// final safety net: the top-level networks are assembled here (not via cacheComputeRec), and killed taxa
+		// have just been reattached, so re-apply the tree-child filter to the complete networks
+		filterTreeChild(result);
+
 		System.err.println("Hybridization number: " + h);
 		hybridizationNumber.set(h);
 		System.err.println("Total networks: " + result.size());
@@ -235,6 +247,8 @@ public class ComputeHybridizationNetwork {
 			} else {
 				var newResults = new TreeSet<>(new NetworkComparator());
 				var h = computeRec(root1, root2, isReduced, candidateHybrids, k, newResults, depth, oneNetworkOnly);
+
+				filterTreeChild(newResults); // honor optionTreeChildOnly at each recursive step
 
 				if (h > 0)
 					lookupTable.put(key, new Pair<>(h, newResults));
@@ -519,5 +533,53 @@ public class ComputeHybridizationNetwork {
 			copy.add(r.copySubNetwork());
 		}
 		return copy;
+	}
+
+	/**
+	 * if optionTreeChildOnly is set, remove from the given collection all networks that are not tree-child
+	 */
+	private void filterTreeChild(Collection<Root> networks) {
+		if (treeChildOnly)
+			networks.removeIf(root -> !isTreeChild(root));
+	}
+
+	/**
+	 * does the network have the tree-child property, i.e., does every internal (non-leaf) node have at least one
+	 * child that is a tree node (in-degree &lt;= 1)? Reticulations are the nodes of in-degree &gt;= 2. Suppressible
+	 * degree-2 nodes (in-degree &lt;= 1 and out-degree 1) are looked through, so that the test matches the network
+	 * obtained once such nodes have been contracted (as happens in post-processing).
+	 *
+	 * @return true if the network is tree-child
+	 */
+	private static boolean isTreeChild(Root root) {
+		var nodes = root.getAllNodesBelow();
+		nodes.add(root);
+		for (var node : nodes) {
+			var v = (Root) node;
+			if (v.getOutDegree() == 0)
+				continue; // leaf
+			if (v.getInDegree() <= 1 && v.getOutDegree() == 1)
+				continue; // suppressible degree-2 node: contracted away, imposes no constraint
+			var hasTreeChild = false;
+			for (var e : v.outEdges()) {
+				if (effectiveChild((Root) e.getTarget()).getInDegree() <= 1) {
+					hasTreeChild = true;
+					break;
+				}
+			}
+			if (!hasTreeChild)
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * follows a chain of suppressible degree-2 nodes (in-degree &lt;= 1 and out-degree 1) to the first node that
+	 * survives contraction
+	 */
+	private static Root effectiveChild(Root w) {
+		while (w.getInDegree() <= 1 && w.getOutDegree() == 1)
+			w = (Root) w.getFirstOutEdge().getTarget();
+		return w;
 	}
 }

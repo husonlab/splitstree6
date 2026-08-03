@@ -134,15 +134,19 @@ public class LayoutUtils {
 		if (graph.getNumberOfTaxa(v) == 1) {
 			var taxonId = graph.getTaxon(v);
 			if (taxonId == -1) {
-				var again = graph.getTaxon(v);
 				System.err.println(StringUtils.toString(graph.getTaxa(v), " "));
 				return null;
 			}
+			var labelProperty = safeTaxonLabel(taxonLabelMap, taxonId);
+			if (labelProperty == null)
+				return null;
 			var textLabel = new RichTextLabel();
-			textLabel.textProperty().bindBidirectional(taxonLabelMap.apply(taxonId));
+			textLabel.textProperty().bindBidirectional(labelProperty);
 			return textLabel;
 		} else if (graph.getNumberOfTaxa(v) >= 2) {
-			var label = StringUtils.toString(IteratorUtils.asStream(graph.getTaxa(v)).map(t -> taxonLabelMap.apply(t).getValue()).collect(Collectors.toList()), ",");
+			var label = StringUtils.toString(IteratorUtils.asStream(graph.getTaxa(v))
+					.map(t -> safeTaxonLabel(taxonLabelMap, t)).filter(p -> p != null).map(StringProperty::getValue)
+					.collect(Collectors.toList()), ",");
 			return new RichTextLabel(label);
 		} else if (v.getLabel() != null && !v.getLabel().isBlank()) {
 			return new RichTextLabel(v.getLabel());
@@ -150,6 +154,20 @@ public class LayoutUtils {
 			return new RichTextLabel(graph.getLabel(v));
 		} else
 			return null;
+	}
+
+	/**
+	 * resolves a taxon's display-label property, tolerating a taxon id that is (transiently) out of range for the
+	 * current taxa block - e.g. while the workflow is still recomputing/filtering the taxa, so that the taxa block's
+	 * ntax momentarily exceeds its actual taxon list. Returns null rather than throwing, so that a single
+	 * unresolvable id cannot abort the whole tree layout ("Draw tree failed").
+	 */
+	private static StringProperty safeTaxonLabel(Function<Integer, StringProperty> taxonLabelMap, int taxonId) {
+		try {
+			return taxonLabelMap.apply(taxonId);
+		} catch (IndexOutOfBoundsException | NullPointerException ex) {
+			return null;
+		}
 	}
 
 	public static void applyLabelScaleFactor(Parent root, double factor) {

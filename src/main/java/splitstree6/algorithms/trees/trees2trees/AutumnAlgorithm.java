@@ -48,16 +48,18 @@ public class AutumnAlgorithm extends Trees2Trees {
 
 	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
 	private final BooleanProperty optionRerootToMinimize = new SimpleBooleanProperty(this, "optionRerootToMinimize", false);
+	private final BooleanProperty optionTreeChildOnly = new SimpleBooleanProperty(this, "optionTreeChildOnly", false);
 
 	{
 		ProgramProperties.track(optionRerootToMinimize, false);
 		ProgramProperties.track(optionOnlyOneNetwork, true);
+		ProgramProperties.track(optionTreeChildOnly, false);
 	}
 
 	@Override
 	public List<String> listOptions() {
 		return List.of(optionFirstTree.getName(), optionSecondTree.getName(), optionOnlyOneNetwork.getName(),
-				optionRerootToMinimize.getName());
+				optionRerootToMinimize.getName(), optionTreeChildOnly.getName());
 	}
 
 	@Override
@@ -70,6 +72,8 @@ public class AutumnAlgorithm extends Trees2Trees {
 			case "optionFirstTree" -> "index of the first tree";
 			case "optionSecondTree" -> "index of the second tree";
 			case "optionRerootToMinimize" -> "reroot input trees to minimize hybridization number";
+			case "optionTreeChildOnly" ->
+					"report only tree-child networks (every internal node has a child that is a tree node)";
 			default -> super.getToolTip(optionName);
 		};
 	}
@@ -103,7 +107,7 @@ public class AutumnAlgorithm extends Trees2Trees {
 			secondTree = new PhyloTree(secondTree);
 			RerootByHybridNumber.apply(firstTree, secondTree, progress);
 		}
-		outputData.getTrees().addAll(ComputeHybridizationNetwork.apply(taxaBlock, firstTree, secondTree, progress, hybridNumber, isOptionOnlyOneNetwork()));
+		outputData.getTrees().addAll(ComputeHybridizationNetwork.apply(taxaBlock, firstTree, secondTree, progress, hybridNumber, isOptionOnlyOneNetwork(), isOptionTreeChildOnly()));
 		outputData.setReticulated(hybridNumber.get() > 0);
 
 		for (var network : outputData.getTrees()) {
@@ -165,5 +169,17 @@ public class AutumnAlgorithm extends Trees2Trees {
 
 	public void setOptionOnlyOneNetwork(boolean optionOnlyOneNetwork) {
 		this.optionOnlyOneNetwork.set(optionOnlyOneNetwork);
+	}
+
+	public boolean isOptionTreeChildOnly() {
+		return optionTreeChildOnly.get();
+	}
+
+	public BooleanProperty optionTreeChildOnlyProperty() {
+		return optionTreeChildOnly;
+	}
+
+	public void setOptionTreeChildOnly(boolean optionTreeChildOnly) {
+		this.optionTreeChildOnly.set(optionTreeChildOnly);
 	}
 }

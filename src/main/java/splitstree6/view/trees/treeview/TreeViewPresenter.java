@@ -313,6 +313,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						}
 					}
 				}));
+			} else {
+				// no current tree (e.g. an upstream filter matched nothing): clear the drawing so the pane shows
+				// nothing. The info line is handled by updateBreadCrumbs in TreeView, which shows "n: <ntax>".
+				treePane.set(null);
+				scrollPane.setContent(new Pane());
 			}
 		};
 

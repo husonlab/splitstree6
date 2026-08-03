@@ -26,6 +26,7 @@ import splitstree6.algorithms.IExperimental;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.cite.IHasCitations;
 import splitstree6.data.TaxaBlock;
+import splitstree6.data.ViewBlock;
 import splitstree6.options.IOptionsCarrier;
 import splitstree6.options.Option;
 import splitstree6.workflow.interfaces.HasFromClass;
@@ -87,6 +88,15 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 			var targetTaxaBlock = outputData.stream().filter(d -> d instanceof TaxaBlock).map(d -> (TaxaBlock) d).findFirst().orElse(null);
 			source.load(progress, inputBlock, targetTaxaBlock, outputBlock);
 		} else if (taxaBlock != null && inputBlock != null && outputBlock != null) {
+			// Empty input (e.g. an upstream filter matched nothing): don't report the generic "not applicable".
+			// For a view-producing algorithm, still run compute so that the view refreshes to an empty display
+			// rather than keeping a stale drawing; for other algorithms, leave the (already-cleared) output empty.
+			// A non-empty input of the wrong type/shape still reports "not applicable" below.
+			if (inputBlock.size() == 0) {
+				if (outputBlock instanceof ViewBlock)
+					compute(progress, taxaBlock, inputBlock, outputBlock);
+				return;
+			}
 			if (!isApplicable(taxaBlock, inputBlock))
 				throw new IOException("Algorithm is not applicable to given input data");
 			if (this instanceof IExperimental && !warned.contains(getName())) {

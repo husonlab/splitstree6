@@ -208,6 +208,10 @@ public class TreeView implements IView {
 		};
 		mainWindow.workingTaxaProperty().addListener(new WeakInvalidationListener(updateBreadCrumbs));
 		treeProperty().addListener(updateBreadCrumbs);
+		// initialize the info line for this (possibly empty) view: with no tree it shows just "n: <ntax>", matching
+		// the other tree views. Needed because, for a freshly-created empty view, the tree never changes from null,
+		// so the listener above would otherwise never fire and the toolbar would keep the previous view's numbers.
+		updateBreadCrumbs.invalidated(null);
 
 		if (setMinWidthHeightToZero) {
 			for (var region : BasicFX.getAllRecursively(loader.getRoot(), Region.class)) {
