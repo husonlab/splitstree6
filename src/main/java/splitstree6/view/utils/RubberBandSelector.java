@@ -1,5 +1,5 @@
 /*
- * RubberbandSelection.java Copyright (C) 2025 Daniel H. Huson
+ * RubberBandSelector.java Copyright (C) 2025 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -18,9 +18,10 @@
  *
  */
 
-package splitstree6.view.network;
+package splitstree6.view.utils;
 
 import javafx.animation.PauseTransition;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -33,11 +34,26 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.BasicFX;
+import jloda.phylo.PhyloGraph;
+import splitstree6.data.TaxaBlock;
+import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.LabeledNodeShape;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+/**
+ * a rubber-band (box) selector that toggles nodes and/or edges that a dragged rectangle intersects.
+ * Activated by a long press followed by a drag (a quick drag pans instead), Shift extends the current selection.
+ * The generic constructor is used by the network view (nodes and edges); the {@link #createForTaxa} factory
+ * sets up a taxa-only selector used by the tree and splits views.
+ * Daniel Huson, 2025
+ */
 public class RubberBandSelector {
 
 	private final Pane canvas;
@@ -54,6 +70,12 @@ public class RubberBandSelector {
 
 	private final Rectangle rubber = new Rectangle();
 	private boolean selecting = false;
+
+	// When a band selection completes with the mouse released inside the canvas, the platform synthesizes a
+	// MOUSE_CLICKED right after the MOUSE_RELEASED. Some canvases clear the selection on such a click (click on
+	// empty space = deselect all), which would immediately wipe what the band just selected. We set this flag when
+	// a band completes and swallow that one following click. It is cleared on the next press so it never lingers.
+	private boolean swallowNextClick = false;
 
 	// We keep BOTH coordinate systems:
 	private Point2D pressCanvas = null; // for drawing the rect on the canvas
@@ -82,6 +104,76 @@ public class RubberBandSelector {
 		installHandlers();
 	}
 
+	/**
+	 * creates a rubber-band selector that selects taxa only: any node-shape whose bounds the band intersects
+	 * has all of its associated taxa toggled in the taxon selection model. Edges are ignored, and node-shapes
+	 * that carry no taxon (internal nodes) are simply skipped. This is used by the tree and splits views, which
+	 * (unlike the network view) currently only support taxon selection.
+	 *
+	 * @param canvas              pane to draw the band on and to listen to for mouse events
+	 * @param nodeShapeMap        maps graph nodes to their shapes; the live values view is used, so it always
+	 *                            reflects the current drawing
+	 * @param taxaBlockSupplier   supplies the current working taxa block, used to resolve taxon ids to taxa;
+	 *                            a supplier (rather than a fixed block) so the selector stays correct after a
+	 *                            taxa filter replaces the working taxa block
+	 * @param taxonSelectionModel the taxon selection model to update
+	 * @return the selector; keep a reference to it so it is not garbage collected
+	 */
+	public static RubberBandSelector createForTaxa(Pane canvas, ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap,
+												   Supplier<TaxaBlock> taxaBlockSupplier, SelectionModel<Taxon> taxonSelectionModel) {
+		return new RubberBandSelector(canvas, nodeShapeMap.values(), List.of(),
+				taxonSelectionModel::clearSelection, null,
+				shape -> toggleTaxaForShape(shape, nodeShapeMap, taxaBlockSupplier, taxonSelectionModel),
+				shape -> {
+				});
+	}
+
+	/**
+	 * creates a rubber-band selector that selects taxa only, given the taxon "shapes" (e.g. taxon labels) directly
+	 * together with a function that maps a shape to its taxon. This is used by the DensiTree view, where the consensus
+	 * tree and its taxon labels are drawn as nodes on top of a canvas and there is no node-shape map to reverse-look-up.
+	 *
+	 * @param canvas              pane to draw the band on and to listen to for mouse events
+	 * @param taxonShapes         the shapes that represent taxa (a live collection is fine, it is iterated on release)
+	 * @param shapeToTaxon        maps a taxon shape to its taxon; may return null to skip a shape
+	 * @param taxonSelectionModel the taxon selection model to update
+	 * @return the selector; keep a reference to it so it is not garbage collected
+	 */
+	public static RubberBandSelector createForTaxonShapes(Pane canvas, Collection<? extends Node> taxonShapes,
+														  Function<Node, Taxon> shapeToTaxon, SelectionModel<Taxon> taxonSelectionModel) {
+		return new RubberBandSelector(canvas, taxonShapes, List.of(),
+				taxonSelectionModel::clearSelection, null,
+				shape -> {
+					var taxon = shapeToTaxon.apply(shape);
+					if (taxon != null)
+						taxonSelectionModel.toggleSelection(taxon);
+				},
+				shape -> {
+				});
+	}
+
+	/**
+	 * toggles the taxa associated with the graph node whose shape equals the given shape
+	 */
+	private static void toggleTaxaForShape(Node shape, ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap,
+										   Supplier<TaxaBlock> taxaBlockSupplier, SelectionModel<Taxon> taxonSelectionModel) {
+		for (var v : nodeShapeMap.keySet()) {
+			if (nodeShapeMap.get(v) == shape) {
+				if (v.getOwner() instanceof PhyloGraph graph) {
+					var taxaBlock = taxaBlockSupplier.get();
+					if (taxaBlock != null) {
+						for (var t : graph.getTaxa(v)) {
+							var taxon = taxaBlock.get(t);
+							if (taxon != null)
+								taxonSelectionModel.toggleSelection(taxon);
+						}
+					}
+				}
+				return;
+			}
+		}
+	}
+
 	private void setupRubber() {
 		rubber.setManaged(false);
 		rubber.setVisible(false);
@@ -96,11 +188,34 @@ public class RubberBandSelector {
 		canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, this::onPressed);
 		canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, this::onDragged);
 		canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, this::onReleased);
-		canvas.addEventHandler(MouseEvent.MOUSE_EXITED, e -> cancelSelection());
+		// Swallow the click that the platform synthesizes right after a band selection released inside the canvas,
+		// so a "click on empty space clears selection" handler on the canvas cannot wipe the fresh band selection.
+		// A filter (capturing phase) runs before the canvas's own bubbling onMouseClicked handler on the same node.
+		canvas.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
+			if (swallowNextClick) {
+				swallowNextClick = false;
+				e.consume();
+			}
+		});
+		canvas.addEventHandler(MouseEvent.MOUSE_EXITED, e -> {
+			// Do NOT cancel an active band when the cursor leaves the drawing: during a press-drag gesture,
+			// drag and release events keep being delivered to this canvas, so the band stays alive (clamped
+			// to the drawing, see onDragged) until the mouse is released. This lets the user select items right
+			// at the edge of the drawing. Only clean up a still-pending (not-yet-begun) selection.
+			if (!selecting) {
+				if (longPressTimer != null) {
+					longPressTimer.stop();
+					longPressTimer = null;
+				}
+				cancelSelection();
+			}
+		});
 	}
 
 	private void onPressed(MouseEvent e) {
 		if (!e.isPrimaryButtonDown()) return;
+
+		swallowNextClick = false; // start of a new gesture: never carry a stale click-swallow over
 
 		// Record both canvas-space and scene-space positions
 		pressCanvas = new Point2D(e.getX(), e.getY());
@@ -125,8 +240,10 @@ public class RubberBandSelector {
 			return;
 		}
 
-		// Update on-canvas rectangle for visuals
-		updateRubber(pressCanvas.getX(), pressCanvas.getY(), e.getX(), e.getY());
+		// Update on-canvas rectangle for visuals, clamping the moving corner to the drawing so the band
+		// stays visible but never extends outside of it (drag/release events still arrive when the cursor
+		// is outside the canvas during a press-drag gesture).
+		updateRubber(pressCanvas.getX(), pressCanvas.getY(), clamp(e.getX(), canvas.getWidth()), clamp(e.getY(), canvas.getHeight()));
 		e.consume();
 	}
 
@@ -141,8 +258,13 @@ public class RubberBandSelector {
 			return;
 		}
 
-		// Build the band in SCENE coordinates from pressScene to current point (converted)
-		Point2D releaseScene = canvas.localToScene(new Point2D(e.getX(), e.getY()));
+		// A band is completing: swallow the click the platform will synthesize if the release is inside the canvas,
+		// so it cannot clear the selection we are about to make.
+		swallowNextClick = true;
+
+		// Build the band in SCENE coordinates from pressScene to current point (converted), clamping the
+		// moving corner to the drawing so the selected region matches the (clamped) visible rectangle.
+		Point2D releaseScene = canvas.localToScene(new Point2D(clamp(e.getX(), canvas.getWidth()), clamp(e.getY(), canvas.getHeight())));
 		Rectangle2D bandScene = rectFromPoints(pressScene, releaseScene);
 
 		if (!e.isShiftDown()) {
@@ -214,6 +336,15 @@ public class RubberBandSelector {
 	}
 
 	// ---------- geometry helpers (scene-space) ----------
+
+	/**
+	 * clamps a value to the range [0, max], keeping the rubber band inside the drawing
+	 */
+	private static double clamp(double value, double max) {
+		if (value < 0)
+			return 0;
+		return Math.min(value, max);
+	}
 
 	private static Rectangle2D rectFromPoints(Point2D a, Point2D b) {
 		double x = Math.min(a.getX(), b.getX());

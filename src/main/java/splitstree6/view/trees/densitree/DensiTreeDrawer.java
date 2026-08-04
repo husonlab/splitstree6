@@ -61,6 +61,7 @@ import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.main.SplitsTree6;
 import splitstree6.utils.TreesUtils;
 import splitstree6.view.trees.InteractionSetup;
+import splitstree6.view.utils.RubberBandSelector;
 import splitstree6.window.MainWindow;
 
 import java.util.*;
@@ -365,6 +366,15 @@ public class DensiTreeDrawer {
 		if (true) // todo: the consensus sometimes appears to far to the right, this hack attempts to fix that...
 			edgesGroup.setTranslateX(-20);
 		pane.getChildren().addAll(edgesGroup, labelGroup);
+
+		// The consensus tree and its taxon labels are Node objects drawn on top of the densitree canvas, so we can
+		// box-select taxa via those labels without touching the canvas. Long-press then drag to select the taxa whose
+		// labels fall inside the rectangle (Shift extends the current selection). pickOnBounds is set so that a drag
+		// starting over the (otherwise non-pickable) blank canvas area still reaches this pane.
+		pane.setPickOnBounds(true);
+		RubberBandSelector.createForTaxonShapes(pane, labelGroup.getChildren(),
+				shape -> (shape.getUserData() instanceof Integer t ? taxaBlock.get(t) : null),
+				mainWindow.getTaxonSelectionModel());
 	}
 
 	private static NodeArray<Point2D> computeTreeCoordinates(TaxaBlock taxaBlock, PhyloTree tree, Averaging averaging, boolean vFlip, int[] taxon2pos, int lastTaxon,

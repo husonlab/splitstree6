@@ -51,6 +51,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.*;
 import splitstree6.view.format.edgelabel.LabelEdgesBy;
 import splitstree6.view.trees.InteractionSetup;
+import splitstree6.view.utils.RubberBandSelector;
 import splitstree6.window.MainWindow;
 
 import java.util.OptionalDouble;
@@ -83,13 +84,16 @@ public class TreePane extends StackPane {
 
 	private ComputeTreeLayout.Result result;
 
+	private RubberBandSelector rubberBandSelector;
+
 	/**
 	 * single tree pane
 	 */
 	public TreePane(MainWindow mainWindow, ScrollPane scrollPane, UndoManager undoManager, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, Averaging averaging, LayoutRootedPhylogeny.Scaling scaling, StringProperty orientationLabel, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<PaneLabel> showTreeLabels, DoubleProperty unitLengthX,
-					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges) {
+					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges,
+					boolean enableTaxonRubberBandSelection) {
 		nodeShapeMap.clear();
 		edgeShapeMap.clear();
 
@@ -233,6 +237,13 @@ public class TreePane extends StackPane {
 				getChildren().setAll(new VBox(treeLabel, pane));
 			} else
 				getChildren().setAll(pane);
+
+			if (enableTaxonRubberBandSelection && rubberBandSelector == null) {
+				// long-press then drag to box-select the taxa whose leaves fall inside the rectangle
+				// (Shift extends the current selection; a quick drag pans instead). Created here, after the
+				// drawing has been set as this pane's content, so the rubber rectangle is not wiped by setAll.
+				rubberBandSelector = RubberBandSelector.createForTaxa(this, nodeShapeMap, () -> taxaBlock, taxonSelectionModel);
+			}
 
 			if (getRunAfterUpdate() != null) {
 				Platform.runLater(() -> getRunAfterUpdate().run());

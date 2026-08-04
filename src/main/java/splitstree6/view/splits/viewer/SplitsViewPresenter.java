@@ -65,6 +65,7 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.view.utils.NodeLabelDialog;
+import splitstree6.view.utils.RubberBandSelector;
 import splitstree6.window.MainWindow;
 
 import java.io.IOException;
@@ -333,6 +334,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		});
 
 		controller.getScrollPane().setContent(splitNetworkPane);
+
+		// rubber-band (box) selection of taxa: long-press then drag to select taxa within the box,
+		// hold Shift to extend the current selection (a quick drag pans instead):
+		RubberBandSelector.createForTaxa(splitNetworkPane, nodeLabeledShapeMap, mainWindow::getWorkingTaxa, mainWindow.getTaxonSelectionModel());
 
 		updateListener = e -> RunAfterAWhile.apply(splitNetworkPane, () -> Platform.runLater(splitNetworkPane::drawNetwork));
 

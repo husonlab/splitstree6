@@ -112,7 +112,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 				var treePane = new TreePane(mainWindow, null, treePagesView.getUndoManager(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 						treePagesView.getOptionDiagram(), treePagesView.getOptionLabelEdgesBy(), treePagesView.getOptionAveraging(), LayoutRootedPhylogeny.Scaling.LateBranching,
 						treePagesView.optionOrientationProperty(), treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), null,
-						FXCollections.observableHashMap(), FXCollections.observableHashMap(), true);
+						FXCollections.observableHashMap(), FXCollections.observableHashMap(), true, true);
 				treePane.changingOrientationProperty().addListener((v, o, n) -> numberChangingOrientation.set(numberChangingOrientation.get() + (n ? 1 : -1)));
 				treePane.setRunAfterUpdate(() -> {
 					for (var treeViewPane : BasicFX.findRecursively(treePane, p -> p.getId() != null && p.getId().equals("treeView"))) {
