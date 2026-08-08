@@ -45,9 +45,9 @@ public class AdditionalConsoleOutput {
 					info = "Total length: %d, excess: %d".formatted(totalEdgeDistances, excessDistance);
 				} else if (NetworkDistancesAnalyzer.isApplicable(networkBlock)) {
 					var analyzer = new NetworkDistancesAnalyzer();
-					var totalDistances = analyzer.inputPairwiseDistances(networkBlock);
-					var excessDistance = analyzer.inputPairwiseDistances(networkBlock) - totalDistances;
-					info = "Length: %s, excess: %s".formatted(StringUtils.trim(totalDistances), StringUtils.trim(excessDistance));
+					var totalEdgeDistances = analyzer.totalEdgeDistances(networkBlock);
+					var excessDistance = analyzer.realizedPairwiseDistances(networkBlock) - analyzer.inputPairwiseDistances(networkBlock);
+					info = "Total length: %s, excess: %s".formatted(StringUtils.trim(totalEdgeDistances), StringUtils.trim(excessDistance));
 				}
 				if (!info.isBlank()) {
 					System.err.println(info);

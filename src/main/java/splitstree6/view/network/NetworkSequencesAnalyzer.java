@@ -128,7 +128,11 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 			if (graph.hasTaxa(v)) {
 				for (var w : graph.nodes(v)) {
 					if (graph.hasTaxa(w)) {
-						var shortestPath = Dijkstra.compute(graph, v, w, weights::get, true);
+						// follow the geodesic as drawn (edge weights w(e)) but sum the mutation labels h(e)
+						// along it -- consistent with reportAllDifferences(). Summary and per-pair report now
+						// use the same geodesic; both diverge from the truth exactly when the labeling's
+						// per-edge mutation count h(e) differs from the realization weight w(e).
+						var shortestPath = Dijkstra.compute(graph, v, w, graph::getWeight, true);
 						Node prev = null;
 						var pathLength = 0;
 						for (var q : shortestPath) {
@@ -139,7 +143,6 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 							prev = q;
 						}
 						sum += pathLength;
-						System.err.println(graph.getLabel(v) + "-" + graph.getLabel(w) + ": " + pathLength);
 					}
 				}
 			}
