@@ -76,7 +76,7 @@ public record NetworkDistancesAnalyzer() {
 					if (graph.hasTaxa(w)) {
 						var shortestPath = Dijkstra.compute(graph, v, w, weights::get, true);
 						Node prev = null;
-						var pathLength = 0;
+						var pathLength = 0.0; // double: edge weights are fractional (half-integer Steiner edges), an int accumulator truncates each step and undershoots
 						for (var q : shortestPath) {
 							if (prev != null) {
 								var e = q.getCommonEdge(prev);
@@ -85,7 +85,6 @@ public record NetworkDistancesAnalyzer() {
 							prev = q;
 						}
 						sum += 2 * pathLength; // from v to w and from w to v
-						System.err.println(graph.getLabel(v) + "-" + graph.getLabel(w) + ": " + pathLength);
 					}
 				}
 			}
