@@ -27,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.icons.MaterialIcons;
@@ -106,6 +107,8 @@ public class SplitsViewController {
 
 	private final CopyableLabel fitLabel = new CopyableLabel();
 
+	private final CopyableLabel infoLabel = new CopyableLabel();
+
 	private ZoomButtonsPanel zoomButtonPane;
 
 	@FXML
@@ -140,6 +143,14 @@ public class SplitsViewController {
 		innerAnchorPane.getChildren().add(fitLabel);
 
 		DraggableLabel.makeDraggable(fitLabel);
+
+		// RazorNet only: draggable label showing the split network's total length and excess (set in SplitsViewPresenter); stays empty/hidden in SplitsTree
+		AnchorPane.setBottomAnchor(infoLabel, 20.0);
+		AnchorPane.setLeftAnchor(infoLabel, 20.0);
+		innerAnchorPane.getChildren().add(infoLabel);
+		infoLabel.setFont(Font.font(infoLabel.getFont().getFamily(), 16));
+		DraggableLabel.makeDraggable(infoLabel);
+		infoLabel.visibleProperty().bind(infoLabel.textProperty().isNotEmpty());
 
 		settingsToggleButton.setSelected(false);
 
@@ -220,6 +231,10 @@ public class SplitsViewController {
 
 	public CopyableLabel getFitLabel() {
 		return fitLabel;
+	}
+
+	public CopyableLabel getInfoLabel() {
+		return infoLabel;
 	}
 
 	public AnchorPane getInnerAnchorPane() {

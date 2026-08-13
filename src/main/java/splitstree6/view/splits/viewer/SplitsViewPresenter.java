@@ -47,6 +47,7 @@ import jloda.fx.util.*;
 import jloda.util.*;
 import splitstree6.algorithms.utils.CharactersUtilities;
 import splitstree6.data.CharactersBlock;
+import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -310,6 +311,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				Platform.runLater(() -> SplitNetworkEdits.clearEdits(view.optionEditsProperty()));
 			}
 			updateCounter.set(updateCounter.get() + 1);
+			updateLengthExcessInfo();
 		});
 
 		view.optionZoomFactorProperty().addListener((v, o, n) -> {
@@ -402,6 +404,60 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
 
 		Platform.runLater(this::setupMenuItems);
+	}
+
+	/**
+	 * RazorNet only: report the split network's total length and excess (realized minus input pairwise distances),
+	 * so a NeighborNet split network can be compared with a RazorNet network on the same footing. The label stays
+	 * empty (and hidden) in SplitsTree, for an unweighted diagram, or when the splits do not derive from distances.
+	 * Total length is the sum of the weights of the edges actually drawn, so it is smaller for an outline than for the
+	 * full network; excess uses the split metric and is therefore the same for either drawing.
+	 */
+	private void updateLengthExcessInfo() {
+		var label = controller.getInfoLabel();
+		var splitsBlock = view.getSplitsBlock();
+		if (!ProgramProperties.getProgramName().equals("RazorNet") || splitsBlock == null || !view.getOptionDiagram().isUsingWeights()) {
+			label.setText("");
+			return;
+		}
+		var distancesBlock = findDistancesBlock(splitsBlock);
+		if (distancesBlock == null) {
+			label.setText("");
+			return;
+		}
+		// total length: sum of the weights of the edges actually drawn (outline: ~2 per split; full network: one band per split)
+		var graph = splitNetworkPane.getSplitNetworkLayout().getGraph();
+		var totalLength = 0.0;
+		for (var e : graph.edges())
+			totalLength += graph.getWeight(e);
+		// realized pairwise distances (both directions), computed from the split metric so it is independent of the drawing:
+		// summed over ordered pairs, this is 2 * sum over splits of weight * |A| * |B| (each split separates |A|*|B| taxon pairs)
+		var realizedPairwiseDistances = 0.0;
+		for (var s = 1; s <= splitsBlock.getNsplits(); s++) {
+			var split = splitsBlock.get(s);
+			realizedPairwiseDistances += split.getWeight() * split.getA().cardinality() * (double) split.getB().cardinality();
+		}
+		realizedPairwiseDistances *= 2;
+		// input pairwise distances (both directions)
+		var inputPairwiseDistances = 0.0;
+		for (var s = 1; s <= distancesBlock.getNtax(); s++)
+			for (var t = s + 1; t <= distancesBlock.getNtax(); t++)
+				inputPairwiseDistances += distancesBlock.get(s, t);
+		inputPairwiseDistances *= 2;
+		var excessDistance = realizedPairwiseDistances - inputPairwiseDistances;
+		label.setText("Total length: %s, excess: %s".formatted(StringUtils.trim(totalLength), StringUtils.trim(excessDistance)));
+	}
+
+	/**
+	 * finds the distances block that the splits were (indirectly) computed from, or null if there is none
+	 */
+	private static DistancesBlock findDistancesBlock(SplitsBlock splitsBlock) {
+		if (splitsBlock.getNode() != null && splitsBlock.getNode().getPreferredParent() != null
+			&& splitsBlock.getNode().getPreferredParent().getPreferredParent() != null
+			&& splitsBlock.getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock distancesBlock) {
+			return distancesBlock;
+		}
+		return null;
 	}
 
 	public void setupMenuItems() {
