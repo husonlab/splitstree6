@@ -31,6 +31,8 @@ import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.*;
 import jloda.graph.fmm.FastMultiLayerMethodLayout;
 import jloda.graph.fmm.FastMultiLayerMethodOptions;
+import jloda.graph.layout.GraphLayouts;
+import jloda.graph.layout.JlodaFmmLayoutService;
 import jloda.phylo.PhyloGraph;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
@@ -46,6 +48,7 @@ import splitstree6.layout.tree.RadialLabelLayout;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.function.BiConsumer;
 import java.util.function.ToDoubleFunction;
 
 import static splitstree6.layout.tree.LayoutUtils.computeFontHeightGraphWidthHeight;
@@ -123,7 +126,16 @@ public class NetworkLayout {
 			} else {
 				options.setRandSeed(randomLayoutSeed);
 				if (false) System.err.print("Running MLML-based layout...");
-				FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, null, (v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY())));
+				// Route through the graph-layout SPI so a native provider (OGDF FM3) is used when one is on
+				// the path; on the built-in Java FMM we pass our tuned options (single-level FR, fixed
+				// iterations, ...), which are jloda-specific and do not apply to an external provider.
+				BiConsumer<Node, FastMultiLayerMethodLayout.Point> sink =
+						(v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY()));
+				var layoutService = GraphLayouts.getService();
+				if (JlodaFmmLayoutService.NAME.equals(layoutService.getName()))
+					FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, null, sink);
+				else
+					layoutService.apply(graph, edgeWeightFunction, sink);
 				System.err.println(" done");
 			}
 
