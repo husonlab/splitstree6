@@ -174,7 +174,7 @@
     </build>
 
     <profiles>
-        <!-- desktop-only: bundle the native OGDF FM3 graph-layout provider (fmm-layout). Activated by the
+        <!-- desktop-only: bundle the native OGDF FM3 graph-layout provider (fmmm-layout). Activated by the
              desktop installer build (-Pdesktop). NOT active for Gluon/iOS builds, which cannot load native
              code and fall back to jloda's Java layout because the provider is then absent. Runtime scope:
              SplitsTree only uses the SPI in jloda-core, so this is never needed at compile time. -->
@@ -183,7 +183,7 @@
             <dependencies>
                 <dependency>
                     <groupId>org.husonlab</groupId>
-                    <artifactId>fmm-layout</artifactId>
+                    <artifactId>fmmm-layout</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                     <scope>runtime</scope>
                 </dependency>
