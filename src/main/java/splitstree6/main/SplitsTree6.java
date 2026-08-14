@@ -34,6 +34,7 @@ import jloda.fx.window.SplashScreen;
 import jloda.fx.window.WindowGeometry;
 import jloda.phylo.PhyloTree;
 import jloda.phylogeny.dolayout.SimulatedAnnealingMinLA;
+import jloda.graph.layout.GraphLayouts;
 import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.ProgramExecutorService;
@@ -131,6 +132,7 @@ public class SplitsTree6 extends Application {
 
 		options.done();
 		System.err.println("Java version: " + System.getProperty("java.version"));
+		System.err.println("Graph layout: " + GraphLayouts.getService().getName()); // "ogdf-fmm" = native, "jloda-fmm" = Java
 
 		ProgramProperties.load(propertiesFile);
 
