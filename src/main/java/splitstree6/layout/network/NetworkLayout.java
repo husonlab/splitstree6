@@ -59,6 +59,7 @@ import static splitstree6.layout.tree.LayoutUtils.normalize;
  * Daniel Huson, 4.2022
  */
 public class NetworkLayout {
+	public boolean verbose = true;
 	private final RadialLabelLayout labelLayout = new RadialLabelLayout();
 	private final FastMultiLayerMethodOptions options;
 
@@ -115,28 +116,29 @@ public class NetworkLayout {
 					nodePointMap.put(v, new Point2D(x, y));
 				}
 			} else if (randomLayoutSeed % 2 == 1) {
-				if (false) System.err.print("Running MDS-based layout...");
+				if (verbose) System.err.print("Running MDS-based layout...");
 				var params = new WeightedLayout.Params();
 				params.maxIterations = 5000;
 				params.randomSeed = randomLayoutSeed;
 				var layout = new WeightedLayout<Node, Edge>();
 				layout.layout(graph.getNodesAsList(), Node::adjacentEdges,
 						Node::getOpposite, edgeWeightFunction, nodePointMap::put, params);
-				System.err.println(" done");
+				if (verbose) System.err.println(" done");
 			} else {
 				options.setRandSeed(randomLayoutSeed);
-				if (false) System.err.print("Running FMMM-based layout...");
+				var layoutService = GraphLayouts.getService();
+
+				if (verbose) System.err.printf("Running %s layout...", layoutService.getName());
 				// Route through the graph-layout SPI so a native provider (OGDF FM3) is used when one is on
 				// the path; on the built-in Java FMM we pass our tuned options (single-level FR, fixed
 				// iterations, ...), which are jloda-specific and do not apply to an external provider.
 				BiConsumer<Node, FastMultiLayerMethodLayout.Point> sink =
 						(v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY()));
-				var layoutService = GraphLayouts.getService();
 				if (JlodaFmmLayoutService.NAME.equals(layoutService.getName()))
 					FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, null, sink);
 				else
 					layoutService.apply(graph, edgeWeightFunction, sink);
-				if (false)
+				if (verbose)
 					System.err.println(" done");
 			}
 
