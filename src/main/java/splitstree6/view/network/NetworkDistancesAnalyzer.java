@@ -92,6 +92,49 @@ public record NetworkDistancesAnalyzer() {
 		return sum;
 	}
 
+	/**
+	 * Multiplicative distortion of the realization: max_{i&lt;j} r_ij / min_{i&lt;j} r_ij, where r_ij = d_G(i,j)/d(i,j)
+	 * with d_G the shortest-path (graph) distance and d the input distance. Equals 1 for an exact realization
+	 * (indeed for any scalar multiple of it); larger values mean more distortion.
+	 */
+	public double distortion(NetworkBlock networkBlock) {
+		if (!isApplicable(networkBlock))
+			throw new IllegalArgumentException("Distances required");
+		var distancesBlock = findDistancesBlock(networkBlock);
+		var graph = networkBlock.getGraph();
+		var weights = new HashMap<Edge, Double>();
+		for (var e : graph.edges())
+			weights.put(e, graph.getWeight(e));
+
+		var maxRatio = 0.0;
+		var minRatio = Double.MAX_VALUE;
+		for (var v : graph.nodes()) {
+			if (graph.hasTaxa(v)) {
+				for (var w : graph.nodes(v)) {
+					if (w != v && graph.hasTaxa(w)) {
+						var input = distancesBlock.get(graph.getTaxon(v), graph.getTaxon(w));
+						if (input <= 0)
+							continue;
+						var shortestPath = Dijkstra.compute(graph, v, w, weights::get, true);
+						Node prev = null;
+						var pathLength = 0.0;
+						for (var q : shortestPath) {
+							if (prev != null)
+								pathLength += weights.get(q.getCommonEdge(prev));
+							prev = q;
+						}
+						if (pathLength > 0) {
+							var r = pathLength / input;
+							maxRatio = Math.max(maxRatio, r);
+							minRatio = Math.min(minRatio, r);
+						}
+					}
+				}
+			}
+		}
+		return (minRatio <= maxRatio) ? maxRatio / minRatio : 1.0; // 1.0 when there is no comparable pair
+	}
+
 	public double reportDifferentDistances(int s, int t, TaxaBlock taxaBlock, NetworkBlock networkBlock) {
 		var diff = 0.0;
 		var distancesBlock = findDistancesBlock(networkBlock);

@@ -46,8 +46,8 @@ public class AdditionalConsoleOutput {
 				} else if (NetworkDistancesAnalyzer.isApplicable(networkBlock)) {
 					var analyzer = new NetworkDistancesAnalyzer();
 					var totalEdgeDistances = analyzer.totalEdgeDistances(networkBlock);
-					var excessDistance = analyzer.realizedPairwiseDistances(networkBlock) - analyzer.inputPairwiseDistances(networkBlock);
-					info = "Total length: %s, excess: %s".formatted(StringUtils.trim(totalEdgeDistances), StringUtils.trim(excessDistance));
+					var distortion = analyzer.distortion(networkBlock);
+					info = "Total length: %s, distortion: %s".formatted(StringUtils.trim(totalEdgeDistances), StringUtils.trim(distortion));
 				}
 				if (!info.isBlank()) {
 					System.err.println(info);

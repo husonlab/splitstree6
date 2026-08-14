@@ -311,7 +311,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				Platform.runLater(() -> SplitNetworkEdits.clearEdits(view.optionEditsProperty()));
 			}
 			updateCounter.set(updateCounter.get() + 1);
-			updateLengthExcessInfo();
+			updateLengthDistortionInfo();
 		});
 
 		view.optionZoomFactorProperty().addListener((v, o, n) -> {
@@ -407,13 +407,14 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	}
 
 	/**
-	 * RazorNet only: report the split network's total length and excess (realized minus input pairwise distances),
-	 * so a NeighborNet split network can be compared with a RazorNet network on the same footing. The label stays
-	 * empty (and hidden) in SplitsTree, for an unweighted diagram, or when the splits do not derive from distances.
-	 * Total length is the sum of the weights of the edges actually drawn, so it is smaller for an outline than for the
-	 * full network; excess uses the split metric and is therefore the same for either drawing.
+	 * RazorNet only: report the split network's total length and distortion (the multiplicative embedding distortion
+	 * of the split metric against the input distances), so a NeighborNet split network can be compared with a RazorNet
+	 * network on the same footing. The label stays empty (and hidden) in SplitsTree, for an unweighted diagram, or when
+	 * the splits do not derive from distances. Total length is the sum of the weights of the edges actually drawn, so
+	 * it is smaller for an outline than for the full network; distortion uses the split metric and is therefore the
+	 * same for either drawing.
 	 */
-	private void updateLengthExcessInfo() {
+	private void updateLengthDistortionInfo() {
 		var label = controller.getInfoLabel();
 		var splitsBlock = view.getSplitsBlock();
 		if (!ProgramProperties.getProgramName().equals("RazorNet") || splitsBlock == null || !view.getOptionDiagram().isUsingWeights()) {
@@ -430,22 +431,36 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		var totalLength = 0.0;
 		for (var e : graph.edges())
 			totalLength += graph.getWeight(e);
-		// realized pairwise distances (both directions), computed from the split metric so it is independent of the drawing:
-		// summed over ordered pairs, this is 2 * sum over splits of weight * |A| * |B| (each split separates |A|*|B| taxon pairs)
-		var realizedPairwiseDistances = 0.0;
+		// distortion = max_{i<j} r_ij / min_{i<j} r_ij, r_ij = d_G(i,j)/d(i,j). Here d_G(i,j) is the split metric
+		// (sum of the weights of the splits separating i and j) -- drawing-independent -- and d(i,j) is the input
+		// distance. 1 = an exact realization (or any scalar multiple of it); larger = more distorted.
+		var ntax = distancesBlock.getNtax();
+		var splitDistance = new double[ntax + 1][ntax + 1];
 		for (var s = 1; s <= splitsBlock.getNsplits(); s++) {
 			var split = splitsBlock.get(s);
-			realizedPairwiseDistances += split.getWeight() * split.getA().cardinality() * (double) split.getB().cardinality();
+			var w = split.getWeight();
+			var a = split.getA();
+			for (var i = a.nextSetBit(1); i != -1; i = a.nextSetBit(i + 1))
+				for (var j = 1; j <= ntax; j++)
+					if (!a.get(j)) {
+						splitDistance[i][j] += w;
+						splitDistance[j][i] += w;
+					}
 		}
-		realizedPairwiseDistances *= 2;
-		// input pairwise distances (both directions)
-		var inputPairwiseDistances = 0.0;
-		for (var s = 1; s <= distancesBlock.getNtax(); s++)
-			for (var t = s + 1; t <= distancesBlock.getNtax(); t++)
-				inputPairwiseDistances += distancesBlock.get(s, t);
-		inputPairwiseDistances *= 2;
-		var excessDistance = realizedPairwiseDistances - inputPairwiseDistances;
-		label.setText("Total length: %s, excess: %s".formatted(StringUtils.trim(totalLength), StringUtils.trim(excessDistance)));
+		var maxRatio = 0.0;
+		var minRatio = Double.MAX_VALUE;
+		for (var i = 1; i <= ntax; i++)
+			for (var j = i + 1; j <= ntax; j++) {
+				var input = distancesBlock.get(i, j);
+				var dg = splitDistance[i][j];
+				if (input > 0 && dg > 0) {
+					var r = dg / input;
+					maxRatio = Math.max(maxRatio, r);
+					minRatio = Math.min(minRatio, r);
+				}
+			}
+		var distortion = (minRatio <= maxRatio) ? maxRatio / minRatio : 1.0;
+		label.setText("Total length: %s, distortion: %s".formatted(StringUtils.trim(totalLength), StringUtils.trim(distortion)));
 	}
 
 	/**
