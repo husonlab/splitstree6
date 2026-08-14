@@ -148,7 +148,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 						Platform.runLater(() -> view.setOptionDiagram(SplitsDiagramType.SplitsTopology));
 				}
 				if (n.getFit() > 0) {
-					controller.getFitLabel().setText(String.format("Fit: %.1f", n.getFit()));
+					controller.getFitLabel().setText("Fit: " + StringUtils.trim("%.2f", n.getFit()));
 				} else
 					controller.getFitLabel().setText("");
 				if (!n.hasConfidenceValues() && view.getOptionLabelSplitsBy() == LabelSplitsBy.Confidence)
