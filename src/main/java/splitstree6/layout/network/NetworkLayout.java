@@ -125,7 +125,7 @@ public class NetworkLayout {
 				System.err.println(" done");
 			} else {
 				options.setRandSeed(randomLayoutSeed);
-				if (false) System.err.print("Running MLML-based layout...");
+				if (false) System.err.print("Running FMMM-based layout...");
 				// Route through the graph-layout SPI so a native provider (OGDF FM3) is used when one is on
 				// the path; on the built-in Java FMM we pass our tuned options (single-level FR, fixed
 				// iterations, ...), which are jloda-specific and do not apply to an external provider.
@@ -136,7 +136,8 @@ public class NetworkLayout {
 					FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, null, sink);
 				else
 					layoutService.apply(graph, edgeWeightFunction, sink);
-				System.err.println(" done");
+				if (false)
+					System.err.println(" done");
 			}
 
 			if (graph.getNumberOfEdges() == 0) {

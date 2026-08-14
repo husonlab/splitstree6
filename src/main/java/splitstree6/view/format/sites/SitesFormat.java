@@ -197,6 +197,7 @@ public class SitesFormat extends Group {
 						var end = new Point2D(line.getEndX(), line.getEndY());
 
 						var gapBetweenHatches = 1.0;
+						try
 						{
 							var onScreenDistance = line.localToScreen(start.getX(), start.getY()).distance(line.localToScreen(end.getX(), end.getY()));
 							var onScreenGap = 4.0;
@@ -208,6 +209,7 @@ public class SitesFormat extends Group {
 							var end1 = start.multiply(0.65).add(end.multiply(0.35));
 							start = start1;
 							end = end1;
+						} catch (Exception ignored) {
 						}
 
 						var angle = GeometryUtilsFX.computeAngle(end.subtract(start));
