@@ -28,7 +28,7 @@ public class ExtractCitations {
 	private final static List<Pair<String, String>> keyCitations = new ArrayList<>();
 
 	static {
-		keyCitations.add(new Pair<>("(Huson and Bryant 2024)", " The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024."));
+		keyCitations.add(new Pair<>("Huson and Bryant 2024", "DH Huson and D. Bryant, The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods 21(10):1773-1774 2024."));
 	}
 	/**
 	 * get all the key - paper pairs for an object with citations
