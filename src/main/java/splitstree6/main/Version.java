@@ -31,7 +31,7 @@ public class Version {
 	public static final String VERSION = resolveVersion();
 	public static final String SHORT_DESCRIPTION = NAME + " (version " + VERSION + ") - License GPL v3";
 
-	static public final String WEBSITE_URL = "https://husonlab.github.io/splitstree6";
+	static public String WEBSITE_URL = "https://husonlab.github.io/splitstree6"; // non-final: a host app (e.g. RazorNet) can repoint the "Open User Manual" item at its own site
 
 	public static String resolveVersion() {
 		var pkg = Version.class.getPackage();
