@@ -724,7 +724,10 @@ public class MainWindowPresenter {
 		controller.getOpenManualInBrowserMenuItem().setOnAction(e -> ProgramProperties.getHostServices().showDocument(Version.WEBSITE_URL));
 
 		var updaterService = UpdateService.get();
-		controller.getCheckForUpdatesMenuItem().setOnAction(e -> updaterService.checkForUpdates(mainWindow.getStage(), Version.HOME_URL, Version.NAME, Version.VERSION));
+		// Use the runtime program identity (ProgramProperties name + repointable UPDATE_VERSION) rather than the
+		// compile-time SplitsTree constants, so a host app such as RazorNet checks its own repo/version. For
+		// SplitsTree itself this is unchanged: program name is "SplitsTree" and UPDATE_VERSION defaults to VERSION.
+		controller.getCheckForUpdatesMenuItem().setOnAction(e -> updaterService.checkForUpdates(mainWindow.getStage(), Version.HOME_URL, ProgramProperties.getProgramName(), Version.UPDATE_VERSION));
 		controller.getCheckForUpdatesMenuItem().disableProperty().bind(updaterService.disabledProperty().or(MainWindowManager.getInstance().sizeProperty().greaterThan(1)).or(mainWindow.dirtyProperty()));
 
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(a -> updateEnableStateAlgorithms());

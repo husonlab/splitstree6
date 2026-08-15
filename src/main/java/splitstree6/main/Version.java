@@ -33,6 +33,9 @@ public class Version {
 
 	static public String WEBSITE_URL = "https://husonlab.github.io/splitstree6"; // non-final: a host app (e.g. RazorNet) can repoint the "Open User Manual" item at its own site
 
+	// non-final: a host app (e.g. RazorNet) can repoint the "Check for Updates" check at its own installed release version (paired with HOME_URL, which selects the repo)
+	static public String UPDATE_VERSION = VERSION;
+
 	public static String resolveVersion() {
 		var pkg = Version.class.getPackage();
 		var v = (pkg != null) ? pkg.getImplementationVersion() : null;
