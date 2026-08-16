@@ -33,6 +33,10 @@ import java.util.StringTokenizer;
 
 /**
  * Phylip matrix input
+ * <p>
+ * Accepts the labeled square, upper- and lower-triangular layouts, and additionally a <i>label-less</i>
+ * square matrix (rows of numbers with no taxon name), for which taxa are named {@code t1...tn}.
+ * Comment lines starting with '#' and empty lines are ignored.
  * Daria Evseeva, 02.10.2017, Daniel Huson, 3.2020
  */
 public class PhylipReader extends DistancesReader {
@@ -45,6 +49,7 @@ public class PhylipReader extends DistancesReader {
 	@Override
 	public void read(ProgressListener progressListener, String inputFile, TaxaBlock taxa, DistancesBlock distances) throws IOException {
 		Triangle triangle = null;
+		var unlabeled = false; // label-less square matrix, taxa are named t1...tn
 		int row = 0;
 		int numberOfTaxa = 0;
 
@@ -60,8 +65,13 @@ public class PhylipReader extends DistancesReader {
 				} else {
 					var tokens = line.split("\\s+");
 
+					// decide this on the raw tokens of the first row, before the old-Phylip fixup below, which
+					// would otherwise split a long leading number (say 0.12345678901) into a label plus a value
+					if (row == 1)
+						unlabeled = isUnlabeledSquareRow(tokens, numberOfTaxa);
+
 					// does this look like old Phylip in which positions 0-10 are the label?
-					if ((row == 1 || triangle == Triangle.Both) && tokens[0].length() > 10 && NumberUtils.isDouble(tokens[0].substring(10))) {
+					if (!unlabeled && (row == 1 || triangle == Triangle.Both) && tokens[0].length() > 10 && NumberUtils.isDouble(tokens[0].substring(10))) {
 						var tmp = new String[tokens.length + 1];
 						tmp[0] = tokens[0].substring(0, 10);
 						tmp[1] = tokens[0].substring(10);
@@ -70,7 +80,9 @@ public class PhylipReader extends DistancesReader {
 					}
 
 					if (row == 1) {
-						if (tokens.length == 1)
+						if (unlabeled)
+							triangle = Triangle.Both;
+						else if (tokens.length == 1)
 							triangle = Triangle.Lower;
 						else if (tokens.length == numberOfTaxa) {
 							triangle = Triangle.Upper;
@@ -84,7 +96,15 @@ public class PhylipReader extends DistancesReader {
 					if (row > numberOfTaxa)
 						throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 
-					if (triangle == Triangle.Both) {
+					if (unlabeled) { // label-less square matrix: every token is a value, so the taxa are named here
+						if (tokens.length != numberOfTaxa)
+							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
+						taxa.addTaxaByNames(Collections.singleton("t" + row));
+						for (int col = 1; col <= numberOfTaxa; col++) {
+							final double value = NumberUtils.parseDouble(tokens[col - 1]);
+							distances.set(row, col, value);
+						}
+					} else if (triangle == Triangle.Both) {
 						if (tokens.length != numberOfTaxa + 1)
 							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 						taxa.addTaxaByNames(Collections.singleton(tokens[0]));
@@ -119,6 +139,27 @@ public class PhylipReader extends DistancesReader {
 		if (triangle == Triangle.Both) {
 			ensureSymmetric(taxa, distances);
 		}
+	}
+
+	/**
+	 * Is this the first row of a label-less square matrix, rather than a labeled upper-triangular one?
+	 * Both have exactly n tokens, so they must be told apart: an upper-triangular first row starts with
+	 * the taxon label and its first value is d(1,2) &gt; 0, whereas a label-less square row starts with
+	 * the diagonal entry d(1,1) = 0. We therefore require all n tokens to be numbers and the first to be
+	 * zero, which only ever catches input that used to fail with "Matrix has wrong shape" at row 2 --
+	 * no file that parsed before changes meaning.
+	 * <p>
+	 * The one input this cannot distinguish is an upper-triangular matrix whose first taxon is literally
+	 * named "0".
+	 */
+	private static boolean isUnlabeledSquareRow(String[] tokens, int numberOfTaxa) {
+		if (tokens.length != numberOfTaxa)
+			return false;
+		for (var token : tokens) {
+			if (!NumberUtils.isDouble(token))
+				return false;
+		}
+		return NumberUtils.parseDouble(tokens[0]) == 0;
 	}
 
 	@Override

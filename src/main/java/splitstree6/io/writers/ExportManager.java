@@ -54,6 +54,7 @@ public class ExportManager {
 		exporters.add(new splitstree6.io.writers.distances.PhylipWriter());
 		exporters.add(new splitstree6.io.writers.distances.PlainTextWriter());
 		exporters.add(new splitstree6.io.writers.genomes.NexusWriter());
+		exporters.add(new splitstree6.io.writers.network.GMLWriter());
 		exporters.add(new splitstree6.io.writers.network.NexusWriter());
 		exporters.add(new splitstree6.io.writers.network.PlainTextWriter());
 		exporters.add(new splitstree6.io.writers.report.NexusWriter());
