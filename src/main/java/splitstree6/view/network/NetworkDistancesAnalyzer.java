@@ -33,16 +33,11 @@ import java.util.HashMap;
 public record NetworkDistancesAnalyzer() {
 
 	public double inputPairwiseDistances(NetworkBlock networkBlock) {
-		if (!isApplicable(networkBlock))
-			throw new IllegalArgumentException("Distances required");
-
+		var distancesBlock = findDistancesBlock(networkBlock);
 		var sum = 0.0;
-		if (networkBlock.getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock distancesBlock) {
-			var graph = networkBlock.getGraph();
-			for (var s = 1; s <= distancesBlock.getNtax(); s++) {
-				for (var t = s + 1; t <= distancesBlock.getNtax(); t++) {
-					sum += distancesBlock.get(s, t);
-				}
+		for (var s = 1; s <= distancesBlock.getNtax(); s++) {
+			for (var t = s + 1; t <= distancesBlock.getNtax(); t++) {
+				sum += distancesBlock.get(s, t);
 			}
 		}
 		return 2 * sum;
@@ -168,14 +163,36 @@ public record NetworkDistancesAnalyzer() {
 	}
 
 	public static DistancesBlock findDistancesBlock(NetworkBlock networkBlock) {
-		if (networkBlock.getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock distancesBlock) {
-			return distancesBlock;
-		}
-		throw new IllegalArgumentException("Distances required");
+		var distancesBlock = findAncestorDistancesBlock(networkBlock);
+		if (distancesBlock == null)
+			throw new IllegalArgumentException("Distances required");
+		return distancesBlock;
 	}
 
 	public static boolean isApplicable(NetworkBlock networkBlock) {
-		return networkBlock.getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof DistancesBlock;
+		return findAncestorDistancesBlock(networkBlock) != null;
+	}
+
+	/**
+	 * Walk up the workflow to the nearest ancestor {@link DistancesBlock}, stepping through any intermediate
+	 * network-to-network algorithms (e.g. the Stretch Filter) so that a filtered network still reports its length
+	 * and distortion against the original input distances. Each step goes DataNode -&gt; its producing
+	 * AlgorithmNode -&gt; that algorithm's source DataNode. Returns null if there is no DistancesBlock ancestor.
+	 */
+	private static DistancesBlock findAncestorDistancesBlock(NetworkBlock networkBlock) {
+		var dataNode = networkBlock.getNode();
+		for (var i = 0; dataNode != null && i < 100; i++) {
+			var algorithmNode = dataNode.getPreferredParent();
+			if (algorithmNode == null)
+				return null;
+			var sourceNode = algorithmNode.getPreferredParent();
+			if (sourceNode == null)
+				return null;
+			if (sourceNode.getDataBlock() instanceof DistancesBlock distancesBlock)
+				return distancesBlock;
+			dataNode = sourceNode;
+		}
+		return null;
 	}
 }
 
