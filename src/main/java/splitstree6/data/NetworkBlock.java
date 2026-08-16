@@ -71,7 +71,10 @@ public class NetworkBlock extends DataBlock {
 		for (var e : oldEdge2new.keys()) {
 			getEdgeData(oldEdge2new.get(e)).putAll((that.getEdgeData(e)));
 		}
-		this.infoString = that.infoString;
+		// Deliberately do NOT copy infoString: it is a derived display cache (total length / distortion / excess,
+		// computed lazily by the viewer). A copy is a new, possibly-modified network -- e.g. the output of a
+		// network-to-network filter such as StretchFilter, which removes edges -- so its info must be recomputed
+		// from its own content, not inherited from the source (clear() above already left it blank).
 	}
 
 	public PhyloGraph getGraph() {
