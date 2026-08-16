@@ -26,10 +26,15 @@ import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 
 public class AdditionalConsoleOutput {
+	// Temporary guard (off by default): the per-taxon-pair "Input distance / Path distance" dumps below are
+	// verbose debugging output. Set true to re-enable. The one-line "Total length / distortion" summary and the
+	// network's info label are unaffected.
+	public static boolean verbose = false;
+
 	public static void setup(NetworkView view) {
 
 		view.networkBlockProperty().addListener((v, o, networkBlock) -> {
-			if (networkBlock != null && true) {
+			if (networkBlock != null && verbose) {
 				reportAllDifferentDistances(view);
 				reportAllDifferencesCharacters(view);
 			}
@@ -61,7 +66,7 @@ public class AdditionalConsoleOutput {
 		var selectedItems = view.getMainWindow().getTaxonSelectionModel().getSelectedItems();
 		selectedItems.addListener((InvalidationListener) e -> {
 			RunAfterAWhile.applyInFXThread(sync, () -> {
-				if (selectedItems.size() == 2) {
+				if (verbose && selectedItems.size() == 2) {
 					var networkBlock = view.getNetworkBlock();
 					if (NetworkSequencesAnalyzer.isApplicable(networkBlock)) {
 						System.err.println(networkBlock.getNode().getPreferredParent().getAlgorithm().getName() + ":");
