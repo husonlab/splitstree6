@@ -51,3 +51,5 @@ buildNumber.properties
 *.ind
 *.out
 *.toc
+
+CLAUDE.md
