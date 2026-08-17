@@ -124,6 +124,7 @@ module splitstreesix {
 	opens splitstree6.io.writers.network;
 	opens splitstree6.io.writers.view;
 
+	exports splitstree6.io.writers;
 	exports splitstree6.io.writers.characters;
 	exports splitstree6.io.writers.genomes;
 	exports splitstree6.io.writers.distances;
@@ -219,6 +220,7 @@ module splitstreesix {
 	exports splitstree6.data.parts;
 	exports splitstree6.window;
 	exports splitstree6.workflow;
+	exports splitstree6.options;
 
 	exports splitstree6.utils;
 	exports splitstree6.view.utils;
