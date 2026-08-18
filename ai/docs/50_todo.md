@@ -58,6 +58,11 @@ and `60_agent_notes.md` all say the new truth.
       check fails for a reason that has nothing to do with portability. Never run; the YAML and every command
       in it were verified locally, but no Actions run has happened.
 
+- [ ] **D-8: make `ProgramProperties`'s font lazy** (jloda3). Its static initialiser calls
+      `javafx.scene.text.Font.font(...)`, so constructing almost any algorithm tries to start a graphics
+      pipeline. Caught and harmless, but it prints alarming `UnsatisfiedLinkError` noise when the natives do
+      not match, and it is the same shape of bug as D-1 in the same class family. See `20_logic.md` §10 D-8.
+
 - [ ] **Nothing checks that a commit compiles.** The only GitHub Actions workflow in this repository,
       `deploy-docs.yml`, rebuilds the Pages site when `docs/` changes. The installer workflows in
       `build-installers` are `workflow_dispatch` — Daniel starts them by hand to cut a release — so nothing

@@ -2,8 +2,13 @@
 #
 # A wheel would bundle a fixed set of jars. Those jars include javafx-graphics, which
 # carries 7 native libraries for one platform only. The claim is that this does not
-# matter, because nothing in the computational path ever starts a JavaFX toolkit, so
-# those natives are never loaded.
+# matter, because nothing in the computational path starts a JavaFX toolkit.
+#
+# Note the claim is NOT that nothing tries to load them - jloda's ProgramProperties asks
+# for a JavaFX font in a static initialiser - but that when the load fails, the failure is
+# caught and the answers are unaffected. Verified on 2026-08-17 with x86_64 JavaFX jars
+# under an arm64 JVM: every native failed with UnsatisfiedLinkError, and PhyloFusion still
+# returned the right network.
 #
 # So: build ONCE, forcing the macOS JavaFX artifacts with -Djavafx.platform=mac, then
 # run the same bytes on Linux, Windows and macOS. Building once is the point - it is

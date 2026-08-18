@@ -283,7 +283,12 @@ Also to bridge:
 - **Jars in the wheel**, under `splitstree/jars/`, discovered relative to `__file__`. 13 MB for the 7-jar set,
   which is unremarkable for a scientific wheel.
 - **Platform wheels, probably not needed — and there is now a workflow that settles it.**  `javafx-base` has
-  no natives; `javafx-graphics`'s 7 native libraries are never loaded because the toolkit never starts. So one
+  no natives, and `javafx-graphics`'s 7 are not needed because no toolkit is ever started. Note the claim is
+  **not** that nothing tries to load them: `jloda.fx.util.ProgramProperties`'s static initialiser asks for a
+  JavaFX font, so touching almost any algorithm does attempt to start a graphics pipeline. The claim, now
+  tested the hard way, is that **when the load fails the failure is caught and the computation is
+  unaffected** — measured 2026-08-17 with x86_64 JavaFX jars under an arm64 JVM, where every native failed
+  with `UnsatisfiedLinkError` and PhyloFusion still returned the right network with hybridization number 2. So one
   `py3-none-any` wheel may serve every platform. `.github/workflows/portability-probe.yml` tests exactly that:
   it builds once with `-Djavafx.platform=mac` and runs the resulting jars unchanged on ubuntu, windows and
   macos. If it comes back ALL PASS, ship one wheel, and **strip the natives out of the bundled
@@ -403,10 +408,13 @@ Each step ends in something runnable; nothing after step 1 starts until step 1's
    `JAVA_HOME` containing spaces (`C:\Program Files\...`), or where Python is conda rather than system and
    JPype therefore looks for `jvm.dll` / `libjvm.so` somewhere else. Runners are clean; users are not. That
    gap is what a real machine belonging to somebody else is for — see step 6.
-3. **The block layer.** `Taxa`, `Distances`, `Characters`, `Splits`, `Trees`, `Network` wrappers with bulk
-   converters, input validation and zero-based indexing. *Verification: round-trip tests for every block type
-   in both directions, including empty, one-taxon and ragged/invalid inputs; large-matrix timing within the
-   step-1 budget.*
+3. ~~**The block layer.**~~ **DONE 2026-08-17**, `husonlab/splitstree-py` commit `4c56a68`: `blocks.py`
+   (`Taxa`, `Distances`, `Characters`, `Split`/`Splits`, `Trees`, `Network`) and `_convert.py`, 53 tests.
+   Round trips are bit-exact, validation names the offending index, and the 1000×1000 round trip is asserted
+   under 0.5 s as a guard against anyone reintroducing an element-wise loop. Two bugs the tests found rather
+   than reading did: a `Trees` built from Newick strings did not register the node→taxon-id mapping that
+   `NewickReader` assigns, so PhyloFusion silently returned a network with hybridization number **0** instead
+   of 2 — a wrong answer, not an error; and an empty matrix threw from `JArray.of`.
 4. **The IO layer.** `read_*` / `write_*` over `ImportManager` / `ExportManager`, with the format lists read
    from Java rather than hard-coded. *Verification: read every file in `examples/` that matches a supported
    format and check the taxon and dimension counts; write each block type in each of its formats and read it

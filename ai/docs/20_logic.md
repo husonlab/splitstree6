@@ -539,6 +539,17 @@ an upstream filter that matched nothing is a legitimate state, and throwing woul
 of the user every time they deselect the last taxon. But an empty result in a headless run no longer looks
 exactly like a computed one. The view-refresh behaviour is unchanged.
 
+**D-8 — `ProgramProperties`'s static initialiser asks JavaFX for a font. NEW 2026-08-17, not yet put to
+Daniel.** `jloda.fx.util.ProgramProperties.<clinit>` calls `javafx.scene.text.Font.font("Arial", 12)`, so
+merely *constructing* an algorithm that tracks an option — `PhyloFusion` does, in an instance initialiser —
+attempts to start a JavaFX graphics pipeline. The call is wrapped in `catch (Exception ignored)`, so it is
+harmless, and the field is simply left null. But it costs a pipeline start-up attempt, it can spawn a
+QuantumRenderer thread, and when the natives cannot load it prints a wall of `UnsatisfiedLinkError` to stderr
+that looks exactly like a fatal error and is not. This is **D-1 again**: eager JavaFX in a static
+initialiser, in the same jloda class family, fixable the same way by making the font lazy. Found while
+running algorithms from Python with deliberately mismatched natives; the computation was unaffected, which is
+itself the evidence.
+
 **D-7 — there is no test suite at all.** Daniel: a plan is needed for generating unit tests of all features.
 Written: `ai/plans/2026-08-17_test-suite.md`. Its centrepiece is that D-1 makes the *workflow itself* unit-
 testable headless and synchronously, and that the catalogue scan of §4 lets one data-driven test exercise all
