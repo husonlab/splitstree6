@@ -14,15 +14,17 @@ and `60_agent_notes.md` all say the new truth.
 
 ## Priority 1 — decisions needed from Daniel
 
-- [ ] **`splitstree.py`: two small decisions before step 5.** Steps 1–4 are done in `husonlab/splitstree-py`
-      (spike, JVM bootstrap, block layer, IO — 79 tests). Next is step 5, the generator, which is the big one.
-      Two things are worth settling first because they get harder later:
-      **(a)** should `quiet` default to `True`? It silences the algorithms' progress chatter on stderr, and on
-      a machine whose JavaFX natives do not match the JVM it also silences a page of harmless
-      `UnsatisfiedLinkError` noise (see D-8). Against: it would also swallow stack traces that Java prints
-      rather than throws. Currently `False`.
-      **(b)** do the jars stay gitignored build artefacts, synced by `tools/sync_jars.py`, or get committed so
-      a release build needs no SplitsTree checkout? Currently gitignored.
+- [ ] **`splitstree.py` step 5, the generator.** Steps 1–4 are done in `husonlab/splitstree-py` (spike, JVM
+      bootstrap, block layer, IO — 83 tests). Step 5 is the big one: one data-driven generator producing the
+      whole algorithm surface from the jar scan. Both decisions that were blocking it are taken (2026-08-18):
+      `quiet` defaults to **true**, capturing Java's stderr into a buffer `java_messages()` returns rather
+      than discarding it — Daniel's reasoning being that Java users do not see that output either unless they
+      open the message window; and the jars **stay gitignored**, synced by `tools/sync_jars.py`.
+
+- [ ] **Let more Java exceptions propagate instead of being printed** (SplitsTree-side, raised 2026-08-18).
+      With `quiet` on, anything jloda `Basic.caught`s and prints goes into the capture buffer rather than to a
+      user. That is no worse than the GUI, where it goes to a message window nobody opens, but the right fix
+      is for those paths to throw rather than print. Worth a pass when someone is next in that code.
 
 - [ ] ~~**`splitstree.py`: decide whether to start.**~~ Started. `ai/plans/2026-08-17_splitstree-py.md` is no longer
       blocked — Daniel answered all six questions in §9 (snake_case; report algorithms in; numpy required with
