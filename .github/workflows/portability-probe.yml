@@ -1,0 +1,156 @@
+# Answers one question: can splitstree.py ship a SINGLE platform-independent wheel?
+#
+# A wheel would bundle a fixed set of jars. Those jars include javafx-graphics, which
+# carries 7 native libraries for one platform only. The claim is that this does not
+# matter, because nothing in the computational path ever starts a JavaFX toolkit, so
+# those natives are never loaded.
+#
+# So: build ONCE, forcing the macOS JavaFX artifacts with -Djavafx.platform=mac, then
+# run the same bytes on Linux, Windows and macOS. Building once is the point - it is
+# what makes this a test of one wheel rather than three builds.
+#
+# ALL PASS everywhere  -> one wheel (py3-none-any).
+# Any failure          -> five per-platform wheels, as ai/plans/2026-08-17_splitstree-py.md S8 provides for.
+#
+# See ai/docs/20_logic.md S6 for why the computation needs no toolkit.
+
+name: Portability probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      jloda3-ref:
+        description: 'jloda3 branch or tag to build against (needs the headless-workflow commit)'
+        required: true
+        default: 'engine-resync/daa'
+      javafx-platform:
+        description: 'JavaFX classifier to bundle. The whole point is that it should not matter.'
+        required: true
+        default: 'mac'
+  # workflow_dispatch only offers a "Run workflow" button once the file is on the default
+  # branch, so also fire on a push that touches the probe itself. That makes it runnable
+  # from a feature branch.
+  push:
+    paths:
+      - '.github/workflows/portability-probe.yml'
+      - '.github/portability-probe/**'
+
+jobs:
+  bundle:
+    name: Build the jar bundle once (JavaFX = ${{ github.event.inputs.javafx-platform || 'mac' }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out splitstree6
+        uses: actions/checkout@v4
+        with:
+          path: splitstree6
+
+      - name: Check out jloda3
+        uses: actions/checkout@v4
+        with:
+          repository: husonlab/jloda3
+          ref: ${{ github.event.inputs.jloda3-ref || 'engine-resync/daa' }}
+          path: jloda3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Install jloda3
+        run: mvn -B -q -DskipTests install
+        working-directory: jloda3
+
+      - name: Build splitstree6, forcing the JavaFX classifier
+        run: mvn -B -q -DskipTests package -Djavafx.platform=${{ github.event.inputs.javafx-platform || 'mac' }}
+        working-directory: splitstree6
+
+      - name: Assemble the seven jars
+        run: |
+          set -eu
+          mkdir -p bundle/jars bundle/src
+          d=splitstree6/target
+          cp "$d"/SplitsTree-*.jar bundle/jars/
+          cp "$d"/dependency/jloda-core-*.jar        bundle/jars/
+          cp "$d"/dependency/jloda-fx-*.jar          bundle/jars/
+          cp "$d"/dependency/jloda-phylogeny-*.jar   bundle/jars/
+          cp "$d"/dependency/ojalgo-*.jar            bundle/jars/
+          # the classified artifacts only - the unclassified ones are ~300-byte stubs
+          cp "$d"/dependency/javafx-base-*-*.jar     bundle/jars/
+          cp "$d"/dependency/javafx-graphics-*-*.jar bundle/jars/
+          cp splitstree6/.github/portability-probe/PortabilityProbe.java bundle/src/
+          echo "### Bundle" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          ls -la bundle/jars | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail early if the JavaFX classifier was not honoured
+        run: |
+          set -eu
+          want='${{ github.event.inputs.javafx-platform || 'mac' }}'
+          if ! ls bundle/jars | grep -q "javafx-graphics-.*-$want\.jar"; then
+            echo "::error::expected a javafx-graphics jar with classifier '$want', got: $(ls bundle/jars | grep javafx || echo none)"
+            exit 1
+          fi
+          du -sh bundle/jars
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-bundle
+          path: bundle
+          retention-days: 7
+
+  probe:
+    name: Run on ${{ matrix.os }}
+    needs: bundle
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false          # one platform failing must not hide the others
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: probe-bundle
+          path: bundle
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # Two steps rather than one, because the classpath separator differs and because
+      # Git Bash on Windows rewrites arguments that look like POSIX paths. This is
+      # exactly the class of platform difference the eventual test workflow exists for.
+      - name: Compile and run (Linux, macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        working-directory: bundle
+        run: |
+          set -eu
+          javac -cp "jars/*" -d out src/PortabilityProbe.java
+          java -cp "jars/*:out" PortabilityProbe | tee result.txt
+          {
+            echo "### ${{ matrix.os }}"
+            echo '```'
+            cat result.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Compile and run (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: bundle
+        run: |
+          javac -cp "jars/*" -d out src/PortabilityProbe.java
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          java -cp "jars/*;out" PortabilityProbe | Tee-Object -FilePath result.txt
+          $code = $LASTEXITCODE
+          "### ${{ matrix.os }}"    | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          '```'                     | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          Get-Content result.txt    | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          '```'                     | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          exit $code
