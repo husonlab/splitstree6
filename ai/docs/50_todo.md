@@ -14,12 +14,15 @@ and `60_agent_notes.md` all say the new truth.
 
 ## Priority 1 — decisions needed from Daniel
 
-- [ ] **`splitstree.py`: steps 3+ (the block layer).** `husonlab/splitstree-py` exists and steps 1 and 2 are
-      done — the spike measured everything the plan asked, and the JVM bootstrap is committed with 19 tests.
-      Next is the block layer: numpy conversion, zero-based indexing at the boundary, and `BitSet` →
-      `frozenset` of labels. Two decisions are worth taking before it grows: whether `quiet` should default
-      to True (it silences algorithm progress chatter on stderr, but also printed stack traces), and whether
-      the jars stay gitignored build artefacts or get committed for release builds.
+- [ ] **`splitstree.py`: two small decisions before step 5.** Steps 1–4 are done in `husonlab/splitstree-py`
+      (spike, JVM bootstrap, block layer, IO — 79 tests). Next is step 5, the generator, which is the big one.
+      Two things are worth settling first because they get harder later:
+      **(a)** should `quiet` default to `True`? It silences the algorithms' progress chatter on stderr, and on
+      a machine whose JavaFX natives do not match the JVM it also silences a page of harmless
+      `UnsatisfiedLinkError` noise (see D-8). Against: it would also swallow stack traces that Java prints
+      rather than throws. Currently `False`.
+      **(b)** do the jars stay gitignored build artefacts, synced by `tools/sync_jars.py`, or get committed so
+      a release build needs no SplitsTree checkout? Currently gitignored.
 
 - [ ] ~~**`splitstree.py`: decide whether to start.**~~ Started. `ai/plans/2026-08-17_splitstree-py.md` is no longer
       blocked — Daniel answered all six questions in §9 (snake_case; report algorithms in; numpy required with
