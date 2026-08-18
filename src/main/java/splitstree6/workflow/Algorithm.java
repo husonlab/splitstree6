@@ -92,7 +92,11 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 			// For a view-producing algorithm, still run compute so that the view refreshes to an empty display
 			// rather than keeping a stale drawing; for other algorithms, leave the (already-cleared) output empty.
 			// A non-empty input of the wrong type/shape still reports "not applicable" below.
+			// Not an error - a filter that matched nothing is a legitimate state, and throwing here would put
+			// an error dialog in front of the user every time they deselect the last taxon - but not silent
+			// either: without this line an empty result in a headless run looks exactly like a computed one.
 			if (inputBlock.size() == 0) {
+				System.err.println("Note: " + getName() + ": input " + inputBlock.getName() + " is empty, nothing to compute");
 				if (outputBlock instanceof ViewBlock)
 					compute(progress, taxaBlock, inputBlock, outputBlock);
 				return;

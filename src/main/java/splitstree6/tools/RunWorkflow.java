@@ -22,8 +22,6 @@ package splitstree6.tools;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 import jloda.fx.util.ArgsOptions;
 import jloda.fx.util.ProgramProperties;
@@ -37,6 +35,7 @@ import splitstree6.io.readers.ImportManager;
 import splitstree6.io.writers.ExportManager;
 import splitstree6.main.SplitsTree6;
 import splitstree6.main.Version;
+import splitstree6.utils.RunningJobs;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.WorkflowDataLoader;
 
@@ -51,7 +50,6 @@ import java.util.concurrent.CountDownLatch;
  */
 public class RunWorkflow extends Application {
 	private static String[] args;
-	public static ObservableList<Object> runningJobsInView; // calculation intensive jobs in the view need to be registered here while they are running so that we wait for them to end
 
 	@Override
 	public void init() {
@@ -79,7 +77,6 @@ public class RunWorkflow extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-		runningJobsInView = FXCollections.observableArrayList();
 		ProgramExecutorService.getInstance().submit(() -> {
 			try {
 				run(args);
@@ -251,9 +248,11 @@ public class RunWorkflow extends Application {
 						Platform.runLater(() -> workflow.getInputTaxaFilterNode().restart());
 						// wait for end of update:
 						latch.await();
-						do {
-							Thread.sleep(500);
-						} while (!runningJobsInView.isEmpty());
+						// the workflow being valid does not mean the views have finished: a view starts its own
+						// heavy jobs after its algorithm node has succeeded. Wait for those too (see RunningJobs).
+						// The grace period gives a job launched from a listener time to register itself.
+						if (!RunningJobs.awaitAll(500, 0))
+							System.err.println("Warning: timed out waiting for " + RunningJobs.size() + " running view job(s)");
 					} finally {
 						workflow.validProperty().removeListener(listener);
 					}

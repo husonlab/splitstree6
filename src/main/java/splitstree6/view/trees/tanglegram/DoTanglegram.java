@@ -29,7 +29,7 @@ import jloda.phylo.PhyloTree;
 import jloda.phylogeny.dolayout.TanglegramDisplacementOptimization;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import splitstree6.tools.RunWorkflow;
+import splitstree6.utils.RunningJobs;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -215,15 +215,10 @@ public class DoTanglegram {
 				}, Math.min(jobs.size(), ProgramExecutorService.getNumberOfCoresToUse()), progress);
 				return true;
 			});
+			RunningJobs.track(service); // so that a headless run waits for this, see RunningJobs
 			service.runningProperty().addListener((v, o, n) -> {
-				if (n) {
-					if (RunWorkflow.runningJobsInView != null)
-						RunWorkflow.runningJobsInView.add(service);
+				if (n)
 					runningConsumer.accept(true);
-				} else {
-					if (RunWorkflow.runningJobsInView != null)
-						RunWorkflow.runningJobsInView.remove(service);
-				}
 			});
 			service.setOnFailed(e -> {
 				runningConsumer.accept(false);

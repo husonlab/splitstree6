@@ -33,6 +33,7 @@ import splitstree6.window.MainWindow;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -52,6 +53,20 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	private final Map<String, List<String>> dataBlockNameTitleMap = new HashMap<>();
 	private final Map<String, List<String>> algorithmNameTitleMap = new HashMap<>();
 
+	// The distinguished nodes of the skeleton, held by reference rather than looked up by title. The titles
+	// above are still what a workflow file and the GUI show, but the user may rename a node, and a renamed
+	// node must not become invisible to getInputTaxaNode() and friends. Set by setupInputAndWorkingNodes,
+	// carried across by shallowCopy, dropped when the node is deleted or the workflow is cleared. The
+	// accessors fall back to matching by title so a workflow assembled by some other route still resolves.
+	private DataNode<SourceBlock> sourceNode;
+	private DataNode<TaxaBlock> inputTaxaNode;
+	private DataNode<? extends DataBlock> inputDataNode;
+	private DataNode<TaxaBlock> workingTaxaNode;
+	private DataNode<? extends DataBlock> workingDataNode;
+	private AlgorithmNode<TaxaBlock, TaxaBlock> inputTaxaFilterNode;
+	private AlgorithmNode<? extends DataBlock, ? extends DataBlock> inputDataFilterNode;
+	private AlgorithmNode<? extends DataBlock, ? extends DataBlock> inputDataLoaderNode;
+
 	private final SelectionModel<WorkflowNode> selectionModel = new SetSelectionModel<>();
 
 	private Consumer<AService<Boolean>> serviceConfigurator;
@@ -66,6 +81,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 				if (e.wasRemoved()) {
 					for (var node : e.getRemoved()) {
 						selectionModel.clearSelection(node);
+						forgetDistinguishedNode(node);
 						if (node instanceof DataNode dataNode) {
 							var names = dataBlockNameTitleMap.get(dataNode.getName());
 							if (names != null)
@@ -86,63 +102,84 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		});
 	}
 
+	/**
+	 * sets up the standard skeleton, with a loader that reads the source into the input nodes
+	 * <p>
+	 * The source node is what the workflow knows about the file system: the file names, the acceptable
+	 * extensions, whether several files may be given and whether the input editor is in use. It is also how
+	 * loading is triggered - WorkflowSetup validates it, and the resulting cascade restarts the loader - and
+	 * it is the input data block of every DataLoader. It is deliberately hidden in the workflow displays
+	 * (WorkflowTabLayout, WorkflowTreeViewLayout), which is why it can look superfluous.
+	 */
 	public <T extends DataBlock> void setupInputAndWorkingNodes(SourceBlock source, DataLoader<SourceBlock, T> dataLoader, TaxaBlock inputTaxaBlock, T inputDataBlock) {
-		var sourceNode = newDataNode(source, INPUT_SOURCE);
-		var inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
-		var inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
+		sourceNode = newDataNode(source, INPUT_SOURCE);
+		inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
+		inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
 
 		var loaderNode = newAlgorithmNode(dataLoader, null, sourceNode, inputDataNode, INPUT_DATA_LOADER);
 		loaderNode.addChild(inputTaxaNode);
+		inputDataLoaderNode = loaderNode;
 
-		var workingTaxaNode = newDataNode(inputTaxaBlock.newInstance(), WORKING_TAXA);
+		workingTaxaNode = newDataNode(inputTaxaBlock.newInstance(), WORKING_TAXA);
 		var workingData = inputDataBlock.newInstance();
-		var workingDataNode = newDataNode(inputDataBlock.newInstance(), WORKING_PREFIX + workingData.getName());
-		newAlgorithmNode(new TaxaFilter(), null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
+		workingDataNode = newDataNode(inputDataBlock.newInstance(), WORKING_PREFIX + workingData.getName());
+		inputTaxaFilterNode = newAlgorithmNode(new TaxaFilter(), null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
 
 		var dataFilterNode = newAlgorithmNode(inputDataBlock.createTaxaDataFilter(), INPUT_TAXA_DATA_FILTER);
 		dataFilterNode.addParent(inputTaxaNode);
 		dataFilterNode.addParent(workingTaxaNode);
 		dataFilterNode.addParent(inputDataNode);
 		dataFilterNode.addChild(workingDataNode);
+		inputDataFilterNode = dataFilterNode;
 	}
 
+	/**
+	 * sets up the standard skeleton for data that is already in hand, with no file and hence no loader
+	 * <p>
+	 * The source node is created empty, so that every workflow has the same shape and getSourceNode() never
+	 * returns null. Use this when driving the workflow programmatically.
+	 */
 	public <T extends DataBlock> void setupInputAndWorkingNodes(TaxaBlock inputTaxaBlock, T inputDataBlock) {
-		var inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
-		var inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
+		sourceNode = newDataNode(new SourceBlock(), INPUT_SOURCE);
+		inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
+		inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
 
-		var workingTaxaNode = newDataNode(inputTaxaBlock.newInstance(), WORKING_TAXA);
+		workingTaxaNode = newDataNode(inputTaxaBlock.newInstance(), WORKING_TAXA);
 		var workingData = inputDataBlock.newInstance();
-		var workingDataNode = newDataNode(inputDataBlock.newInstance(), WORKING_PREFIX + workingData.getName());
-		newAlgorithmNode(new TaxaFilter(), null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
+		workingDataNode = newDataNode(inputDataBlock.newInstance(), WORKING_PREFIX + workingData.getName());
+		inputTaxaFilterNode = newAlgorithmNode(new TaxaFilter(), null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
 
 		var dataFilterNode = newAlgorithmNode(inputDataBlock.createTaxaDataFilter(), INPUT_TAXA_DATA_FILTER);
 		dataFilterNode.addParent(inputTaxaNode);
 		dataFilterNode.addParent(workingTaxaNode);
 		dataFilterNode.addParent(inputDataNode);
 		dataFilterNode.addChild(workingDataNode);
+		inputDataFilterNode = dataFilterNode;
 	}
 
+	/**
+	 * sets up the standard skeleton from blocks that have already been parsed, as when reading a .stree6 file
+	 * <p>
+	 * There is deliberately no loader here: WorkflowNexusInput has already parsed the input taxa and data, and
+	 * WorkflowDataLoader later writes new data straight into the input nodes rather than going through a
+	 * loader. The source node therefore has no children in a loaded workflow, and that is expected.
+	 */
 	public <T extends DataBlock> void setupInputAndWorkingNodes(SourceBlock source, TaxaBlock inputTaxaBlock, TaxaFilter taxaFilter, TaxaBlock workingTaxaBlock,
 																DataBlock inputDataBlock, DataTaxaFilter dataTaxaFilter, DataBlock workingDataBlock) {
-		var sourceNode = newDataNode(source, INPUT_SOURCE); // todo: what is the purpose of the source node?
-		var inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
-		var inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
+		sourceNode = newDataNode(source, INPUT_SOURCE);
+		inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
+		inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
 
-		// todo: create nexus loader
-		/*
-		var loaderNode = newAlgorithmNode(dataLoader, null, sourceNode, inputDataNode, INPUT_DATA_LOADER);
-		loaderNode.addChild(inputTaxaNode);
-		 */
-
-		var workingTaxaNode = newDataNode(workingTaxaBlock, WORKING_TAXA);
-		var workingDataNode = newDataNode(workingDataBlock, WORKING_PREFIX + workingDataBlock.getName());
-		newAlgorithmNode(taxaFilter, null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
+		workingTaxaNode = newDataNode(workingTaxaBlock, WORKING_TAXA);
+		workingDataNode = newDataNode(workingDataBlock, WORKING_PREFIX + workingDataBlock.getName());
+		inputTaxaFilterNode = newAlgorithmNode(taxaFilter, null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
 
 		var dataFilterNode = newAlgorithmNode(dataTaxaFilter, INPUT_TAXA_DATA_FILTER);
 		dataFilterNode.addParent(inputTaxaNode);
 		dataFilterNode.addParent(workingTaxaNode);
 		dataFilterNode.addParent(inputDataNode);
 		dataFilterNode.addChild(workingDataNode);
+		inputDataFilterNode = dataFilterNode;
 	}
 
 	public <D extends DataBlock> DataNode<D> newDataNode(D dataBlock) {
@@ -213,15 +250,17 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 			}
 			list.add(title);
 			algorithmNode.setTitle(title);
-		} else if (node instanceof DataNode dataName) {
-			var title = dataName.getName();
+		} else if (node instanceof DataNode dataNode) {
+			var title = dataNode.getName();
 			var t = 1;
-			var list = algorithmNameTitleMap.computeIfAbsent(dataName.getName(), n -> new ArrayList<>());
+			// the data-block map, not the algorithm one: data-node and algorithm-node titles are separate
+			// namespaces, and the node-removal listener above puts each back into its own map
+			var list = dataBlockNameTitleMap.computeIfAbsent(dataNode.getName(), n -> new ArrayList<>());
 			while (list.contains(title)) {
-				title = dataName.getName() + "-" + (++t);
+				title = dataNode.getName() + "-" + (++t);
 			}
 			list.add(title);
-			dataName.setTitle(title);
+			dataNode.setTitle(title);
 		}
 	}
 
@@ -237,30 +276,46 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		return nodeStream().filter(v -> v instanceof AlgorithmNode).map(v -> (AlgorithmNode) v);
 	}
 
+	/**
+	 * resolves one of the distinguished nodes: by reference if we have it, else by title
+	 * <p>
+	 * The reference is what makes the accessors survive a rename. The title fall-back is for a workflow that
+	 * was assembled without going through setupInputAndWorkingNodes.
+	 *
+	 * @param node       the remembered node, or null
+	 * @param byTitle    how to find it by title, used only when node is null
+	 * @return the node, or null if there is none
+	 */
+	private <N extends WorkflowNode> N resolve(N node, Supplier<N> byTitle) {
+		if (node != null && nodes().contains(node))
+			return node;
+		return byTitle.get();
+	}
+
 	public DataNode<SourceBlock> getSourceNode() {
-		return dataNodesStream().filter(v -> v.getTitle().equals(INPUT_SOURCE)).findFirst().orElse(null);
+		return resolve(sourceNode, () -> (DataNode<SourceBlock>) dataNodesStream().filter(v -> v.getTitle().equals(INPUT_SOURCE)).findFirst().orElse(null));
 	}
 
 	public AlgorithmNode getLoaderNode() {
-		return algorithmNodesStream().filter(v -> v.getTitle().equals(INPUT_DATA_LOADER)).findFirst().orElse(null);
+		return getInputDataLoaderNode();
 	}
 
 
 	public DataNode<TaxaBlock> getInputTaxaNode() {
-		return dataNodesStream().filter(v -> v.getTitle().equals(INPUT_TAXA)).findFirst().orElse(null);
+		return resolve(inputTaxaNode, () -> (DataNode<TaxaBlock>) dataNodesStream().filter(v -> v.getTitle().equals(INPUT_TAXA)).findFirst().orElse(null));
 	}
 
 	public DataNode<? extends DataBlock> getInputDataNode() {
-		return dataNodesStream().filter(v -> v.getTitle().startsWith(INPUT_PREFIX)).filter(v -> !v.getTitle().equals(INPUT_SOURCE))
-				.filter(v -> !v.getTitle().equals(INPUT_TAXA)).findFirst().orElse(null);
+		return resolve(inputDataNode, () -> dataNodesStream().filter(v -> v.getTitle().startsWith(INPUT_PREFIX)).filter(v -> !v.getTitle().equals(INPUT_SOURCE))
+				.filter(v -> !v.getTitle().equals(INPUT_TAXA)).findFirst().orElse(null));
 	}
 
 	public DataNode<TaxaBlock> getWorkingTaxaNode() {
-		return dataNodesStream().filter(v -> v.getTitle().equals(WORKING_TAXA)).findFirst().orElse(null);
+		return resolve(workingTaxaNode, () -> (DataNode<TaxaBlock>) dataNodesStream().filter(v -> v.getTitle().equals(WORKING_TAXA)).findFirst().orElse(null));
 	}
 
 	public DataNode<? extends DataBlock> getWorkingDataNode() {
-		return dataNodesStream().filter(v -> v.getTitle().startsWith(WORKING_PREFIX)).filter(v -> !v.getTitle().equals(WORKING_TAXA)).findFirst().orElse(null);
+		return resolve(workingDataNode, () -> dataNodesStream().filter(v -> v.getTitle().startsWith(WORKING_PREFIX)).filter(v -> !v.getTitle().equals(WORKING_TAXA)).findFirst().orElse(null));
 	}
 
 	public DataNode<? extends DataBlock> getAlignmentViewNode() {
@@ -276,17 +331,43 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	}
 
 	public AlgorithmNode<TaxaBlock, TaxaBlock> getInputTaxaFilterNode() {
-		return algorithmNodesStream().filter(v -> v.getTitle().startsWith(INPUT_TAXA_FILTER)).findFirst().orElse(null);
+		return resolve(inputTaxaFilterNode, () -> (AlgorithmNode<TaxaBlock, TaxaBlock>) algorithmNodesStream().filter(v -> v.getTitle().startsWith(INPUT_TAXA_FILTER)).findFirst().orElse(null));
 	}
 
 	public AlgorithmNode<? extends DataBlock, ? extends DataBlock> getInputDataFilterNode() {
-		return algorithmNodesStream().filter(v -> v.getAlgorithm() instanceof DataTaxaFilter).findFirst().orElse(null);
+		return resolve(inputDataFilterNode, () -> algorithmNodesStream().filter(v -> v.getAlgorithm() instanceof DataTaxaFilter).findFirst().orElse(null));
 	}
 
 	public AlgorithmNode<? extends DataBlock, ? extends DataBlock> getInputDataLoaderNode() {
-		return algorithmNodesStream().filter(v -> v.getTitle().startsWith(INPUT_DATA_LOADER)).findFirst().orElse(null);
+		return resolve(inputDataLoaderNode, () -> algorithmNodesStream().filter(v -> v.getTitle().startsWith(INPUT_DATA_LOADER)).findFirst().orElse(null));
 	}
 
+	/**
+	 * drops a distinguished node reference when the node leaves the workflow
+	 */
+	private void forgetDistinguishedNode(WorkflowNode node) {
+		if (node == sourceNode) sourceNode = null;
+		else if (node == inputTaxaNode) inputTaxaNode = null;
+		else if (node == inputDataNode) inputDataNode = null;
+		else if (node == workingTaxaNode) workingTaxaNode = null;
+		else if (node == workingDataNode) workingDataNode = null;
+		else if (node == inputTaxaFilterNode) inputTaxaFilterNode = null;
+		else if (node == inputDataFilterNode) inputDataFilterNode = null;
+		else if (node == inputDataLoaderNode) inputDataLoaderNode = null;
+	}
+
+	@Override
+	public void clear() {
+		super.clear();
+		sourceNode = null;
+		inputTaxaNode = null;
+		inputDataNode = null;
+		workingTaxaNode = null;
+		workingDataNode = null;
+		inputTaxaFilterNode = null;
+		inputDataFilterNode = null;
+		inputDataLoaderNode = null;
+	}
 
 	public SourceBlock getSourceBlock() {
 		var sourceNode = getSourceNode();
@@ -391,6 +472,18 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 				}
 			}
 		}
+
+		// carry the distinguished-node references across, otherwise the copy would have to fall back to
+		// matching by title and would lose them again the moment a node is renamed
+		sourceNode = (DataNode<SourceBlock>) nodeCopyNodeMap.get(src.getSourceNode());
+		inputTaxaNode = (DataNode<TaxaBlock>) nodeCopyNodeMap.get(src.getInputTaxaNode());
+		inputDataNode = (DataNode<? extends DataBlock>) nodeCopyNodeMap.get(src.getInputDataNode());
+		workingTaxaNode = (DataNode<TaxaBlock>) nodeCopyNodeMap.get(src.getWorkingTaxaNode());
+		workingDataNode = (DataNode<? extends DataBlock>) nodeCopyNodeMap.get(src.getWorkingDataNode());
+		inputTaxaFilterNode = (AlgorithmNode<TaxaBlock, TaxaBlock>) nodeCopyNodeMap.get(src.getInputTaxaFilterNode());
+		inputDataFilterNode = (AlgorithmNode<? extends DataBlock, ? extends DataBlock>) nodeCopyNodeMap.get(src.getInputDataFilterNode());
+		inputDataLoaderNode = (AlgorithmNode<? extends DataBlock, ? extends DataBlock>) nodeCopyNodeMap.get(src.getInputDataLoaderNode());
+
 		setValid(true);
 	}
 
