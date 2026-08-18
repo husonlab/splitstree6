@@ -72,7 +72,7 @@ jobs:
         run: mvn -B -q -DskipTests package -Djavafx.platform=${{ github.event.inputs.javafx-platform || 'mac' }}
         working-directory: splitstree6
 
-      - name: Assemble the seven jars
+      - name: Assemble the eight jars
         run: |
           set -eu
           mkdir -p bundle/jars bundle/src
@@ -85,6 +85,8 @@ jobs:
           # the classified artifacts only - the unclassified ones are ~300-byte stubs
           cp "$d"/dependency/javafx-base-*-*.jar     bundle/jars/
           cp "$d"/dependency/javafx-graphics-*-*.jar bundle/jars/
+          # NotificationManager extends a JavaFX control and readers call it when they warn
+          cp "$d"/dependency/javafx-controls-*-*.jar bundle/jars/
           cp splitstree6/.github/portability-probe/PortabilityProbe.java bundle/src/
           echo "### Bundle" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"

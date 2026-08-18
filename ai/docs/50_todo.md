@@ -58,6 +58,20 @@ and `60_agent_notes.md` all say the new truth.
       check fails for a reason that has nothing to do with portability. Never run; the YAML and every command
       in it were verified locally, but no Actions run has happened.
 
+- [ ] **Six files in `examples/` cannot be read by the readers that claim them.** Found 2026-08-18 by reading
+      the whole corpus from Python (171/177 succeed). Each needs a decision — fix the reader, fix the file, or
+      accept it: `genomes/domestic-mtdna.fasta` is ragged at line 482; three Nexml/BEAST2 XML files give
+      "No trees found" (two are BEAST2 *input* XML that the detector over-claims);
+      `Gruenstaeudl2019/.../ML-trees-rerooted.tree` is Newick the reader rejects at position 81; and
+      `.../nj.workf6` is a SplitsTree5 workflow file claimed as Nexus characters, which then **reads as empty
+      rather than failing** — the worst kind. Listed in `tests/test_io.py::KNOWN_UNREADABLE` in splitstree-py.
+
+- [ ] **`ExportManager` leaks the prepend-taxa flag.** `write(..., "NexusWithTaxa", ...)` sets
+      `optionPrependTaxa` on the **shared** Nexus writer instance and never clears it, so every later
+      plain-Nexus write in the same process also prepends taxa. Found 2026-08-18. Also worth noting that the
+      plain `Nexus` exporter writes a bare block that SplitsTree's own reader will not read back — correct for
+      the GUI, which concatenates blocks, but a trap for anything writing standalone files.
+
 - [ ] **D-8: make `ProgramProperties`'s font lazy** (jloda3). Its static initialiser calls
       `javafx.scene.text.Font.font(...)`, so constructing almost any algorithm tries to start a graphics
       pipeline. Caught and harmless, but it prints alarming `UnsatisfiedLinkError` noise when the natives do

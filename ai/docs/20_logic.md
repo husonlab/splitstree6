@@ -390,9 +390,12 @@ Three things the pure routines do **not** give you, all of which live in the vie
    result — as long as it contains no view nodes. This is what makes the workflow engine unit-testable
    (`ai/plans/2026-08-17_test-suite.md`) and what removes the main obstacle from the `splitstree.py` workflow
    layer (`ai/plans/2026-08-17_splitstree-py.md` §5, whose layer 2 was gated on exactly this).
-3. **A binding that wants only the algorithms still needs `javafx.base` and `javafx.graphics` on the
-   classpath** — the options are `javafx.beans.property.*` and `jloda.fx.workflow` uses `javafx.concurrent` —
-   but never their natives, because the toolkit never starts. Seven jars, 13 MB.
+3. **A binding that wants only the algorithms still needs JavaFX on the classpath**, though never a running
+   toolkit: the options are `javafx.beans.property.*` (`javafx.base`), `jloda.fx.workflow` uses
+   `javafx.concurrent` (`javafx.graphics`), and **`javafx.controls` is needed too** — `NotificationManager`
+   extends a JavaFX control and readers call it on their warning paths, so without it `NexmlReader` dies with
+   `NoClassDefFoundError: javafx/scene/control/Label`. Eight jars, 16 MB. That last one was found by reading
+   the whole `examples/` corpus from Python, not by inspection; it only bites on a warning path.
 
 ---
 

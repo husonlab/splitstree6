@@ -79,7 +79,7 @@ Everything in this table was established by probe on 2026-08-17 and is the factu
 | readers and writers work headless (`NewickReader`, `io.writers.splits.NexusWriter`) | file IO needs no special handling |
 | ~~`workflow.newAlgorithmNode(...)` throws `Toolkit not initialized`~~ — **fixed 2026-08-17 (D-1)**: a whole 11-node workflow now computes headless in ~40 ms, synchronously, same answers as the toolkit path | **the layer-2 gate is gone.** The workflow API no longer needs a toolkit in the user's Python process; see the revised §5 |
 | after `Platform.startup()` the workflow also runs (`nsplits=7`, `isValid()` true, no window) | unchanged, and still the path for anything that builds views |
-| **7 jars suffice**: `SplitsTree.jar`, `jloda-core`, `jloda-fx`, `jloda-phylogeny`, `javafx-base`, `javafx-graphics`, `ojalgo` — **13 MB**, against 76 MB for the full dependency directory | the wheel is small; NeighborNet, NJ, LogDet and PhyloFusion (incl. NNLS edge weights) all run on it |
+| **8 jars suffice**: `SplitsTree.jar`, `jloda-core`, `jloda-fx`, `jloda-phylogeny`, `javafx-base`, `javafx-graphics`, `javafx-controls`, `ojalgo` — **16 MB**, against 76 MB for the full dependency directory | the wheel is small. It was 7 until the corpus sweep of 2026-08-18 hit `NoClassDefFoundError: javafx/scene/control/Label` from `NotificationManager` on a reader's warning path |
 | `javafx-base` contains **0** native libraries; `javafx-graphics` contains 7, none of which is loaded unless the toolkit starts | a **platform-agnostic wheel is plausible** — to be verified, §8 |
 | the unclassified `javafx-*.jar` artifacts are **302-byte stubs**; the classes are only in the classified ones | you cannot dodge the platform classifier by using the plain artifact |
 | `DistancesBlock` has bulk `set(double[][])` / `getDistances()`, `CharactersBlock` has `getMatrix()` | matrices cross the bridge in one call, not n² calls |
@@ -89,7 +89,7 @@ Everything in this table was established by probe on 2026-08-17 and is the factu
 
 ### 3.1 The step-1 spike, run 2026-08-17
 
-JPype 1.7.1, Python 3.14, the seven-jar bundle, JDK 23. Every number the plan asked for:
+JPype 1.7.1, Python 3.14, the jar bundle (7 at the time, 8 since), JDK 23. Every number the plan asked for:
 
 | Measured | Result | What it settles |
 |---|---|---|
@@ -152,7 +152,7 @@ and `st.configure` after the JVM is up should raise, not silently do nothing.
    │    io.py            read_* / write_*, format registry        │
    │    progress.py      ProgressListener bridge, cancellation    │
    │    errors.py        Java exception → Python exception        │
-   │    jars/            the 7 jars (13 MB)                       │
+   │    jars/            the 8 jars (16 MB)                       │
    │                                                              │
    │  ── layer 2, NOT in v1 ──────────────────────────────────    │
    │    workflow.py      Workflow, .stree6 load/save/run          │
@@ -397,7 +397,7 @@ Each step ends in something runnable; nothing after step 1 starts until step 1's
    `0f7d067`: `_jvm.py` (search order, version *and architecture* checking, lazy start), `errors.py`,
    `configure()` raising after start, `tools/sync_jars.py`, `pyproject.toml`, 19 tests. Measured on macOS:
    `st.start()` 217 ms end to end, neighbor-net from Python `nsplits=7 fit=100.0`, tests 0.3 s, and the wheel
-   builds **`py3-none-any`, 11.7 MB, with all seven jars inside** — which is the packaging half of the
+   builds **`py3-none-any`, 11.7 MB, with all the jars inside** — which is the packaging half of the
    one-wheel question answered. *Still to verify: that it runs on Linux and Windows*, which
    `.github/workflows/portability-probe.yml` covers for the jars and a `pip install` will have to cover for
    the Python.
@@ -415,10 +415,17 @@ Each step ends in something runnable; nothing after step 1 starts until step 1's
    than reading did: a `Trees` built from Newick strings did not register the node→taxon-id mapping that
    `NewickReader` assigns, so PhyloFusion silently returned a network with hybridization number **0** instead
    of 2 — a wrong answer, not an error; and an empty matrix threw from `JArray.of`.
-4. **The IO layer.** `read_*` / `write_*` over `ImportManager` / `ExportManager`, with the format lists read
-   from Java rather than hard-coded. *Verification: read every file in `examples/` that matches a supported
-   format and check the taxon and dimension counts; write each block type in each of its formats and read it
-   back.*
+4. ~~**The IO layer.**~~ **DONE 2026-08-18**, `husonlab/splitstree-py` commit `248f97a`: `io.py` with
+   `read`/`write`, the typed `read_*` helpers, and `detect`/`input_formats`/`output_formats` asked of Java.
+   79 tests. The verification found three things worth more than the code:
+   **(a)** the jar set was wrong — `javafx-controls` is needed, because `NotificationManager` extends a JavaFX
+   control and readers call it when they warn; without it `NexmlReader` dies with `NoClassDefFoundError`.
+   **(b)** SplitsTree's plain `Nexus` exporter writes a bare block with no `#nexus` and no `TAXA`, so its own
+   reader rejects the file; every Nexus round trip failed until `write()` was made to emit the complete file.
+   **(c)** `ExportManager`'s `NexusWithTaxa` pseudo-name sets `optionPrependTaxa` on the **shared** writer
+   instance and never clears it, so a later plain-Nexus write in the same process silently keeps prepending
+   taxa. The corpus sweep reads **171 of the 177** files the detector claims; the six that do not are
+   SplitsTree-side and listed with reasons.
 5. **The generator.** JSON exporter, Python code generator, generated modules and `.pyi` stubs, checked in so
    the diff is reviewable. *Verification: every algorithm in the catalogue instantiates; every option round
    trips Python → Java → Python; a spot-check of ten algorithms against hand-written calls gives identical
