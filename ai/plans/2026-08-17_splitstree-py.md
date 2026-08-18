@@ -347,8 +347,16 @@ Each step ends in something runnable; nothing after step 1 starts until step 1's
    `@JImplements(ProgressListener)` works and what a Python callback costs per call. *Verification: the numbers
    match the Java probe exactly; the transfer timings are recorded.*
 2. **The JVM bootstrap and the jar set.** `_jvm.py`, lazy start, `st.configure`, a clear error when no JVM is
-   found. Confirm the 7-jar set on **Linux and Windows**, and confirm or refute the platform-agnostic-wheel
-   hypothesis. *Verification: step 1's script runs unchanged on all three platforms.*
+   found. *Verification: step 1's script runs unchanged on all three platforms.* The
+   platform-agnostic-wheel hypothesis is settled separately and earlier, by
+   `.github/workflows/portability-probe.yml`, which needs no Python at all.
+
+   **Know what a clean runner does and does not prove.** GitHub's runners install a known-good JDK via
+   `setup-java`, so they demonstrate that the code is portable and prove nothing whatever about the thing most
+   likely to go wrong in the field: a machine where the JVM is missing, is the wrong version, lives behind a
+   `JAVA_HOME` containing spaces (`C:\Program Files\...`), or where Python is conda rather than system and
+   JPype therefore looks for `jvm.dll` / `libjvm.so` somewhere else. Runners are clean; users are not. That
+   gap is what a real machine belonging to somebody else is for — see step 6.
 3. **The block layer.** `Taxa`, `Distances`, `Characters`, `Splits`, `Trees`, `Network` wrappers with bulk
    converters, input validation and zero-based indexing. *Verification: round-trip tests for every block type
    in both directions, including empty, one-taxon and ragged/invalid inputs; large-matrix timing within the
@@ -368,6 +376,13 @@ Each step ends in something runnable; nothing after step 1 starts until step 1's
    *running* the tests, where the platform differences are real and silent — the classpath separator is `;` on
    Windows and `:` elsewhere, JVM discovery differs, and so do default encodings. *Verification: `pip install`
    into a clean environment on all three platforms and run the notebook.*
+
+   **This is the point at which somebody else's computer earns its keep.** Give a colleague with a real
+   Windows or Linux machine a five-minute script: `pip install`, run three lines, paste the output. Do not ask
+   them to debug, and do not ask before there is something installable — a person's goodwill is a scarcer
+   resource than a runner minute. What they test that no runner can is an *unprepared* machine, and the top
+   support issue for a JVM-backed Python package is always the JVM: absent, too old, or not where JPype
+   looked. The error message for that case is worth as much design attention as any API in this plan.
 
 That is v1. Two follow-ons, both now decided in principle (§9.6, §9.2) but neither scoped:
 
