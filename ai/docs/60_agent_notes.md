@@ -8,6 +8,48 @@ successes — they stop the next agent repeating them.
 
 ---
 
+## 2026-08-17 (evening) — the splitstree.py spike: JPype works, and the numbers are good
+
+Step 1 of `ai/plans/2026-08-17_splitstree-py.md`, the time-boxed spike. Full table in that plan's §3.1;
+the short version is that every one of the four questions came back favourably and nothing needs rethinking.
+
+`nsplits=7 fit=100.0` and `(((a:1,b:1):3,c:1):1,d:1,e:1)` from Python — byte-identical to the Java probe, which
+is the only result that really mattered. JVM start-up ~105 ms once per process. A 1000x1000 float64 matrix
+crosses in 17 ms (numpy to JArray) + 26 ms (into DistancesBlock) and comes back in 0.7 ms, bit-exact at
+`atol=0`. The same thing element-wise extrapolates to **0.8 s**, so the plan's "never a per-element call in a
+loop" rule is now measured at ~19x rather than asserted. A Python `ProgressListener` via `@JImplements` works
+and costs 0.06 us per callback, so progress and cancellation from Python are free.
+
+**Three things the spike found that the plan had not anticipated, all of which improve it.**
+
+The first is the one worth remembering. `startJVM` failed immediately with
+`FileNotFoundError: JVM DLL not found: /usr/local/Cellar/openjdk@17/.../libjli.dylib` — a compiled-in guess at
+a Homebrew path that does not exist on this machine. Chasing it turned up a real constraint: **JPype loads the
+JVM into the Python process, so the JVM architecture must match the interpreter's.** Here `python3` is arm64
+and the `java` on `PATH` is an x86_64 GraalVM 17, so this machine's default JVM cannot be used from Python at
+all; the spike runs only with `JAVA_HOME` pointed at the arm64 JDK 23. Two consequences are now in the plan's
+§8: `_jvm.py` must *check* the architecture rather than take the first JVM it finds, and the no-JVM error
+message is the most important string in the package - it is the first thing most users will see go wrong.
+
+Second, an accidental strengthening of the one-wheel hypothesis. The bundle carries the **x86_64** macOS
+JavaFX jars, and the spike loaded them under an **arm64** JDK 23 without complaint. That is a harder test than
+the portability workflow runs: not merely a different operating system but a different processor
+architecture, and still nothing touched the natives. It does not replace the workflow - Windows and Linux have
+their own loaders - but it is the best single piece of evidence so far.
+
+Third, a conversion the block layer must own: `java.util.BitSet` is not iterable from Python, so
+`ASplit.getA()` is unusable as it stands, and the indices are one-based on top of that. A split has to reach
+Python as a `frozenset` of taxon *labels*. That was the only thing in the spike that needed fixing rather than
+measuring, and it is a good worked example of why §7 exists.
+
+Also noted and not yet solved: the algorithms print progress to stderr (`NNet algorithm: ActiveSet taxa: 5
+...`). Fine in a tool, noise in a library.
+
+**Not done, deliberately:** nothing beyond the spike. §9.4 puts the code in `husonlab/splitstree-py`, which
+does not exist; creating a repository is Daniel's call, so step 2 stops here.
+
+---
+
 ## 2026-08-17 (later still) — the layouts report coordinates headless
 
 Daniel asked for the one thing the `splitstree.py` plan still listed as unmeasured (§9.6): can the layouts

@@ -1,9 +1,10 @@
 # Plan — `splitstree.py`: the SplitsTree algorithms as a Python package
 
-**Status:** ready to build. Daniel answered all six open questions on 2026-08-17 (§9); the one Java-side change
-the plan depended on (D-1) is done; both engineering risks the plan carried — headless workflows and headless
-coordinates — have been measured and are closed; and the PyPI name is free. Nothing is outstanding except the
-decision to start, at §10 step 1.
+**Status:** step 1 is done — see §3.1. Daniel answered all six open questions on 2026-08-17 (§9); the one
+Java-side change the plan depended on (D-1) is done; both engineering risks the plan carried — headless
+workflows and headless coordinates — are measured and closed; the PyPI name is free. **The next step needs a
+repository**: §9.4 puts the code in `husonlab/splitstree-py`, which does not exist yet, so step 2 is blocked
+on creating it.
 **Raised by:** Daniel, 2026-08-17 — "I want to make all the algorithms that I have implemented in SplitsTree
 available as a Python package."
 **Related:** `ai/docs/20_logic.md` (especially §2, §6, §7), `ai/docs/30_tools.md`, `ai/docs/40_testing.md`,
@@ -84,6 +85,36 @@ Everything in this table was established by probe on 2026-08-17 and is the factu
 | `DistancesBlock` has bulk `set(double[][])` / `getDistances()`, `CharactersBlock` has `getMatrix()` | matrices cross the bridge in one call, not n² calls |
 | the classpath ignores `module-info` entirely, so `Option` reflection needs no `opens` | **use the classpath, not the module path** — this removes the whole JPMS problem |
 | scanning the jar for non-abstract `Algorithm` subclasses, instantiating each and asking it for its own from/to classes, options, citation and `IExperimental` status **works and takes a second**: 102 classes, 177 options, 75 transformations, 38 without a citation | the generator's discovery mechanism (§6) is settled — jar scan, no Java-side registry needed |
+| **the layouts report coordinates headless.** The `javafx.scene`-importing layout classes are wrappers around pure routines that fill a `NodeArray<Point2D>`; probed for split-network outline and equal angle, all four rooted layouts on a reticulate network, and the general-network SPI | plotting from Python is buildable, §9.6 |
+
+### 3.1 The step-1 spike, run 2026-08-17
+
+JPype 1.7.1, Python 3.14, the seven-jar bundle, JDK 23. Every number the plan asked for:
+
+| Measured | Result | What it settles |
+|---|---|---|
+| same answers from Python? | `nsplits=7 fit=100.0`, NJ `(((a:1,b:1):3,c:1):1,d:1,e:1)` — **identical to Java** | the bridge does not perturb the numbers |
+| JVM start-up | **~105 ms**, once per process | cheap enough to do lazily on first call and never mention again |
+| 1000×1000 `float64` (8 MB) numpy → Java | 17 ms to `JArray`, 26 ms into `DistancesBlock` | bulk transfer is fine |
+| back to numpy | **0.7 ms**, round-trip bit-exact (`allclose` at `atol=0`) | `getDistances()` → numpy is essentially free |
+| the same element-wise | 1.9 ms for 50×50, i.e. **~0.8 s** extrapolated to 1000×1000 | **~19× slower**; §7's "never a per-element call in a loop" is now measured, not asserted |
+| Python `ProgressListener` via `@JImplements` | **works** — 4 callbacks during a NeighborNet run | progress and cancellation from Python are available |
+| cost of a callback | **0.06 µs/call** (100k calls in 6 ms) | free; no need to batch or throttle |
+
+Three things the spike found that the plan had not anticipated:
+
+- **JPype loads the JVM into the Python process, so the JVM's architecture must match the interpreter's.** On
+  the development Mac, `python3` is arm64 and the `java` on `PATH` is an x86_64 GraalVM, so the default JVM
+  **cannot be used at all** — `startJVM` fails before any SplitsTree code runs. See §8.
+- **The first error a new user meets is `FileNotFoundError: JVM DLL not found`**, naming a path that does not
+  exist (JPype's compiled-in guess: a Homebrew `openjdk@17`). It mentions neither `JAVA_HOME` nor what to
+  install. This is the single most important error message in the package (§8).
+- **`java.util.BitSet` is not iterable from Python**, and split indices are one-based, so
+  `ASplit.getA()` is unusable as it stands. Converting a split to a `frozenset` of taxon *labels* is exactly
+  the kind of thing §7 says the block layer must own, and it is now the worked example.
+
+Also noted: algorithms print progress lines to stderr (`NNet algorithm: ActiveSet taxa: 5 ...`). Harmless in a
+tool, noise in a library — the binding needs a way to silence or capture it.
 | **the layouts report coordinates headless.** The `javafx.scene`-importing layout classes are wrappers around pure routines that fill a `NodeArray<Point2D>`; probed for split-network outline and equal angle, all four rooted layouts on a reticulate network, and the general-network SPI | plotting from Python is buildable, §9.6 |
 
 ## 4. The bridge
@@ -262,8 +293,19 @@ Also to bridge:
   (§ above: there is nothing to compile).
 - **The JVM itself is not bundled.** Require a JDK/JRE ≥ 17 and let JPype find it via `JAVA_HOME`; document
   `conda install -c conda-forge openjdk` and `install-jdk` as the easy routes. Bundling a JVM per platform
-  triples the wheel size and the maintenance. Give a clear, actionable error when no JVM is found — this will
-  be the single most common support question.
+  triples the wheel size and the maintenance.
+
+- **The JVM's architecture must match the interpreter's**, because JPype loads it into the Python process.
+  This is not a theoretical caveat: on the development Mac, `python3` is arm64 while the `java` on `PATH` is
+  an x86_64 GraalVM 17, so the machine's default JVM cannot be used from Python at all. `_jvm.py` must
+  therefore *check* the architecture rather than take the first JVM it finds, and say so when they differ.
+
+- **The no-JVM error message is the most important string in the package.** Measured: JPype's own is
+  `FileNotFoundError: JVM DLL not found: /usr/local/Cellar/openjdk@17/.../libjli.dylib` — a compiled-in guess
+  at a Homebrew path, naming neither `JAVA_HOME` nor what to install nor the architecture requirement. Replace
+  it with one that says what was looked for, where, what was found and rejected (and why), and the one command
+  that fixes it. This is the first thing most users will see go wrong, and it is cheap to get right now and
+  painful to retrofit.
 - **Licence.** SplitsTree is **GPL v3**, and a wheel that bundles the jars is a GPL v3 distribution. That is a
   real constraint on who can use the package in a closed pipeline, and it should be stated on the PyPI page
   rather than discovered later. It is Daniel's decision whether that is the intended outcome.
@@ -341,11 +383,11 @@ have been updated to match.
 
 Each step ends in something runnable; nothing after step 1 starts until step 1's numbers are in.
 
-1. **Spike, time-boxed to a day.** JPype in a venv, `startJVM` with the 7-jar classpath, run NeighborNet on a
-   five-taxon matrix from Python and get `nsplits=7, fit=100.0` — the same numbers the Java probe gave.
-   Measure: JVM start-up time; the cost of a 1000-taxon `double[][]` transfer both ways; whether
-   `@JImplements(ProgressListener)` works and what a Python callback costs per call. *Verification: the numbers
-   match the Java probe exactly; the transfer timings are recorded.*
+1. ~~**Spike, time-boxed to a day.**~~ **DONE 2026-08-17** — every number is in §3.1, and all four questions
+   came back favourably: the answers match Java exactly, the JVM costs ~105 ms once, bulk matrix transfer is
+   ~19× faster than element-wise and bit-exact both ways, and a Python `ProgressListener` works at 0.06 µs per
+   callback. The spike also turned up the JVM-architecture constraint and the no-JVM error message, both now
+   in §8, and one conversion the block layer must own (`BitSet` → `frozenset` of labels).
 2. **The JVM bootstrap and the jar set.** `_jvm.py`, lazy start, `st.configure`, a clear error when no JVM is
    found. *Verification: step 1's script runs unchanged on all three platforms.* The
    platform-agnostic-wheel hypothesis is settled separately and earlier, by
