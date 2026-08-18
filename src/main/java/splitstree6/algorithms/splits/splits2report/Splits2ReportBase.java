@@ -20,6 +20,7 @@
 package splitstree6.algorithms.splits.splits2report;
 
 import javafx.application.Platform;
+import jloda.fx.util.AService;
 import javafx.beans.value.ChangeListener;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.ReportBlock;
@@ -81,19 +82,33 @@ abstract public class Splits2ReportBase extends Algorithm<SplitsBlock, ReportBlo
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splitsBlock, ReportBlock reportBlock) {
 		reportBlock.setInputBlockName(SplitsBlock.BLOCK_NAME);
 
-		Platform.runLater(() -> {
-			reportBlock.getViewTab().setText(getName());
-			reportBlock.getView().getUndoManager().clear();
-		});
+		// The view is optional. Guard it so that a report can be computed headless - from a
+		// tool, a test or a language binding - where there is no toolkit, no view tab and no
+		// workflow node. Same shape of fix as D-1 and D-8: JavaFX where a guard belongs.
+		var showInView = AService.isToolkitRunning() && reportBlock.getViewTab() != null && reportBlock.getView() != null;
 
-		var mainWindow = getNode().getOwner().getMainWindow();
-		var text = runAnalysis(progress, taxaBlock, splitsBlock, mainWindow.getTaxonSelectionModel().getSelectedItems());
+		if (showInView)
+			Platform.runLater(() -> {
+				reportBlock.getViewTab().setText(getName());
+				reportBlock.getView().getUndoManager().clear();
+			});
 
-		Platform.runLater(() -> {
-			reportBlock.getViewTab().setText(getName());
+		// The selected taxa are a GUI concept; headless there is no selection.
+		var mainWindow = (getNode() != null && getNode().getOwner() != null ? getNode().getOwner().getMainWindow() : null);
+		Collection<Taxon> selectedTaxa = (mainWindow != null ? mainWindow.getTaxonSelectionModel().getSelectedItems() : List.of());
+		var text = runAnalysis(progress, taxaBlock, splitsBlock, selectedTaxa);
+
+		// setText mutates an ObservableList, so keep it on the FX thread whenever there is a
+		// view - that path is then exactly as it was. Headless there is no thread to wait
+		// for and no view to update, and the caller still needs the result, so set it here.
+		if (showInView)
+			Platform.runLater(() -> {
+				reportBlock.getViewTab().setText(getName());
+				reportBlock.setText(text);
+				reportBlock.getView().replaceText(text);
+			});
+		else
 			reportBlock.setText(text);
-			reportBlock.getView().replaceText(text);
-		});
 		reportBlock.updateShortDescription();
 	}
 

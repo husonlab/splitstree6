@@ -20,6 +20,7 @@
 package splitstree6.algorithms.trees.trees2report;
 
 import javafx.application.Platform;
+import jloda.fx.util.AService;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -106,25 +107,39 @@ abstract public class Trees2ReportBase extends Algorithm<TreesBlock, ReportBlock
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, ReportBlock reportBlock) throws CanceledException {
 		reportBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
 
-		Platform.runLater(() -> {
-			reportBlock.getViewTab().setText(getName());
-			reportBlock.getView().getUndoManager().clear();
-		});
+		// The view is optional. Guard it so that a report can be computed headless - from a
+		// tool, a test or a language binding - where there is no toolkit, no view tab and no
+		// workflow node. Same shape of fix as D-1 and D-8: JavaFX where a guard belongs.
+		var showInView = AService.isToolkitRunning() && reportBlock.getViewTab() != null && reportBlock.getView() != null;
 
-		var mainWindow = getNode().getOwner().getMainWindow();
+		if (showInView)
+			Platform.runLater(() -> {
+				reportBlock.getViewTab().setText(getName());
+				reportBlock.getView().getUndoManager().clear();
+			});
+
+		// The selected taxa are a GUI concept; headless there is no selection.
+		var mainWindow = (getNode() != null && getNode().getOwner() != null ? getNode().getOwner().getMainWindow() : null);
+		Collection<Taxon> selectedTaxa = (mainWindow != null ? mainWindow.getTaxonSelectionModel().getSelectedItems() : List.of());
 		if (getOptionApplyTo() == ApplyTo.OneTree && getOptionWhichTree() >= 1 && getOptionWhichTree() <= treesBlock.getNTrees()) {
 			var tree = treesBlock.getTree(getOptionWhichTree());
 			treesBlock = new TreesBlock();
 			treesBlock.getTrees().add(tree);
 		}
 
-		var text = runAnalysis(progress, taxaBlock, treesBlock, mainWindow.getTaxonSelectionModel().getSelectedItems());
+		var text = runAnalysis(progress, taxaBlock, treesBlock, selectedTaxa);
 
-		Platform.runLater(() -> {
-			reportBlock.getViewTab().setText(getName());
+		// setText mutates an ObservableList, so keep it on the FX thread whenever there is a
+		// view - that path is then exactly as it was. Headless there is no thread to wait
+		// for and no view to update, and the caller still needs the result, so set it here.
+		if (showInView)
+			Platform.runLater(() -> {
+				reportBlock.getViewTab().setText(getName());
+				reportBlock.setText(text);
+				reportBlock.getView().replaceText(text);
+			});
+		else
 			reportBlock.setText(text);
-			reportBlock.getView().replaceText(text);
-		});
 		reportBlock.updateShortDescription();
 	}
 

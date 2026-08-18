@@ -553,6 +553,17 @@ initialiser, in the same jloda class family, fixable the same way by making the 
 running algorithms from Python with deliberately mismatched natives; the computation was unaffected, which is
 itself the evidence.
 
+**D-9 — the report algorithms could not run outside the GUI. FIXED 2026-08-18.** All four report bases
+(`Splits2ReportBase`, `Distances2ReportBase`, `AnalyzeCharactersBase`, `Trees2ReportBase`) called
+`Platform.runLater` unconditionally, dereferenced `reportBlock.getViewTab()` and `getView()` without checking
+them, and read the selected taxa through `getNode().getOwner().getMainWindow()` with no null guard. So the 12
+report algorithms — `DeltaScore`, `PhiTest`, `PhylogeneticDiversity`, `ShapleyValues` and the rest — threw
+`Toolkit not initialized` when called from anywhere but a running application, which was measured before
+fixing. They now compute when there is no toolkit, no view tab and no workflow node, treating the selection as
+empty. **The GUI path is unchanged**: `setText` still happens inside `Platform.runLater` when a view exists,
+because it mutates an `ObservableList` (§5.3). This is the third instance of the same shape — see D-1 and
+D-8 — of JavaFX called where a guard belongs.
+
 **D-7 — there is no test suite at all.** Daniel: a plan is needed for generating unit tests of all features.
 Written: `ai/plans/2026-08-17_test-suite.md`. Its centrepiece is that D-1 makes the *workflow itself* unit-
 testable headless and synchronously, and that the catalogue scan of §4 lets one data-driven test exercise all
