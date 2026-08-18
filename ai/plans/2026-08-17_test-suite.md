@@ -9,7 +9,7 @@
 
 ## 1. Why now
 
-There is no `src/test`, no JUnit dependency, and no CI that compiles the code. Every claim about this codebase
+There is no `src/test`, no JUnit dependency, and no workflow that compiles the code on a push. Every claim about this codebase
 rests on a probe someone wrote by hand and threw away.
 
 Two things changed on 2026-08-17 that make a real suite cheap rather than expensive, and they are the reason
@@ -193,8 +193,10 @@ print the whole input in the failure message.
    *Verification: the D-3, D-4 and D-6 probes of 2026-08-17 become tests and pass.*
 6. **T5's `.stree6` round trip.** *Verification: all 177 options survive.*
 7. **T3, readers and writers.** *Verification: every file in `examples/` that some reader claims is read.*
-8. **The `examples/publications/` regression script**, and only then a CI hook that runs `mvn test` on push —
-   which the repository does not have at all today.
+8. **The `examples/publications/` regression script**, and only then a GitHub Actions workflow triggered
+   `on: push` that runs `mvn -o package` and `mvn test`. The repository has no push-triggered workflow at all
+   today: `deploy-docs.yml` fires only on changes under `docs/`, and the installer workflows in
+   `build-installers` are `workflow_dispatch`, i.e. started by hand to cut a release.
 
 ## 8. Risks and non-goals
 

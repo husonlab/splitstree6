@@ -1,8 +1,9 @@
 # 40 — Testing and verification
 
 How a change is shown to be correct. **There is no test suite in `splitstree6`** — no `src/test`, no JUnit
-dependency, no test runner, and no CI that compiles the code (the single GitHub workflow,
-`.github/workflows/deploy-docs.yml`, only rebuilds the Pages site when `docs/` changes). That is the honest
+dependency, no test runner, and nothing that checks a commit compiles (the single GitHub Actions workflow,
+`.github/workflows/deploy-docs.yml`, only rebuilds the Pages site when `docs/` changes; the installer
+workflows in `build-installers` are started by hand, not by a push). That is the honest
 starting point, and it means the burden of verification falls entirely on what you do by hand in the session.
 Everything below is about doing that well.
 

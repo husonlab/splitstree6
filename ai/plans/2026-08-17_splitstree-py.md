@@ -269,9 +269,9 @@ Also to bridge:
 - **Where the code lives: `husonlab/splitstree-py`, a separate repository** (§9.4). The cost of separation is
   drift, since the generator reads a built jar rather than the sources next to it. Manage it explicitly: the
   Python repo pins the SplitsTree version it generated against, exposes it as `st.splitstree_version`, and
-  regeneration lands as its own reviewable commit whose diff shows exactly what changed in the Java API. A CI
-  job that regenerates against the latest SplitsTree jar and fails on an unexpected diff is the cheap way to
-  notice a rename the day it happens.
+  regeneration lands as its own reviewable commit whose diff shows exactly what changed in the Java API. A
+  scheduled workflow that regenerates against the latest SplitsTree jar and fails on an unexpected diff is the
+  cheap way to notice a rename the day it happens.
 
 ## 9. Decisions — taken by Daniel, 2026-08-17
 
@@ -358,8 +358,12 @@ Each step ends in something runnable; nothing after step 1 starts until step 1's
    trips Python → Java → Python; a spot-check of ten algorithms against hand-written calls gives identical
    results.*
 6. **Docs, examples and packaging.** README, a Jupyter notebook reproducing one figure from
-   `examples/publications/`, wheel build, CI. *Verification: `pip install` into a clean environment on all
-   three platforms and run the notebook.*
+   `examples/publications/`, the wheel build, and a GitHub Actions workflow that installs and tests the wheel
+   on ubuntu/macos/windows. Note that **nothing here needs a build matrix**: a wheel bundling jars has nothing
+   to compile, so `python -m build` on one machine produces the artefact for every platform. The matrix is for
+   *running* the tests, where the platform differences are real and silent — the classpath separator is `;` on
+   Windows and `:` elsewhere, JVM discovery differs, and so do default encodings. *Verification: `pip install`
+   into a clean environment on all three platforms and run the notebook.*
 
 That is v1. Two follow-ons, both now decided in principle (§9.6, §9.2) but neither scoped:
 

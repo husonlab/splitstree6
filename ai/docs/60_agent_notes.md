@@ -142,8 +142,8 @@ Daniel asked for a documentation set mirroring the one adopted in `megan8/ai`, p
 with a planning document for a Python package. Six files in `ai/docs` and one plan were written from the code.
 
 **What was measured rather than assumed.** The single most consequential fact about this codebase is where its
-JavaFX dependency actually begins, because it decides what can be reused headless — by a server, by CI, by a
-language binding. It is stated in `20_logic.md` §6 as a table of probe results rather than as an opinion,
+JavaFX dependency actually begins, because it decides what can be reused headless — by a server, by an
+automated build, by a language binding. It is stated in `20_logic.md` §6 as a table of probe results rather than as an opinion,
 because it was easy to get wrong in both directions. Two probes, both compiled against `target/classes` plus
 `target/dependency` on the **plain classpath** (no module path):
 

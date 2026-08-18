@@ -43,9 +43,12 @@ and `60_agent_notes.md` all say the new truth.
 
 ## Priority 3 — infrastructure
 
-- [ ] **No CI compiles the code.** The only GitHub workflow rebuilds the Pages site when `docs/` changes.
-      A push-triggered `mvn -o package` would have caught more than any single test. Do this with step 8 of the
-      test plan.
+- [ ] **Nothing checks that a commit compiles.** The only GitHub Actions workflow in this repository,
+      `deploy-docs.yml`, rebuilds the Pages site when `docs/` changes. The installer workflows in
+      `build-installers` are `workflow_dispatch` — Daniel starts them by hand to cut a release — so nothing
+      runs on a push. A workflow triggered `on: push` that does no more than `mvn -o package` would catch a
+      commit that does not compile, which is the cheapest possible check and the one this repository lacks.
+      Do this with step 8 of the test plan.
 
 - [ ] **Stored baselines.** There is no recorded reference output for any dataset, so "did this change
       anything?" can only be answered within a single session. `examples/publications/` — datasets paired with
@@ -80,8 +83,8 @@ and `60_agent_notes.md` all say the new truth.
 - **The JavaFX boundary now sits at the views, not at the workflow.** Since 2026-08-17 a whole workflow
   computes headless and synchronously (`20_logic.md` §6). Code written before that date still assumes
   otherwise — `RunWorkflow` extends `Application` only to get a toolkit — so do not take an existing pattern
-  as evidence of a current constraint. Re-read §6 before answering any question about servers, bindings, CI or
-  headless use.
+  as evidence of a current constraint. Re-read §6 before answering any question about servers, bindings,
+  automated builds or headless use.
 - **Geometry is not GUI code, despite the imports.** `SplitNetworkLayout`, `ComputeTreeLayout` and
   `NetworkLayout` import `javafx.scene.*`, but each is a wrapper around a pure routine that fills a
   `NodeArray<Point2D>`. Do not conclude from a grep that a layout needs a toolkit; see `20_logic.md` §6.2a for
