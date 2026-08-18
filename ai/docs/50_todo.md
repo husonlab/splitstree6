@@ -77,6 +77,19 @@ and `60_agent_notes.md` all say the new truth.
       plain `Nexus` exporter writes a bare block that SplitsTree's own reader will not read back — correct for
       the GUI, which concatenates blocks, but a trap for anything writing standalone files.
 
+- [ ] **D-12: find what leaves `System.err` replaced.** Running the whole algorithm catalogue in sequence ends
+      with `System.err` pointing at a discarding stream; no single algorithm reproduces it and every
+      hide/restore call site looks correct. See `20_logic.md` §10 D-12. Low impact, but it is an unfinished
+      diagnosis rather than a closed question.
+
+- [ ] **Six algorithms cannot run outside a workflow.** `BootstrapSplits`, `BootstrapTreeSplits`,
+      `BootstrapTree` reach `getNode().getOwner()` to resample the original characters; `MedianJoining`,
+      `MinSpanningNetwork`, `MinSpanningTree` reach `getNode().getPreferredParent()`. So they need more than
+      their declared input, and calling them directly throws `NullPointerException`. That is a design fact, not
+      obviously a defect — but it means the declared `fromClass` understates what they consume, and it is worth
+      deciding whether they should take that input explicitly. Listed in `tests/test_algorithms.py` in
+      splitstree-py, where they are xfailed with reasons.
+
 - [ ] **D-8: make `ProgramProperties`'s font lazy** (jloda3). Its static initialiser calls
       `javafx.scene.text.Font.font(...)`, so constructing almost any algorithm tries to start a graphics
       pipeline. Caught and harmless, but it prints alarming `UnsatisfiedLinkError` noise when the natives do

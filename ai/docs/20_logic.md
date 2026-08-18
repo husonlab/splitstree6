@@ -564,6 +564,35 @@ empty. **The GUI path is unchanged**: `setText` still happens inside `Platform.r
 because it mutates an `ObservableList` (§5.3). This is the third instance of the same shape — see D-1 and
 D-8 — of JavaFX called where a guard belongs.
 
+**D-10 — `ProgressMover` kept the JVM alive for ever. FIXED 2026-08-18** (committed as `0cd6ff1b`).
+`splitstree6.utils.ProgressMover` animates a progress bar from a single-thread executor whose loop was
+`while (true) { try { Thread.sleep(...); ... } catch (Exception ignored) {} }`. `close()` calls
+`shutdownNow()`, which interrupts the worker — and the broad catch swallowed the `InterruptedException` and
+went round again, so the thread could not be stopped. Being non-daemon, it then held the whole JVM open. Its
+one caller, `ComputeHybridizationNetwork`, uses it correctly in a try-with-resources, so this was invisible in
+the application (which exits via `System.exit`) and fatal anywhere else: **running the Autumn algorithm from a
+tool or a binding meant the process never ended** — measured at over seven minutes before being killed, 0.46 s
+after the fix. The loop now exits on interrupt and the thread is a daemon.
+
+**D-11 — the shared executor's threads were non-daemon. FIXED 2026-08-18 in jloda3** (`b422ec3`).
+`ProgramExecutorService.getInstance()` returns `Executors.newCachedThreadPool()`, whose workers were
+non-daemon. A cached pool keeps idle workers for 60 seconds, so any process that had run a parallel algorithm
+— `AntiConsensusNetwork`, `ConsensusNetwork`, `ConsensusOutline` among them — sat idle for a full minute after
+finishing. Measured: a one-second consensus-network computation took **60.4 s** wall clock; 0.38 s after the
+fix. The desktop application never noticed because it exits through `System.exit`, and **the command-line tools
+call `System.exit` too, which is exactly what hid it.** Affects megan8, tegula and phylosketch2 as well, all of
+which gain the same improvement.
+
+**D-12 — something in the algorithm catalogue leaves `System.err` replaced, and it has not been isolated.**
+Running all 86 generated algorithms in sequence from Python leaves `System.err` pointing at a stream that
+discards: output reaches neither the console nor a capture buffer. `Basic.hideSystemErr()` correctly returns
+the stream it replaced, and every call site in splitstree6 and jloda3 restores in a `finally`, so the
+unbalanced one has not been found; and **no single algorithm reproduces it** — `AverageConsensus` was where a
+sweep first noticed, but running it alone, or its two constituent steps, or `AntiConsensusNetwork` before it,
+all leave the stream intact. Consequence for the GUI: none observed. Consequence for a binding: a capture of
+Java's stderr silently stops receiving. Worked around on the Python side, which re-installs its stream
+whenever it finds it has been replaced, so this is a diagnosis left unfinished rather than a live defect.
+
 **D-7 — there is no test suite at all.** Daniel: a plan is needed for generating unit tests of all features.
 Written: `ai/plans/2026-08-17_test-suite.md`. Its centrepiece is that D-1 makes the *workflow itself* unit-
 testable headless and synchronously, and that the catalogue scan of §4 lets one data-driven test exercise all
