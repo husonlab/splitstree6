@@ -37,13 +37,27 @@ public class ProgressMover implements AutoCloseable {
 	public ProgressMover(ProgressListener progress) throws CanceledException {
 		progress.setMaximum(20);
 		progress.setProgress(0);
-		executor = Executors.newSingleThreadExecutor();
+		// A daemon thread: animating a progress bar must never be a reason for the JVM to
+		// stay alive. Belt and braces alongside the interrupt handling below.
+		executor = Executors.newSingleThreadExecutor(runnable -> {
+			var thread = new Thread(runnable);
+			thread.setDaemon(true);
+			return thread;
+		});
 		executor.execute(() -> {
-			while (true) {
+			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					Thread.sleep(waitTime);
 					progress.incrementProgress();
 					waitTime = Math.round(1.5 * waitTime);
+				} catch (InterruptedException ex) {
+					// close() calls shutdownNow(), which interrupts us: that is the stop signal.
+					// Catching this with the broad clause below - as this loop used to - made the
+					// thread unstoppable, and being non-daemon it then kept the whole JVM alive.
+					// Invisible in the application, which exits via System.exit; fatal in a tool
+					// or a language binding, where running Autumn meant the process never ended.
+					Thread.currentThread().interrupt();
+					return;
 				} catch (Exception ignored) {
 				}
 			}
