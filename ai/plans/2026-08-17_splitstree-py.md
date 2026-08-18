@@ -388,10 +388,14 @@ Each step ends in something runnable; nothing after step 1 starts until step 1's
    ~19× faster than element-wise and bit-exact both ways, and a Python `ProgressListener` works at 0.06 µs per
    callback. The spike also turned up the JVM-architecture constraint and the no-JVM error message, both now
    in §8, and one conversion the block layer must own (`BitSet` → `frozenset` of labels).
-2. **The JVM bootstrap and the jar set.** `_jvm.py`, lazy start, `st.configure`, a clear error when no JVM is
-   found. *Verification: step 1's script runs unchanged on all three platforms.* The
-   platform-agnostic-wheel hypothesis is settled separately and earlier, by
-   `.github/workflows/portability-probe.yml`, which needs no Python at all.
+2. ~~**The JVM bootstrap and the jar set.**~~ **DONE 2026-08-17**, in `husonlab/splitstree-py` commit
+   `0f7d067`: `_jvm.py` (search order, version *and architecture* checking, lazy start), `errors.py`,
+   `configure()` raising after start, `tools/sync_jars.py`, `pyproject.toml`, 19 tests. Measured on macOS:
+   `st.start()` 217 ms end to end, neighbor-net from Python `nsplits=7 fit=100.0`, tests 0.3 s, and the wheel
+   builds **`py3-none-any`, 11.7 MB, with all seven jars inside** — which is the packaging half of the
+   one-wheel question answered. *Still to verify: that it runs on Linux and Windows*, which
+   `.github/workflows/portability-probe.yml` covers for the jars and a `pip install` will have to cover for
+   the Python.
 
    **Know what a clean runner does and does not prove.** GitHub's runners install a known-good JDK via
    `setup-java`, so they demonstrate that the code is portable and prove nothing whatever about the thing most

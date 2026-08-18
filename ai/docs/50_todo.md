@@ -14,7 +14,14 @@ and `60_agent_notes.md` all say the new truth.
 
 ## Priority 1 — decisions needed from Daniel
 
-- [ ] **`splitstree.py`: decide whether to start.** `ai/plans/2026-08-17_splitstree-py.md` is no longer
+- [ ] **`splitstree.py`: steps 3+ (the block layer).** `husonlab/splitstree-py` exists and steps 1 and 2 are
+      done — the spike measured everything the plan asked, and the JVM bootstrap is committed with 19 tests.
+      Next is the block layer: numpy conversion, zero-based indexing at the boundary, and `BitSet` →
+      `frozenset` of labels. Two decisions are worth taking before it grows: whether `quiet` should default
+      to True (it silences algorithm progress chatter on stderr, but also printed stack traces), and whether
+      the jars stay gitignored build artefacts or get committed for release builds.
+
+- [ ] ~~**`splitstree.py`: decide whether to start.**~~ Started. `ai/plans/2026-08-17_splitstree-py.md` is no longer
       blocked — Daniel answered all six questions in §9 (snake_case; report algorithms in; numpy required with
       the rest as extras; separate repo `husonlab/splitstree-py`, PyPI name `splitstree`; make `AService` lazy,
       done; report coordinates, probed and possible). Both risks the plan was carrying are now measured and
