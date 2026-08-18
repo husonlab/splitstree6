@@ -19,7 +19,8 @@ and `60_agent_notes.md` all say the new truth.
       the rest as extras; separate repo `husonlab/splitstree-py`, PyPI name `splitstree`; make `AService` lazy,
       done; report coordinates, probed and possible). Both risks the plan was carrying are now measured and
       closed: the workflow runs headless, and so do the layouts. The PyPI name `splitstree` is free (checked
-      2026-08-17). **Nothing is outstanding except the decision to start.**
+      2026-08-17). **Nothing is outstanding except the decision to start**, plus one build-shape question that
+      `.github/workflows/portability-probe.yml` answers on its own (see below).
 
 - [ ] **Read the test-suite plan.** `2026-08-17_test-suite.md` is still a proposal with no code written
       against it.
@@ -42,6 +43,13 @@ and `60_agent_notes.md` all say the new truth.
 ---
 
 ## Priority 3 — infrastructure
+
+- [ ] **Run the portability probe.** `.github/workflows/portability-probe.yml`, added 2026-08-17. It builds
+      once with the macOS JavaFX jars and runs them on ubuntu, windows and macos, which decides whether
+      `splitstree.py` ships one wheel or five. **It needs the jloda3 headless-workflow commit pushed first** —
+      the workflow checks jloda3 out from GitHub, and without that commit the "whole workflow, no toolkit"
+      check fails for a reason that has nothing to do with portability. Never run; the YAML and every command
+      in it were verified locally, but no Actions run has happened.
 
 - [ ] **Nothing checks that a commit compiles.** The only GitHub Actions workflow in this repository,
       `deploy-docs.yml`, rebuilds the Pages site when `docs/` changes. The installer workflows in

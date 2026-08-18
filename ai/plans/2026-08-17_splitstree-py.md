@@ -251,11 +251,15 @@ Also to bridge:
   obvious, and it costs nothing to hold. (Re-check at registration; a name can be claimed at any time.)
 - **Jars in the wheel**, under `splitstree/jars/`, discovered relative to `__file__`. 13 MB for the 7-jar set,
   which is unremarkable for a scientific wheel.
-- **Platform wheels, probably not needed.** `javafx-base` has no natives; `javafx-graphics`'s 7 native
-  libraries are never loaded because the toolkit never starts. So one wheel may serve every platform. **This
-  must be verified on Linux and Windows before it is relied on**; if it holds, consider stripping the natives
-  from the bundled `javafx-graphics` jar so the claim is enforced rather than hoped for. Fall back to five
-  platform wheels (`mac-aarch64`, `mac`, `linux`, `linux-aarch64`, `win`) if it does not.
+- **Platform wheels, probably not needed — and there is now a workflow that settles it.**  `javafx-base` has
+  no natives; `javafx-graphics`'s 7 native libraries are never loaded because the toolkit never starts. So one
+  `py3-none-any` wheel may serve every platform. `.github/workflows/portability-probe.yml` tests exactly that:
+  it builds once with `-Djavafx.platform=mac` and runs the resulting jars unchanged on ubuntu, windows and
+  macos. If it comes back ALL PASS, ship one wheel, and **strip the natives out of the bundled
+  `javafx-graphics` jar** so the claim is enforced rather than hoped for — a future code path that does touch
+  them then fails loudly instead of working on one platform only. If it does not, fall back to five platform
+  wheels (`mac-aarch64`, `mac`, `linux`, `linux-aarch64`, `win`), which are still all built on one machine
+  (§ above: there is nothing to compile).
 - **The JVM itself is not bundled.** Require a JDK/JRE ≥ 17 and let JPype find it via `JAVA_HOME`; document
   `conda install -c conda-forge openjdk` and `install-jdk` as the easy routes. Bundling a JVM per platform
   triples the wheel size and the maintenance. Give a clear, actionable error when no JVM is found — this will
