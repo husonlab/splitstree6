@@ -8,6 +8,73 @@ successes — they stop the next agent repeating them.
 
 ---
 
+## 2026-08-18/19 — splitstree.py built to step 5, and five defects it found
+
+Daniel asked for the Python package. Steps 1-5 of `ai/plans/2026-08-17_splitstree-py.md` are done and live in
+`husonlab/splitstree-py`: the JPype spike, the JVM bootstrap, the block layer, IO, and the generated algorithm
+surface. 412 tests, about 9 seconds. How to build and run it is in `30_tools.md`; what follows is what the work
+found out about SplitsTree, which is the part worth keeping.
+
+**Running the whole catalogue from outside the application is a good bug detector.** Nothing had ever
+constructed every algorithm and fed each one a canonical input. Doing so found, in one afternoon, the five
+things below - none of which is a Python problem, and all of which affect the Java side.
+
+- **D-9. The report algorithms could not run outside the GUI.** All four report bases called
+  `Platform.runLater` unconditionally and dereferenced `getViewTab()`. Fixed; the GUI path is byte-identical,
+  because `setText` mutates an `ObservableList` and stays on the FX thread whenever a view exists.
+- **D-10. `ProgressMover` kept the JVM alive for ever.** `while (true) { try { sleep } catch (Exception
+  ignored) {} }` on a non-daemon thread swallowed the interrupt from `shutdownNow()`. Running the Autumn
+  algorithm meant the process never exited: over seven minutes before I killed it, 0.46 s after.
+- **D-11. Every parallel algorithm cost 60 seconds at exit** (jloda3). `ProgramExecutorService` handed out a
+  cached pool with non-daemon workers, which linger 60 s when idle. Measured 60.4 s for a one-second consensus
+  network; 0.38 s after. **What hid both of these: the GUI and every command-line tool call `System.exit`.**
+- **`ExportManager` writes Nexus that its own reader rejects**, and leaks the prepend-taxa flag between writes.
+  Both in `50_todo.md`.
+- **The bootstrap support values were not reproducible**, even with `optionRandomSeed` set - see below.
+
+**Two jars were missing from what I had believed was the minimal set**, and both were found by running rather
+than reading: `javafx-controls`, because `NotificationManager` extends a JavaFX control and readers call it on
+their *warning* paths, so `NexmlReader` died with `NoClassDefFoundError`; and `commons-collections4`, for
+Autumn's `LRUMap`. Nine jars, 16 MB. The lesson generalises: the minimum dependency set cannot be derived from
+the imports of the happy path.
+
+**The bootstrap reproducibility bug is the one to remember.** `BootstrapSplits` aggregated into two shared maps
+with `map.put(k, map.getOrDefault(k, 0) + 1)` - a read-modify-write, not atomic - so increments were lost
+whenever two workers hit the same split. The same build, the same seed and the same data gave one split 90, 95
+and 100 percent support across three runs. Now `merge`, and five consecutive runs are byte-identical.
+
+I found it only because I needed a stable baseline to check a refactor against. My first before/after diff
+showed differences, and the honest next step was to ask whether the *unchanged* build was self-consistent. It
+was not. **When a before/after comparison differs, check that "before" is deterministic before concluding
+anything about the change** - that habit is the whole reason this was found, and it applies to every numeric
+change in this codebase.
+
+**The pattern behind five of these fixes.** `getNode()` is null for a data block that was never put in a
+workflow, so any algorithm reaching back through the workflow for context throws before computing anything.
+Daniel's construct, now applied five times: the old method does the workflow archaeology and delegates to a new
+one that takes the context explicitly. `MedianJoining` needed no new method at all - its base already had the
+characters and was asking the workflow to re-derive them. `MinSpanningNetwork` / `MinSpanningTree` /
+`ExternalDistance2Network` got `IUsesCharacters`. `RazorHaplotypeNetwork`, in the bridge repo, wanted the
+`AlignmentView`'s active sites rather than characters, so it takes a `BitSet`. `BootstrapSplits` wanted the
+alignment *and* the pipeline to replay, so it takes a `PathSupplier`. Four different kinds of extra context
+across five algorithms, which suggests the general statement is "an algorithm may need context beyond its
+declared input", not anything about characters specifically.
+
+**Still open**, all in `50_todo.md`: `BootstrapTreeSplits` and `BootstrapTree` (plan:
+`ai/plans/2026-08-19_bootstrapping.md`); D-8, the eager `Font.font()` in `ProgramProperties`; D-12, something
+in the catalogue leaves `System.err` replaced by a discarding stream and **I did not isolate it** - no single
+algorithm reproduces it and every hide/restore site looks correct, so the Python side re-installs its capture
+stream instead. That one is an unfinished diagnosis, not a closed question.
+
+**One thing I would tell the next session before it starts.** The docs in this directory were written on
+2026-08-17 from the code, and several of their central claims have since been *narrowed by measurement*: the
+JavaFX boundary moved from "the workflow needs a toolkit" to "only the views do", and the claim that the
+JavaFX natives are never loaded turned out to be false (they are loaded, they just fail harmlessly). Both were
+corrected in place. Treat a confident statement in `20_logic.md` as a hypothesis with a date on it, and re-run
+the probe rather than citing it.
+
+---
+
 ## 2026-08-19 (night) — protein ambiguity treated as missing, and the RNA code list completed
 
 The two items the previous entry left open, both on Daniel's instruction.

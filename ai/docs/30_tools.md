@@ -198,6 +198,78 @@ NexusWithTaxa.
 
 `docs/` holds the user manual (`manual.md` in the gh-pages branch, `manual.pdf` here) and its figures.
 
+## Working across the three repositories
+
+Since 2026-08-18 a change can span **jloda3 → splitstree6 → splitstree-py**, and each stage has to be rebuilt
+before the next one sees it. The full loop, in order:
+
+```bash
+cd ~/IdeaProjects/apps/jloda3 && mvn -o install -DskipTests -q
+```
+
+```bash
+cd ~/IdeaProjects/apps/splitstree6 && mvn -o package -q
+```
+
+```bash
+python3 ~/PycharmProjects/splitstree-py/tools/sync_jars.py ~/IdeaProjects/apps/splitstree6
+```
+
+Skipping the last step is the classic mistake: the Python package keeps running the **previous** jars, so a
+fix looks as though it did nothing. `sync_jars.py` prints the jar count and total size, which is the cheapest
+confirmation that it ran.
+
+`razornet-splitstree-bridge` is a fourth consumer, rebuilt with `mvn -o compile` in its own directory. It
+depends on the installed `SplitsTree` artifact, so `mvn -o package` here is not enough — splitstree6 must be
+`mvn -o install`ed for the bridge to see a change.
+
+## The Python package
+
+`husonlab/splitstree-py`, checked out at `~/PycharmProjects/splitstree-py`. It runs the SplitsTree algorithms
+in-process through JPype. `ai/plans/2026-08-17_splitstree-py.md` is the design; what follows is only how to run
+it.
+
+**The JVM's architecture must match the Python interpreter's**, because JPype loads it into the same process.
+This bites immediately on this machine: `python3` is arm64 and the `java` on `PATH` is an **x86_64 GraalVM 17**,
+so the default JVM cannot be used from Python at all — though it remains the right one for `mvn` and for
+plain `java` runs, which is what makes the mismatch confusing.
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 23 -a arm64)
+```
+
+Then, from the package directory:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
+```
+
+```bash
+SPLITSTREE_EXAMPLES=~/IdeaProjects/apps/splitstree6/examples .venv/bin/python -m pytest -q
+```
+
+412 tests, about 9 seconds. `$SPLITSTREE_EXAMPLES` is optional: without it the corpus sweep skips and
+everything else still runs, which is deliberate so a fresh clone is green.
+
+**Regenerate after changing any algorithm or option:**
+
+```bash
+.venv/bin/python tools/generate.py
+```
+
+`splitstree/algorithms.py` is generated from the jar and checked in, so **a renamed or retyped option shows up
+as a signature diff rather than as a bug report** — which is the whole point of generating it. It has happened
+already: an enum replaced by two booleans in `HammingDistance` surfaced exactly that way. The generator
+compiles its own output before installing it, and replaces an unparseable module with a placeholder so that it
+can always run again — necessary, because it imports the package it is regenerating.
+
+Two shell traps, both of which cost time here:
+
+- **`pip install -e "$R[dev]"` silently installs nothing in zsh**, because `$R[dev]` is array subscripting.
+  Write `"${R}[dev]"`.
+- **`git stash pop` runs in the current directory's repository.** With four checkouts in play, `cd` into the
+  right one first; a pop in the wrong repo reports "No stash entries found" and leaves the stash where it was.
+
 ## Profiling
 
 The heavy paths are neighbor-net's weight optimisation, the network layouts, and PhyloFusion's search. Java
