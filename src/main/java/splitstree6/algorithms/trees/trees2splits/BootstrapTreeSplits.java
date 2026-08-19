@@ -25,6 +25,8 @@ import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.trees.IToSingleTree;
 import splitstree6.algorithms.trees.trees2trees.BootstrapTree;
 import splitstree6.data.CharactersBlock;
+import splitstree6.algorithms.utils.BootstrappingUtils;
+import jloda.util.Pair;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -69,6 +71,35 @@ public class BootstrapTreeSplits extends Trees2Splits {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputTrees, SplitsBlock splitsBlock) throws IOException {
+		// Read the alignment and the pipeline out of the workflow, then hand both over, exactly as
+		// BootstrapSplits does. The tree-to-splits conversion below needs neither.
+		var workflow = (Workflow) taxaBlock.getNode().getOwner();
+		var workingDataNode = workflow.getWorkingDataNode();
+		var charactersBlock = (workingDataNode.getDataBlock() instanceof CharactersBlock characters ? characters : null);
+		var targetNode = inputTrees.getNode();
+
+		compute(progress, taxaBlock, inputTrees, splitsBlock, charactersBlock,
+				() -> {
+					var path = BootstrappingUtils.extractPath(workingDataNode, targetNode);
+					// the target is a trees node, so the pipeline needs a step that turns the replicate
+					// tree into splits; see BootstrapSplits for why this is built fresh per thread
+					path.add(new Pair<>(new TreeSelectorSplits(), new SplitsBlock()));
+					return path;
+				});
+	}
+
+	/**
+	 * bootstrap, using the given alignment and pipeline rather than looking for them in the workflow
+	 * <p>
+	 * See {@link BootstrapSplits#compute(ProgressListener, TaxaBlock, SplitsBlock, SplitsBlock, CharactersBlock,
+	 * BootstrapSplits.PathSupplier)} for what the two extra arguments mean and why the pipeline arrives as a
+	 * supplier. The pipeline must end in a step producing splits, since that is what this aggregates.
+	 *
+	 * @param charactersBlock the alignment to resample, or null to produce only the trivial splits
+	 * @param pathSupplier    supplies a fresh pipeline per worker thread
+	 */
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputTrees, SplitsBlock splitsBlock,
+						CharactersBlock charactersBlock, BootstrapSplits.PathSupplier pathSupplier) throws IOException {
 		setOptionReplicates(Math.max(1, optionReplicates.get()));
 
 		setShortDescription(String.format("bootstrapping using %d replicates", getOptionReplicates()));
@@ -90,16 +121,23 @@ public class BootstrapTreeSplits extends Trees2Splits {
 		bootstrapSplits.setOptionRandomSeed(getOptionRandomSeed());
 		bootstrapSplits.setOptionReplicates(getOptionReplicates());
 		bootstrapSplits.setOptionHighDimensionFilter(isOptionHighDimensionFilter());
-		bootstrapSplits.compute(progress, taxaBlock, inputSplits, inputTrees.getNode(), splitsBlock);
+		bootstrapSplits.compute(progress, taxaBlock, inputSplits, splitsBlock, charactersBlock, pathSupplier);
 	}
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
+		if (datablock.getNTrees() != 1)
+			return false;
+		// Answer false rather than throwing when there is no workflow. This used to dereference
+		// getNode() and getOwner() unguarded, so asking whether the algorithm applies threw a
+		// NullPointerException outside the application - and callers ask before every run.
 		var dataNode = datablock.getNode();
-		var workflow = (Workflow) dataNode.getOwner();
+		if (dataNode == null || !(dataNode.getOwner() instanceof Workflow workflow))
+			return false;
 		var preferredParent = dataNode.getPreferredParent();
-		var workingDataBlock = workflow.getWorkingDataNode().getDataBlock();
-		return datablock.getNTrees() == 1 && preferredParent != null && preferredParent.getAlgorithm() instanceof IToSingleTree && workingDataBlock instanceof CharactersBlock;
+		var workingDataNode = workflow.getWorkingDataNode();
+		return preferredParent != null && preferredParent.getAlgorithm() instanceof IToSingleTree
+			   && workingDataNode != null && workingDataNode.getDataBlock() instanceof CharactersBlock;
 	}
 
 	public int getOptionReplicates() {
