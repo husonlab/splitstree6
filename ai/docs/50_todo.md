@@ -89,26 +89,17 @@ and `60_agent_notes.md` all say the new truth.
       hide/restore call site looks correct. See `20_logic.md` §10 D-12. Low impact, but it is an unfinished
       diagnosis rather than a closed question.
 
-- [x] ~~**Finish the bootstrap separation.**~~ Done 2026-08-19, all three. Plan: `ai/plans/2026-08-19_bootstrapping.md`. `BootstrapSplits` is
-      done (`b995795c`); `BootstrapTreeSplits` is mechanical and `BootstrapTree` needs one small decision
-      (whether its `run` stays static). **Note the reproducibility fix in that commit**: support values were
-      not repeatable even with `optionRandomSeed` set, so any bootstrap baseline recorded before it is
-      worthless.
+- [x] ~~**The bootstrap separation.**~~ **Done 2026-08-19, all three** — `BootstrapSplits` `b995795c`,
+      `BootstrapTreeSplits` `f4e4e885`, `BootstrapTree` `0cd540cb`, plan
+      `ai/plans/2026-08-19_bootstrapping.md`. Each keeps its workflow entry point, which now reads the
+      alignment and the pipeline out of the workflow and delegates to a form taking both explicitly. **The
+      thing to remember from it:** `b995795c` also fixed a non-atomic aggregation that made support values
+      irreproducible even with `optionRandomSeed` set, so **any bootstrap baseline recorded before that commit
+      is worthless**.
 
-- [ ] ~~**The three bootstrap algorithms cannot run outside a workflow**~~, and unlike the others this is not
-      fixable by handing over one extra block. `BootstrapSplits`, `BootstrapTreeSplits` and `BootstrapTree`
-      need the original alignment **and** the chain of algorithms between it and their input —
-      `BootstrappingUtils.extractPath(workflow.getWorkingDataNode(), targetNode)` — so that each replicate can
-      be pushed through the same pipeline. Daniel's `IUsesCharacters` shape extends to this naturally if the
-      five-argument method takes the path as well as the characters, with the four-argument one deriving both
-      from the workflow exactly as now; that is the proposal, not yet implemented, and it touches subtle
-      numeric code so it wants a deliberate pass rather than a quick one. Xfailed with reasons in
-      `tests/test_algorithms.py` in splitstree-py.
-
-      *Resolved 2026-08-19 for the other three:* `MedianJoining` needed no API change at all (its base already
-      had the characters and was asking the workflow to re-derive them), and `MinSpanningNetwork` /
-      `MinSpanningTree` / `ExternalDistance2Network` now implement `IUsesCharacters` — see `splitstree6`
-      commit `f2ed09c2`.
+      Also resolved along the way: `MedianJoining`, `MinSpanningNetwork`, `MinSpanningTree` and
+      `ExternalDistance2Network` (`f2ed09c2`, via `IUsesCharacters`), and `RazorHaplotypeNetwork` in the bridge
+      repo (`4b37433`, via an explicit `BitSet` of active sites).
 
 - [ ] **D-8: make `ProgramProperties`'s font lazy** (jloda3). Its static initialiser calls
       `javafx.scene.text.Font.font(...)`, so constructing almost any algorithm tries to start a graphics
