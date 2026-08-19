@@ -174,25 +174,13 @@ public record NetworkDistancesAnalyzer() {
 	}
 
 	/**
-	 * Walk up the workflow to the nearest ancestor {@link DistancesBlock}, stepping through any intermediate
-	 * network-to-network algorithms (e.g. the Stretch Filter) so that a filtered network still reports its length
-	 * and distortion against the original input distances. Each step goes DataNode -&gt; its producing
-	 * AlgorithmNode -&gt; that algorithm's source DataNode. Returns null if there is no DistancesBlock ancestor.
+	 * The nearest ancestor {@link DistancesBlock} up the workflow, or null if there is none. Walks up rather than
+	 * taking exactly two hops, so a network produced by a network-to-network algorithm (e.g. the Stretch Filter),
+	 * whose grandparent block is another network, still reports its total length and its distortion measured
+	 * against the original input distances.
 	 */
 	private static DistancesBlock findAncestorDistancesBlock(NetworkBlock networkBlock) {
-		var dataNode = networkBlock.getNode();
-		for (var i = 0; dataNode != null && i < 100; i++) {
-			var algorithmNode = dataNode.getPreferredParent();
-			if (algorithmNode == null)
-				return null;
-			var sourceNode = algorithmNode.getPreferredParent();
-			if (sourceNode == null)
-				return null;
-			if (sourceNode.getDataBlock() instanceof DistancesBlock distancesBlock)
-				return distancesBlock;
-			dataNode = sourceNode;
-		}
-		return null;
+		return networkBlock.findAncestor(DistancesBlock.class);
 	}
 }
 

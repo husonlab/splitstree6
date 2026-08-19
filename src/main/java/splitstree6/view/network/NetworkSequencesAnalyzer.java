@@ -242,16 +242,34 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 		return diff;
 	}
 
+	/**
+	 * can we report on this network in terms of sequences? Requires both the characters the network was
+	 * computed from, somewhere up the workflow, and per-node sequences on the network itself.
+	 */
 	public static boolean isApplicable(NetworkBlock networkBlock) {
-		if (networkBlock.getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock)
-			return networkBlock.getNodeData(networkBlock.getGraph().getFirstNode()).containsKey(NetworkBlock.NODE_STATES_KEY);
-		else return false;
+		if (findAncestorCharactersBlock(networkBlock) == null)
+			return false;
+		var firstNode = networkBlock.getGraph().getFirstNode();
+		return firstNode != null && networkBlock.getNodeData(firstNode).containsKey(NetworkBlock.NODE_STATES_KEY);
 	}
 
 	public static CharactersBlock findCharactersBlock(NetworkBlock networkBlock) {
-		if (networkBlock.getNode().getPreferredParent().getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock)
-			return charactersBlock;
-		throw new IllegalArgumentException("Characters required");
+		var charactersBlock = findAncestorCharactersBlock(networkBlock);
+		if (charactersBlock == null)
+			throw new IllegalArgumentException("Characters required");
+		return charactersBlock;
+	}
+
+	/**
+	 * the characters the network was ultimately computed from, or null if there are none
+	 * <p>
+	 * Walks up the workflow rather than taking exactly two hops, so that a network produced by a
+	 * network-to-network algorithm (e.g. the Stretch Filter), whose grandparent block is another network
+	 * and not the characters, still reports its total length and excess. The per-node sequences that the
+	 * report is computed from survive such a filter, because {@link NetworkBlock#copy} copies node data.
+	 */
+	private static CharactersBlock findAncestorCharactersBlock(NetworkBlock networkBlock) {
+		return networkBlock.findAncestor(CharactersBlock.class);
 	}
 }
 
