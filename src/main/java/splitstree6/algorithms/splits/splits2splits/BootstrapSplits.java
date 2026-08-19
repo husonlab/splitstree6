@@ -94,13 +94,49 @@ public class BootstrapSplits extends Splits2Splits {
 	}
 
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputSplits, DataNode targetNode, SplitsBlock splitsBlock) throws IOException {
+		// Read the alignment and the pipeline out of the workflow, then hand both over. Everything
+		// below works from the arguments, so the computation itself needs no workflow and no node.
+		var workflow = (Workflow) taxaBlock.getNode().getOwner();
+		var workingDataNode = workflow.getWorkingDataNode();
+		var charactersBlock = (workingDataNode.getDataBlock() instanceof CharactersBlock characters ? characters : null);
+
+		// A supplier, not a list: each worker thread needs its OWN path. The data blocks in it are
+		// output buffers, and TreeSelectorSplits mutates its own optionWhich against the block it is
+		// given, so sharing one path across threads would have them writing over each other. The
+		// algorithms inside are deliberately shared, exactly as extractPath has always returned them:
+		// they carry the user's option settings, which a fresh instance would not.
+		compute(progress, taxaBlock, inputSplits, splitsBlock, charactersBlock,
+				() -> {
+					var path = BootstrappingUtils.extractPath(workingDataNode, targetNode);
+					if (targetNode.getDataBlock() instanceof TreesBlock)
+						path.add(new Pair<>(new TreeSelectorSplits(), new SplitsBlock()));
+					else
+						path.get(path.size() - 1).setSecond(new SplitsBlock());
+					return path;
+				});
+	}
+
+	/**
+	 * bootstrap, using the given alignment and pipeline rather than looking for them in the workflow
+	 * <p>
+	 * Bootstrapping needs more than its declared input: it resamples the ORIGINAL alignment and pushes
+	 * each replicate through the same chain of algorithms that produced the splits it was given. Inside
+	 * the application both come from the workflow; this form takes them directly, so a test, a tool or a
+	 * language binding can bootstrap without building one.
+	 *
+	 * @param charactersBlock the alignment to resample, or null to produce only the trivial splits
+	 * @param pathSupplier    supplies a FRESH pipeline each time it is called - once per worker thread.
+	 *                        Each is a list of (algorithm, output buffer) in the order they are applied,
+	 *                        ending in one that produces a SplitsBlock. The buffers must not be shared
+	 *                        between calls; the algorithms may be, and should be, so that they carry
+	 *                        their configured options.
+	 */
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputSplits, SplitsBlock splitsBlock,
+						CharactersBlock charactersBlock, PathSupplier pathSupplier) throws IOException {
 
 		setOptionReplicates(Math.max(1, optionReplicates.get()));
 
 		setShortDescription(String.format("bootstrapping using %d replicates", getOptionReplicates()));
-
-		// figure out the pipeline:
-		var workflow = (Workflow) taxaBlock.getNode().getOwner();
 
 		var splitCountMap = new ConcurrentHashMap<ASplit, Integer>();
 		var splitWeightMap = new ConcurrentHashMap<ASplit, Double>();
@@ -109,7 +145,7 @@ public class BootstrapSplits extends Splits2Splits {
 			splitCountMap.put(new ASplit(split), 0);
 		}
 
-		if (workflow.getWorkingDataNode().getDataBlock() instanceof CharactersBlock charactersBlock) {
+		if (charactersBlock != null) {
 			if (charactersBlock.isDiploid())
 				throw new IOException("Bootstrapping not implemented for diploid data, if you need this, please contact the authors!");
 
@@ -133,21 +169,22 @@ public class BootstrapSplits extends Splits2Splits {
 
 					service.execute(() -> {
 						try {
-							var path = BootstrappingUtils.extractPath(workflow.getWorkingDataNode(), targetNode);
+							var path = pathSupplier.get();
 							if (thread == 0)
 								System.err.println("Bootstrap workflow: " + BootstrappingUtils.toString(charactersBlock, path));
 
-							if (targetNode.getDataBlock() instanceof TreesBlock) {
-								path.add(new Pair<>(new TreeSelectorSplits(), new SplitsBlock()));
-							} else
-								path.get(path.size() - 1).setSecond(new SplitsBlock());
-
 							for (var r = thread; r < getOptionReplicates(); r += numberOfThreads) {
-								var replicateSplits = (SplitsBlock) run(new ProgressSilent(), workflow.getWorkingTaxaBlock(), BootstrappingUtils.createReplicate(charactersBlock, new Random(seeds[r])), path);
+								var replicateSplits = (SplitsBlock) run(new ProgressSilent(), taxaBlock, BootstrappingUtils.createReplicate(charactersBlock, new Random(seeds[r])), path);
 								for (var split : replicateSplits.getSplits()) {
 									if (isOptionShowAllSplits() || splitCountMap.containsKey(split)) {
-										splitCountMap.put(split, splitCountMap.getOrDefault(split, 0) + 1);
-										splitWeightMap.put(split, splitWeightMap.getOrDefault(split, 0.0) + split.getWeight());
+										// merge, not get-then-put: the maps are shared by every worker thread,
+										// and a read-modify-write across them loses increments whenever two
+										// land on the same split at once. That made the support values
+										// irreproducible even with optionRandomSeed set - measured at 90, 95
+										// and 100 percent for the same split across three runs of the same
+										// build and the same seed.
+										splitCountMap.merge(split, 1, Integer::sum);
+										splitWeightMap.merge(split, split.getWeight(), Double::sum);
 									}
 								}
 								if (thread == 0)
@@ -286,6 +323,14 @@ public class BootstrapSplits extends Splits2Splits {
 	 * @return the final datablock that is computed
 	 * @throws IOException
 	 */
+	/**
+	 * supplies a fresh pipeline per worker thread; separate from Supplier because extractPath throws
+	 */
+	@FunctionalInterface
+	public interface PathSupplier {
+		ArrayList<Pair<Algorithm, DataBlock>> get() throws IOException;
+	}
+
 	public static DataBlock run(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, Collection<Pair<Algorithm, DataBlock>> path) throws IOException {
 		DataBlock inputData = characters;
 		for (var pair : path) {
