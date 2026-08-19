@@ -1,6 +1,12 @@
 # Plan — bootstrapping: finish separating the computation from the workflow
 
-**Status:** proposed. One third of the work is done and committed (`b995795c`); this covers the rest.
+**Status:** DONE, 2026-08-19. `BootstrapSplits` `b995795c`, `BootstrapTreeSplits` `f4e4e885`, `BootstrapTree`
+`0cd540cb`. All three now read the alignment and the pipeline out of the workflow in their old entry point and
+delegate to a form taking both explicitly; each was checked by requiring the workflow route to produce output
+identical to before, and by running the same computation with no workflow at all and requiring the same answer.
+`run` stayed static in `BootstrapTree`, per Daniel. The rest of this document is kept as the record of why the
+shape is what it is — §2 in particular, which explains why the pipeline is a supplier and why the algorithms
+inside it are shared.
 **Raised by:** Daniel, 2026-08-19, after the same construct was applied to the simpler cases in `f2ed09c2`.
 **Related:** `ai/docs/20_logic.md` §3 and §10, `ai/docs/50_todo.md`, `ai/plans/2026-08-17_splitstree-py.md`.
 

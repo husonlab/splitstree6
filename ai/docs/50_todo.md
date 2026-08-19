@@ -89,7 +89,7 @@ and `60_agent_notes.md` all say the new truth.
       hide/restore call site looks correct. See `20_logic.md` §10 D-12. Low impact, but it is an unfinished
       diagnosis rather than a closed question.
 
-- [ ] **Finish the bootstrap separation.** Plan: `ai/plans/2026-08-19_bootstrapping.md`. `BootstrapSplits` is
+- [x] ~~**Finish the bootstrap separation.**~~ Done 2026-08-19, all three. Plan: `ai/plans/2026-08-19_bootstrapping.md`. `BootstrapSplits` is
       done (`b995795c`); `BootstrapTreeSplits` is mechanical and `BootstrapTree` needs one small decision
       (whether its `run` stays static). **Note the reproducibility fix in that commit**: support values were
       not repeatable even with `optionRandomSeed` set, so any bootstrap baseline recorded before it is
