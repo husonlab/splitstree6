@@ -1,6 +1,6 @@
 # 50 — Current tasks, open questions and concerns
 
-Last updated: **2026-08-17**. Branch `main`.
+Last updated: **2026-08-19**. Branch `main`.
 
 ## Standing task — always
 
@@ -20,6 +20,13 @@ and `60_agent_notes.md` all say the new truth.
       `quiet` defaults to **true**, capturing Java's stderr into a buffer `java_messages()` returns rather
       than discarding it — Daniel's reasoning being that Java users do not see that output either unless they
       open the message window; and the jars **stay gitignored**, synced by `tools/sync_jars.py`.
+
+- [ ] **Confirm the `HammingDistance.optionMatchAmbiguityCodes` default** (raised 2026-08-19). The rewrite
+      replaced the `AmbiguousOptions` enum with two booleans and had to pick a default for the ambiguity flag,
+      which Daniel did not specify. It is **true**, on the grounds that this preserves the old `Ignore`
+      default's *behaviour* — an ambiguous site produced no difference then and produces none now — whereas
+      false would silently start counting Y against C as a difference in every existing nucleotide dataset.
+      One word to flip if that reasoning is not what is wanted. See `60_agent_notes.md`, 2026-08-19.
 
 - [ ] **Let more Java exceptions propagate instead of being printed** (SplitsTree-side, raised 2026-08-18).
       With `quiet` on, anything jloda `Basic.caught`s and prints goes into the capture buffer rather than to a
@@ -82,13 +89,20 @@ and `60_agent_notes.md` all say the new truth.
       hide/restore call site looks correct. See `20_logic.md` §10 D-12. Low impact, but it is an unfinished
       diagnosis rather than a closed question.
 
-- [ ] **Six algorithms cannot run outside a workflow.** `BootstrapSplits`, `BootstrapTreeSplits`,
-      `BootstrapTree` reach `getNode().getOwner()` to resample the original characters; `MedianJoining`,
-      `MinSpanningNetwork`, `MinSpanningTree` reach `getNode().getPreferredParent()`. So they need more than
-      their declared input, and calling them directly throws `NullPointerException`. That is a design fact, not
-      obviously a defect — but it means the declared `fromClass` understates what they consume, and it is worth
-      deciding whether they should take that input explicitly. Listed in `tests/test_algorithms.py` in
-      splitstree-py, where they are xfailed with reasons.
+- [ ] **The three bootstrap algorithms cannot run outside a workflow**, and unlike the others this is not
+      fixable by handing over one extra block. `BootstrapSplits`, `BootstrapTreeSplits` and `BootstrapTree`
+      need the original alignment **and** the chain of algorithms between it and their input —
+      `BootstrappingUtils.extractPath(workflow.getWorkingDataNode(), targetNode)` — so that each replicate can
+      be pushed through the same pipeline. Daniel's `IUsesCharacters` shape extends to this naturally if the
+      five-argument method takes the path as well as the characters, with the four-argument one deriving both
+      from the workflow exactly as now; that is the proposal, not yet implemented, and it touches subtle
+      numeric code so it wants a deliberate pass rather than a quick one. Xfailed with reasons in
+      `tests/test_algorithms.py` in splitstree-py.
+
+      *Resolved 2026-08-19 for the other three:* `MedianJoining` needed no API change at all (its base already
+      had the characters and was asking the workflow to re-derive them), and `MinSpanningNetwork` /
+      `MinSpanningTree` / `ExternalDistance2Network` now implement `IUsesCharacters` — see `splitstree6`
+      commit `f2ed09c2`.
 
 - [ ] **D-8: make `ProgramProperties`'s font lazy** (jloda3). Its static initialiser calls
       `javafx.scene.text.Font.font(...)`, so constructing almost any algorithm tries to start a graphics
@@ -147,6 +161,15 @@ and `60_agent_notes.md` all say the new truth.
 - **Option defaults are a published interface.** They are what a user gets when they have not saved an explicit
   value, and they are what an old `.stree6` file falls back to when an option has been renamed — silently, with
   only a warning. Changing one changes everybody's answers.
+- **`PairwiseCompare.getNumNotMissing()` does not mean what a caller would assume.** Its own javadoc admits
+  "not completely accurate really": it counts a site whenever neither character is the gap or the missing
+  character, including sites that `getF()` then excluded, so any caller multiplying a proportion by it
+  overcounts wherever ambiguity codes occur. That is exactly the defect that made `HammingDistance` wrong. No
+  current caller does that multiplication, so it was left alone rather than changed blind — but it is a trap
+  for the next one. The NaN half of this entry was fixed on 2026-08-19; see `60_agent_notes.md`.
+- **A non-finite distance is now caught centrally, but do not rely on it.** `FixUndefinedDistances` treats any
+  NaN or infinity as undefined, not just `-1`. Guard divisions at source anyway: a NaN reaching `LogDet` makes
+  `jama`'s eigenvalue decomposition spin forever, and the algorithm hangs rather than returning a bad number.
 - **Two taxa blocks, two data blocks.** An algorithm that reaches for `workflow.getInputTaxaBlock()` instead of
   the taxa block it was handed will be wrong exactly when a taxon is deselected — which is to say, in the case
   nobody tests.
@@ -178,6 +201,19 @@ and `60_agent_notes.md` all say the new truth.
   registered in the data-node map, so a deleted title is actually freed; an empty input is reported instead of
   swallowed; the source node was found to be load-bearing and is now documented rather than removed. All
   verified against a `RunWorkflow` regression that came out byte-identical.
+- 2026-08-19 — **Four divisions by zero fixed**, in `PairwiseCompare` (`getF`, `mlDistance`, `bulmerVariance`)
+  and `GeneSharingDistance`, plus `FixUndefinedDistances` now treating any non-finite entry as undefined. The
+  NaN these produced was not merely a bad number: it made `LogDet` hang forever inside `jama`'s eigenvalue
+  decomposition, and it silently turned every undefined entry of the same matrix into NaN as well. It reached
+  shipped data — 35 non-finite Gene Sharing entries on `dolphins_binary.nex`, now 0. Everything else
+  unchanged over three alignments. Details in `60_agent_notes.md`.
+- 2026-08-19 — **`HammingDistance` (and so `PDistance`) rewritten.** It was not computing a Hamming distance:
+  the unnormalized branch rescaled a proportion by a mismatched site count, and the `MatchStates` branch
+  charged a fractional cost for compatible codes, ignored `optionNormalize` and dropped all RNA. It now counts
+  the sites at which two sequences differ, leaving out gap, missing and whole-alphabet codes (`n`, `x`), with
+  `optionMatchAmbiguityCodes` (default true) and `optionMatchGapToGap` (default false) replacing the
+  `AmbiguousOptions` enum. Verified against an independent implementation over 8 option combinations on three
+  alignments, 0 mismatches; unchanged on data without codes. Details and numbers in `60_agent_notes.md`.
 - 2026-08-17 — `ai/docs` written (this file set), following the structure adopted in `megan8/ai`; `ai/plans`
   established, with the `splitstree.py` and test-suite plans as its entries. The JavaFX boundary was
   **measured**, not assumed: see `60_agent_notes.md`.
