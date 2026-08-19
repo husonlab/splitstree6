@@ -21,6 +21,17 @@ and `60_agent_notes.md` all say the new truth.
       than discarding it — Daniel's reasoning being that Java users do not see that output either unless they
       open the message window; and the jars **stay gitignored**, synced by `tools/sync_jars.py`.
 
+- [ ] **`numStates` counts the ambiguity codes as states, and it breaks LogDet** (found 2026-08-19, not
+      fixed). `CharactersType.DNAwithAmbiguityCodes` has symbols `acgtryswkmbdhvn` — the four bases and all
+      eleven codes — so `PairwiseCompare.getNumStates()` is 15. But the codes are expanded into bases before
+      they reach `fCount`, so those eleven rows and columns are always zero and `F` is singular by
+      construction. **`LogDet` on `examples/large_DNA_phyml/nucleic_M2573_346x897_2006.phy` returns the
+      replaced value 1.0 for all 59 685 pairs**; on `primates.nex`, typed plain `DNA`, it works and gives a
+      mean of 0.2996. `RNAwithAmbiguityCodes` (`acgury`) has 2 dead states out of 6. This is long-standing,
+      not a regression. The question for Daniel is whether `getSymbols()` for these types should report only
+      the bases — which touches parsing, `guessType`, the state labelers and the colouring — or whether the
+      model-based algorithms should ask for the base alphabet some other way. See `60_agent_notes.md`.
+
 - [ ] **Confirm the `HammingDistance.optionMatchAmbiguityCodes` default** (raised 2026-08-19). The rewrite
       replaced the `AmbiguousOptions` enum with two booleans and had to pick a default for the ambiguity flag,
       which Daniel did not specify. It is **true**, on the grounds that this preserves the old `Ignore`
@@ -89,7 +100,13 @@ and `60_agent_notes.md` all say the new truth.
       hide/restore call site looks correct. See `20_logic.md` §10 D-12. Low impact, but it is an unfinished
       diagnosis rather than a closed question.
 
-- [ ] **The three bootstrap algorithms cannot run outside a workflow**, and unlike the others this is not
+- [ ] **Finish the bootstrap separation.** Plan: `ai/plans/2026-08-19_bootstrapping.md`. `BootstrapSplits` is
+      done (`b995795c`); `BootstrapTreeSplits` is mechanical and `BootstrapTree` needs one small decision
+      (whether its `run` stays static). **Note the reproducibility fix in that commit**: support values were
+      not repeatable even with `optionRandomSeed` set, so any bootstrap baseline recorded before it is
+      worthless.
+
+- [ ] ~~**The three bootstrap algorithms cannot run outside a workflow**~~, and unlike the others this is not
       fixable by handing over one extra block. `BootstrapSplits`, `BootstrapTreeSplits` and `BootstrapTree`
       need the original alignment **and** the chain of algorithms between it and their input —
       `BootstrappingUtils.extractPath(workflow.getWorkingDataNode(), targetNode)` — so that each replicate can
@@ -161,12 +178,18 @@ and `60_agent_notes.md` all say the new truth.
 - **Option defaults are a published interface.** They are what a user gets when they have not saved an explicit
   value, and they are what an old `.stree6` file falls back to when an option has been renamed — silently, with
   only a warning. Changing one changes everybody's answers.
-- **`PairwiseCompare.getNumNotMissing()` does not mean what a caller would assume.** Its own javadoc admits
-  "not completely accurate really": it counts a site whenever neither character is the gap or the missing
-  character, including sites that `getF()` then excluded, so any caller multiplying a proportion by it
-  overcounts wherever ambiguity codes occur. That is exactly the defect that made `HammingDistance` wrong. No
-  current caller does that multiplication, so it was left alone rather than changed blind — but it is a trap
-  for the next one. The NaN half of this entry was fixed on 2026-08-19; see `60_agent_notes.md`.
+- **`PairwiseCompare.getNumNotMissing()` now counts exactly the sites `getF()` normalises over**, fixed
+  2026-08-19. With unit character weights it equals the sum of the states-by-states block of `fCount`, so
+  `proportion * getNumNotMissing()` is a valid count of sites — it was not before, and that is what made
+  `HammingDistance` wrong. Keep the invariant if you touch `calculatePairwiseCompare`: the site is counted
+  where the mass is added, not where the characters are read.
+- **The ambiguity codes are written in terms of DNA.** `AmbiguityCodes.getNucleotides` expands `y` to `"ct"`,
+  which is wrong for RNA. Use the `getNucleotides(code, alphabet)` overload, which maps `t` onto `u` for an
+  alphabet that has `u` and no `t`; `HammingDistance` folds the other way, `u` onto `t`, because its bitmask
+  is indexed over `acgt`. Getting this wrong used to make every RNA sequence containing a code unusable.
+- **`PairwiseCompare` still throws `ArrayIndexOutOfBoundsException`** rather than reporting, when an algorithm
+  meets a data type it does not accept (`ProteinMLDistance` on DNA). Only reachable from code; the GUI gates
+  on `isApplicable`.
 - **A non-finite distance is now caught centrally, but do not rely on it.** `FixUndefinedDistances` treats any
   NaN or infinity as undefined, not just `-1`. Guard divisions at source anyway: a NaN reaching `LogDet` makes
   `jama`'s eigenvalue decomposition spin forever, and the algorithm hangs rather than returning a bad number.
@@ -201,6 +224,16 @@ and `60_agent_notes.md` all say the new truth.
   registered in the data-node map, so a deleted title is actually freed; an empty input is reported instead of
   swallowed; the source node was found to be load-bearing and is now documented rather than removed. All
   verified against a `RunWorkflow` regression that came out byte-identical.
+- 2026-08-19 — **RNA with ambiguity codes made to work.** `AmbiguityCodes` expands codes to DNA bases, so `y`
+  in RNA data gave `t`, which is not one of RNA's symbols: `PairwiseCompare` either indexed `fCount[-1][-1]`
+  or reported `invalid character 't'` for a character not in the data, making every such sequence unusable.
+  New `AmbiguityCodes.getNucleotides(code, alphabet)` overload holds the fold; RNA now returns exactly the
+  numbers equivalent DNA returns. Details in `60_agent_notes.md`.
+- 2026-08-19 — **`PairwiseCompare.getNumNotMissing()` redefined to agree with `getF()`**: it counts the sites
+  that reach the states-by-states block of `fCount`, not every site whose characters were neither gap nor
+  missing. On the phyml alignment the two disagreed for 1098 of 1770 pairs, worst case by 43 sites, and the
+  old `HammingDistance` formula `round(p * numNotMissing)` was wrong for 402 of them; both are now 0. No
+  current algorithm's numbers change — the method has no callers outside the class.
 - 2026-08-19 — **Four divisions by zero fixed**, in `PairwiseCompare` (`getF`, `mlDistance`, `bulmerVariance`)
   and `GeneSharingDistance`, plus `FixUndefinedDistances` now treating any non-finite entry as undefined. The
   NaN these produced was not merely a bad number: it made `LogDet` hang forever inside `jama`'s eigenvalue

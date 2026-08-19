@@ -293,3 +293,4 @@ covers; there is no plan for ordinary fixes.
 |---|---|
 | `2026-08-17_splitstree-py.md` | **`splitstree.py`** — exposing the SplitsTree algorithms as a Python package. Proposed, awaiting Daniel's answers to its §9. |
 | `2026-08-17_test-suite.md` | **Unit tests for all features** — tiered, mostly data-driven from the algorithm catalogue. Proposed, awaiting review. |
+| `2026-08-19_bootstrapping.md` | **Bootstrapping** — finishing the separation of the computation from the workflow. One of three done; proposed. |

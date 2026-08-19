@@ -8,6 +8,184 @@ successes — they stop the next agent repeating them.
 
 ---
 
+## 2026-08-19 (later) — PairwiseCompare: a hang, a miscount, and RNA that never worked
+
+Follow-up to the entry below, at Daniel's request. Three divisions by zero in `PairwiseCompare`, one in
+`GeneSharingDistance`, a safety net in `FixUndefinedDistances`, `getNumNotMissing()` redefined to agree with
+`getF()`, and RNA-with-ambiguity-codes made to work at all.
+
+**Why it mattered more than it looked.** The write-up below called this "a NaN passes into the matrix". Running
+it says worse. Building a pair whose comparable sites all carry character weight 0 — so `fCount` stays empty
+while `numNotMissing` is positive — and feeding it to each of the seven algorithms that still use
+`PairwiseCompare`:
+
+- `NeiLiRestrictionDistance` and `UpholtRestrictionDistance` put a **NaN** straight into the distance matrix;
+- `LogDet` **hangs**. `Matrix.eig` on a NaN matrix never converges in `jama.EigenvalueDecomposition.hqr2`,
+  which has no iteration cap. 24 s of CPU and still spinning when the thread dump was taken. Inside an
+  `AService` that is a frozen computation, not a wrong answer;
+- `JaccardDistance`, `DiceDistance` and `GeneSharingDistance` happened to escape, because `NaN > 0.0` is false
+  and their guards therefore fell through to the `-1` path. Luck, not design.
+
+**And it fires on shipped data.** Running the seven algorithms over `primates.nex`, `dolphins_binary.nex` and
+the 346-taxon phyml alignment, exactly one number moved: **Gene Sharing Distance on
+`examples/programs/splitstree4/dolphins_binary.nex` had 35 non-finite entries**, now 0. That NaN is not from
+`PairwiseCompare` at all — it is `GeneSharingDistance`'s own, and it was found only because the safety net
+caught it.
+
+**The four fixes.**
+
+- `PairwiseCompare.getF()` returns null (the class's existing "undefined" signal) when `Fsum <= 0`, instead of
+  filling the matrix with `0.0/0.0`. Testing `numNotMissing > 0` was never sufficient: that counts a site
+  whenever neither character is gap or missing, while `fCount` only receives sites that actually contributed —
+  not sites skipped as ambiguous, and not sites of weight 0. All six `getF()` callers already null-check and
+  fall back to `-1`, so this widens an existing path rather than adding one.
+- `PairwiseCompare.mlDistance()` returns `-1` when the copied sub-matrix sums to 0, which the rescale
+  `F[i][j] /= k` would otherwise turn entirely into NaN. Both callers already initialise `dist = -1.0` and
+  only overwrite on success, matching the `if (fullF == null) return -1;` already above it.
+- `PairwiseCompare.bulmerVariance()` guards `getNumNotMissing() == 0`. Currently uncalled, but it was a
+  division by zero waiting for its first caller.
+- `GeneSharingDistance` guards the divisor rather than `2a+b+c`. The two are not the same: `2a+b+c` is positive
+  whenever either taxon has a gene, but `min(a+b, a+c)` is 0 as soon as `a` is 0 and one of `b`, `c` is 0.
+
+**And the net.** `FixUndefinedDistances` tested `== -1` only, so any non-finite value from anywhere went
+through untouched — and worse, a single NaN destroyed the replacement value it computes, `Math.max(x, NaN)`
+being NaN, so `Math.log10` of it made `largeValue` NaN as well and *every* undefined entry in that matrix came
+out NaN. It now treats any non-finite entry as undefined via a small `isUndefined` helper.
+
+**Verification.** With the fixes, all seven algorithms return finite values on the weight-0 input, `LogDet`
+completes instead of hanging, and an NaN injected directly into a matrix is replaced (3.0) while the finite
+entries are left alone (2.0). On real data the regression over three alignments is byte-identical to before
+apart from the 35 Gene Sharing entries. Fixing `GeneSharingDistance` at source produced numbers identical to
+letting the net catch it, which is the expected result and the reason both were done. The whole of
+`src/main/java` compiles, and the Hamming checks from the entry below still pass unchanged: 23 hand-computed
+cases, and 0 mismatches against the independent implementation over all 8 option combinations.
+
+**`getNumNotMissing()` fixed too**, on Daniel's instruction, in the same pass. It now counts exactly the sites
+that reach the states-by-states block of `fCount` — the only part `getF()` sums over — instead of every site
+whose two characters happened to be neither gap nor missing. The increment moved from the top of the site loop
+to the places where the mass is actually added, guarded by `stateX < numStates && stateY < numStates` so that
+a site whose weight lands in the gap or missing row is not counted. `getF()` correspondingly dropped its
+`numNotMissing > 0` gate and now guards on `Fsum` alone, so it depends only on `fCount`.
+
+The invariant this establishes is worth stating, because it is what "matches `getF()`" means and it is
+directly checkable: **with unit character weights, every compared site adds exactly 1 to the states block, so
+`getNumNotMissing()` equals that block's sum.** Measured over the first 60 taxa of the 346-taxon phyml
+alignment, 1770 pairs, with `isIgnoreAmbiguous` on:
+
+| | numNotMissing != Fsum | `round(p * numNotMissing)` wrong |
+|---|---|---|
+| before | 1098 of 1770 pairs, worst case off by 43 sites | 402 of 1770 |
+| after | 0 | 0 |
+
+That second column is the old `HammingDistance` formula, checked against an independent count of differing
+sites: it was giving the wrong answer for 23 % of pairs, and now gives the right one for all of them. With
+`isIgnoreAmbiguous` off — which is what all eight remaining callers use — the invariant already held, and on
+`primates.nex` (no ambiguity codes) both versions were already exact. That is why the change moves no current
+algorithm's numbers: the regression over `primates.nex`, `dolphins_binary.nex` and the phyml alignment is
+byte-identical to the run before it. `getNumNotMissing()` has no callers outside this class.
+
+**RNA with ambiguity codes now works at all**, fixed in the same pass. It did not before: `AmbiguityCodes`
+expands the codes to DNA bases, so in RNA data `y` became `"ct"`, and `states.indexOf('t')` is -1 against RNA's
+`acgu`. The `si.equals(sj)` branch then indexed `fCount[-1][-1]` — an `ArrayIndexOutOfBoundsException` — and
+the other branch threw `SplitsException: invalid character 't'`, naming a character that does not occur
+anywhere in the data. Every RNA sequence carrying a code was unusable by any algorithm built on this class.
+
+The fold now lives in one place, a new `AmbiguityCodes.getNucleotides(char code, String alphabet)` that maps
+the expansion's `t` onto `u` when the alphabet has `u` and no `t`; `PairwiseCompare` passes the block's own
+symbols. The `si.equals(sj)` branch also got the `statei >= 0` check its two neighbours already had, so a code
+genuinely outside the alphabet now throws a `SplitsException` naming the code, the base it expanded to and the
+alphabet, instead of an index error. `HammingDistance` keeps its own mask table, which folds `u` onto `t`
+because its bitmask is indexed over `acgt`; same fact, opposite direction, and it is separately verified.
+
+The check that this is right: RNA `y/c` now returns exactly the numbers the equivalent DNA `y/c` returns
+(`1 - sum F[x][x] = 0.1000`, LogDet `0.0849`), which is what must happen when `u` and `t` are the same base.
+DNA is untouched, and a code against an alphabet that really lacks it (`y` against `Standard`'s `01`) still
+throws, as it should.
+
+**A separate defect this uncovered, not fixed — needs Daniel.** `CharactersType.DNAwithAmbiguityCodes` has
+symbols `acgtryswkmbdhvn`: the four bases **and all eleven codes**. `numStates` is therefore 15, so `fCount`
+carries 15 states while `PairwiseCompare` expands every code into bases — the eleven code rows and columns can
+never receive any mass. `F` is singular by construction, and every algorithm that reads `getNumStates()` gets
+a matrix that cannot be inverted or log-determined. Measured: **`LogDet` on the 346-taxon
+`nucleic_M2573_346x897_2006.phy`, which is typed `DNAwithAmbiguityCodes`, returns the replaced value 1.0 for
+every one of its 59 685 pairs** — the whole matrix is undefined. On `primates.nex`, typed plain `DNA` with
+`numStates` 4, the same algorithm gives a mean of 0.2996 and works. `RNAwithAmbiguityCodes` (`acgury`, 6
+states, 2 of them dead) has the same shape of problem. This is pre-existing and unchanged by anything here —
+both the before and after regression runs show 1.0 — but it means LogDet and the nucleotide models are
+effectively broken on any alignment the reader typed as carrying ambiguity codes. The fix is not local: it
+means deciding whether `getSymbols()` for these types should report only the bases, which touches parsing,
+`guessType`, the state labelers and the colouring. See `50_todo.md`.
+
+**Still not fixed.** `PairwiseCompare` throws `ArrayIndexOutOfBoundsException` rather than a clean message when
+an algorithm meets a data type it does not accept (`ProteinMLDistance` on DNA); the GUI gates that through
+`isApplicable`, so it is only reachable from code.
+
+---
+
+## 2026-08-19 — HammingDistance rewritten: what it counts, and what it leaves out
+
+`HammingDistance` did not compute a Hamming distance. Rewritten from scratch against Daniel's specification;
+`PDistance` (the same class with `optionNormalize` on) follows it.
+
+**What was wrong.** The unnormalized branch computed `Math.round(p * seqPair.getNumNotMissing())`, where `p`
+came out of `PairwiseCompare.getF()`. Those two quantities have different denominators: `getF()` normalises
+over the sites that landed in the states-by-states block of `fCount`, while `numNotMissing` counts every site
+where neither character is the gap or the missing character — **including the sites that were skipped as
+ambiguous**. Wherever ambiguity codes occur, the count is inflated by exactly the ratio between the two. On
+the 87-taxon rhabdovirus alignment (`razornet/examples/rhabdoviruses/DImmSV_ADAR.fasta`, 40 % `n`) the mean
+pairwise count fell from **2.444 to 1.808** and the maximum from **12 to 9**: the old numbers were 35 % too
+high. The normalized values on that file are unchanged to six decimals, which is the tell — the proportion was
+right all along, only the rescaling into a count was wrong.
+
+The `MatchStates` branch was a second algorithm entirely. It scored Y against C as `1 - 2/3 = 0.333` rather
+than 0 (a partial-overlap cost, not "compatible states do not differ"), it ignored `optionNormalize`
+completely, and its `ALLSTATES = "acgt" + AmbiguityCodes.CODES` silently dropped every RNA site, `u` not being
+in it.
+
+**What it does now.** A site is compared only where both sequences have an observed character. Gap, missing,
+and a code covering the whole alphabet (`n` for nucleotides, `x` for protein) all count as unobserved and stay
+out of both numerator and denominator, so each pair is scored on its own overlap. Unnormalized is that count
+of differing sites; normalized divides by the number of sites compared.
+
+Three decisions Daniel took on 2026-08-19:
+
+- **`n` is missing, not an ambiguity code.** It stands for all four bases, so with matching on it can never
+  produce a difference but would still enlarge the denominator — a sequence with a long unsequenced run would
+  come out *closer* to everything. Partial codes (`y`, `r`, …) stay real characters.
+- **No overlap stays `-1`**, and goes to `FixUndefinedDistances`, which warns and substitutes a large value.
+  The obvious divide-by-one guard yields 0, which reports two sequences sharing no observed site as identical.
+- **gap-to-gap is off by default**, behind `optionMatchGapToGap`. On, a site where both sequences are gapped
+  counts as a match — a shared deletion is shared information — and so enters the denominator; off, it is
+  skipped. A gap against a base is ignored either way.
+
+**Options.** The `AmbiguousOptions` enum (`Ignore` / `AverageStates` / `MatchStates`) is gone, replaced by two
+booleans: `optionMatchAmbiguityCodes` (default **true**) and `optionMatchGapToGap` (default false). The first
+defaults to true because that is what preserves the old default's *behaviour*: under `Ignore` an ambiguous
+site contributed no difference, and matching keeps it that way, where false would silently start counting Y
+against C as a difference in every existing dataset. This is the one default choice Daniel has not explicitly
+confirmed — see `50_todo.md`. Old `.stree6` files carrying `HandleAmbiguousStates` load with the usual
+skipped-unknown-option warning; there is one in the tree, `razornet/examples/other/dusky_dolphins.stree6`.
+
+Ambiguity matching uses a 128-entry bitmask table over `acgt`, built once per `compute` from
+`AmbiguityCodes.getNucleotides`, rather than a per-site `AmbiguityCodes.codesOverlap` call, which allocates two
+strings each time and would be called ntax²/2 × nchar times. RNA's `u` is folded onto `t` when the table is
+built, `AmbiguityCodes` being written in terms of DNA; without the fold, `y` against `u` is a difference.
+
+**Verification.** 23 hand-computed cases (gaps, missing, `n`, `x`, the ambiguity combinations, RNA, character
+weights, both flags, no-overlap) all pass. The whole matrix was then recomputed by an independent naive
+implementation calling `codesOverlap` directly, for all 8 option combinations on three files — 346×897 with
+codes and gaps, 87×1281 at 40 % `n`, primates 12×898: **0 mismatches, max delta 0**. The mask table agrees
+with `codesOverlap` on all 625 letter pairs that reach it. As the "nothing else moved" check,
+`primates.nex`, `dusky_dolphins.nex` and the 256-taxon `streptococcus-agalactiae.nex` (1125 missing
+characters, no ambiguity codes) come out identical to the old code to six decimals, the only difference being
+that the old code returned `-0.000000` where the new one returns exact 0. All 733 files of `src/main/java`
+compile. The two large files also ran faster: 1.75 s against 3.47 s wall, JVM start and parsing included.
+
+**Not checked:** nothing was run through the GUI or a workflow round-trip, and the option rename was reasoned
+about from `OptionIO.parseOptions` rather than exercised by actually loading an old `.stree6` file.
+
+---
+
 ## 2026-08-17 (evening) — the splitstree.py spike: JPype works, and the numbers are good
 
 Step 1 of `ai/plans/2026-08-17_splitstree-py.md`, the time-boxed spike. Full table in that plan's §3.1;
