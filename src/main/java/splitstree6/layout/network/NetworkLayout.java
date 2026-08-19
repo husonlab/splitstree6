@@ -45,10 +45,7 @@ import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.RadialLabelLayout;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.function.BiConsumer;
+import java.util.*;
 import java.util.function.ToDoubleFunction;
 
 import static splitstree6.layout.tree.LayoutUtils.computeFontHeightGraphWidthHeight;
@@ -60,6 +57,15 @@ import static splitstree6.layout.tree.LayoutUtils.normalize;
  */
 public class NetworkLayout {
 	public boolean verbose = true;
+
+	/**
+	 * wall-clock budget, in milliseconds, for optimizing candidate drawings. The most promising candidate is
+	 * always optimized; after that we only start on another while still inside the budget. That keeps a redraw
+	 * responsive on a large network, where a single pass of the force-directed layout can itself cost a second,
+	 * while still buying several passes on the small networks where a pass is cheap and where the extra passes
+	 * do the most good.
+	 */
+	private static final long OPTIMIZATION_BUDGET_MILLIS = 600;
 	private final RadialLabelLayout labelLayout = new RadialLabelLayout();
 	private final FastMultiLayerMethodOptions options;
 
@@ -115,31 +121,8 @@ public class NetworkLayout {
 					var y = Double.parseDouble(networkBlock.getNodeData(v).get(NetworkBlock.NodeData.BasicKey.y.name()));
 					nodePointMap.put(v, new Point2D(x, y));
 				}
-			} else if (randomLayoutSeed % 2 == 1) {
-				if (verbose) System.err.print("Running MDS-based layout...");
-				var params = new WeightedLayout.Params();
-				params.maxIterations = 5000;
-				params.randomSeed = randomLayoutSeed;
-				var layout = new WeightedLayout<Node, Edge>();
-				layout.layout(graph.getNodesAsList(), Node::adjacentEdges,
-						Node::getOpposite, edgeWeightFunction, nodePointMap::put, params);
-				if (verbose) System.err.println(" done");
 			} else {
-				options.setRandSeed(randomLayoutSeed);
-				var layoutService = GraphLayouts.getService();
-
-				if (verbose) System.err.printf("Running %s layout...", layoutService.getName());
-				// Route through the graph-layout SPI so a native provider (OGDF FM3) is used when one is on
-				// the path; on the built-in Java FMM we pass our tuned options (single-level FR, fixed
-				// iterations, ...), which are jloda-specific and do not apply to an external provider.
-				BiConsumer<Node, FastMultiLayerMethodLayout.Point> sink =
-						(v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY()));
-				if (JlodaFmmLayoutService.NAME.equals(layoutService.getName()))
-					FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, null, sink);
-				else
-					layoutService.apply(graph, edgeWeightFunction, sink);
-				if (verbose)
-					System.err.println(" done");
+				computeBestLayout(progress, graph, edgeWeightFunction, randomLayoutSeed, nodePointMap);
 			}
 
 			if (graph.getNumberOfEdges() == 0) {
@@ -261,6 +244,206 @@ public class NetworkLayout {
 			Platform.runLater(() -> edgeShapeMap.putAll(newEdgeShapeMap));
 
 			return new Group(edgesGroup, nodesGroup, nodeLabelsGroup);
+		}
+	}
+
+	/**
+	 * computes the positions of the nodes, keeping the most readable of several candidate drawings
+	 * <p>
+	 * Neither of our layouts has any notion of an edge crossing, and neither has a move that would undo one,
+	 * so which drawing we end up with is decided almost entirely by the configuration the optimizer starts
+	 * from. We therefore produce more than one drawing and keep whichever reads best; see {@link LayoutScore}.
+	 */
+	private void computeBestLayout(ProgressListener progress, PhyloGraph graph, ToDoubleFunction<Edge> edgeWeightFunction,
+								   int randomLayoutSeed, NodeArray<Point2D> result) throws CanceledException {
+		// the parity of the seed selects which of the two layouts to use
+		var useStressLayout = (randomLayoutSeed % 2 == 1);
+		var layoutService = GraphLayouts.getService();
+
+		LayoutScore best = null;
+		if (verbose)
+			System.err.printf("Running %s layout...", useStressLayout ? "MDS-based" : layoutService.getName());
+
+		if (useStressLayout)
+			best = computeStressLayout(progress, graph, edgeWeightFunction, randomLayoutSeed, result);
+		else if (JlodaFmmLayoutService.NAME.equals(layoutService.getName()))
+			best = computeForceDirectedLayout(progress, graph, edgeWeightFunction, randomLayoutSeed, result);
+		else {
+			// Route through the graph-layout SPI so that a native provider (OGDF FM3) is used when one is on the
+			// path. Such a provider takes neither a seed nor a starting drawing, so there is only ever the one
+			// drawing to be had from it and nothing to choose between.
+			layoutService.apply(graph, edgeWeightFunction, (v, p) -> result.put(v, new Point2D(p.getX(), p.getY())));
+		}
+
+		if (verbose)
+			System.err.println(best != null ? " done (%s)".formatted(best) : " done");
+	}
+
+	/**
+	 * force-directed layout, started from a crossing-free drawing of a spanning tree
+	 * <p>
+	 * Our options ask the FMM layout to keep the positions it is given, so it has to actually be given some:
+	 * passing it null left every node sitting on the origin, and a force layout started from a collapsed point
+	 * cloud shoots leaves out along whatever direction the numerical jitter happened to point and then has no
+	 * move that could ever undo the resulting crossings. {@link InitialTreeLayout} supplies a starting drawing
+	 * that has no crossings to begin with.
+	 * <p>
+	 * Generating and scoring one of those costs microseconds where relaxing it costs tens of milliseconds, so
+	 * we generate many, sort them, and relax only the most promising - stopping at the first result that comes
+	 * back without crossings, which in practice is usually the first one tried.
+	 */
+	private LayoutScore computeForceDirectedLayout(ProgressListener progress, PhyloGraph graph, ToDoubleFunction<Edge> edgeWeightFunction,
+												   int randomLayoutSeed, NodeArray<Point2D> result) throws CanceledException {
+		var candidates = computeCandidates(progress, graph, edgeWeightFunction, randomLayoutSeed);
+
+		LayoutScore best = null;
+		var deadline = System.currentTimeMillis() + OPTIMIZATION_BUDGET_MILLIS;
+		try (NodeArray<Point2D> candidate = graph.newNodeArray()) {
+			for (var run = 0; run < Math.min(numberOfRelaxations(graph), candidates.size()); run++) {
+				progress.checkForCancel();
+				if (run > 0 && System.currentTimeMillis() >= deadline)
+					break; // out of budget; what we have is what we keep
+				candidate.clear();
+				var initial = candidates.get(run);
+				options.setRandSeed(randomLayoutSeed + 2 * run);
+				FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction,
+						v -> new LayoutPoint(initial.getOrDefault(v, Point2D.ZERO)),
+						(v, p) -> candidate.put(v, new Point2D(p.getX(), p.getY())));
+				var score = LayoutScore.compute(graph, candidate);
+				if (best == null || score.compareTo(best) < 0) {
+					best = score;
+					result.clear();
+					result.putAll(candidate);
+				}
+				if (best.crossings() == 0)
+					break; // nothing left worth paying for another relaxation
+			}
+		}
+		return best;
+	}
+
+	/**
+	 * MDS-based layout, run once per candidate starting drawing
+	 * <p>
+	 * Started from a circle this layout is barely affected by its seed: the jitter that breaks the circle's
+	 * symmetry is small enough that on many graphs every run converges to the same local minimum of the
+	 * stress, crossings and all. Given the spanning-tree drawings to start from instead, its runs differ as
+	 * much as the drawings do. A run is far cheaper here than a force-directed relaxation, so it can afford
+	 * to work through more of them.
+	 */
+	private LayoutScore computeStressLayout(ProgressListener progress, PhyloGraph graph, ToDoubleFunction<Edge> edgeWeightFunction,
+											int randomLayoutSeed, NodeArray<Point2D> result) throws CanceledException {
+		var candidates = computeCandidates(progress, graph, edgeWeightFunction, randomLayoutSeed);
+
+		LayoutScore best = null;
+		var deadline = System.currentTimeMillis() + OPTIMIZATION_BUDGET_MILLIS;
+		try (NodeArray<Point2D> candidate = graph.newNodeArray()) {
+			for (var run = 0; run < Math.min(numberOfStressRuns(graph), candidates.size()); run++) {
+				progress.checkForCancel();
+				if (run > 0 && System.currentTimeMillis() >= deadline)
+					break;
+				candidate.clear();
+				var initial = candidates.get(run);
+				var params = new WeightedLayout.Params();
+				params.maxIterations = 5000;
+				params.randomSeed = randomLayoutSeed + 2L * run;
+				new WeightedLayout<Node, Edge>().layout(graph.getNodesAsList(), Node::adjacentEdges,
+						Node::getOpposite, edgeWeightFunction, candidate::put, params, initial::get);
+				var score = LayoutScore.compute(graph, candidate);
+				if (best == null || score.compareTo(best) < 0) {
+					best = score;
+					result.clear();
+					result.putAll(candidate);
+				}
+				if (best.crossings() == 0)
+					break;
+			}
+		}
+		return best;
+	}
+
+	/**
+	 * generates candidate starting drawings and returns them ordered, most promising first
+	 * <p>
+	 * These cost microseconds each where actually optimizing one costs tens of milliseconds, so it pays to
+	 * make a great many, score them, and only ever optimize the best few.
+	 */
+	private List<Map<Node, Point2D>> computeCandidates(ProgressListener progress, PhyloGraph graph,
+													   ToDoubleFunction<Edge> edgeWeightFunction, int randomLayoutSeed) throws CanceledException {
+		var candidates = new ArrayList<Map<Node, Point2D>>();
+		var scores = new ArrayList<LayoutScore>();
+		for (var i = 0; i < numberOfCandidates(graph); i++) {
+			progress.checkForCancel();
+			// candidate 0 is the canonical drawing, so that an unchanged graph always redraws the same way
+			candidates.add(InitialTreeLayout.apply(graph, edgeWeightFunction, i == 0 ? null : new Random(randomLayoutSeed + 31L * i)));
+			scores.add(LayoutScore.compute(graph, candidates.get(i)));
+		}
+		var order = new ArrayList<Integer>();
+		for (var i = 0; i < candidates.size(); i++)
+			order.add(i);
+		order.sort(Comparator.comparing(scores::get)); // stable, so a tie leaves the canonical drawing in front
+		return order.stream().map(candidates::get).toList();
+	}
+
+	/**
+	 * how many candidate spanning-tree drawings to generate and score before relaxing any of them. Scoring is
+	 * quadratic in the number of edges, so the number shrinks as the graph grows; on a small network fifty of
+	 * them together cost a few milliseconds.
+	 */
+	private static int numberOfCandidates(Graph graph) {
+		if (!LayoutScore.isApplicable(graph))
+			return 1; // too big to score, so there would be nothing to choose by
+		else if (graph.getNumberOfEdges() <= 150)
+			return 50;
+		else if (graph.getNumberOfEdges() <= 400)
+			return 20;
+		else
+			return 8;
+	}
+
+	/**
+	 * upper bound on how many candidates to relax. This is only a backstop: what actually decides how many we
+	 * get through is {@link #OPTIMIZATION_BUDGET_MILLIS}, and we stop at the first crossing-free result anyway.
+	 */
+	private static int numberOfRelaxations(Graph graph) {
+		if (!LayoutScore.isApplicable(graph))
+			return 1;
+		else if (graph.getNumberOfEdges() <= 150)
+			return 6;
+		else
+			return 4;
+	}
+
+	/**
+	 * upper bound on how many candidates to run the MDS layout on. A run of it costs a small fraction of a
+	 * force-directed relaxation, so within the same budget it gets through far more of them.
+	 */
+	private static int numberOfStressRuns(Graph graph) {
+		if (!LayoutScore.isApplicable(graph))
+			return 1;
+		else if (graph.getNumberOfEdges() <= 150)
+			return 24;
+		else
+			return 12;
+	}
+
+	/**
+	 * adapter for handing a coordinate to the FMM layout: its point interface declares two methods and so
+	 * cannot be a lambda, and jloda does not export its own implementation of it
+	 */
+	private record LayoutPoint(double x, double y) implements FastMultiLayerMethodLayout.Point {
+		LayoutPoint(Point2D point) {
+			this(point.getX(), point.getY());
+		}
+
+		@Override
+		public double getX() {
+			return x;
+		}
+
+		@Override
+		public double getY() {
+			return y;
 		}
 	}
 

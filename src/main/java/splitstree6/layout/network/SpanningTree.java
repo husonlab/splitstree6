@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.view.network;
+package splitstree6.layout.network;
 
 import java.util.*;
 import java.util.function.Function;

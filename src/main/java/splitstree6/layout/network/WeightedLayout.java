@@ -62,6 +62,29 @@ public class WeightedLayout<N, E> {
 			BiConsumer<N, Point2D> setPoint,
 			Params params
 	) {
+		layout(nodes, getAdjacent, getOtherEnd, getLength, setPoint, params, null);
+	}
+
+	/**
+	 * as above, but started from the given positions rather than from a circle
+	 * <p>
+	 * Stress is not convex and this is plain gradient descent, so the drawing it converges to is largely
+	 * decided by the one it starts from - and in particular it will never undo a crossing that the starting
+	 * drawing already had. Starting from a circle leaves that to the tiny jitter that breaks the circle's
+	 * symmetry, which on many graphs is not enough to reach a second local minimum at all. Callers that have
+	 * a sensible starting drawing should pass it; see InitialTreeLayout.
+	 *
+	 * @param initialPositions starting position of each node, or null to start from a circle
+	 */
+	public void layout(
+			List<N> nodes,
+			Function<N, Iterable<E>> getAdjacent,
+			BiFunction<N, E, N> getOtherEnd,
+			ToDoubleFunction<E> getLength,
+			BiConsumer<N, Point2D> setPoint,
+			Params params,
+			Function<N, Point2D> initialPositions
+	) {
 		int n = nodes.size();
 		if (n == 0) return;
 		if (n == 1) {
@@ -116,8 +139,8 @@ public class WeightedLayout<N, E> {
 			circleFallback(nodes, setPoint);
 		}
 
-		// 4) Initialize positions (circle)
-		double[][] X = initCircle(n, params.randomSeed);
+		// 4) Initialize positions (from the caller, else a circle)
+		double[][] X = (initialPositions != null ? initFrom(nodes, initialPositions) : initCircle(n, params.randomSeed));
 
 		// 5) Optimize stress with gradient descent + step backoff
 		double step = params.initialStep;
@@ -187,6 +210,21 @@ public class WeightedLayout<N, E> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * starting positions taken from the caller; a node it has no position for is left at the origin
+	 */
+	private static <N> double[][] initFrom(List<N> nodes, Function<N, Point2D> initialPositions) {
+		var X = new double[nodes.size()][2];
+		for (var i = 0; i < nodes.size(); i++) {
+			var p = initialPositions.apply(nodes.get(i));
+			if (p != null) {
+				X[i][0] = p.getX();
+				X[i][1] = p.getY();
+			}
+		}
+		return X;
 	}
 
 	private static double[][] initCircle(int n, long seed) {
