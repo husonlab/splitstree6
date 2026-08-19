@@ -192,7 +192,8 @@ public class StretchFilter extends Network2Network {
 
 	/**
 	 * Remove superfluous unlabeled (Steiner) nodes: drop degree-&le;1 danglers and dissolve degree-2 nodes into a
-	 * single edge (summed weight). Taxon nodes are never touched. Iterates to convergence.
+	 * single edge (summed weight and, on a haplotype network, concatenated mutation list). Taxon nodes are never
+	 * touched. Iterates to convergence.
 	 */
 	private static void cleanAndSmooth(PhyloGraph graph, NetworkBlock block, ProgressListener progress) throws Exception {
 		var changed = true;
@@ -211,17 +212,44 @@ public class StretchFilter extends Network2Network {
 					var v1 = edges.get(0).getOpposite(v);
 					var v2 = edges.get(1).getOpposite(v);
 					var weight = graph.getWeight(edges.get(0)) + graph.getWeight(edges.get(1));
+					// read the two mutation lists before deleting the node takes their edges with them
+					var sites = mergeSites(block.getEdgeData(edges.get(0)).get(NetworkBlock.EDGE_SITES_KEY),
+							block.getEdgeData(edges.get(1)).get(NetworkBlock.EDGE_SITES_KEY));
 					graph.deleteNode(v); // also removes its two edges
 					if (v1 != v2) {
 						var f = graph.newEdge(v1, v2);
 						graph.setWeight(f, weight);
 						block.getEdgeData(f).put("weight", StringUtils.trim((float) weight));
+						if (sites != null)
+							block.getEdgeData(f).put(NetworkBlock.EDGE_SITES_KEY, sites);
 					}
 					changed = true;
 				}
 				progress.checkForCancel();
 			}
 		}
+	}
+
+	/**
+	 * The mutation list for an edge that replaces a two-edge path: the two lists, concatenated in path order.
+	 * Returns null if either edge has no list, because then there is nothing faithful to write -- a network that
+	 * is not a haplotype network carries no mutation lists at all, and half a list would understate the merged
+	 * edge. (Left unset, the merged edge used to claim no mutations at all while carrying the summed weight.)
+	 * <p>
+	 * Deliberately <em>not</em> de-duplicated. The merged edge's weight has to be the sum of the two weights,
+	 * since that is what preserves the shortest-path distances this filter is bounding, so a site that mutates on
+	 * both edges -- a reversal, or two steps such as a &rarr; c &rarr; g -- must appear twice, or the mutations
+	 * drawn would no longer add up to the length drawn. Deliberately not sorted either: a site is not necessarily
+	 * a number, {@code QuasiMedianBase} writes the alignment's character labels.
+	 */
+	private static String mergeSites(String sites1, String sites2) {
+		if (sites1 == null || sites2 == null)
+			return null;
+		if (sites1.isBlank())
+			return sites2;
+		if (sites2.isBlank())
+			return sites1;
+		return sites1 + "," + sites2;
 	}
 
 	public double getOptionMaxStretchPercent() {

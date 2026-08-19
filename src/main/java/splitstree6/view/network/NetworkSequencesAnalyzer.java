@@ -23,6 +23,7 @@ package splitstree6.view.network;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.algorithms.Dijkstra;
+import jloda.util.StringUtils;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
@@ -99,11 +100,10 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 
 		var sum = 0;
 		for (var e : graph.edges()) {
-			var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
-			var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
-			if (sequence1 == null || sequence2 == null)
+			var count = mutations(networkBlock, e);
+			if (count < 0)
 				return -1;
-			sum += differences(sequence1, sequence2);
+			sum += count;
 		}
 		return sum;
 	}
@@ -115,12 +115,10 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 		var graph = networkBlock.getGraph();
 		var weights = new HashMap<Edge, Integer>();
 		for (var e : graph.edges()) {
-			var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
-			var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
-			if (sequence1 == null || sequence2 == null)
+			var count = mutations(networkBlock, e);
+			if (count < 0)
 				return -1;
-			var weight = differences(sequence1, sequence2);
-			weights.put(e, weight);
+			weights.put(e, count);
 		}
 
 		var sum = 0;
@@ -148,6 +146,31 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 			}
 		}
 		return sum;
+	}
+
+	/**
+	 * the number of mutations on an edge: the length of its mutation list, or, failing that, the number of sites
+	 * at which its two endpoints differ
+	 * <p>
+	 * The list is the authority because it can outnumber the endpoint differences. An edge that replaces a path
+	 * through dissolved degree-2 nodes -- what the Stretch Filter leaves behind -- carries the mutations of the
+	 * whole path, and a site that mutated twice along that path appears twice in the list but not at all in the
+	 * comparison of its two endpoints. Counting the endpoints there reports fewer mutations than the network
+	 * draws and than its edge weights add up to. The fallback keeps unlabeled edges working, and gives the same
+	 * answer as the list whenever the labeling itself computed it from the endpoints, which is what every
+	 * characters-to-network algorithm here does.
+	 *
+	 * @return the count, or -1 if the edge has neither a mutation list nor a pair of sequences
+	 */
+	private int mutations(NetworkBlock networkBlock, Edge e) {
+		var sites = networkBlock.getEdgeData(e).get(NetworkBlock.EDGE_SITES_KEY);
+		if (sites != null)
+			return sites.isBlank() ? 0 : StringUtils.countOccurrences(sites, ',') + 1;
+		var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
+		var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
+		if (sequence1 == null || sequence2 == null)
+			return -1;
+		return differences(sequence1, sequence2);
 	}
 
 	public String computeEdgeLabel(String sequence1, String sequence2, IntFunction<Integer> mapBackIndex) {
