@@ -30,6 +30,7 @@ import jloda.graph.Node;
 import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.IUsesCharacters;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.NetworkBlock;
@@ -40,7 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public class ExternalDistance2Network extends Distances2Network { // implements IExperimental {
+public class ExternalDistance2Network extends Distances2Network implements IUsesCharacters<DistancesBlock, NetworkBlock> { // implements IExperimental {
 	private final StringProperty optionExecutablePath = new SimpleStringProperty(this, "optionExecutablePath");
 	private final StringProperty optionCallFormat = new SimpleStringProperty(this, "optionCallFormat");
 	private final StringProperty optionTmpDirectory = new SimpleStringProperty(this, "optionTmpDirectory");
@@ -87,6 +88,12 @@ public class ExternalDistance2Network extends Distances2Network { // implements 
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, NetworkBlock networkBlock) throws IOException {
+		// find the characters in the workflow, if there is one, and hand them over explicitly
+		compute(progress, taxaBlock, distancesBlock, networkBlock, IUsesCharacters.findCharacters(distancesBlock));
+	}
+
+	@Override
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, NetworkBlock networkBlock, CharactersBlock charactersBlock) throws IOException {
 		if (getOptionExecutablePath().isBlank())
 			throw new IOException("Please set executable file");
 
@@ -164,8 +171,7 @@ public class ExternalDistance2Network extends Distances2Network { // implements 
 			FileUtils.deleteFileIfExists(inputFile, outputFile);
 		}
 
-		var parent = distancesBlock.getNode().getPreferredParent();
-		if (parent != null && parent.getPreferredParent() != null && parent.getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock) {
+		if (charactersBlock != null) {
 			graph.nodeStream().filter(v -> graph.getNumberOfTaxa(v) == 1).forEach(v -> {
 				var row = graph.getTaxon(v) - 1;
 				var sequence = String.valueOf(charactersBlock.getRow0(row));

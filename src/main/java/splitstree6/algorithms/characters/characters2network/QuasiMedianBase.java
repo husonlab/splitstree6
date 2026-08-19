@@ -126,7 +126,10 @@ public abstract class QuasiMedianBase {
 			}
 		}
 
-		var analyzer = new NetworkSequencesAnalyzer(networkBlock);
+		// from the characters we were handed, not from the workflow. The NetworkBlock
+		// constructor re-derives them by walking getNode().getPreferredParent() twice, which
+		// throws when the block has no node - that is, whenever this runs outside a workflow.
+		var analyzer = new NetworkSequencesAnalyzer(charactersBlock);
 
 		for (var e : graph.edges()) {
 			if (e.getSource().getInfo() instanceof String conA && e.getTarget().getInfo() instanceof String conB) {

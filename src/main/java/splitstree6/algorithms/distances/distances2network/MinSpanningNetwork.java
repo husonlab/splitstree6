@@ -27,6 +27,7 @@ import jloda.graph.Node;
 import jloda.util.Pair;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.IUsesCharacters;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.NetworkBlock;
@@ -40,7 +41,7 @@ import java.util.TreeMap;
 /**
  * computes a minimum spanning network
  */
-public class MinSpanningNetwork extends Distances2Network {
+public class MinSpanningNetwork extends Distances2Network implements IUsesCharacters<DistancesBlock, NetworkBlock> {
 	@Override
 	public String getCitation() {
 		return "Excoffier & Smouse 1994; L. Excoffier and PE Smouse. Using allele frequencies and geographic subdivision to reconstruct gene trees within a species: molecular variance parsimony, Genetics.136(1):343-59, 1994.";
@@ -72,6 +73,12 @@ public class MinSpanningNetwork extends Distances2Network {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, NetworkBlock networkBlock) throws IOException {
+		// find the characters in the workflow, if there is one, and hand them over explicitly
+		compute(progress, taxaBlock, distancesBlock, networkBlock, IUsesCharacters.findCharacters(distancesBlock));
+	}
+
+	@Override
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, NetworkBlock networkBlock, CharactersBlock charactersBlock) throws IOException {
 		final var ntax = taxaBlock.getNtax();
 		final var graph = networkBlock.getGraph();
 
@@ -156,8 +163,7 @@ public class MinSpanningNetwork extends Distances2Network {
 			}
 		}
 
-		var parent = distancesBlock.getNode().getPreferredParent();
-		if (parent != null && parent.getPreferredParent() != null && parent.getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock) {
+		if (charactersBlock != null) {
 			graph.nodeStream().filter(v -> graph.getNumberOfTaxa(v) == 1).forEach(v -> {
 				var row = graph.getTaxon(v) - 1;
 				var sequence = String.valueOf(charactersBlock.getRow0(row));
