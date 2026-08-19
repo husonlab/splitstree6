@@ -1,18 +1,43 @@
-# 60 — Agent notes
+# Journal
 
-You don't need to read this before starting work. It's an archive of past work and findings.
+You don't need to read this before starting work. It is the chronological archive of past work and findings —
+newest entries first.
 
-Newest entries first. Record here what does not belong in `50_todo.md`: what was done and when, what was
-measured, what was tried and abandoned, and why a decision went the way it did. Dead ends are worth as much as
-successes — they stop the next agent repeating them.
+Since 2026-08-19 the primary record of *investigations* is `INDEX.md` plus the per-question entries beside
+this file. This journal is for what does not fit a single question: dead ends, surprises, decisions and why
+they went the way they did, and everything from before the ledger existed.
 
 ---
 
+## 2026-08-19 — `ai/` restructured into three layers by epistemic status
+
+Same restructure as `megan8/ai`, and for the same reason: `docs/` + `plans/` came from software engineering,
+where the plan precedes the work. Here the work is exploratory, and the most consequential fact in this
+codebase — that the computation is plain Java and only the views are JavaFX — was established by a **probe**
+that contradicted what the imports said. A structure whose primary artefact is a plan cannot record that.
+
+The new shape sorts documentation by how sure we are of it: `docs/` (what we believe true, unchanged except
+that `10_context.md` was rewritten around the new working rules and file tables), `open/` (what we do not
+know — `50_todo.md` split into `../open/questions.md`, which holds open questions with **gates** rather than owners,
+and `../open/todo.md`, which holds jobs whose answer is already known), and `lab/` (what was tried — `plans/` renamed,
+`60_agent_notes.md` became `journal.md`, plus `TEMPLATE.md`, the ledger `INDEX.md`, and `measurements.md`).
+
+The old "concerns worth keeping in view" list became "read before designing any experiment" at the top of
+`../open/questions.md`, since that is the moment it matters.
+
+`INDEX.md` was back-filled with 14 rows from this journal and the plan files. Putting the numbers in one place
+made two things visible that were scattered before: that **171 of 177** example files read, and that **any
+bootstrap baseline predating `b995795c` is worthless** — the latter now carries a warning at the top of
+`measurements.md`, where a baseline would otherwise be quoted in good faith.
+
+Also added: a root `CLAUDE.md` (there was none, so nothing pointed Claude Code at this directory) and
+`/probe`, `/wrap`, `/tried` in `.claude/commands/`.
+
 ## 2026-08-18/19 — splitstree.py built to step 5, and five defects it found
 
-Daniel asked for the Python package. Steps 1-5 of `ai/plans/2026-08-17_splitstree-py.md` are done and live in
+Daniel asked for the Python package. Steps 1-5 of `ai/lab/2026-08-17_splitstree-py.md` are done and live in
 `husonlab/splitstree-py`: the JPype spike, the JVM bootstrap, the block layer, IO, and the generated algorithm
-surface. 412 tests, about 9 seconds. How to build and run it is in `30_tools.md`; what follows is what the work
+surface. 412 tests, about 9 seconds. How to build and run it is in `../docs/30_tools.md`; what follows is what the work
 found out about SplitsTree, which is the part worth keeping.
 
 **Running the whole catalogue from outside the application is a good bug detector.** Nothing had ever
@@ -29,7 +54,7 @@ things below - none of which is a Python problem, and all of which affect the Ja
   cached pool with non-daemon workers, which linger 60 s when idle. Measured 60.4 s for a one-second consensus
   network; 0.38 s after. **What hid both of these: the GUI and every command-line tool call `System.exit`.**
 - **`ExportManager` writes Nexus that its own reader rejects**, and leaks the prepend-taxa flag between writes.
-  Both in `50_todo.md`.
+  Both in `../open/todo.md`.
 - **The bootstrap support values were not reproducible**, even with `optionRandomSeed` set - see below.
 
 **Two jars were missing from what I had believed was the minimal set**, and both were found by running rather
@@ -60,8 +85,8 @@ alignment *and* the pipeline to replay, so it takes a `PathSupplier`. Four diffe
 across five algorithms, which suggests the general statement is "an algorithm may need context beyond its
 declared input", not anything about characters specifically.
 
-**Still open**, all in `50_todo.md`: `BootstrapTreeSplits` and `BootstrapTree` (plan:
-`ai/plans/2026-08-19_bootstrapping.md`); D-8, the eager `Font.font()` in `ProgramProperties`; D-12, something
+**Still open**, all in `../open/todo.md`: `BootstrapTreeSplits` and `BootstrapTree` (plan:
+`ai/lab/2026-08-19_bootstrapping.md`); D-8, the eager `Font.font()` in `ProgramProperties`; D-12, something
 in the catalogue leaves `System.err` replaced by a discarding stream and **I did not isolate it** - no single
 algorithm reproduces it and every hide/restore site looks correct, so the Python side re-installs its capture
 stream instead. That one is an unfinished diagnosis, not a closed question.
@@ -70,7 +95,7 @@ stream instead. That one is an unfinished diagnosis, not a closed question.
 2026-08-17 from the code, and several of their central claims have since been *narrowed by measurement*: the
 JavaFX boundary moved from "the workflow needs a toolkit" to "only the views do", and the claim that the
 JavaFX natives are never loaded turned out to be false (they are loaded, they just fail harmlessly). Both were
-corrected in place. Treat a confident statement in `20_logic.md` as a hypothesis with a date on it, and re-run
+corrected in place. Treat a confident statement in `../docs/20_logic.md` as a hypothesis with a date on it, and re-run
 the probe rather than citing it.
 
 ---
@@ -193,7 +218,7 @@ Fsum` invariant at 0 violations, RNA and the NaN/hang cases all clean. `src/main
 easy fix, because `PairwiseCompare` has no way to expand a protein ambiguity, so dropping those four from the
 state list would make it throw on protein alignments that work today — `mlDistance` currently survives by
 taking the top-left 20×20 sub-matrix, the 20 amino acids happening to come first. Left alone and written into
-`50_todo.md`. Also still open: `RNAwithAmbiguityCodes`'s enum symbol list is `acgury`, only two of the eleven
+`../open/todo.md`. Also still open: `RNAwithAmbiguityCodes`'s enum symbol list is `acgury`, only two of the eleven
 codes, so RNA data using `w` or `n` may not be typed at all by `guessType`.
 
 ---
@@ -304,7 +329,7 @@ states, 2 of them dead) has the same shape of problem. This is pre-existing and 
 both the before and after regression runs show 1.0 — but it means LogDet and the nucleotide models are
 effectively broken on any alignment the reader typed as carrying ambiguity codes. The fix is not local: it
 means deciding whether `getSymbols()` for these types should report only the bases, which touches parsing,
-`guessType`, the state labelers and the colouring. See `50_todo.md`.
+`guessType`, the state labelers and the colouring. See `../open/todo.md`.
 
 **Still not fixed.** `PairwiseCompare` throws `ArrayIndexOutOfBoundsException` rather than a clean message when
 an algorithm meets a data type it does not accept (`ProteinMLDistance` on DNA); the GUI gates that through
@@ -353,7 +378,7 @@ booleans: `optionMatchAmbiguityCodes` (default **true**) and `optionMatchGapToGa
 defaults to true because that is what preserves the old default's *behaviour*: under `Ignore` an ambiguous
 site contributed no difference, and matching keeps it that way, where false would silently start counting Y
 against C as a difference in every existing dataset. This is the one default choice Daniel has not explicitly
-confirmed — see `50_todo.md`. Old `.stree6` files carrying `HandleAmbiguousStates` load with the usual
+confirmed — see `../open/todo.md`. Old `.stree6` files carrying `HandleAmbiguousStates` load with the usual
 skipped-unknown-option warning; there is one in the tree, `razornet/examples/other/dusky_dolphins.stree6`.
 
 Ambiguity matching uses a 128-entry bitmask table over `acgt`, built once per `compute` from
@@ -378,7 +403,7 @@ about from `OptionIO.parseOptions` rather than exercised by actually loading an 
 
 ## 2026-08-17 (evening) — the splitstree.py spike: JPype works, and the numbers are good
 
-Step 1 of `ai/plans/2026-08-17_splitstree-py.md`, the time-boxed spike. Full table in that plan's §3.1;
+Step 1 of `ai/lab/2026-08-17_splitstree-py.md`, the time-boxed spike. Full table in that plan's §3.1;
 the short version is that every one of the four questions came back favourably and nothing needs rethinking.
 
 `nsplits=7 fit=100.0` and `(((a:1,b:1):3,c:1):1,d:1,e:1)` from Python — byte-identical to the Java probe, which
@@ -421,7 +446,7 @@ does not exist; creating a repository is Daniel's call, so step 2 stops here.
 ## 2026-08-17 (later still) — the layouts report coordinates headless
 
 Daniel asked for the one thing the `splitstree.py` plan still listed as unmeasured (§9.6): can the layouts
-give coordinates without a toolkit? **Yes, all of them.** Recorded in `20_logic.md` §6.2a.
+give coordinates without a toolkit? **Yes, all of them.** Recorded in `../docs/20_logic.md` §6.2a.
 
 The reason it looked doubtful is that `SplitNetworkLayout`, `ComputeTreeLayout` and `NetworkLayout` all import
 `javafx.scene.control.Label`, `javafx.scene.shape.*` and `RichTextLabel`, so a quick grep says "this is GUI
@@ -463,8 +488,8 @@ only remaining unknown of any kind, so that plan is now blocked on nothing but t
 
 ## 2026-08-17 (late) — D-1 to D-7 answered and addressed
 
-Daniel answered all seven discrepancies inline in `20_logic.md`. Six led to code changes, one to a plan.
-The resolutions are in `20_logic.md` §10; what follows is what was measured and what was learned.
+Daniel answered all seven discrepancies inline in `../docs/20_logic.md`. Six led to code changes, one to a plan.
+The resolutions are in `../docs/20_logic.md` §10; what follows is what was measured and what was learned.
 
 **D-1 was the big one, and my own description of it was half wrong.** I had written that making `AService`
 build its `ProgressPane` lazily "would make the entire workflow engine usable headless". It does not. The
@@ -536,10 +561,10 @@ nymphoides tanglegram workflow byte-identical across two runs apart from its cre
 
 **One pre-existing defect surfaced and was not fixed**: `AlgorithmTabsManager.lambda$new$1` throws through
 `Platform.runLater` in roughly one headless tanglegram run in three. It does not affect the output. Recorded
-in `50_todo.md` rather than chased, because it is a GUI listener misbehaving in a tool and is unrelated to
+in `../open/todo.md` rather than chased, because it is a GUI listener misbehaving in a tool and is unrelated to
 anything changed today.
 
-**D-7 produced `ai/plans/2026-08-17_test-suite.md`.** Its two load-bearing observations: D-1 makes the
+**D-7 produced `ai/lab/2026-08-17_test-suite.md`.** Its two load-bearing observations: D-1 makes the
 workflow engine unit-testable (headless, synchronous, no toolkit, ~40 ms), which it was not this morning; and
 the catalogue scan means one data-driven test can exercise all 102 algorithms and all 177 options instead of
 102 hand-written classes. No test code written — the plan is a proposal.
@@ -548,12 +573,13 @@ the catalogue scan means one data-driven test can exercise all 102 algorithms an
 
 ## 2026-08-17 — `ai/docs` written; the JavaFX boundary measured
 
-Daniel asked for a documentation set mirroring the one adopted in `megan8/ai`, plus an `ai/plans` directory
+Daniel asked for a documentation set mirroring the one adopted in `megan8/ai`, plus an `ai/lab` directory
 with a planning document for a Python package. Six files in `ai/docs` and one plan were written from the code.
 
 **What was measured rather than assumed.** The single most consequential fact about this codebase is where its
 JavaFX dependency actually begins, because it decides what can be reused headless — by a server, by an
-automated build, by a language binding. It is stated in `20_logic.md` §6 as a table of probe results rather than as an opinion,
+automated build, by a language binding. It is stated in `../docs/20_logic.md` §6 as a table of probe results rather than
+as an opinion,
 because it was easy to get wrong in both directions. Two probes, both compiled against `target/classes` plus
 `target/dependency` on the **plain classpath** (no module path):
 
@@ -573,12 +599,13 @@ because it was easy to get wrong in both directions. Two probes, both compiled a
 
 So the boundary is **exactly at `AlgorithmNode`**, and the cause is incidental: `AService` eagerly builds a
 *display of* progress in its constructor. The computation has no graphical content at all. That observation is
-now `20_logic.md` D-1 and `50_todo.md`'s highest-value open question, because fixing it in jloda3 would make
+now `../docs/20_logic.md` D-1 and `../open/todo.md`'s highest-value open question, because fixing it in jloda3 would
+make
 the entire workflow engine headless — with knock-on benefits for `RunWorkflow` (which only extends
 `Application` to get a toolkit), for servers, and for the Python binding.
 
 **An end-to-end `RunWorkflow` run was also recorded**, on the module path, as the verification recipe in
-`40_testing.md`: `10taxaExample.stree6` applied to `nucleic_M2573_346x897_2006.phy` → workflow with 8 data
+`../docs/40_testing.md`: `10taxaExample.stree6` applied to `nucleic_M2573_346x897_2006.phy` → workflow with 8 data
 nodes and 5 algorithms, 346 input taxa, neighbor-net on **256** taxa in 0.3 s, 2.2 s total, `SPLITS` block with
 `ntax=256 nsplits=517 fit=99.9`.
 
@@ -587,7 +614,8 @@ carries `DisabledTaxa = 'tax100' 'tax11' … 'tax99'`, and the 346-taxon file ha
 naming, so **90 taxa were matched by name and silently dropped**. Confirmed by counting: exactly 90 taxon names
 in the phylip file match `tax11`…`tax100`. A saved taxa filter is applied by name to whatever dataset you point
 the workflow at, which is reasonable behaviour and a very good way to verify the wrong thing. Recorded in both
-`30_tools.md` and `40_testing.md`. The same run also showed that unknown options in an old workflow file are
+`../docs/30_tools.md` and `../docs/40_testing.md`. The same run also showed that unknown options in an old workflow file
+are
 skipped with a warning, not an error (`UsePreconditioner`, `UseDual`, `Normalize`, `ShowConfidence`), so a
 renamed option silently reverts to its current default.
 
@@ -601,12 +629,12 @@ plan's generator design (§6): discovery is a jar scan, there is no registry to 
 Result: **102 concrete algorithm classes carrying 177 options** — 75 transformations, 12 report producers,
 7 taxa filters, 6 loaders, 3 view producers, 2 marked `IExperimental`. Two cells hold two thirds of them:
 `Trees2Trees` (23) and `Characters2Distances` (18, including the seven nucleotide substitution models in the
-`nucleotide` subpackage). The full signature table is `20_logic.md` §4.
+`nucleotide` subpackage). The full signature table is `../docs/20_logic.md` §4.
 
 The unexpected number is **38 algorithms returning no citation**. `getCitation()` feeds `ExtractCitations` and
 therefore the methods text, so each is a silent hole in every analysis that uses that algorithm. At most 16 of
 the 102 (filters, loaders, view producers) are legitimately uncitable, so roughly 22 real algorithms are simply
-missing theirs. Recorded in `50_todo.md` P3.
+missing theirs. Recorded in `../open/todo.md` P3.
 
 **Build facts checked, not copied from megan8.** `mvn -o clean compile -q` 32 s; incremental `mvn -o package -q`
 8 s, and `copy-dependencies` is bound to `package`, so there is no separate invocation (`mvn clean` removes
@@ -617,7 +645,8 @@ copied; megan8 needed explicit exclusions for the same duplication, this project
 native classifier follows the JVM Maven itself runs on: here an x86_64 GraalVM 17 on an arm64 Mac, giving
 `-mac` (Intel) jars, which is why the default `java` works while `splitstree-env` would refuse it.
 
-**Six discrepancies recorded** in `20_logic.md` §10 and listed in `50_todo.md`. None has been put to Daniel.
+**Six discrepancies recorded** in `../docs/20_logic.md` §10 and listed in `../open/todo.md`. None has been put to
+Daniel.
 Four are one-line observations (the title-string node lookup; `updateTitle` using the algorithm map for data
 nodes; the source node whose purpose the code itself queries in a `// todo:`; the silent empty-input path); one
 is the view-completion poll; one is D-1 above.
@@ -625,8 +654,9 @@ is the view-completion poll; one is D-1 above.
 **What was deliberately not written.** No `2x_logic_*.md` files. Daniel asked for the overview only — "just
 give an overview of the main workflow design, without detailing all the algorithms" — and writing algorithm
 descriptions from the code without his review would produce exactly the kind of document that
-`10_context.md` rule 2 exists to prevent. `20_logic.md` §4 lists what exists and with which signature, and the
-file table in `10_context.md` says the `2x_` files are to be added one subsystem at a time.
+`../docs/10_context.md` rule 2 exists to prevent. `../docs/20_logic.md` §4 lists what exists and with which signature,
+and the
+file table in `../docs/10_context.md` says the `2x_` files are to be added one subsystem at a time.
 
 ---
 
@@ -686,5 +716,5 @@ Naming, deliberately: OGDF's is **FMMM** (three M's); jloda's own `jloda.graph.f
 
 **`splitstree6.xtra` is read-only (7.2026).** Experimental and student work is kept there as a stable
 reference. Production integrations are self-contained copies in the appropriate main package, with attribution
-— never a `git mv` or an in-place refactor. This is a standing instruction from Daniel, now `10_context.md`
+— never a `git mv` or an in-place refactor. This is a standing instruction from Daniel, now `../docs/10_context.md`
 rule 9.

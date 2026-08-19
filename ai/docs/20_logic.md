@@ -388,8 +388,8 @@ Three things the pure routines do **not** give you, all of which live in the vie
    set three options, `compute(new ProgressSilent(), taxa, trees, out)`, print the network.
 2. **A whole workflow can now be driven the same way** — build it, `restart()` the taxa filter, read the
    result — as long as it contains no view nodes. This is what makes the workflow engine unit-testable
-   (`ai/plans/2026-08-17_test-suite.md`) and what removes the main obstacle from the `splitstree.py` workflow
-   layer (`ai/plans/2026-08-17_splitstree-py.md` §5, whose layer 2 was gated on exactly this).
+   (`ai/lab/2026-08-17_test-suite.md`) and what removes the main obstacle from the `splitstree.py` workflow
+   layer (`ai/lab/2026-08-17_splitstree-py.md` §5, whose layer 2 was gated on exactly this).
 3. **A binding that wants only the algorithms still needs JavaFX on the classpath**, though never a running
    toolkit: the options are `javafx.beans.property.*` (`javafx.base`), `jloda.fx.workflow` uses
    `javafx.concurrent` (`javafx.graphics`), and **`javafx.controls` is needed too** — `NotificationManager`
@@ -479,7 +479,7 @@ to that dataset" is made of, and the one a binding will want most.
 
 Things where the code and a reasonable reading of this description do not line up, or where a design decision
 has a cost worth naming. Each is stated so it can be checked. All seven were put to Daniel on 2026-08-17 and
-answered; items marked **FIXED** were repaired the same day. Per-item measurements are in `60_agent_notes.md`.
+answered; items marked **FIXED** were repaired the same day. Per-item measurements are in `../lab/journal.md`.
 
 **D-1 — `AService` built a JavaFX `Control` in its constructor, which forced the toolkit. FIXED
 (2026-08-17), and the premise was only half right.** `AService.<init>` did `new ProgressPane(this)`, and
@@ -594,6 +594,6 @@ Java's stderr silently stops receiving. Worked around on the Python side, which 
 whenever it finds it has been replaced, so this is a diagnosis left unfinished rather than a live defect.
 
 **D-7 — there is no test suite at all.** Daniel: a plan is needed for generating unit tests of all features.
-Written: `ai/plans/2026-08-17_test-suite.md`. Its centrepiece is that D-1 makes the *workflow itself* unit-
+Written: `ai/lab/2026-08-17_test-suite.md`. Its centrepiece is that D-1 makes the *workflow itself* unit-
 testable headless and synchronously, and that the catalogue scan of §4 lets one data-driven test exercise all
 102 algorithms and all 177 options rather than 102 hand-written classes. Awaiting review; no test code written.

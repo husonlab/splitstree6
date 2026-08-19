@@ -8,7 +8,7 @@ identical to before, and by running the same computation with no workflow at all
 shape is what it is — §2 in particular, which explains why the pipeline is a supplier and why the algorithms
 inside it are shared.
 **Raised by:** Daniel, 2026-08-19, after the same construct was applied to the simpler cases in `f2ed09c2`.
-**Related:** `ai/docs/20_logic.md` §3 and §10, `ai/docs/50_todo.md`, `ai/plans/2026-08-17_splitstree-py.md`.
+**Related:** `../docs/20_logic.md` §3 and §10, `ai/open/todo.md`, `ai/lab/2026-08-17_splitstree-py.md`.
 
 ---
 

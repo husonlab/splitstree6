@@ -7,8 +7,8 @@ repository**: §9.4 puts the code in `husonlab/splitstree-py`, which does not ex
 on creating it.
 **Raised by:** Daniel, 2026-08-17 — "I want to make all the algorithms that I have implemented in SplitsTree
 available as a Python package."
-**Related:** `ai/docs/20_logic.md` (especially §2, §6, §7), `ai/docs/30_tools.md`, `ai/docs/40_testing.md`,
-`ai/docs/50_todo.md` P1.
+**Related:** `../docs/20_logic.md` (especially §2, §6, §7), `../docs/30_tools.md`, `../docs/40_testing.md`,
+`ai/open/todo.md` P1.
 
 ---
 
@@ -20,7 +20,7 @@ today only through a JavaFX application or a `.stree6` workflow file. Everyone w
 programmatically works in Python. The gap is not the algorithms; it is the doorway.
 
 The reason this is a tractable project rather than a rewrite is a property of the existing design, and it was
-**measured** on 2026-08-17 rather than assumed (`ai/docs/20_logic.md` §6, `60_agent_notes.md`):
+**measured** on 2026-08-17 rather than assumed (`../docs/20_logic.md` §6, `journal.md`):
 
 > An algorithm is `compute(ProgressListener, TaxaBlock, S in, T out)`. It runs on any thread, with **no JavaFX
 > toolkit**, on a plain classpath, in milliseconds.
@@ -211,7 +211,7 @@ Two pieces:
    *How it finds the algorithms* was the one open engineering question, and it is now settled: **scan the jar's
    entries** for classes assignable to `Algorithm`, skip the abstract ones, instantiate the rest with their
    no-argument constructor and interrogate them. There is no registry to read and none is needed. This was run
-   on 2026-08-17 and produced the catalogue in `ai/docs/20_logic.md` §4 in about a second, with no Java-side
+   on 2026-08-17 and produced the catalogue in `../docs/20_logic.md` §4 in about a second, with no Java-side
    change of any kind.
 
 2. **A Python generator** that turns that JSON into `.py` modules plus `.pyi` stubs: a class per algorithm with
@@ -227,7 +227,7 @@ Why this is the right call:
 - **It documents itself from `getToolTip`**, which turns those strings into user-facing documentation and gives
   a reason to improve the ones that are currently just the option name.
 - **It surfaces gaps.** An algorithm whose citation is missing or malformed shows up as a hole in the generated
-  docs. That is the same information the methods-text feature depends on (`20_logic.md` §8).
+  docs. That is the same information the methods-text feature depends on (`../docs/20_logic.md` §8).
 
 Both decisions the generator forces are now taken (§9.1, §9.2): **snake_case** for functions and options, and
 **report algorithms are exposed** while loaders, taxa filters and `Show*` are not. The generator therefore owns
@@ -352,7 +352,7 @@ have been updated to match.
    was generated against, expose it as `st.splitstree_version`, and regenerate as a visible, reviewable commit.
 
 5. **Make `AService` create its progress pane lazily. DONE, 2026-08-17** — and it turned out to be only half
-   the fix. See `ai/docs/20_logic.md` §6 and D-1: the lazy pane fixed *construction*, but `Service.start()`
+   the fix. See `../docs/20_logic.md` §6 and D-1: the lazy pane fixed *construction*, but `Service.start()`
    dispatches through `Platform.runLater` and still needed the toolkit, so `AlgorithmNode.restart()` gained an
    inline execution path for when none is running. Net effect for this plan: **layer 2 is no longer gated**. A
    whole workflow computes headless and synchronously (11 nodes in ~40 ms, same answers as the toolkit path).
@@ -361,7 +361,7 @@ have been updated to match.
    the last open engineering risk in the plan and it is closed. The layout classes that import
    `javafx.scene.*` turn out to be *wrappers*: each calls a pure routine that fills a `NodeArray<Point2D>` or
    `Map<Node, Point2D>` and only then builds shapes. The pure routines are public and toolkit-free. Full
-   evidence in `ai/docs/20_logic.md` §6.2a; in summary:
+   evidence in `../docs/20_logic.md` §6.2a; in summary:
 
    | Geometry | Call | Verified on |
    |---|---|---|
@@ -473,10 +473,10 @@ text** (§9.2). That belongs in SplitsTree, not in the binding.
   boundary.
 - **Do not chase feature parity with the GUI.** Views, tabs, interactive selection and the workflow editor are
   not in scope and probably never will be.
-- **This is not a substitute for the test suite** (`50_todo.md` P3) — but it is the best available *excuse* for
+- **This is not a substitute for the test suite** (`../open/todo.md` P3) — but it is the best available *excuse* for
   one. The step-3 to step-5 verifications are, in effect, the first end-to-end tests the algorithms have ever
   had, written in a language with a working test runner. If they find Java bugs, those get fixed in Java, and
-  the finding goes in `60_agent_notes.md`.
+  the finding goes in `journal.md`.
 - **The Java side may still need small changes**, and each one must be justified separately rather than smuggled
   in: a catalogue exporter in `splitstree6.tools`, possibly a public accessor or two, possibly D-1 in jloda3.
   None is required for step 1.

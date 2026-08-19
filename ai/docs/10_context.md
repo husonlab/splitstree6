@@ -27,7 +27,7 @@ The program has three faces:
 - an **embeddable engine**. `IAppProfile` (`splitstree6.main`) lets a host application filter the algorithm
   list, restrict the readers, override the default workflow and trim the menu bar. RazorNet is such a host.
   Anything a host can do, a language binding can do; this is the seam the `splitstree.py` plan builds on
-  (`ai/plans/2026-08-17_splitstree-py.md`).
+  (`ai/lab/2026-08-17_splitstree-py.md`).
 
 There is one architectural fact that governs almost every decision in this codebase, and it is worth stating
 before anything else:
@@ -83,32 +83,51 @@ the code, and do not quietly change the code to match a description you are unsu
 
 ## Working rules for the AI agent
 
-1. **Start here.** Read this file, then read whichever of the numbered files below are relevant. If you are
-   touching anything that runs inside the workflow, `20_logic.md` is always relevant.
-2. **Verify against the description.** When you work on something a logic file describes, check that the code
+The documentation is in three layers, and the layer a fact goes in is decided by **how sure we are of it**:
+`docs/` is what we believe true, `../open/` is what we do not yet know, `../lab/` is the record of what was
+tried. See `../README.md` for the map.
+
+1. **Start here.** Read this file, then whichever of the numbered files below are relevant. If you are
+   touching anything that runs inside the workflow, `20_logic.md` is always relevant. Then read
+   `../open/questions.md` and `../open/todo.md`.
+2. **Search the ledger before investigating anything.** `../lab/INDEX.md` has one row per question ever asked
+   here, with its verdict. A refuted idea is recorded precisely so that it is not tried twice; if what you are
+   about to pursue is already there, say so rather than repeating it.
+3. **Verify against the description.** When you work on something a logic file describes, check that the code
    actually does what is written there, and report **every** discrepancy you find, even the ones you are not
    fixing. Each logic file ends with a discrepancy section; add to it.
-3. **Change the documentation with the code.** A change is not finished until the relevant logic file, the
-   class javadoc and the in-code comments say the new truth, and `50_todo.md` and `60_agent_notes.md` have been
-   updated.
-4. **Be specific.** "The splits look wrong" is useless. Name the file, the method, the line, the option, the
-   dataset, the measured numbers, and the case that fails. When you propose work, propose it concretely enough
-   to act on. When you report a result, give the number.
+4. **Ask a question, not a plan.** Research work starts from something that could turn out to be false — "does
+   the layout report coordinates with no toolkit?", not "make it headless". Open an entry from
+   `../lab/TEMPLATE.md` (or run `/probe`), and **write down what would settle it before you measure**. A plan
+   is what an entry becomes once the answer is "build this"; it is an outcome of investigation, not its
+   precondition. Small, local fixes need no entry — `../open/todo.md` is enough.
 5. **Verify by running, not by reading.** See `40_testing.md`. Reading the code is how you form a hypothesis;
    compiling a ten-line probe against `target/classes` and looking at the splits it produces is how you find
-   out. This project has no unit tests, so this rule carries more weight here than usual.
-6. **Report honestly.** If something is half-done, broken, slower than before, or was fixed for a different
+   out. This project has no unit tests, so this rule carries more weight here than usual — and note that the
+   JavaFX boundary, the single most consequential fact in this codebase, was established by measurement and
+   contradicted what the imports suggested.
+6. **Record the outcome, including the failures.** An idea is finished when `../lab/INDEX.md` has a row with a
+   verdict — `confirmed`, `refuted`, `inconclusive`, `shipped`, `reverted` or `parked` — and every number
+   worth comparing later is in `../lab/measurements.md`. "We tried it and it did nothing" is a result, and the
+   most expensive kind to rediscover.
+7. **Change the documentation with the code.** A change is not finished until the relevant logic file, the
+   class javadoc and the in-code comments say the new truth, and `../open/todo.md`, `../lab/journal.md` and
+   `../lab/INDEX.md` have been updated.
+8. **Be specific.** "The splits look wrong" is useless. Name the file, the method, the line, the option, the
+   dataset, the measured numbers, and the case that fails. When you report a result, give the number — and the
+   size of the sample it came from.
+9. **Report honestly.** If something is half-done, broken, slower than before, or was fixed for a different
    reason than you first claimed, say so plainly.
-7. **Keep the diff minimal.** Do not reformat, re-indent or "tidy" code you were not asked to change. A
-   whitespace-only diff hides the real change.
-8. **Never silently change a default.** Every `optionX` default is a published parameter that users' results
-   depend on, and it is written into every `.stree6` file ever saved. Changing one changes everybody's answers
-   and can change how an old file reloads.
-9. **Do not move or edit anything under `splitstree6.xtra`.** That package holds experimental and student work
-   (for example `xtra/phyloFusionTreeTrace`, contributed by Banu Cetinkaya) and is kept as a stable reference.
-   When a feature needs code from there, **copy** it into a new class in the appropriate main package — as
-   `compute/phylofusion/Traced*.java` did — keeping the attribution. Never `git mv` out of `xtra`, never
-   refactor it in place.
+10. **Keep the diff minimal.** Do not reformat, re-indent or "tidy" code you were not asked to change. A
+    whitespace-only diff hides the real change.
+11. **Never silently change a default.** Every `optionX` default is a published parameter that users' results
+    depend on, and it is written into every `.stree6` file ever saved. Changing one changes everybody's
+    answers and can change how an old file reloads.
+12. **Do not move or edit anything under `splitstree6.xtra`.** That package holds experimental and student
+    work (for example `xtra/phyloFusionTreeTrace`, contributed by Banu Cetinkaya) and is kept as a stable
+    reference. When a feature needs code from there, **copy** it into a new class in the appropriate main
+    package — as `compute/phylofusion/Traced*.java` did — keeping the attribution. Never `git mv` out of
+    `xtra`, never refactor it in place.
 
 ## Coding guidelines
 
@@ -155,7 +174,7 @@ branch avoids, and the alternative that was tried and failed. Good existing exam
 Write comments of that kind. When you fix a subtle bug, leave behind the sentence that will stop the next
 person reintroducing it. A `// todo:` comment is acceptable and is used in this codebase (there is one in
 `Workflow.setupInputAndWorkingNodes` asking what the source node is for), but if you add one, also add it to
-`50_todo.md`.
+`../open/todo.md`.
 
 ### Style
 
@@ -260,37 +279,53 @@ hard to see. Say so explicitly in the javadoc when you add one.
 - Launcher scripts live in `splitstree6-tools/tools`, one per tool, named in `kebab-case`, all sourcing
   `splitstree6-tools/lib/splitstree-env`. `tools/` at the repo root holds the installer's own templates of the
   same scripts, with `${installer:...}` placeholders.
-- These documents live in `splitstree6/ai/docs`, named `NN_name.md`, two digits, lowercase, underscore. The
-  tens digit is the section (10 context, 20 logic, 30 tools, 40 testing, 50 todo, 60 notes); logic files for
-  individual algorithms or subsystems take the numbers `21`, `22`, … . Keep the numbering stable; add new files
-  with the next free number **and list them in the table below**.
-- **`splitstree6/ai/plans`** holds planning documents for major code transformations — a migration, a rewrite,
-  a new interface, a change that touches many files. Write the plan there *before* starting the work, name it
-  after the transformation (`YYYY-MM-DD_short-name.md`), and keep it updated as the work proceeds. A plan says
-  what is being changed and why, the order of the steps, what has to keep working, and how each step is
-  verified. When the work is done, the plan stays as a record; the durable conclusions move into a logic file
-  and `60_agent_notes.md`. Small, local fixes do not need a plan — `50_todo.md` is enough.
+- **These documents live in `splitstree6/ai/`, in three directories by epistemic status** — `docs/` (what we
+  believe true), `open/` (what we do not yet know), `lab/` (what was tried). `../README.md` is the map. Files
+  in `docs/` are named `NN_name.md`, two digits, lowercase, underscore; the tens digit is the section
+  (10 context, 20 logic, 30 tools, 40 testing), and logic files for individual algorithms or subsystems take
+  `21`, `22`, … . Keep the numbering stable; add new files with the next free number **and list them below**.
+- **`ai/lab/`** holds one file per question investigated, named `YYYY-MM-DD_short-name.md`, from the skeleton
+  in `../lab/TEMPLATE.md`. It is append-only: entries are never deleted or rewritten to match how things turned
+  out, and abandoned entries stay. Every entry gets a row in `../lab/INDEX.md` when it closes. Durable
+  conclusions are *copied* into a logic file; the entry remains as the record of how they were reached.
 
-## The other files in this directory
+## The three layers
+
+|                   | Directory  | Holds                                                         | Written how                                             |
+|-------------------|------------|---------------------------------------------------------------|---------------------------------------------------------|
+| **What we know**  | `ai/docs/` | The workflow design, the tools, the testing.                  | Rewritten in place; one current version.                |
+| **What we don't** | `ai/open/` | Open questions with their gates; tasks whose answer is known. | Rewritten in place; items leave when settled.           |
+| **What we tried** | `ai/lab/`  | One entry per question, the ledger, the numbers, the journal. | Append-only; nothing is deleted, including wrong turns. |
+
+## The files
+
+### `ai/docs/` — what we believe true
 
 | File | Contents | Read it when |
 |---|---|---|
 | `20_logic.md` | **The workflow design**: data blocks, algorithms, the shape of a workflow, the reactive execution model, the type system, options, citations, IO and persistence, and — measured — exactly where the JavaFX dependency starts. Deliberately does *not* describe individual algorithms. | Always, before touching anything that runs inside the workflow. It is the map to the `2x_` files. |
 | `30_tools.md` | Build, dependencies, the module system, the command-line tools and their launchers, the example data, profiling, IDE, version control. | Before building, running or writing a harness. |
 | `40_testing.md` | How changes are verified in a project with no test suite: the probe pattern, the example datasets, workflow round-trips, and the known gaps. | Before claiming that anything works. |
-| `50_todo.md` | Current tasks and progress, open questions, known defects and concerns, with priorities. | At the start and end of every session. |
-| `60_agent_notes.md` | An archive log of past work, findings and dead ends, with dates. Not required reading before starting. | When you need the history of a decision or want to know what was already tried. |
 
-There are **no `2x_logic_*.md` files yet**. They are to be written one subsystem at a time, as work touches
-them, following the megan8 pattern: the mathematics, the parameter table, and a discrepancy section at the end.
-The obvious first candidates are named in `50_todo.md`.
+There are **no `2x_logic_*.md` files yet**. Write them one subsystem at a time, as work touches them,
+following the megan8 pattern: the mathematics, the parameter table, and a discrepancy section at the end.
+The obvious first candidates are named in `../open/todo.md`.
 
-Alongside this directory, **`ai/plans/`** holds planning documents for major code transformations, one file per
-transformation (see the structuring rules above). Read the relevant plan before continuing work that a plan
-covers; there is no plan for ordinary fixes.
+### `ai/open/` — what we do not yet know
 
-| Plan | Topic |
-|---|---|
-| `2026-08-17_splitstree-py.md` | **`splitstree.py`** — exposing the SplitsTree algorithms as a Python package. Proposed, awaiting Daniel's answers to its §9. |
-| `2026-08-17_test-suite.md` | **Unit tests for all features** — tiered, mostly data-driven from the algorithm catalogue. Proposed, awaiting review. |
-| `2026-08-19_bootstrapping.md` | **Bootstrapping** — finishing the separation of the computation from the workflow. One of three done; proposed. |
+| File                   | Contents                                                                                                                                                                             | Read it when                                                        |
+|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| `../open/questions.md` | The frontier. Open questions, each with the **gate** that would settle it, plus the standing hazards that will ruin a measurement if forgotten. Nothing here has an owner or a date. | At the start of every session, and before designing any experiment. |
+| `../open/todo.md`      | Jobs whose answer is already known and only the work is outstanding.                                                                                                                 | At the start and end of every session.                              |
+
+### `ai/lab/` — what was tried
+
+| File                                 | Contents                                                                                                                                                                                                   | Read it when                                                                   |
+|--------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| `../lab/INDEX.md`                    | **The ledger.** One row per question ever investigated, with a verdict from a closed vocabulary and the number that justifies it.                                                                          | **Before starting anything.** It is the answer to "have we tried this?"        |
+| `../lab/TEMPLATE.md`                 | The skeleton for a new entry. Copy it to `YYYY-MM-DD_short-name.md`, or run `/probe`.                                                                                                                      | When an idea is worth more than ten minutes.                                   |
+| `../lab/measurements.md`             | Every number worth comparing to a later number, with the instrument and the conditions that produced it.                                                                                                   | Before quoting a figure, and after taking one.                                 |
+| `../lab/2026-08-17_splitstree-py.md` | **`splitstree.py`** — exposing the SplitsTree algorithms as a Python package. Steps 1–4 done in `husonlab/splitstree-py`; step 5, the generator, is the big one.                                           |
+| `../lab/2026-08-17_test-suite.md`    | **Unit tests for all features** — tiered, mostly data-driven from the algorithm catalogue. Proposed, no code written against it.                                                                           |
+| `../lab/2026-08-19_bootstrapping.md` | **Bootstrapping** — separating the computation from the workflow. All three done 2026-08-19.                                                                                                               |
+| `../lab/journal.md`                  | The chronological archive of past work, findings and dead ends, newest first. Superseded as the primary record by `../lab/INDEX.md` and the entries, but everything before 2026-08-19 lives there in full. | When you need the history of a decision. Not required reading before starting. |

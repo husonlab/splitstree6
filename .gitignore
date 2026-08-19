@@ -53,3 +53,6 @@ buildNumber.properties
 *.toc
 
 CLAUDE.md
+
+# working area for files removed by the ai/ restructure (2026-08-19); delete when reviewed
+ai/_to_delete/

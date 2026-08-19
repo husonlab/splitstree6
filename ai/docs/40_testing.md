@@ -7,7 +7,7 @@ workflows in `build-installers` are started by hand, not by a push). That is the
 starting point, and it means the burden of verification falls entirely on what you do by hand in the session.
 Everything below is about doing that well.
 
-A plan for building one exists — `ai/plans/2026-08-17_test-suite.md` — and is waiting to be read. Note that
+A plan for building one exists — `ai/lab/2026-08-17_test-suite.md` — and is waiting to be read. Note that
 its premise changed on 2026-08-17: with the workflow now runnable headless and synchronously (§ below), the
 engine itself became unit-testable, which it was not before.
 
@@ -17,7 +17,7 @@ engine itself became unit-testable, which it was not before.
    you find out. This project makes running cheap — see the probe pattern below — so there is no excuse.
 2. **Every claim is a number.** "The splits look better" is worthless. "Neighbor-net on the 346-taxon phyml
    alignment went from 517 splits at fit 99.9 % to 519 at 99.9 %, and the cycle is unchanged" is a result.
-   Numbers go in the commit message and in `60_agent_notes.md`.
+   Numbers go in the commit message and in `../lab/journal.md`.
 3. **Show that nothing else moved.** Every change should be accompanied by a run of an unrelated configuration
    that must *not* change, and that number should come out identical.
 4. **Reproduce the failure before fixing it**, then, having fixed it, **re-break it deliberately** and confirm
@@ -130,7 +130,7 @@ assert workflow.isValid();
 Verified on 2026-08-17: an 11-node workflow computed in **36–43 ms** on the `main` thread with no toolkit,
 `isValid()` true, `nsplits=7 fit=100.0`, NJ tree `(((a:1,b:1):3,c:1):1,d:1,e:1)` — the same answers the
 toolkit path gives. This is what makes the workflow testable at all; see
-`ai/plans/2026-08-17_test-suite.md`.
+`ai/lab/2026-08-17_test-suite.md`.
 
 A probe that *does* want the toolkit — because it builds views — still starts it the old way
 (`Platform.startup(latch::countDown)`), and that path is unchanged.

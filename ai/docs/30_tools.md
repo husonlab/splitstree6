@@ -226,7 +226,7 @@ depends on the installed `SplitsTree` artifact, so `mvn -o package` here is not 
 ## The Python package
 
 `husonlab/splitstree-py`, checked out at `~/PycharmProjects/splitstree-py`. It runs the SplitsTree algorithms
-in-process through JPype. `ai/plans/2026-08-17_splitstree-py.md` is the design; what follows is only how to run
+in-process through JPype. `ai/lab/2026-08-17_splitstree-py.md` is the design; what follows is only how to run
 it.
 
 **The JVM's architecture must match the Python interpreter's**, because JPype loads it into the same process.
@@ -297,7 +297,7 @@ IntelliJ IDEA; `.idea/` is **not** checked in here (it is in `.gitignore`, unlik
   IDE run and a Maven run can disagree about which version of the library is in play. When a change seems not
   to take effect, check which of the two is being used.
 - After a dependency rename, re-importing silently reverts profile selections and can keep a stale Maven model.
-  Symptoms and fixes are recorded in `60_agent_notes.md` under the fmmm-layout entry. Only edit `.idea/*.xml`
+  Symptoms and fixes are recorded in `../lab/journal.md` under the fmmm-layout entry. Only edit `.idea/*.xml`
   with IntelliJ closed.
 
 `CLAUDE.md` is in `.gitignore`; the standing instructions live in this directory instead.

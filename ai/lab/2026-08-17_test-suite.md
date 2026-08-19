@@ -2,8 +2,8 @@
 
 **Status:** proposed, awaiting review.
 **Raised by:** Daniel, 2026-08-17 — "We need to create a plan for generating unit testing of all features"
-(answering D-7 in `ai/docs/20_logic.md`).
-**Related:** `ai/docs/40_testing.md`, `ai/docs/20_logic.md` §4 and §6, `ai/docs/50_todo.md` P3.
+(answering D-7 in `../docs/20_logic.md`).
+**Related:** `../docs/40_testing.md`, `../docs/20_logic.md` §4 and §6, `ai/open/todo.md` P3.
 
 ---
 
@@ -22,7 +22,7 @@ this plan is worth acting on now:
    means workflow behaviour is testable in an ordinary JUnit method, with no toolkit, no window, no latch and
    no sleep. Before today it was not.
 2. **The algorithm catalogue is machine-readable.** Scanning the jar for non-abstract `Algorithm` subclasses
-   and interrogating each one takes about a second and needs no Java-side change (`20_logic.md` §4). So the
+   and interrogating each one takes about a second and needs no Java-side change (`../docs/20_logic.md` §4). So the
    suite does not have to be 102 hand-written test classes: most of it can be **data-driven from the
    catalogue**, which is also the only way it stays complete as algorithms are added.
 
@@ -74,7 +74,7 @@ and then blocks the fix. Two consequences:
 - for anything golden-file based (T2's numeric outputs, T5), the file is a **characterization** fixture, must
   be labelled as such in the test, and a diff is a question ("did we mean to change this?"), not a failure to
   be silenced by re-recording. Re-record only in the same commit as the change that justifies it, with the
-  numbers in `60_agent_notes.md`.
+  numbers in `journal.md`.
 
 ## 5. The tiers
 
@@ -108,7 +108,7 @@ probe did, and for **each of the 102 algorithms** asserts:
    fail today for many; see §7 — it is a documentation debt the suite should make visible, so start it as a
    reported warning rather than a failure)**;
 6. `getCitation()` is either null or parses into `short;full;` pairs — **38 algorithms return null today**
-   (`20_logic.md` §4), so assert the *format* and report the count, do not fail on absence yet;
+   (`../docs/20_logic.md` §4), so assert the *format* and report the count, do not fail on absence yet;
 7. given a canonical input of its `fromClass` (§6), either `isApplicable` is false, or `compute` runs without
    throwing and produces a non-empty output.
 
