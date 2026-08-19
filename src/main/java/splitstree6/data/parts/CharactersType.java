@@ -33,7 +33,7 @@ public enum CharactersType {
 	DNA("acgt"),
 	DNAwithAmbiguityCodes("acgtryswkmbdhvn"),
 	RNA("acgu"),
-	RNAwithAmbiguityCodes("acgury"),
+	RNAwithAmbiguityCodes("acguryswkmbdhvn"),
 	Protein("arndcqeghilkmfpstwyvbzx*"),
 	Microsat(""),
 	Unknown("");
@@ -51,6 +51,30 @@ public enum CharactersType {
 	 */
 	public String getSymbols() {
 		return this.symbols;
+	}
+
+	/**
+	 * gets those symbols of this data type that do not stand for a state of their own
+	 * <p>
+	 * The nucleotide types list the ambiguity codes among their symbols, because a code is a legal character in
+	 * such an alignment and the readers validate against this list. A code is not a state, though: it stands for
+	 * a set of bases and is expanded into them before it ever reaches a frequency matrix. Anything that means
+	 * "the states" must therefore ask for the state symbols and not for getSymbols(). Counting the codes as
+	 * states gave DNAwithAmbiguityCodes 15 states rather than 4, eleven of whose rows can never be filled, which
+	 * made every such frequency matrix singular and left LogDet undefined for every pair of taxa.
+	 *
+	 * @return the symbols that are not states, or an empty string if every symbol is one
+	 */
+	public String getNonStateSymbols() {
+		return switch (this) {
+			case DNA, DNAwithAmbiguityCodes, RNA, RNAwithAmbiguityCodes -> AmbiguityCodes.CODES;
+			// 'b' is D or N, 'z' is E or Q and 'x' is any residue, so none of the three is a state; '*' is a stop
+			// codon rather than a residue, and ProteinMLDistance says in so many words that such sites are to be
+			// ignored. Unlike the nucleotide codes these are not expanded - PairwiseCompare has no machinery for
+			// protein ambiguity - so they are treated as missing, which is what excluding them here achieves.
+			case Protein -> "bzx*";
+			default -> "";
+		};
 	}
 
 	public static CharactersType valueOfIgnoreCase(String str) {

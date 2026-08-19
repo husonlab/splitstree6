@@ -236,7 +236,8 @@ public class PhiTest extends AnalyzeCharactersBase {
 
 		this.ntax = characters.getNtax();
 		int nchar = characters.getNchar();
-		var symbols = characters.getSymbols();
+		// the states: an ambiguity code is not a state of its own, and falls through to 'missing' below
+		var symbols = characters.getStateSymbols();
 		int nstates = symbols.length();
 		int[] symbol_map = new int[nstates];
 		sitePositions = new int[nchar];

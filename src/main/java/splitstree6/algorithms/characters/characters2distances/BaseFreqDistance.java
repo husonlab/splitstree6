@@ -37,7 +37,8 @@ import java.io.IOException;
 public class BaseFreqDistance extends Characters2Distances {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
-		final String symbols = charactersBlock.getSymbols();
+		// the states: a base frequency vector must not have a bin for each ambiguity code
+		final String symbols = charactersBlock.getStateSymbols();
 		final int nstates = symbols.length();
 
 		final int ntax = taxaBlock.getNtax();

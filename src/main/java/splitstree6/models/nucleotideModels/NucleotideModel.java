@@ -35,6 +35,8 @@ import splitstree6.algorithms.characters.characters2distances.utils.PairwiseComp
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 import splitstree6.algorithms.utils.SplitsException;
 import splitstree6.data.CharactersBlock;
+
+import java.util.Arrays;
 import splitstree6.data.DistancesBlock;
 import splitstree6.models.SubstitutionModel;
 
@@ -460,16 +462,21 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	 */
 
 	static public double[] computeFreqs(CharactersBlock chars, boolean warned) {
-		int numNotMissing = 0;
-		final String symbols = chars.getSymbols();
+		int numCounted = 0;
+		// the states, so that a nucleotide model gets the four base frequencies it expects. Asking for
+		// getSymbols() gave a vector of length 15 on data typed DNAwithAmbiguityCodes, one bin per ambiguity
+		// code, which is neither a base frequency nor the length optionBaseFrequencies is read back at
+		final String symbols = chars.getStateSymbols();
 		final int numStates = symbols.length();
 		final double[] Fcount = new double[numStates];
 		final char missingChar = chars.getMissingCharacter();
 		final char gapChar = chars.getGapCharacter();
 
-		for (int i = 1; i < chars.getNtax(); i++) {
+		// from 0, and to the end: these loops used to start at 1 and stop short, silently leaving the first
+		// taxon, the first site and the last site out of every base frequency this program has ever reported
+		for (int i = 0; i < chars.getNtax(); i++) {
 			char[] seq = chars.getMatrix()[i];
-			for (int k = 1; k < chars.getNchar(); k++) {
+			for (int k = 0; k < chars.getNchar(); k++) {
 				char c = seq[k];
 
 				//Convert to lower case if the respectCase option is not set
@@ -478,12 +485,14 @@ public abstract class NucleotideModel implements SubstitutionModel {
 						c = Character.toLowerCase(c);
 				}
 				if (c != missingChar && c != gapChar) {
-					numNotMissing = numNotMissing + 1;
-
 					int state = symbols.indexOf(c);
 
+					// count in the denominator only what is counted in the numerator, so that the frequencies
+					// sum to 1. Ambiguity codes reach this point and are not states, and they used to be counted
+					// as not-missing while contributing to no bin, which quietly scaled every frequency down
 					if (state >= 0) {
 						Fcount[state] += 1.0;
+						numCounted++;
 					} else if (!warned) {
 
 						NotificationManager.showWarning("Unknown symbol encountered in characters: " + c);
@@ -493,8 +502,15 @@ public abstract class NucleotideModel implements SubstitutionModel {
 			}
 		}
 
+		if (numCounted == 0) {
+			// nothing observed at all: report a flat distribution rather than dividing by zero, which used to
+			// hand the model a vector of NaN
+			Arrays.fill(Fcount, numStates > 0 ? 1.0 / numStates : 0.0);
+			return Fcount;
+		}
+
 		for (int i = 0; i < numStates; i++) {
-			Fcount[i] = Fcount[i] / (double) numNotMissing;
+			Fcount[i] = Fcount[i] / (double) numCounted;
 		}
 		return Fcount;
 	}

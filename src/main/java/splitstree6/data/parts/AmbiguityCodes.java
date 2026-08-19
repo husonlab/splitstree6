@@ -49,6 +49,25 @@ public class AmbiguityCodes {
 	}
 
 	/**
+	 * gets all nucleotides associated with a given code, expressed in the given alphabet
+	 * <p>
+	 * The codes are defined in terms of DNA, so the 't' they expand to has to be reported as 'u' when the data
+	 * is RNA. Without this, 'y' in an RNA sequence expands to "ct", 't' is not one of RNA's symbols, and the
+	 * caller either indexes an array with -1 or reports a perfectly legal character as invalid.
+	 *
+	 * @param code     a character coding an ambiguous state
+	 * @param alphabet the symbols in use, as given by CharactersBlock.getSymbols(). An alphabet that contains
+	 *                 'u' and no 't' is taken to be RNA
+	 * @return all (lowercase) letters associated with the given code, or the nucleotide itself, if not a code
+	 */
+	public static String getNucleotides(char code, String alphabet) {
+		var nucleotides = getNucleotides(code);
+		if (alphabet.indexOf('u') >= 0 && alphabet.indexOf('t') < 0)
+			nucleotides = nucleotides.replace('t', 'u');
+		return nucleotides;
+	}
+
+	/**
 	 * is the given letter an ambiguity code?
 	 *
 	 * @param ch char

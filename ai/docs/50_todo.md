@@ -21,17 +21,6 @@ and `60_agent_notes.md` all say the new truth.
       than discarding it — Daniel's reasoning being that Java users do not see that output either unless they
       open the message window; and the jars **stay gitignored**, synced by `tools/sync_jars.py`.
 
-- [ ] **`numStates` counts the ambiguity codes as states, and it breaks LogDet** (found 2026-08-19, not
-      fixed). `CharactersType.DNAwithAmbiguityCodes` has symbols `acgtryswkmbdhvn` — the four bases and all
-      eleven codes — so `PairwiseCompare.getNumStates()` is 15. But the codes are expanded into bases before
-      they reach `fCount`, so those eleven rows and columns are always zero and `F` is singular by
-      construction. **`LogDet` on `examples/large_DNA_phyml/nucleic_M2573_346x897_2006.phy` returns the
-      replaced value 1.0 for all 59 685 pairs**; on `primates.nex`, typed plain `DNA`, it works and gives a
-      mean of 0.2996. `RNAwithAmbiguityCodes` (`acgury`) has 2 dead states out of 6. This is long-standing,
-      not a regression. The question for Daniel is whether `getSymbols()` for these types should report only
-      the bases — which touches parsing, `guessType`, the state labelers and the colouring — or whether the
-      model-based algorithms should ask for the base alphabet some other way. See `60_agent_notes.md`.
-
 - [ ] **Confirm the `HammingDistance.optionMatchAmbiguityCodes` default** (raised 2026-08-19). The rewrite
       replaced the `AmbiguousOptions` enum with two booleans and had to pick a default for the ambiguity flag,
       which Daniel did not specify. It is **true**, on the grounds that this preserves the old `Ignore`
@@ -183,6 +172,20 @@ and `60_agent_notes.md` all say the new truth.
   `proportion * getNumNotMissing()` is a valid count of sites — it was not before, and that is what made
   `HammingDistance` wrong. Keep the invariant if you touch `calculatePairwiseCompare`: the site is counted
   where the mass is added, not where the characters are read.
+- **A non-state symbol is either expanded or treated as missing, and which one depends on the data type.** The
+  nucleotide ambiguity codes are expanded into the bases they stand for; protein's `b`, `z`, `x` and the stop
+  codon `*` are mapped onto the missing index, there being no machinery to expand them. In `PairwiseCompare`
+  the gap test comes first on purpose - `ungulates.nex` declares `gap=x`, and there `x` is a gap, not missing.
+- **LogDet needs every state observed in a pair.** With 20 protein states that often fails on skewed
+  alignments: 99.1 % of pairs in `ungulates.nex` come back undefined, because 5 of its 156 156 characters are
+  `l`. That is the data, not a defect - unlike the structural singularity fixed on 2026-08-19, where rows
+  existed that no data could ever fill.
+- **`getSymbols()` is the legal characters, `getStateSymbols()` is the states.** They differ for nucleotide
+  data read from phylip or FASTA, whose readers set the symbols from the observed alphabet and so include the
+  ambiguity codes; a nexus file declaring `symbols="acgt"` makes them identical, which is why this was
+  invisible on the nexus examples for years. Anything counting states, indexing states, or sizing a frequency
+  vector wants `getStateSymbols()`. Getting this wrong left LogDet undefined for every pair and put `h` where
+  a model expected π_T.
 - **The ambiguity codes are written in terms of DNA.** `AmbiguityCodes.getNucleotides` expands `y` to `"ct"`,
   which is wrong for RNA. Use the `getNucleotides(code, alphabet)` overload, which maps `t` onto `u` for an
   alphabet that has `u` and no `t`; `HammingDistance` folds the other way, `u` onto `t`, because its bitmask
@@ -224,6 +227,24 @@ and `60_agent_notes.md` all say the new truth.
   registered in the data-node map, so a deleted title is actually freed; an empty input is reported instead of
   swallowed; the source node was found to be load-bearing and is now documented rather than removed. All
   verified against a `RunWorkflow` regression that came out byte-identical.
+- 2026-08-19 — **Protein ambiguity treated as missing, and the RNA ambiguity-code list completed.** `b`, `z`,
+  `x` and the stop codon `*` are no longer states, so protein has 20 rather than 24; `PairwiseCompare` maps
+  them onto the missing index instead of expanding them, the gap test still winning so that `ungulates.nex`'s
+  `gap=x` keeps its meaning. **LogDet on protein went from undefined for every pair to a working matrix** on
+  `buttercups-cytochromeC.fasta` (mean 0.134, 1 of 4950 pairs at the replacement value); on `ungulates.nex` it
+  stays 99.1 % undefined, which is the alignment's skew and not a defect. `RNAwithAmbiguityCodes` was
+  `acgury`, two of the eleven codes, so RNA using `w` or `n` was typed `Unknown` and then failed with
+  `invalid character 't'`; it is now `acguryswkmbdhvn` and such data runs end to end. Details in
+  `60_agent_notes.md`.
+- 2026-08-19 — **Ambiguity codes are no longer counted as states.** `getSymbols()` was serving both as the
+  legal-character list and as the state list; for nucleotide data read from phylip or FASTA those differ.
+  New `CharactersType.getNonStateSymbols()` and `CharactersBlock.getStateSymbols()`, used by
+  `PairwiseCompare`, `NucleotideModel.computeFreqs`, `BaseFreqDistance`, `PhiTest` and `LogDet.isApplicable`.
+  **LogDet on the 346-taxon phyml alignment went from undefined for all 59 685 pairs to a working matrix**
+  (mean 0.111), and base frequencies from a vector of length 11 with π_T = 0 to a correct four. Two further
+  defects fixed in `computeFreqs`: loops that skipped the first taxon, the first site and the last site of
+  every base frequency ever reported, and a denominator counting characters the numerator did not. Nexus
+  output unchanged, verified by round trip. Details in `60_agent_notes.md`.
 - 2026-08-19 — **RNA with ambiguity codes made to work.** `AmbiguityCodes` expands codes to DNA bases, so `y`
   in RNA data gave `t`, which is not one of RNA's symbols: `PairwiseCompare` either indexed `fCount[-1][-1]`
   or reported `invalid character 't'` for a character not in the data, making every such sequence unusable.

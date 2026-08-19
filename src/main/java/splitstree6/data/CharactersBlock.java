@@ -312,6 +312,40 @@ public class CharactersBlock extends DataBlock {
 		return symbols;
 	}
 
+	/**
+	 * gets the symbols that stand for a state, that is, the symbols without the ambiguity codes
+	 * <p>
+	 * Use this, and not getSymbols(), wherever the code means "the states" - how many there are, or the index of
+	 * a character among them. getSymbols() is the list of characters that may legally appear, which for the
+	 * nucleotide types includes the ambiguity codes; a code is not a state, it is expanded into the bases it
+	 * stands for. See CharactersType.getNonStateSymbols().
+	 *
+	 * @return the state symbols, in the order they appear in getSymbols()
+	 */
+	/**
+	 * gets the symbols that may legally appear but do not stand for a state, so that a caller can decide how to
+	 * handle them: the nucleotide ambiguity codes are expanded into the bases they stand for, whereas protein's
+	 * 'b', 'z', 'x' and the stop codon '*' are treated as missing
+	 *
+	 * @return the non-state symbols, or an empty string if every symbol is a state
+	 */
+	public String getNonStateSymbols() {
+		return (dataType != null ? dataType.getNonStateSymbols() : "");
+	}
+
+	public String getStateSymbols() {
+		final var nonStates = (dataType != null ? dataType.getNonStateSymbols() : "");
+		if (nonStates.isEmpty())
+			return symbols;
+		final var buf = new StringBuilder();
+		for (var i = 0; i < symbols.length(); i++) {
+			final var ch = symbols.charAt(i);
+			if (nonStates.indexOf(ch) < 0)
+				buf.append(ch);
+		}
+		return buf.toString();
+	}
+
 	public void setSymbols(String symbols) {
 		this.symbols = symbols.toLowerCase();
 		computeColors();

@@ -259,7 +259,7 @@ public class LogDet extends Characters2Distances {
 	public boolean isApplicable(TaxaBlock taxa, CharactersBlock characters) {
 
 		/* We can computeConsensusAndCycle as long as there is more than one symbol */
-		return characters.getSymbols().length() > 1;
+		return characters.getStateSymbols().length() > 1;
 	}
 
 	/**

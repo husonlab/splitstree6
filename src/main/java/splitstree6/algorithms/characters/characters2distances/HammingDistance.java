@@ -1,5 +1,5 @@
 /*
- *  HammingDistance.java Copyright (C) 2024 Daniel H. Huson
+ *  HammingDistance.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -20,29 +20,41 @@
 package splitstree6.algorithms.characters.characters2distances;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
-import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.AmbiguityCodes;
+import splitstree6.data.parts.CharactersType;
 
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * computes the Hamming distance, the number of sites at which two sequences differ
+ * <p>
+ * A site is compared only if both sequences have an observed character there. A gap, the missing
+ * character, and a code standing for the whole alphabet ('n' for nucleotides, 'x' for protein) all
+ * count as unobserved: such a site contributes neither a difference nor a compared site. So each
+ * pair is scored on its own overlap, and a pair with no overlap at all gets the undefined distance
+ * -1, which FixUndefinedDistances then reports and replaces. Returning 0 there would claim that two
+ * sequences sharing no observed site are identical.
+ * <p>
+ * Because every pair has its own denominator, unnormalized counts coming from pairs with very
+ * different overlaps are not on one scale. Run CharactersFilter with optionExcludeGapSites first if
+ * the raw counts have to be comparable across the whole matrix.
+ * <p>
+ * Daniel Huson, 2006, 8.2026
+ */
 public class HammingDistance extends Characters2Distances {
-
-	public enum AmbiguousOptions {Ignore, AverageStates, MatchStates}
-
 	private final BooleanProperty optionNormalize = new SimpleBooleanProperty(this, "optionNormalize", false);
-	private final Property<AmbiguousOptions> optionHandleAmbiguousStates = new SimpleObjectProperty<>(this, "optionHandleAmbiguousStates", AmbiguousOptions.Ignore);
+	private final BooleanProperty optionMatchAmbiguityCodes = new SimpleBooleanProperty(this, "optionMatchAmbiguityCodes", true);
+	private final BooleanProperty optionMatchGapToGap = new SimpleBooleanProperty(this, "optionMatchGapToGap", false);
 
 	public List<String> listOptions() {
-		return List.of(optionHandleAmbiguousStates.getName());
+		return List.of(optionMatchAmbiguityCodes.getName(), optionMatchGapToGap.getName());
 	}
 
 	@Override
@@ -50,142 +62,137 @@ public class HammingDistance extends Characters2Distances {
 		if (!optionName.startsWith("option"))
 			optionName = "option" + optionName;
 		if (optionName.equals(optionNormalize.getName())) {
-			return "Normalize distances";
-		} else if (optionName.equals(optionHandleAmbiguousStates.getName())) {
-			return "Choose how to handle ambiguous states (nucleotide data only)";
+			return "Divide the number of differences by the number of sites compared";
+		} else if (optionName.equals(optionMatchAmbiguityCodes.getName())) {
+			return "Do not count two compatible nucleotide ambiguity codes, such as Y and C, as a difference (nucleotide data only)";
+		} else if (optionName.equals(optionMatchGapToGap.getName())) {
+			return "Count a site at which both sequences have a gap as a match, rather than leaving it out";
 		} else
 			return super.getToolTip(optionName);
 	}
 
 	@Override
 	public String getCitation() {
-		return "Hamming 1950; Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.";
+		return "Hamming 1950; Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147-160. MR 0035935, 1950.";
 	}
 
 	@Override
 	public String getShortDescription() {
-		return "Computes the Hamming distance, that is the number of differences between sequences";
+		return "Computes the Hamming distance, that is, the number of sites at which two sequences differ";
 	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, DistancesBlock distancesBlock) throws IOException {
-		progress.setMaximum(taxa.getNtax());
+		var ntax = taxa.getNtax();
+		progress.setMaximum(ntax);
 
-		if (!characters.getDataType().isNucleotides())
-			setOptionHandleAmbiguousStates(AmbiguousOptions.Ignore);
+		distancesBlock.setNtax(ntax);
 
-		distancesBlock.setNtax(characters.getNtax());
+		var nchar = characters.getNchar();
+		var gapChar = Character.toLowerCase(characters.getGapCharacter());
+		var missingChar = Character.toLowerCase(characters.getMissingCharacter());
+		var dataType = characters.getDataType();
 
-		if (optionHandleAmbiguousStates.getValue().equals(AmbiguousOptions.MatchStates)
-			&& characters.getDataType().isNucleotides() && characters.isHasAmbiguityCodes())
-			computeMatchStatesHamming(taxa, characters, distancesBlock);
-		else {
-			// all the same here
-			var ntax = taxa.getNtax();
-			for (var s = 1; s <= ntax; s++) {
-				for (var t = s + 1; t <= ntax; t++) {
-					var seqPair = new PairwiseCompare(characters, s, t, optionHandleAmbiguousStates.getValue().equals(AmbiguousOptions.Ignore));
-					var F = seqPair.getF();
-					var dist = -1.0;
-					if (F != null) {
-						var p = 1.0;
-						for (int x = 0; x < seqPair.getNumStates(); x++) {
-							p = p - F[x][x];
-						}
+		// a code standing for the whole alphabet says nothing, so a stretch of it must not make two
+		// sequences look alike; treat it as missing. Partial codes such as 'y' stay real characters
+		final char anyChar;
+		if (dataType.isNucleotides())
+			anyChar = 'n';
+		else if (dataType == CharactersType.Protein)
+			anyChar = 'x';
+		else
+			anyChar = 0; // no character of this data type stands for the whole alphabet
 
-						if (!isOptionNormalize())
-							p = Math.round(p * seqPair.getNumNotMissing());
-						dist = p;
+		// the ambiguity codes are nucleotide codes, so protein 'b' or 'd' must never be read as one
+		var matchAmbiguityCodes = isOptionMatchAmbiguityCodes() && dataType.isNucleotides();
+		var masks = (matchAmbiguityCodes ? setupNucleotideMasks() : null);
+
+		var matchGapToGap = isOptionMatchGapToGap();
+		var normalize = isOptionNormalize();
+
+		for (var s = 1; s <= ntax; s++) {
+			var rowS = characters.getRow0(s - 1);
+			for (var t = s + 1; t <= ntax; t++) {
+				var rowT = characters.getRow0(t - 1);
+
+				var differences = 0.0;
+				var compared = 0.0;
+
+				for (var k = 1; k <= nchar; k++) {
+					var cs = rowS[k - 1];
+					var ct = rowT[k - 1];
+					var weight = characters.getCharacterWeight(k);
+
+					if (isUnobserved(cs, gapChar, missingChar, anyChar) || isUnobserved(ct, gapChar, missingChar, anyChar)) {
+						// the one unobserved pair that can carry information: both share the same deletion
+						if (matchGapToGap && cs == gapChar && ct == gapChar)
+							compared += weight;
+						continue;
 					}
-					distancesBlock.set(s, t, dist);
-					distancesBlock.set(t, s, dist);
+					compared += weight;
+					if (cs != ct && !(matchAmbiguityCodes && compatible(masks, cs, ct)))
+						differences += weight;
 				}
-				progress.incrementProgress();
+
+				final double dist;
+				if (compared == 0)
+					dist = -1; // the two sequences have no observed site in common, distance undefined
+				else if (normalize)
+					dist = differences / compared;
+				else
+					dist = differences;
+
+				distancesBlock.set(s, t, dist);
+				distancesBlock.set(t, s, dist);
 			}
+			progress.incrementProgress();
 		}
 		FixUndefinedDistances.apply(distancesBlock);
 		progress.reportTaskCompleted();
 	}
 
 	/**
-	 * Computes 'Best match' Hamming distances with a given characters block.
-	 *
-	 * @param taxa       the taxa
-	 * @param characters the input characters
+	 * does this character fail to report an observed state? A gap, the missing character and a code
+	 * covering the whole alphabet all do, and a site at which either sequence has one is not compared
 	 */
-	private void computeMatchStatesHamming(TaxaBlock taxa, CharactersBlock characters, DistancesBlock distances) {
-		final String ALLSTATES = "acgt" + AmbiguityCodes.CODES;
-		final int ntax = taxa.getNtax();
-		final int nstates = ALLSTATES.length();
-
-		/* Fill in the costs ascribed to comparing different allele combinations */
-		final double[][] weights = new double[nstates][nstates];
-		for (int s1 = 0; s1 < nstates; s1++)
-			for (int s2 = 0; s2 < nstates; s2++)
-				weights[s1][s2] = stringDiff(AmbiguityCodes.getNucleotides(ALLSTATES.charAt(s1)),
-						AmbiguityCodes.getNucleotides(ALLSTATES.charAt(s2)));
-
-        /*for (char s1 : ALLSTATES.toCharArray())
-            for (char s2 : ALLSTATES.toCharArray())
-                weights[s1][s2] = stringDiff(AmbiguityCodes.getNucleotides(s1), AmbiguityCodes.getNucleotides(s2));*/
-
-		/*Fill in the distance matrix */
-		for (int s = 1; s <= ntax; s++) {
-			for (int t = s + 1; t <= ntax; t++) {
-
-				double[][] F = getFmatrix(ALLSTATES, characters, s, t);
-				double diff = 0.0;
-				for (int s1 = 0; s1 < F.length; s1++)
-					for (int s2 = 0; s2 < F.length; s2++)
-						diff += F[s1][s2] * weights[s1][s2];
-
-				distances.set(s, t, (float) diff);
-				distances.set(t, s, (float) diff);
-			}
-		}
+	private static boolean isUnobserved(char ch, char gapChar, char missingChar, char anyChar) {
+		return ch == gapChar || ch == missingChar || ch == anyChar;
 	}
 
-	private double stringDiff(String s1, String s2) {
-		int matchCount = 0;
-		for (int i = 0; i < s1.length(); i++) {
-			char ch = s1.charAt(i);
-			if (s2.indexOf(ch) >= 0) {
-				matchCount++;
-			}
-		}
-		for (int i = 0; i < s2.length(); i++) {
-			char ch = s2.charAt(i);
-			if (s1.indexOf(ch) >= 0) {
-				matchCount++;
-			}
-		}
-
-		return 1.0 - (double) matchCount / ((double) s1.length() + s2.length());
-		//SAME IN INVERSE.
+	/**
+	 * can the two characters stand for the same base?
+	 */
+	private static boolean compatible(int[] masks, char cs, char ct) {
+		var ms = (cs < masks.length ? masks[cs] : 0);
+		var mt = (ct < masks.length ? masks[ct] : 0);
+		return ms != 0 && (ms & mt) != 0;
 	}
 
-	private double[][] getFmatrix(String ALLSTATES, CharactersBlock characters, int i, int j) {
-		int nstates = ALLSTATES.length();
-		double[][] F = new double[nstates][nstates];
-		double fsum = 0.0;
-		for (int k = 1; k <= characters.getNchar(); k++) {
-			char ch1 = characters.get(i, k);
-			char ch2 = characters.get(j, k);
-			int state1 = ALLSTATES.indexOf(ch1);
-			int state2 = ALLSTATES.indexOf(ch2);
-			if (state1 >= 0 && state2 >= 0) {
-				F[state1][state2] += 1.0;
-				fsum += 1.0;
+	/**
+	 * sets up the table mapping a base or ambiguity code to the set of bases it stands for, as a bit set
+	 * over a, c, g and t; two characters are compatible exactly when their sets intersect. This is a table
+	 * rather than a call to AmbiguityCodes.codesOverlap because that allocates two strings per comparison
+	 * and there are ntax^2/2 * nchar comparisons.
+	 * <p>
+	 * RNA's 'u' is folded onto 't' because AmbiguityCodes is written in terms of DNA. Without the fold,
+	 * 'y' (c or t) against 'u' would come out as a difference.
+	 *
+	 * @return table indexed by character, 0 for anything that is neither a base nor a code
+	 */
+	private static int[] setupNucleotideMasks() {
+		var masks = new int[128];
+		for (var ch = 'a'; ch <= 'z'; ch++) {
+			var bases = AmbiguityCodes.getNucleotides(ch);
+			var mask = 0;
+			for (var i = 0; i < bases.length(); i++) {
+				var base = (bases.charAt(i) == 'u' ? 't' : bases.charAt(i));
+				var bit = "acgt".indexOf(base);
+				if (bit >= 0)
+					mask |= (1 << bit);
 			}
+			masks[ch] = mask;
 		}
-		if (fsum > 0.0) {
-			for (int x = 0; x < nstates; x++)
-				for (int y = 0; y < nstates; y++)
-					F[x][y] = F[x][y] / fsum;
-
-		}
-
-		return F;
+		return masks;
 	}
 
 	// GETTERS AND SETTERS
@@ -202,21 +209,32 @@ public class HammingDistance extends Characters2Distances {
 		this.optionNormalize.setValue(optionNormalize);
 	}
 
-	public AmbiguousOptions getOptionHandleAmbiguousStates() {
-		return this.optionHandleAmbiguousStates.getValue();
+	public boolean isOptionMatchAmbiguityCodes() {
+		return optionMatchAmbiguityCodes.getValue();
 	}
 
-	public Property<AmbiguousOptions> optionHandleAmbiguousStatesProperty() {
-		return this.optionHandleAmbiguousStates;
+	public BooleanProperty optionMatchAmbiguityCodesProperty() {
+		return optionMatchAmbiguityCodes;
 	}
 
-	public void setOptionHandleAmbiguousStates(AmbiguousOptions optionHandleAmbiguousStates) {
-		this.optionHandleAmbiguousStates.setValue(optionHandleAmbiguousStates);
+	public void setOptionMatchAmbiguityCodes(boolean optionMatchAmbiguityCodes) {
+		this.optionMatchAmbiguityCodes.setValue(optionMatchAmbiguityCodes);
+	}
+
+	public boolean isOptionMatchGapToGap() {
+		return optionMatchGapToGap.getValue();
+	}
+
+	public BooleanProperty optionMatchGapToGapProperty() {
+		return optionMatchGapToGap;
+	}
+
+	public void setOptionMatchGapToGap(boolean optionMatchGapToGap) {
+		this.optionMatchGapToGap.setValue(optionMatchGapToGap);
 	}
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
 		return super.isApplicable(taxa, datablock);
 	}
-
 }

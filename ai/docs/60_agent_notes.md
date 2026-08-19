@@ -8,6 +8,129 @@ successes — they stop the next agent repeating them.
 
 ---
 
+## 2026-08-19 (night) — protein ambiguity treated as missing, and the RNA code list completed
+
+The two items the previous entry left open, both on Daniel's instruction.
+
+**Protein.** `CharactersType.Protein` is `arndcqeghilkmfpstwyvbzx*`, so `getNumStates()` said 24 where there
+are 20 residues: `b` is D or N, `z` is E or Q, `x` is any residue, and `*` is a stop codon that
+`ProteinMLDistance` already says in a comment it wants to ignore. They are now listed in
+`getNonStateSymbols()`, and — the part that differs from the nucleotide fix — `PairwiseCompare` maps a legal
+non-state character onto the **missing** index rather than expanding it, because there is no machinery for
+expanding a protein ambiguity. The gap test still comes first, which matters: `ungulates.nex` declares
+`gap=x`, and there `x` must stay a gap rather than becoming missing by the generic rule.
+
+Measured on a synthetic pair, `numStates` 24 → 20, and the sites carrying `b`, `z` and `*` drop out of the
+comparison: `compared` 6 → 3. On a clean protein pair with none of them, `ProteinMLDistance` returns
+**0.2335 before and after** — as expected, since `mlDistance` was already surviving by copying the top-left
+20×20 sub-matrix and rescaling, the twenty residues happening to come first in the symbol string. That was
+luck rather than design, and it is no longer load-bearing.
+
+**LogDet on protein was broken in exactly the way it was broken on nucleotides**, which the previous entry did
+not notice because it had no protein data in the regression. At HEAD it returned the replaced value 1.0 for
+every pair of both protein examples. Now, on `buttercups-cytochromeC.fasta` (100 taxa, 364 sites): mean
+0.13426012, max 0.24178202, and **1 pair of 4950 at the maximum**, so the matrix is genuinely defined
+throughout.
+
+**Where it is still undefined, and why that is not a bug.** On `ungulates.nex`, 2899 of 2926 pairs (99.1 %)
+are still the replaced value. That is the data, not the code: the alignment is extremely skewed — 51 284 `g`
+and 32 716 `p` against 5 occurrences of `l` in the whole matrix — so most pairs never observe all twenty
+residues, `F` is singular for an honest reason, and the saturation test fires. LogDet with twenty states needs
+twenty observed states. The difference from before is that the singularity used to be **structural**, four
+rows that could never be filled whatever the data, and is now a property of the alignment. Worth stating
+plainly rather than claiming LogDet on protein now works.
+
+**RNA.** `RNAwithAmbiguityCodes` listed `acgury` — the bases and two of the eleven codes. So an RNA alignment
+using `w` or `n` was not recognised at all: `guessType` returned `Unknown` for `acguw`, `acgun` and `acguwn`,
+and the alignment then failed with `SplitsException: invalid character 't'`, naming a character not present in
+the data. The list is now `acguryswkmbdhvn`, matching what `DNAwithAmbiguityCodes` already carried. All three
+alphabets now come back as `RNAwithAmbiguityCodes`, and such an alignment runs end to end — `numStates` 4,
+LogDet 0.2094 on the probe pair. DNA typing is untouched, and there is no risk of capturing protein, which
+always contains residues outside this set.
+
+**Verification.** The nucleotide and binary regression is unchanged from the run before this change, and the
+protein regression differs from HEAD in the two LogDet lines only. All the standing checks still pass: 23
+Hamming cases, 0 mismatches over 8 option combinations, the `numNotMissing == Fsum` invariant at 0 violations,
+the RNA and NaN/hang probes clean, and all four nucleotide types reporting 4 states. `src/main/java` compiles.
+
+**What is left.** Nothing known in this area. The one thing not exercised is a protein alignment that actually
+contains `b`, `z` or `*` — none of the three examples in the repository has any, so that path is covered by a
+synthetic pair only.
+
+---
+
+## 2026-08-19 (evening) — ambiguity codes were being counted as states
+
+Daniel's call: sequence handling has never been rigorously reviewed, so flush the inconsistencies out. This is
+the root cause behind the LogDet finding recorded below, and it reached further than that finding suggested.
+
+**The confusion.** `CharactersBlock.getSymbols()` was doing two different jobs. It is the list of characters
+that may legally appear — which the readers validate against and which nexus writes as `SYMBOLS=` — and it was
+*also* being read as the list of states. For the nucleotide types those are not the same list, because an
+ambiguity code is a legal character but is not a state: it stands for a set of bases and is expanded into them
+before it reaches any frequency matrix. Six places meant "states" and asked for the wrong one.
+
+**Which files were affected, and why it was easy to miss.** A nexus file that declares `symbols="acgt"` in its
+FORMAT line comes out with symbols and states identical, so `primates.nex` and `100taxaExample.nex` behave the
+same before and after. The phylip and FASTA readers instead set the symbols from the alphabet they observe, so
+`nucleic_M2573_346x897_2006.phy` arrives with `symbols='acghkmrstwy'` — the codes included. Everything below
+is invisible on the nexus examples and wrong on the phylip ones.
+
+**What it broke.**
+
+- **LogDet was undefined for every pair** on such data. `r = getNumStates()` was 11 here (15 for the enum's own
+  `DNAwithAmbiguityCodes` symbol list), so `F` was an 11×11 matrix in which seven rows can never be filled;
+  every zero eigenvalue tripped the saturation test. Measured on the 346-taxon file: **mean 1.0, the replaced
+  value, for all 59 685 pairs → now mean 0.11100813, max 0.41899542.** `r` also appears in the distance
+  formula itself, `-(1-PiSum)/(r-1) * (x - logPi)`, so it had to be the true state count for the number to
+  mean anything.
+- **Base frequencies were nonsense.** `NucleotideModel.computeFreqs` returned an array as long as the symbol
+  list, and a model reading π[0..3] got the frequencies of `a`, `c`, `g` and **`h`** — a code occurring once
+  in the whole file. **π_T came out as 0.0000** because `t` was sitting at index 8. Length 11 rather than 4
+  also means `optionBaseFrequencies` could not survive a `.stree6` round trip, `OptionIO` reading a
+  `doubleArray` back at the length it already has.
+
+**Two more defects in the same method**, found while fixing it and worth stating separately because they hit
+every dataset, not just the ones with codes:
+
+- The loops read `for (i = 1; i < getNtax(); i++)` over a **0-based** matrix and `for (k = 1; k < getNchar())`.
+  So the first taxon, the first site and the last site were left out of **every base frequency this program
+  has ever reported**. On `primates.nex`: `[0.3230, 0.3066, 0.1059, 0.2645]` → `[0.3255, 0.3033, 0.1052,
+  0.2660]`.
+- `numNotMissing` counted every non-gap non-missing character but only recognised states landed in a bin, so
+  ambiguous characters quietly scaled all four frequencies down. Same shape as the `PairwiseCompare` defect in
+  the entry below. The denominator now counts exactly what the numerator counts, and a sequence with nothing
+  observed returns a flat distribution instead of dividing by zero.
+
+**The fix.** `CharactersType.getNonStateSymbols()` names the symbols that are not states — the ambiguity codes,
+for the four nucleotide types — and `CharactersBlock.getStateSymbols()` returns the symbols with those removed,
+so a `SYMBOLS=` override from a file is still respected. Six consumers now ask for it: `PairwiseCompare`
+(`numStates` and the state lookup, which is what fixes LogDet and every model-based distance),
+`NucleotideModel.computeFreqs`, `BaseFreqDistance`, `PhiTest`, and `LogDet.isApplicable`. `getSymbols()` itself
+is untouched, so parsing, validation, colouring and nexus output all behave exactly as before — verified by a
+round trip, which still writes `symbols="acghkmrstwy"` for the phylip file.
+
+`PhiTest` changes behaviour on data with codes, deliberately: a code is no longer a state of its own, so it
+falls through to the test's `missing` value. Treating an ambiguity as a distinct fifth state made sites look
+more polymorphic than they are, and treating it as missing is what PhiPack does. `BaseFreqDistance` likewise
+no longer gives each code its own bin in a base-frequency vector.
+
+**Verification.** Regression over `primates.nex`, `dolphins_binary.nex` and the 346-taxon phyml alignment,
+seven algorithms each: exactly one number moved, LogDet on the phylip file, from broken to working. Standard
+(binary) data is untouched, `primates.nex` is untouched, and all the earlier checks still pass — 23 Hamming
+cases, 0 mismatches against the independent implementation over 8 option combinations, the `numNotMissing ==
+Fsum` invariant at 0 violations, RNA and the NaN/hang cases all clean. `src/main/java` compiles.
+
+**Deliberately not changed.** Protein's `b`, `z` and `x` are ambiguity codes too and `*` is a stop codon, so
+`Protein("arndcqeghilkmfpstwyvbzx*")` has the same defect: 24 states where there are 20. It is not the same
+easy fix, because `PairwiseCompare` has no way to expand a protein ambiguity, so dropping those four from the
+state list would make it throw on protein alignments that work today — `mlDistance` currently survives by
+taking the top-left 20×20 sub-matrix, the 20 amino acids happening to come first. Left alone and written into
+`50_todo.md`. Also still open: `RNAwithAmbiguityCodes`'s enum symbol list is `acgury`, only two of the eleven
+codes, so RNA data using `w` or `n` may not be typed at all by `guessType`.
+
+---
+
 ## 2026-08-19 (later) — PairwiseCompare: a hang, a miscount, and RNA that never worked
 
 Follow-up to the entry below, at Daniel's request. Three divisions by zero in `PairwiseCompare`, one in

@@ -67,8 +67,12 @@ public class GeneSharingDistance extends Characters2Distances {
 					var b = F[1][0];
 					var c = F[0][1];
 
-					if (2 * a + b + c > 0.0) {
-						dist = 1.0 - a / Math.min(a + b, a + c);
+					// the guard has to be on the divisor itself: 2a+b+c is positive whenever either taxon has a
+					// gene, but min(a+b, a+c) is 0 as soon as a is 0 and one of b, c is 0, and the division was
+					// then 0.0/0.0. That NaN reached the matrix (35 entries on examples/.../dolphins_binary.nex)
+					var divisor = Math.min(a + b, a + c);
+					if (divisor > 0.0) {
+						dist = 1.0 - a / divisor;
 					}
 				}
 

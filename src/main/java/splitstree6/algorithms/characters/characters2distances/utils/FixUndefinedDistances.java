@@ -39,7 +39,7 @@ public class FixUndefinedDistances {
 		var ntax = distancesBlock.getNtax();
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = 1; t <= ntax; t++) {
-				if (distancesBlock.get(s, t) == -1)
+				if (isUndefined(distancesBlock.get(s, t)))
 					numUndefined++;
 				else
 					maxValue = Math.max(maxValue, distancesBlock.get(s, t));
@@ -56,7 +56,7 @@ public class FixUndefinedDistances {
 			}
 			for (var t = 1; t <= ntax; t++) {
 				for (var s = t + 1; s <= ntax; s++) {
-					if (distancesBlock.get(s, t) == -1) {
+					if (isUndefined(distancesBlock.get(s, t))) {
 						distancesBlock.set(s, t, largeValue);
 						distancesBlock.set(t, s, largeValue);
 					}
@@ -66,5 +66,14 @@ public class FixUndefinedDistances {
 											"These have been replaced by the value '" + StringUtils.trim(largeValue) + "'.");
 		}
 
+	}
+
+	/**
+	 * is this entry undefined? Besides the -1 that algorithms use to report an undefined distance, this catches
+	 * any NaN or infinity left by a division by zero upstream. Those used to pass straight into the matrix, and
+	 * a single NaN also destroyed the replacement value computed here, Math.max(x, NaN) being NaN
+	 */
+	private static boolean isUndefined(double value) {
+		return value == -1 || !Double.isFinite(value);
 	}
 }
