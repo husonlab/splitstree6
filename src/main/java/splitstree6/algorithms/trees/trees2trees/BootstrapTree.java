@@ -118,8 +118,36 @@ public class BootstrapTree extends Trees2Trees {
 	 * @throws IOException
 	 */
 	public static PhyloTree run(ProgressListener progress, Workflow workflow, DataNode<TreesBlock> targetNode, boolean transferBootstrap, int numberOfReplicates, int randomSeed, double minPercent) throws IOException {
+		// Read the alignment and the pipeline out of the workflow, then hand both over, together with
+		// the two other things this used the workflow for: the taxa, and the tree to annotate.
+		var workingDataNode = workflow.getWorkingDataNode();
+		var characters = (workingDataNode.getDataBlock() instanceof CharactersBlock c ? c : null);
+		return run(progress, workflow.getWorkingTaxaBlock(), targetNode.getDataBlock().getTree(1), characters,
+				() -> {
+					var path = BootstrappingUtils.extractPath(workingDataNode, targetNode);
+					path.get(path.size() - 1).setSecond(new TreesBlock());
+					return path;
+				}, transferBootstrap, numberOfReplicates, randomSeed, minPercent);
+	}
 
-		if (workflow.getWorkingDataNode().getDataBlock() instanceof CharactersBlock charactersBlock) {
+	/**
+	 * bootstrap a tree, using the given alignment and pipeline rather than looking for them in a workflow
+	 * <p>
+	 * See {@link splitstree6.algorithms.splits.splits2splits.BootstrapSplits} for what the extra arguments
+	 * mean and why the pipeline arrives as a supplier: each worker thread needs its own, because the data
+	 * blocks in it are output buffers. The pipeline must end in a step producing trees.
+	 *
+	 * @param taxaBlock  the taxa the alignment is over
+	 * @param targetTree the tree whose edges are to carry the support values; it is copied, not modified
+	 * @param characters the alignment to resample, or null to return the target tree unannotated
+	 * @param pathSupplier supplies a fresh pipeline per worker thread
+	 */
+	public static PhyloTree run(ProgressListener progress, TaxaBlock taxaBlock, PhyloTree targetTree0, CharactersBlock characters,
+								BootstrapSplits.PathSupplier pathSupplier, boolean transferBootstrap, int numberOfReplicates,
+								int randomSeed, double minPercent) throws IOException {
+
+		var charactersBlock = characters;
+		if (charactersBlock != null) {
 			if (charactersBlock.isDiploid())
 				throw new IOException("Bootstrapping not implemented for diploid data, if you need this, please contact the authors!");
 
@@ -131,7 +159,7 @@ public class BootstrapTree extends Trees2Trees {
 			}
 
 			var targetTree = new PhyloTree();
-			targetTree.copy(targetNode.getDataBlock().getTree(1));
+			targetTree.copy(targetTree0);
 
 			try (var targetEdgeClustersMap = computeEdgeToSplitSideNotContaining1Map(targetTree);
 				 EdgeArray<DoubleAdder> targetEdgeSupport = targetTree.newEdgeArray()) {
@@ -139,7 +167,7 @@ public class BootstrapTree extends Trees2Trees {
 					targetEdgeSupport.put(e, new DoubleAdder());
 				}
 
-				var ntax = workflow.getWorkingTaxaBlock().getNtax();
+				var ntax = taxaBlock.getNtax();
 
 				var numberOfThreads = Math.max(1, Math.min(numberOfReplicates, ProgramExecutorService.getNumberOfCoresToUse()));
 
@@ -155,13 +183,12 @@ public class BootstrapTree extends Trees2Trees {
 
 						service.execute(() -> {
 							try {
-								var path = BootstrappingUtils.extractPath(workflow.getWorkingDataNode(), targetNode);
-								path.get(path.size() - 1).setSecond(new TreesBlock());
+								var path = pathSupplier.get();
 
 								if (thread == 0)
 									System.err.println("Bootstrap workflow: " + BootstrappingUtils.toString(charactersBlock, path));
 								for (var r = thread; r < numberOfReplicates; r += numberOfThreads) {
-									var replicateTreeBlock = (TreesBlock) BootstrapSplits.run(new ProgressSilent(), workflow.getWorkingTaxaBlock(), BootstrappingUtils.createReplicate(charactersBlock, new Random(seeds[r])), path);
+									var replicateTreeBlock = (TreesBlock) BootstrapSplits.run(new ProgressSilent(), taxaBlock, BootstrappingUtils.createReplicate(charactersBlock, new Random(seeds[r])), path);
 									var replicateTree = replicateTreeBlock.getTree(1);
 									try (var edgeClusterMap = computeEdgeToSplitSideNotContaining1Map(replicateTree)) {
 										var replicateClusters = new HashSet<>(edgeClusterMap.values());
