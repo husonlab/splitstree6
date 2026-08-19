@@ -246,11 +246,18 @@ public class BootstrapSplits extends Splits2Splits {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, SplitsBlock datablock) {
+		// Answer false rather than throwing when there is no workflow. This used to dereference
+		// getNode() and getOwner() unguarded, so asking whether the algorithm applies threw a
+		// NullPointerException outside the application - and callers ask before every run. It is
+		// the question "may this be added to this workflow"; the form of compute that takes the
+		// alignment and the pipeline explicitly answers to its arguments instead.
 		var dataNode = datablock.getNode();
-		var workflow = (Workflow) dataNode.getOwner();
+		if (dataNode == null || !(dataNode.getOwner() instanceof Workflow workflow))
+			return false;
 		var preferredParent = dataNode.getPreferredParent();
-		var workingDataBlock = workflow.getWorkingDataNode().getDataBlock();
-		return preferredParent != null && preferredParent.getAlgorithm().getToClass().equals(SplitsBlock.class) && workingDataBlock instanceof CharactersBlock;
+		var workingDataNode = workflow.getWorkingDataNode();
+		return preferredParent != null && preferredParent.getAlgorithm().getToClass().equals(SplitsBlock.class)
+			   && workingDataNode != null && workingDataNode.getDataBlock() instanceof CharactersBlock;
 	}
 
 	public int getOptionReplicates() {

@@ -9,6 +9,51 @@ they went the way they did, and everything from before the ledger existed.
 
 ---
 
+## 2026-08-19 — bootstrapping opened up to callers without a workflow, and two things that fell out
+
+The separation done earlier in the day (`b995795c`, `f4e4e885`, `0cd540cb`) left the three bootstraps callable
+from outside a workflow but not *usable*: the caller had to hand-build an `ArrayList<Pair<Algorithm,
+DataBlock>>`, know that the buffers must be fresh per worker thread and that the algorithms must not be, and
+know that a chain ending in trees needs a `TreeSelectorSplits` appended when splits are being aggregated. So
+`BootstrappingUtils.newPathSupplier(algorithms, targetClass)` now takes the chain as configured algorithms,
+`BootstrapTree` gained the six-argument `compute` the other two already had, and `splitstree.py` exposes all
+three. Full record in `2026-08-19_bootstrapping.md` §6.
+
+**One design point worth keeping.** The appended `TreeSelectorSplits` is constructed *inside* the supplier, not
+once and shared. It rewrites its own `optionWhich` against the block it is handed, so a single instance across
+worker threads is exactly the race §2 of that entry warns about — and appending it to the caller's list, which
+is the obvious implementation, would have introduced it. The workflow route gets this right for the same reason
+and it is easy to miss twice.
+
+**The probe went silent and exited 0.** Seven lines of output, then nothing, then success. It was not a crash:
+`System.out` had been replaced underneath it, and that turned out to be **Q1 / D-12**, open since 2026-08-17 as
+"something in the catalogue leaves `System.err` replaced, and no single algorithm reproduces it". It is a data
+race — `Basic.hideSystemOut`/`hideSystemErr` save into a local and write a global, and
+`SplitsBlockUtilities.computeCycle` calls them from every worker thread. Intact at 1 thread, replaced at 2, 4
+and 8, every run. Own entry: `2026-08-19_stream-hiding-race.md`.
+
+Two lessons. The first: **"no single algorithm reproduces it" was true and misleading.** Nothing had yet run a
+*parallel* algorithm whose replicate pipeline computes a cycle; the sweep that found the symptom ran algorithms
+one at a time. The second: every hide/restore call site is correctly paired, so **reading them could never have
+found this**, and two days were spent doing exactly that. The bug is in the primitive, not in its use.
+
+**A seed does not fix everything, and the earlier claim was too strong.** Checking that the two routes agree
+meant checking that each is reproducible first, and the split *set*, confidences and weights are — 5 runs
+identical, and identical between routes, weights to the last bit. The **order** the splits come back in is not:
+10 runs at seed 42 gave 10 distinct orders and 2 distinct cycles, on each of `algae`, `bees` and `primates`.
+`BootstrapSplits` iterates a `ConcurrentHashMap` `keySet()` and that order feeds `DimensionFilter` and
+`computeCycle`. So `b995795c`'s "five consecutive runs are byte-identical", recorded here on 2026-08-18, is
+right about the values and wrong about a written file. Compare bootstrap output by split, never by position.
+Not fixed: a deterministic order changes what every bootstrap prints and sometimes the drawn network, which is
+Daniel's call.
+
+**What the cross-check is worth.** Building the same analysis twice — once as a headless workflow, once
+standalone with the pipeline stated — is the check `2026-08-19_bootstrapping.md` §4.2 called the strongest
+available, and it is, because the two routes share only the code under test. It is also what makes the Python
+binding trustworthy: `tests/test_bootstrap.py` ends by building a SplitsTree `Workflow` through JPype and
+requiring the Python call to produce the same annotated tree. Neither check would have been possible before the
+workflow became headless in the morning of 2026-08-17.
+
 ## 2026-08-19 — `ai/` restructured into three layers by epistemic status
 
 Same restructure as `megan8/ai`, and for the same reason: `docs/` + `plans/` came from software engineering,

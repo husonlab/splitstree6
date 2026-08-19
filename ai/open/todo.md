@@ -21,7 +21,15 @@ in-code comments, this file, `../lab/journal.md`, and a row in `../lab/INDEX.md`
 
 ## In flight
 
-- [ ] **`splitstree.py` step 5 — the generator.** Steps 1–4 are done in `husonlab/splitstree-py`
+- [ ] **`splitstree.py` step 6 — docs, examples and packaging.** Step 5, the generator, is **done**
+  (`0e5833d`, `312fb57`), and on 2026-08-19 the three bootstraps were exposed on top of it, so
+  `NEEDS_WORKFLOW` is now empty and the suite is at 424 tests. What is left of v1 is the README, a
+  notebook reproducing one figure from `examples/publications/`, the wheel build and the
+  install-and-test workflow on the three platforms. Note the repository README still opens with
+  "This is the JVM bootstrap only. No algorithm surface exists yet", which has been wrong since
+  `0e5833d`. Plan: `../lab/2026-08-17_splitstree-py.md` §10.
+
+- [ ] ~~**`splitstree.py` step 5 — the generator.**~~ **DONE.** Steps 1–4 are done in `husonlab/splitstree-py`
   (spike, JVM bootstrap, block layer, IO — 83 tests). Step 5 is the big one: one data-driven
   generator producing the whole algorithm surface from the jar scan. Both blocking decisions were
   taken 2026-08-18 — `quiet` defaults **true**, capturing Java's stderr into a buffer
@@ -35,6 +43,20 @@ in-code comments, this file, `../lab/journal.md`, and a row in `../lab/INDEX.md`
   `examples/publications/` corpus. GUI explicitly out of scope.
 
 ## Known defects, fix pending
+
+- [ ] **`Basic.hideSystemOut`/`hideSystemErr` race, and it is reachable from the GUI.** Two threads in
+  `SplitsBlockUtilities.computeCycle` interleave their save/restore and one of them puts the
+  discarding stream back for good. Measured on `BootstrapTreeSplits`: intact at 1 thread, replaced
+  at 2, 4 and 8, every run, on the workflow route as well as the standalone one. In the application
+  `System.out` is aimed at the message window, so a user who bootstraps stops seeing warnings for
+  the rest of the session. Diagnosis and the three candidate fixes:
+  `../lab/2026-08-19_stream-hiding-race.md`. **The choice of fix is in `questions.md`.**
+
+- [ ] **A bootstrap's split order, and sometimes its cycle, differ between runs at one seed.**
+  `BootstrapSplits` iterates a `ConcurrentHashMap` `keySet()` and that order feeds `DimensionFilter`
+  and `computeCycle`. Values are stable; arrangement is not. Ten runs at seed 42 gave ten distinct
+  orders and two distinct cycles on each of three datasets. Fixing it changes published output, so
+  it is a decision rather than a task — see `questions.md`.
 
 - [ ] **`ExportManager` leaks the prepend-taxa flag.** `write(…, "NexusWithTaxa", …)` sets
   `optionPrependTaxa` on the **shared** Nexus writer instance and never clears it, so every later

@@ -92,17 +92,53 @@ public class BootstrapTree extends Trees2Trees {
 
 		var result = run(progress, getNode().getOwner(), inputTrees.getNode(), getOptionTransferBootstrap(), getOptionReplicates(), getOptionRandomSeed(), getOptionMinPercent());
 
+		store(inputTrees, outputTreesBlock, result);
+	}
+
+	/**
+	 * bootstrap, using the given alignment and pipeline rather than looking for them in the workflow
+	 * <p>
+	 * The same shape as {@link splitstree6.algorithms.splits.splits2splits.BootstrapSplits} and
+	 * {@link splitstree6.algorithms.trees.trees2splits.BootstrapTreeSplits} have, so that a caller
+	 * outside the application meets one signature rather than three. See BootstrapSplits for what the
+	 * two extra arguments mean and why the pipeline arrives as a supplier;
+	 * {@link splitstree6.algorithms.utils.BootstrappingUtils#newPathSupplier} builds one from a stated
+	 * chain of algorithms. The pipeline must end in a step producing trees.
+	 *
+	 * @param characters   the alignment to resample
+	 * @param pathSupplier supplies a fresh pipeline per worker thread
+	 */
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputTrees, TreesBlock outputTreesBlock,
+						CharactersBlock characters, BootstrapSplits.PathSupplier pathSupplier) throws IOException {
+		setOptionReplicates(Math.max(1, optionReplicates.get()));
+
+		setShortDescription(String.format("bootstrapping using %d replicates", getOptionReplicates()));
+
+		var result = run(progress, taxaBlock, inputTrees.getTree(1), characters, pathSupplier,
+				getOptionTransferBootstrap(), getOptionReplicates(), getOptionRandomSeed(), getOptionMinPercent());
+
+		store(inputTrees, outputTreesBlock, result);
+	}
+
+	private static void store(TreesBlock inputTrees, TreesBlock outputTreesBlock, PhyloTree result) {
 		outputTreesBlock.getTrees().setAll(result);
 		outputTreesBlock.getTree(1).setName(inputTrees.getTree(1).getName() + "-bootstrapped");
 	}
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
+		if (datablock.getNTrees() != 1)
+			return false;
+		// Answer false rather than throwing when there is no workflow, as BootstrapTreeSplits does:
+		// this used to dereference getNode() and getOwner() unguarded, so asking whether the algorithm
+		// applies threw a NullPointerException outside the application, and callers ask before every run.
 		var dataNode = datablock.getNode();
-		var workflow = (Workflow) dataNode.getOwner();
+		if (dataNode == null || !(dataNode.getOwner() instanceof Workflow workflow))
+			return false;
 		var preferredParent = dataNode.getPreferredParent();
-		var workingDataBlock = workflow.getWorkingDataNode().getDataBlock();
-		return datablock.getNTrees() == 1 && preferredParent != null && preferredParent.getAlgorithm() instanceof IToSingleTree && workingDataBlock instanceof CharactersBlock;
+		var workingDataNode = workflow.getWorkingDataNode();
+		return preferredParent != null && preferredParent.getAlgorithm() instanceof IToSingleTree
+			   && workingDataNode != null && workingDataNode.getDataBlock() instanceof CharactersBlock;
 	}
 
 	/**

@@ -583,15 +583,33 @@ fix. The desktop application never noticed because it exits through `System.exit
 call `System.exit` too, which is exactly what hid it.** Affects megan8, tegula and phylosketch2 as well, all of
 which gain the same improvement.
 
-**D-12 — something in the algorithm catalogue leaves `System.err` replaced, and it has not been isolated.**
-Running all 86 generated algorithms in sequence from Python leaves `System.err` pointing at a stream that
-discards: output reaches neither the console nor a capture buffer. `Basic.hideSystemErr()` correctly returns
-the stream it replaced, and every call site in splitstree6 and jloda3 restores in a `finally`, so the
-unbalanced one has not been found; and **no single algorithm reproduces it** — `AverageConsensus` was where a
-sweep first noticed, but running it alone, or its two constituent steps, or `AntiConsensusNetwork` before it,
-all leave the stream intact. Consequence for the GUI: none observed. Consequence for a binding: a capture of
-Java's stderr silently stops receiving. Worked around on the Python side, which re-installs its stream
-whenever it finds it has been replaced, so this is a diagnosis left unfinished rather than a live defect.
+**D-12 — `Basic.hideSystemOut`/`hideSystemErr` race, so a parallel algorithm can leave `System.out` and
+`System.err` pointing at a discarding stream.** Diagnosed 2026-08-19; `ai/lab/2026-08-19_stream-hiding-race.md`
+has the measurement. Both methods save the current stream into a **local** and write a **global**:
+
+```java
+public static PrintStream hideSystemOut() {
+	var current = System.out;
+	System.setOut(nullOut);
+	return current;
+}
+```
+
+`SplitsBlockUtilities.computeCycle` wraps the SplitsTree4 cycle heuristic in a correctly paired
+hide/try/finally/restore — but two threads entering together have one of them save `nullOut`, and whichever
+restores last wins. Reached from `TreeSelectorSplits`, `ConfidenceNetwork`, `SuperNetwork`, `BinaryToSplits`,
+`SplitDecomposition` and `WeightsSlider`, so any algorithm computing cycles on a pool can do it.
+**Measured on `BootstrapTreeSplits`, `algae.nex`: streams intact at 1 thread, replaced at 2, 4 and 8, every
+run** — on the workflow route as much as the standalone one. This is why "no single algorithm reproduces it"
+held for two days: nothing had yet run a *parallel* algorithm whose replicate pipeline computes a cycle, and
+reading the call sites could never have found it, because they are all correct.
+
+Consequence for the GUI: `SplitsTree6.main` aims `System.out` at `System.err` and thence at the message window,
+so a user who bootstraps stops seeing warnings for the rest of the session. Consequence for a binding: a
+capture of Java's stderr silently stops receiving; `splitstree.py` works around it by re-installing its stream.
+Consequence for a probe: **it can go quiet half-way through and still exit 0** — hold the original
+`PrintStream` in a static at start-up. Not fixed; the three candidate fixes are not equivalent and the choice
+is in `ai/open/questions.md`.
 
 **D-7 — there is no test suite at all.** Daniel: a plan is needed for generating unit tests of all features.
 Written: `ai/lab/2026-08-17_test-suite.md`. Its centrepiece is that D-1 makes the *workflow itself* unit-

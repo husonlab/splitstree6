@@ -27,6 +27,17 @@ Settled facts that will quietly ruin a measurement if forgotten.
   session. Record what you measure in `../lab/measurements.md` or it is gone.
 - **Any bootstrap number from before `b995795c` is worthless** — a non-atomic aggregation made
   support values irreproducible even with `optionRandomSeed` set.
+- **A seed fixes a bootstrap's values, not their arrangement.** The split set, the confidences and the
+  weights are identical run to run; the **order the splits come back in never is, and the cycle
+  sometimes is not** — 10 runs at one seed gave 10 distinct orders and 2 distinct cycles on each of
+  three datasets. `BootstrapSplits` iterates a `ConcurrentHashMap`. So compare bootstrap output by
+  split, never by position, and do not diff two written `SPLITS` blocks and conclude anything.
+- **`Basic.hideSystemOut`/`hideSystemErr` are not safe on more than one thread**, and
+  `SplitsBlockUtilities.computeCycle` calls them. Any parallel algorithm that computes a cycle can
+  leave `System.out` and `System.err` pointing at a discarding stream — measured: intact at 1 thread,
+  replaced at 2, 4 and 8, every run. **A probe that prints its results can therefore go silent
+  half-way through and still exit 0.** Hold the original `PrintStream` in a static at start-up.
+  `lab/2026-08-19_stream-hiding-race.md`.
 - **The example workflows carry dead options** (`UsePreconditioner`, `UseDual`, `Normalize`,
   `ShowConfidence`). They exercise the pipeline but do not pin down current defaults.
 - **Option defaults are a published interface.** They are what a user gets with no saved value, and
@@ -67,16 +78,6 @@ Settled facts that will quietly ruin a measurement if forgotten.
 ---
 
 ## Open — worth an entry
-
-### Q1. What leaves `System.err` replaced? (D-12)
-
-Running the whole algorithm catalogue in sequence ends with `System.err` pointing at a discarding
-stream. **No single algorithm reproduces it**, and every hide/restore call site looks correct. This is
-an unfinished diagnosis, not a closed question.
-
-**Gate:** bisect the catalogue — run halves, then quarters, until the shortest sequence that
-reproduces it is found. If no *sequence* reproduces it either, the cause is ordering or concurrency
-and the question changes shape. Low impact, so time-box it.
 
 ### Q2. Do the readers and writers agree with each other?
 
@@ -124,6 +125,15 @@ any change. Do not read a single clean run as a fix.
   grounds that this preserves the old `Ignore` default's *behaviour* — an ambiguous site produced no
   difference then and produces none now — whereas false would silently start counting Y against C as
   a difference in every existing nucleotide dataset. One word to flip if that reasoning is wrong.
+- **How to fix the stream-hiding race** (raised 2026-08-19, `lab/2026-08-19_stream-hiding-race.md`).
+  Three ways out and they are not equivalent: stop hiding in `computeCycle` and let the noise back;
+  serialise the hidden region, which is correct but slows the cycle heuristic exactly where it is
+  hottest; or fix `Basic` in jloda3, which is the right answer, the largest change and another
+  repository. Found while doing something else, so nothing was attempted.
+- **Whether a bootstrap should return its splits in a deterministic order** (raised 2026-08-19). It
+  does not today, and the cycle can differ between two runs of one analysis. Sorting before the
+  dimension filter would fix it and would change what every bootstrap prints — including, sometimes,
+  the drawn network. A published-interface question, not a tidying one.
 - **Read the test-suite plan** (`../lab/2026-08-17_test-suite.md`). Still a proposal with no code
   written against it.
 - **Triage what the test suite will find.** Step 4 is expected to produce a list of algorithms that
