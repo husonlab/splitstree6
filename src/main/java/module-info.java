@@ -68,6 +68,7 @@ module splitstreesix {
 
 	opens splitstree6.algorithms.source.source2characters;
 	opens splitstree6.algorithms.source.source2distances;
+	opens splitstree6.algorithms.source.source2network;
 	opens splitstree6.algorithms.source.source2splits;
 	opens splitstree6.algorithms.source.source2trees;
 
@@ -250,6 +251,7 @@ module splitstreesix {
 	exports splitstree6.algorithms.source.source2distances;
 	exports splitstree6.algorithms.network.network2view;
 	exports splitstree6.algorithms.source.source2characters;
+	exports splitstree6.algorithms.source.source2network;
 	exports splitstree6.view.network;
 	exports splitstree6.view.format.taxlabel;
 	exports splitstree6.view.alignment;
