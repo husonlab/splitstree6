@@ -323,10 +323,15 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 			var label = targetTaxa.getLabel(tarId);
 			final int srcId = srcTaxa.indexOf(label);
 			for (int traitId = 1; traitId <= srcTraits.getNTraits(); traitId++) {
-				var value = srcTraits.getTraitValue(srcId, traitId);
 				setTraitValue(tarId, traitId, srcTraits.getTraitValue(srcId, traitId));
-				if (srcTraits.matrixOfLabels != null) {
-					setTraitValueLabel(tarId, traitId, srcTraits.getTraitValueLabel(srcId, traitId));
+				if (srcId != -1 && srcTraits.matrixOfLabels != null) {
+					// copy the raw entry rather than calling getTraitValueLabel(): that never returns
+					// null, it formats the value instead, so a block holding even one categorical trait
+					// would come out of here with *every* trait categorical, and nothing numerical left
+					// for the pie charts to draw
+					var srcLabel = srcTraits.matrixOfLabels[srcId - 1][traitId - 1];
+					if (srcLabel != null)
+						setTraitValueLabel(tarId, traitId, srcLabel);
 				}
 			}
 		}
