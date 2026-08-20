@@ -99,10 +99,18 @@ public class ImportHaplotypeApply {
 				var networkNode = workflow.newDataNode(new NetworkBlock());
 
 						switch (result.method()) {
-							case "RazorNet1" -> {
-								var razor = AlgorithmList.create("RazorHaplotypeNetwork1",
+							case "RazorNet" -> {
+								var razor = AlgorithmList.create("RazorHaplotypeNetwork",
 										Map.of("distanceModel", result.distanceModel()));
 								workflow.newAlgorithmNode(Objects.requireNonNullElseGet(razor, MedianJoining::new),
+										workflow.getWorkingTaxaNode(),
+										workflow.getWorkingDataNode(),
+										networkNode);
+							}
+							case "TightSpanWalker" -> {
+								var tsw = AlgorithmList.create("TightSpanHaplotypeNetwork",
+										Map.of("distanceModel", result.distanceModel()));
+								workflow.newAlgorithmNode(Objects.requireNonNullElseGet(tsw, MedianJoining::new),
 										workflow.getWorkingTaxaNode(),
 										workflow.getWorkingDataNode(),
 										networkNode);

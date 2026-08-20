@@ -49,6 +49,7 @@ import splitstree6.data.ViewBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.displaytext.DisplayTextTab;
+import splitstree6.tabs.displaytext.InputNoteEditor;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
@@ -124,6 +125,7 @@ public class MainWindow implements IMainWindow {
 
 		methodsTab = new DisplayTextTab(this, "How to Cite", false);
 		methodsTab.setGraphic(MaterialIcons.graphic("notes"));
+		InputNoteEditor.setup(this, methodsTab.getDisplayTextView());
 
 		workflow.validProperty().addListener(e -> updateMethodsTab());
 		workflow.numberOfNodesProperty().addListener(e -> Platform.runLater(this::updateMethodsTab));

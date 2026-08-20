@@ -65,8 +65,11 @@ public class HaplotypeController {
 		distanceChoice.getSelectionModel().selectFirst();
 
 		var methods = new ArrayList<String>();
-		if (AlgorithmList.isAvailable("RazorNet1")) {
-			methods.add("RazorNet1");
+		if (AlgorithmList.isAvailable("RazorNet")) {
+			methods.add("RazorNet");
+		}
+		if (AlgorithmList.isAvailable("TightSpanHaplotypeNetwork")) {
+			methods.add("TightSpanWalker");
 		}
 		methods.add(MedianJoining.class.getSimpleName());
 		methods.add(MinSpanningNetwork.class.getSimpleName());
