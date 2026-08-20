@@ -303,6 +303,12 @@ public class WorldMapView implements IView {
 		}
 	}
 
+	/**
+	 * places one pie chart per geo-referenced trait on both world maps.
+	 * A trait is geo-referenced, and hence drawn, exactly when its latitude or longitude is
+	 * non-zero. Traits are 1-based, so the loop must run to getNTraits() *inclusive*: it read
+	 * {@code traitId < getNTraits()} until 8.2026 and silently omitted the last location.
+	 */
 	public void updateNodes() {
 		var taxaBlock = workingTaxa.get();
 		var traitsBlock = getTraitsBlock();
@@ -312,7 +318,7 @@ public class WorldMapView implements IView {
 			presenter.getWorldMap1().clear();
 			presenter.getWorldMap2().clear();
 
-			for (var traitId = 1; traitId < traitsBlock.getNTraits(); traitId++) {
+			for (var traitId = 1; traitId <= traitsBlock.getNTraits(); traitId++) {
 				var lat = traitsBlock.getTraitLatitude(traitId);
 				var lon = traitsBlock.getTraitLongitude(traitId);
 				if (lat != 0 || lon != 0) {
@@ -346,9 +352,14 @@ public class WorldMapView implements IView {
 		return chart;
 	}
 
+	/**
+	 * the largest per-trait total over all geo-referenced traits; sets the scale that
+	 * {@link #setupChart} sizes every pie against. Must visit the same traits as
+	 * {@link #updateNodes}, or the biggest pie is scaled against someone else's maximum.
+	 */
 	private static double computeMaxCount(TaxaBlock taxaBlock, TraitsBlock traitsBlock) {
 		var max = 0.0;
-		for (var traitId = 1; traitId < traitsBlock.getNTraits(); traitId++) {
+		for (var traitId = 1; traitId <= traitsBlock.getNTraits(); traitId++) {
 			var count = 0.0;
 			var lat = traitsBlock.getTraitLatitude(traitId);
 			var lon = traitsBlock.getTraitLongitude(traitId);
