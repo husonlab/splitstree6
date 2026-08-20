@@ -24,6 +24,7 @@ import javafx.stage.FileChooser;
 import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.NotificationManager;
 import jloda.util.*;
+import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 import splitstree6.window.MainWindow;
 
@@ -57,101 +58,117 @@ public class ImportTaxonTraits {
 				if (!isTraitsFile(file))
 					throw new IOException("Traits import file must start with 'traits' keyword");
 				ProgramProperties.put("TaxonTraitsFile", file.getPath());
-				try (var it = new FileLineIterator(file)) {
-					String[] traitNames = null;
-					var taxonValuesMap = new HashMap<String, String[]>();
-					var traitLocations = new HashMap<String, Point2D>();
-
-					var seen = 0;
-
-					for (var line : it.lines()) {
-						line = line.trim().replaceAll("'", "_");
-						if (!line.startsWith("#")) {
-							var tokens = StringUtils.split(line, '\t');
-							if (tokens.length > 0) {
-								if (seen == 0) {
-									traitNames = tokens;
-									if (false)
-										System.err.println("Traits: " + StringUtils.toString(traitNames, 1, traitNames.length, ", "));
-									seen++;
-								} else {
-									if (seen == 1 && line.startsWith("Coordinates")) {
-										if (tokens.length != traitNames.length) {
-											throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected %,d pairs of coordinates 'lat,long', got: %,d".formatted(traitNames.length, tokens.length));
-										}
-										for (int t = 1; t < traitNames.length; t++) {
-											var values = StringUtils.split(tokens[t], ',');
-											if (values.length != 2 || !NumberUtils.isDouble(values[0]) || !NumberUtils.isDouble(values[1]))
-												throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected pair of coordinates, got: " + tokens[t]);
-											traitLocations.put(traitNames[t], new Point2D(NumberUtils.parseDouble(values[0]), NumberUtils.parseDouble(values[1])));
-										}
-										seen++;
-									} else {
-										if (tokens.length == 3 && Arrays.stream(traitNames).anyMatch(n -> n.equals(tokens[1])) && NumberUtils.isDouble(tokens[2])) {
-											var length = traitNames.length;
-											var values = taxonValuesMap.computeIfAbsent(tokens[0],
-													k -> {
-														var array = new String[length];
-														Arrays.fill(array, "0");
-														return array;
-													});
-											for (var t = 0; t < traitNames.length; t++) {
-												if (traitNames[t].equals(tokens[1]))
-													values[t] = String.valueOf(NumberUtils.parseDouble(values[t]) + NumberUtils.parseDouble(tokens[2]));
-											}
-										} else {
-											if (tokens.length != traitNames.length)
-												throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected %,d values, got: %,d".formatted(traitNames.length, tokens.length));
-											taxonValuesMap.put(tokens[0], tokens);
-										}
-										seen++;
-									}
-								}
-							}
-						}
-					}
-
-					if (traitNames != null && traitNames.length > 1) {
-						var inputTaxa = mainWindow.getWorkflow().getInputTaxaBlock();
-						for (var label : inputTaxa.getLabels()) {
-							if (!taxonValuesMap.containsKey(label))
-								System.err.println("Taxon not found in file: " + label);
-						}
-
-						if (!taxonValuesMap.keySet().containsAll(inputTaxa.getLabels())) {
-							throw new IOException("Imported taxon labels do not include all existing labels");
-						}
-						var traitsBlock = new TraitsBlock();
-						traitsBlock.setDimensions(inputTaxa.getNtax(), traitNames.length - 1);
-						for (var tr = 1; tr < traitNames.length; tr++) {
-							var name = traitNames[tr];
-							traitsBlock.setTraitLabel(tr, name);
-							if (traitLocations.containsKey(name)) {
-								var latlong = traitLocations.get(name);
-								traitsBlock.setTraitLatitude(tr, (float) latlong.getX());
-								traitsBlock.setTraitLongitude(tr, (float) latlong.getY());
-							}
-						}
-						var traitCount = new int[traitNames.length];
-						for (var t = 1; t <= inputTaxa.getNtax(); t++) {
-							var valuesLine = taxonValuesMap.get(inputTaxa.getLabel(t));
-							for (var tr = 1; tr < valuesLine.length; tr++) {
-								var label = valuesLine[tr];
-								if (NumberUtils.isDouble(label))
-									traitsBlock.setTraitValue(t, tr, NumberUtils.parseDouble(label));
-								else {
-									traitsBlock.setTraitValueLabel(t, tr, label);
-									traitsBlock.setTraitValue(t, tr, ++traitCount[tr]);
-								}
-							}
-						}
-						inputTaxa.setTraitsBlock(traitsBlock);
-						mainWindow.getWorkflow().restart(mainWindow.getWorkflow().getInputTaxaFilterNode());
-					}
+				var inputTaxa = mainWindow.getWorkflow().getInputTaxaBlock();
+				var traitsBlock = parse(file, inputTaxa);
+				if (traitsBlock != null) {
+					inputTaxa.setTraitsBlock(traitsBlock);
+					mainWindow.getWorkflow().restart(mainWindow.getWorkflow().getInputTaxaFilterNode());
 				}
 			} catch (IOException ex) {
 				NotificationManager.showError("Import failed: " + ex);
 			}
+		}
+	}
+
+	/**
+	 * parses a taxon-traits file: a header line of trait names, an optional 'Coordinates' line
+	 * giving each trait a 'latitude,longitude' pair, and then one line of values per taxon.
+	 * Shared with the Open Haplotype Data dialog, which accepts the same layout.
+	 *
+	 * @return the traits block, or null if the file names no traits
+	 * @throws IOException if the file is malformed, or does not cover every taxon of inputTaxa
+	 */
+	public static TraitsBlock parse(File file, TaxaBlock inputTaxa) throws IOException {
+		try (var it = new FileLineIterator(file)) {
+			String[] traitNames = null;
+			var taxonValuesMap = new HashMap<String, String[]>();
+			var traitLocations = new HashMap<String, Point2D>();
+
+			var seen = 0;
+
+			for (var line : it.lines()) {
+				line = line.trim().replaceAll("'", "_");
+				if (!line.startsWith("#")) {
+					var tokens = StringUtils.split(line, '\t');
+					if (tokens.length > 0) {
+						if (seen == 0) {
+							traitNames = tokens;
+							if (false)
+								System.err.println("Traits: " + StringUtils.toString(traitNames, 1, traitNames.length, ", "));
+							seen++;
+						} else {
+							if (seen == 1 && line.startsWith("Coordinates")) {
+								if (tokens.length != traitNames.length) {
+									throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected %,d pairs of coordinates 'lat,long', got: %,d".formatted(traitNames.length, tokens.length));
+								}
+								for (int t = 1; t < traitNames.length; t++) {
+									var values = StringUtils.split(tokens[t], ',');
+									if (values.length != 2 || !NumberUtils.isDouble(values[0]) || !NumberUtils.isDouble(values[1]))
+										throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected pair of coordinates, got: " + tokens[t]);
+									traitLocations.put(traitNames[t], new Point2D(NumberUtils.parseDouble(values[0]), NumberUtils.parseDouble(values[1])));
+								}
+								seen++;
+							} else {
+								if (tokens.length == 3 && Arrays.stream(traitNames).anyMatch(n -> n.equals(tokens[1])) && NumberUtils.isDouble(tokens[2])) {
+									var length = traitNames.length;
+									var values = taxonValuesMap.computeIfAbsent(tokens[0],
+											k -> {
+												var array = new String[length];
+												Arrays.fill(array, "0");
+												return array;
+											});
+									for (var t = 0; t < traitNames.length; t++) {
+										if (traitNames[t].equals(tokens[1]))
+											values[t] = String.valueOf(NumberUtils.parseDouble(values[t]) + NumberUtils.parseDouble(tokens[2]));
+									}
+								} else {
+									if (tokens.length != traitNames.length)
+										throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected %,d values, got: %,d".formatted(traitNames.length, tokens.length));
+									taxonValuesMap.put(tokens[0], tokens);
+								}
+								seen++;
+							}
+						}
+					}
+				}
+			}
+
+			if (traitNames != null && traitNames.length > 1) {
+				for (var label : inputTaxa.getLabels()) {
+					if (!taxonValuesMap.containsKey(label))
+						System.err.println("Taxon not found in file: " + label);
+				}
+
+				if (!taxonValuesMap.keySet().containsAll(inputTaxa.getLabels())) {
+					throw new IOException("Imported taxon labels do not include all existing labels");
+				}
+				var traitsBlock = new TraitsBlock();
+				traitsBlock.setDimensions(inputTaxa.getNtax(), traitNames.length - 1);
+				for (var tr = 1; tr < traitNames.length; tr++) {
+					var name = traitNames[tr];
+					traitsBlock.setTraitLabel(tr, name);
+					if (traitLocations.containsKey(name)) {
+						var latlong = traitLocations.get(name);
+						traitsBlock.setTraitLatitude(tr, (float) latlong.getX());
+						traitsBlock.setTraitLongitude(tr, (float) latlong.getY());
+					}
+				}
+				var traitCount = new int[traitNames.length];
+				for (var t = 1; t <= inputTaxa.getNtax(); t++) {
+					var valuesLine = taxonValuesMap.get(inputTaxa.getLabel(t));
+					for (var tr = 1; tr < valuesLine.length; tr++) {
+						var label = valuesLine[tr];
+						if (NumberUtils.isDouble(label))
+							traitsBlock.setTraitValue(t, tr, NumberUtils.parseDouble(label));
+						else {
+							traitsBlock.setTraitValueLabel(t, tr, label);
+							traitsBlock.setTraitValue(t, tr, ++traitCount[tr]);
+						}
+					}
+				}
+				return traitsBlock;
+			}
+			return null;
 		}
 	}
 

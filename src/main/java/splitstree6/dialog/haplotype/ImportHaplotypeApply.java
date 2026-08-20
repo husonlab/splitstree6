@@ -38,6 +38,7 @@ import splitstree6.data.*;
 import splitstree6.io.nexus.CharactersNexusOutput;
 import splitstree6.io.nexus.TaxaNexusOutput;
 import splitstree6.io.nexus.TraitsNexusOutput;
+import splitstree6.dialog.importing.ImportTaxonTraits;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.utils.DataReaderBase;
 import splitstree6.utils.CollapseIdenticalHyplotypes;
@@ -74,58 +75,7 @@ public class ImportHaplotypeApply {
 		// setup traits:
 		if (!result.traitsPath().isBlank()) {
 			FileUtils.checkFileReadableNonEmpty(result.traitsPath());
-
-			var traitsBlock = new TraitsBlock();
-			traitsBlock.setDimensions(originalTaxa.getNtax(), 0);
-			originalTaxa.setTraitsBlock(traitsBlock);
-
-			var first = true;
-			char splitToken = 0;
-
-			for (var line : Files.readAllLines((new File(result.traitsPath())).toPath())) {
-				if (first) {
-					if (line.contains("\t"))
-						splitToken = '\t';
-					else if (line.contains(";"))
-						splitToken = ';';
-					else
-						splitToken = ',';
-					var tokens = StringUtils.split(line, splitToken);
-					if (tokens.length > 0) {
-						var taxonId = originalTaxa.indexOf(tokens[0]);
-						if (taxonId != -1) {
-							float[] latLongPair = null;
-							for (int i = 1; i < tokens.length; i++) {
-								var token = tokens[i];
-								var coordinates = parsePair(token);
-								if (coordinates != null) {
-									latLongPair = coordinates;
-								}
-							}
-							for (int i = 1; i < tokens.length; i++) {
-								var token = tokens[i];
-								var coordinates = parsePair(token);
-								if (coordinates == null) {
-									var traitId = traitsBlock.getTraitId(token);
-									if (traitId == -1) {
-										traitId = traitsBlock.addTrait(token);
-									}
-									traitsBlock.setTraitValue(taxonId, traitId, 1);
-									if (latLongPair != null) {
-										traitsBlock.setTraitLatitude(traitId, latLongPair[0]);
-										traitsBlock.setTraitLongitude(traitId, latLongPair[1]);
-									}
-								}
-							}
-						} else System.err.println("Skipped: " + line);
-					}
-				}
-			}
-			if (false) {
-				var w = new StringWriter();
-				(new TraitsNexusOutput()).write(w, originalTaxa, traitsBlock);
-				System.err.println("Input traits:\n" + w);
-			}
+			originalTaxa.setTraitsBlock(readTraits(new File(result.traitsPath()), originalTaxa));
 		}
 		var data = CollapseIdenticalHyplotypes.apply(originalTaxa, originalCharacters);
 		if (true) {
@@ -149,8 +99,8 @@ public class ImportHaplotypeApply {
 				var networkNode = workflow.newDataNode(new NetworkBlock());
 
 						switch (result.method()) {
-							case "RazorNet" -> {
-								var razor = AlgorithmList.create("RazorHaplotypeNetwork",
+							case "RazorNet1" -> {
+								var razor = AlgorithmList.create("RazorHaplotypeNetwork1",
 										Map.of("distanceModel", result.distanceModel()));
 								workflow.newAlgorithmNode(Objects.requireNonNullElseGet(razor, MedianJoining::new),
 										workflow.getWorkingTaxaNode(),
@@ -189,6 +139,63 @@ public class ImportHaplotypeApply {
 				}
 			}
 		}
+	}
+
+	/**
+	 * reads the traits file named in the dialog. Two layouts are accepted:
+	 * <ul>
+	 * <li>the taxon-traits matrix that File-&gt;Import-&gt;Taxon Traits uses, recognized by the
+	 * 'traits' keyword on its first line and read by {@link ImportTaxonTraits#parse}; and</li>
+	 * <li>one line per taxon, {@code taxon <sep> trait [<sep> trait ...] [<sep> (latitude,longitude)]},
+	 * where every trait named on a line is set to 1 for that taxon.</li>
+	 * </ul>
+	 * In the second layout the coordinate pair applies to <i>every</i> trait named on its line, so a
+	 * trait that must stay off the world map has to be given on a line that carries no pair.
+	 * Accepting both matters because the two are easy to confuse: fed the matrix layout, the
+	 * per-taxon reader used to take each cell as a trait name and quietly build two traits called
+	 * '0' and '1', with no coordinates and hence no world map.
+	 */
+	private static TraitsBlock readTraits(File file, TaxaBlock taxa) throws IOException {
+		if (ImportTaxonTraits.isTraitsFile(file)) {
+			var traitsBlock = ImportTaxonTraits.parse(file, taxa);
+			if (traitsBlock == null)
+				throw new IOException("No traits found in: " + file.getName());
+			return traitsBlock;
+		}
+
+		var traitsBlock = new TraitsBlock();
+		traitsBlock.setDimensions(taxa.getNtax(), 0);
+
+		for (var line : Files.readAllLines(file.toPath())) {
+			var splitToken = line.contains("\t") ? '\t' : line.contains(";") ? ';' : ',';
+			var tokens = StringUtils.split(line, splitToken);
+			if (tokens.length == 0)
+				continue;
+			var taxonId = taxa.indexOf(tokens[0]);
+			if (taxonId == -1) {
+				System.err.println("Skipped: " + line);
+				continue;
+			}
+			float[] latLongPair = null;
+			for (var i = 1; i < tokens.length; i++) {
+				var coordinates = parsePair(tokens[i]);
+				if (coordinates != null)
+					latLongPair = coordinates;
+			}
+			for (var i = 1; i < tokens.length; i++) {
+				if (parsePair(tokens[i]) != null)
+					continue;
+				var traitId = traitsBlock.getTraitId(tokens[i]);
+				if (traitId == -1)
+					traitId = traitsBlock.addTrait(tokens[i]);
+				traitsBlock.setTraitValue(taxonId, traitId, 1);
+				if (latLongPair != null) {
+					traitsBlock.setTraitLatitude(traitId, latLongPair[0]);
+					traitsBlock.setTraitLongitude(traitId, latLongPair[1]);
+				}
+			}
+		}
+		return traitsBlock;
 	}
 
 	public static float[] parsePair(String s) {
