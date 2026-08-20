@@ -28,6 +28,12 @@ import jloda.phylo.PhyloGraph;
 import jloda.util.StringUtils;
 import splitstree6.data.DistancesBlock;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 /**
  * check all pairwise distances
  * Daniel Huson, 9.2025
@@ -47,11 +53,15 @@ public class CheckPairwiseDistances {
 		var totalOutput = 0.0;
 		for (var i = 0; i < taxonNodePairs.size(); i++) {
 			var a = taxonNodePairs.get(i);
+			// ONE shortest-path solve per row, not one per pair: see graphDistances
+			var distanceFromA = graphDistances(graph, a.getValue());
 			for (var j = i + 1; j < taxonNodePairs.size(); j++) {
 				var b = taxonNodePairs.get(j);
 				var inputDistance = D[a.getKey() - 1][b.getKey() - 1];
 				totalInput += inputDistance;
-				var outputDistance = graphDistance(graph, a.getValue(), b.getValue());
+				var outputDistance = distanceFromA.get(b.getValue());
+				if (Double.isInfinite(outputDistance))
+					throw new RuntimeException("No path from source to sink");
 				totalOutput += outputDistance;
 				var diff = Math.abs(inputDistance - outputDistance);
 				if (diff > epsilon) {
@@ -77,6 +87,55 @@ public class CheckPairwiseDistances {
 		System.err.printf("Total network length: %s%n", StringUtils.trim("%.8f", graph.edgeStream().mapToDouble(graph::getWeight).sum()));
 	}
 
+	/**
+	 * Shortest-path distance from {@code source} to every node of the graph, computed in one pass.
+	 * <p>
+	 * {@link Dijkstra#compute} is itself a single-source algorithm: it relaxes the whole graph and then keeps
+	 * only the path to the one sink it was asked about. Calling it once per pair therefore repeats the entire
+	 * solve and discards all but one of its answers, turning an O(n) job into an O(n^2) one. Over the taxon
+	 * pairs of the 517-taxon HIV reference alignment that is 133,386 solves where 517 suffice, which is the
+	 * difference between this check taking minutes and taking seconds.
+	 * <p>
+	 * Edges are traversed undirected, matching {@code Dijkstra.compute(..., undirected = true)} as used here.
+	 *
+	 * @return the distance to every node; {@code Double.POSITIVE_INFINITY} for nodes the source cannot reach
+	 */
+	public static Map<Node, Double> graphDistances(PhyloGraph graph, Node source) {
+		var distance = new HashMap<Node, Double>();
+		for (var v : graph.nodes())
+			distance.put(v, Double.POSITIVE_INFINITY);
+		distance.put(source, 0.0);
+
+		var queue = new PriorityQueue<NodeDistance>(Comparator.comparingDouble(NodeDistance::distance));
+		queue.add(new NodeDistance(source, 0.0));
+		var settled = new HashSet<Node>();
+
+		while (!queue.isEmpty()) {
+			var top = queue.poll();
+			if (!settled.add(top.node()))
+				continue;   // a stale queue entry, already settled at a shorter distance
+			for (var e : top.node().adjacentEdges()) {
+				var weight = graph.getWeight(e);
+				if (weight < 0)
+					throw new IllegalArgumentException("Dijkstra requires non-negative weights");
+				var v = e.getOpposite(top.node());
+				var candidate = top.distance() + weight;
+				if (candidate < distance.get(v)) {
+					distance.put(v, candidate);
+					queue.add(new NodeDistance(v, candidate));
+				}
+			}
+		}
+		return distance;
+	}
+
+	private record NodeDistance(Node node, double distance) {
+	}
+
+	/**
+	 * Distance between a single pair. Prefer {@link #graphDistances} whenever more than one pair from the same
+	 * source is wanted -- this recomputes the whole single-source solve every time it is called.
+	 */
 	public static double graphDistance(PhyloGraph graph, Node v, Node w) {
 		var list = Dijkstra.compute(graph, v, w, graph::getWeight, true);
 		var sum = 0.0;
