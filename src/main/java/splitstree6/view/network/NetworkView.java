@@ -36,6 +36,7 @@ import jloda.fx.util.*;
 import jloda.graph.Edge;
 import splitstree6.data.NetworkBlock;
 import splitstree6.layout.network.DiagramType;
+import splitstree6.layout.network.LayoutAlgorithm;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
@@ -83,6 +84,7 @@ public class NetworkView implements IView {
 	private final ObjectProperty<SitesStyle> optionSitesStyle = new SimpleObjectProperty<>(this, "optionSitesStyle");
 
 	private final IntegerProperty optionLayoutSeed = new SimpleIntegerProperty(this, "optionLayoutSeed", 1);
+	private final ObjectProperty<LayoutAlgorithm> optionLayoutAlgorithm = new SimpleObjectProperty<>(this, "optionLayoutAlgorithm", LayoutAlgorithm.MDS);
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	private final ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
@@ -91,12 +93,13 @@ public class NetworkView implements IView {
 	{
 		ProgramProperties.track(optionDiagram, DiagramType::valueOf, DiagramType.Network);
 		ProgramProperties.track(optionSitesStyle, SitesStyle::valueOf, SitesStyle.Hatches);
+		ProgramProperties.track(optionLayoutAlgorithm, LayoutAlgorithm::valueOf, LayoutAlgorithm.MDS);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(),
 				optionFontScaleFactor.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(), optionSitesStyle.getName(),
-				optionEdits.getName(), optionLayoutSeed.getName());
+				optionEdits.getName(), optionLayoutSeed.getName(), optionLayoutAlgorithm.getName());
 	}
 
 	public NetworkView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -374,6 +377,18 @@ public class NetworkView implements IView {
 
 	public void setOptionEdits(String[] optionEdits) {
 		this.optionEdits.set(optionEdits);
+	}
+
+	public LayoutAlgorithm getOptionLayoutAlgorithm() {
+		return optionLayoutAlgorithm.get();
+	}
+
+	public ObjectProperty<LayoutAlgorithm> optionLayoutAlgorithmProperty() {
+		return optionLayoutAlgorithm;
+	}
+
+	public void setOptionLayoutAlgorithm(LayoutAlgorithm optionLayoutAlgorithm) {
+		this.optionLayoutAlgorithm.set(optionLayoutAlgorithm);
 	}
 
 	public int getOptionLayoutSeed() {

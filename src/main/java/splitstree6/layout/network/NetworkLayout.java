@@ -89,7 +89,7 @@ public class NetworkLayout {
 		}
 	}
 
-	public Group apply(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock networkBlock, DiagramType diagram, double width, double height, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
+	public Group apply(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock networkBlock, DiagramType diagram, LayoutAlgorithm algorithm, double width, double height, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 					   ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, int randomLayoutSeed) throws CanceledException {
 		labelLayout.clear();
 		Platform.runLater(nodeShapeMap::clear);
@@ -122,7 +122,7 @@ public class NetworkLayout {
 					nodePointMap.put(v, new Point2D(x, y));
 				}
 			} else {
-				computeBestLayout(progress, graph, edgeWeightFunction, randomLayoutSeed, nodePointMap);
+				computeBestLayout(progress, graph, edgeWeightFunction, randomLayoutSeed, algorithm, nodePointMap);
 			}
 
 			if (graph.getNumberOfEdges() == 0) {
@@ -255,9 +255,8 @@ public class NetworkLayout {
 	 * from. We therefore produce more than one drawing and keep whichever reads best; see {@link LayoutScore}.
 	 */
 	private void computeBestLayout(ProgressListener progress, PhyloGraph graph, ToDoubleFunction<Edge> edgeWeightFunction,
-								   int randomLayoutSeed, NodeArray<Point2D> result) throws CanceledException {
-		// the parity of the seed selects which of the two layouts to use
-		var useStressLayout = (randomLayoutSeed % 2 == 1);
+								   int randomLayoutSeed, LayoutAlgorithm algorithm, NodeArray<Point2D> result) throws CanceledException {
+		var useStressLayout = (algorithm == LayoutAlgorithm.MDS);
 		var layoutService = GraphLayouts.getService();
 
 		LayoutScore best = null;

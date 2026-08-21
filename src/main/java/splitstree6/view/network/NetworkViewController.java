@@ -83,6 +83,9 @@ public class NetworkViewController {
 	private VBox formatVBox;
 
 	@FXML
+	private ToggleButton layoutAlgorithmToggleButton;
+
+	@FXML
 	private ToggleButton settingsToggleButton;
 
 	@FXML
@@ -168,6 +171,10 @@ public class NetworkViewController {
 
 	public ChoiceBox<DiagramType> getDiagramCBox() {
 		return diagramCBox;
+	}
+
+	public ToggleButton getLayoutAlgorithmToggleButton() {
+		return layoutAlgorithmToggleButton;
 	}
 
 	public Button getNewLayoutButton() {

@@ -45,6 +45,7 @@ import jloda.util.ProgramExecutorService;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.layout.network.DiagramType;
+import splitstree6.layout.network.LayoutAlgorithm;
 import splitstree6.layout.network.NetworkLayout;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
@@ -76,7 +77,7 @@ public class NetworkPane extends StackPane {
 	 */
 	public NetworkPane(MainWindow mainWindow, ReadOnlyObjectProperty<TaxaBlock> taxaBlock, ReadOnlyObjectProperty<NetworkBlock> networkBlock,
 					   ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight,
-					   ReadOnlyObjectProperty<DiagramType> diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+					   ReadOnlyObjectProperty<DiagramType> diagram, ReadOnlyObjectProperty<LayoutAlgorithm> layoutAlgorithm, ReadOnlyObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap, ReadOnlyIntegerProperty layoutSeed) {
 		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
@@ -111,7 +112,7 @@ public class NetworkPane extends StackPane {
 			if (taxaBlock.get() == null || networkBlock.get() == null)
 				return new Group();
 
-			var result = networkLayout.apply(service.getProgressListener(), taxaBlock.get(), networkBlock.get(), diagram.get(),
+			var result = networkLayout.apply(service.getProgressListener(), taxaBlock.get(), networkBlock.get(), diagram.get(), layoutAlgorithm.get(),
 					getPrefWidth() - 4, getPrefHeight() - 16, taxonLabelMap, nodeShapeMap, edgeShapeMap, layoutSeed.get());
 
 			result.setId("networkGroup");

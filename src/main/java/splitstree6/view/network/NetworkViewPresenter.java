@@ -34,7 +34,10 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
+import javafx.scene.control.Tooltip;
+import jloda.fx.icons.MaterialIcons;
 import splitstree6.layout.network.DiagramType;
+import splitstree6.layout.network.LayoutAlgorithm;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -110,7 +113,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		});
 
 		networkPane = new NetworkPane(mainWindow, mainWindow.workingTaxaProperty(), networkBlock,
-				paneWidth, paneHeight, view.optionDiagramProperty(), view.optionOrientationProperty(),
+				paneWidth, paneHeight, view.optionDiagramProperty(), view.optionLayoutAlgorithmProperty(), view.optionOrientationProperty(),
 				view.optionZoomFactorProperty(), view.optionFontScaleFactorProperty(),
 				taxonLabelMap, nodeShapeMap, edgeShapeMap, view.optionLayoutSeedProperty());
 
@@ -163,10 +166,11 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		networkBlock.addListener(updateListener);
 		view.optionDiagramProperty().addListener(updateListener);
+		view.optionLayoutAlgorithmProperty().addListener(updateListener);
 
 		controller.getNewLayoutButton().setOnAction(e -> {
 			var oldValue = view.getOptionLayoutSeed();
-			var newValue = oldValue + 7;
+			var newValue = oldValue + 1;
 			view.getUndoManager().doAndAdd("layout", () -> {
 				view.optionLayoutSeedProperty().set(oldValue);
 				updateListener.invalidated(null);
@@ -177,6 +181,26 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		});
 		controller.getNewLayoutButton().disableProperty().bind(view.emptyProperty());
+
+		// The layout algorithm used to be picked by the parity of the layout seed, so that the button above
+		// switched algorithm as well as reseeding and there was no way to ask for another attempt at the one
+		// on screen. It is an explicit option now, and this toggle is it. The icon swaps with the state, so
+		// which algorithm is in use can be read without hovering: a scatter of points for MDS, which places
+		// points to match distances, and hub-and-spokes for the force-directed layout.
+		var algorithmToggle = controller.getLayoutAlgorithmToggleButton();
+		InvalidationListener updateAlgorithmToggle = e -> {
+			var forceDirected = (view.getOptionLayoutAlgorithm() == LayoutAlgorithm.ForceDirected);
+			algorithmToggle.setSelected(forceDirected);
+			MaterialIcons.setIcon(algorithmToggle, forceDirected ? MaterialIcons.hub : MaterialIcons.scatter_plot);
+			algorithmToggle.setTooltip(new Tooltip(forceDirected
+					? "Layout: force-directed. Fewer crossings on large networks, but takes seconds. Click for MDS"
+					: "Layout: MDS. Fast, and fewer crossings on small networks. Click for force-directed"));
+		};
+		view.optionLayoutAlgorithmProperty().addListener(updateAlgorithmToggle);
+		// deferred, as the controller also sets its icons that way: the icon font is not ready any earlier
+		Platform.runLater(() -> updateAlgorithmToggle.invalidated(null));
+		algorithmToggle.setOnAction(e -> view.setOptionLayoutAlgorithm(algorithmToggle.isSelected() ? LayoutAlgorithm.ForceDirected : LayoutAlgorithm.MDS));
+		algorithmToggle.disableProperty().bind(view.emptyProperty());
 
 		controller.getZoomInButton().setOnAction(e -> view.setOptionZoomFactor(1.1 * view.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(view.emptyProperty().or(view.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
@@ -197,6 +221,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		var undoManager = view.getUndoManager();
 
 		view.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram", view.optionDiagramProperty(), o, n));
+		view.optionLayoutAlgorithmProperty().addListener((v, o, n) -> undoManager.add("layout algorithm", view.optionLayoutAlgorithmProperty(), o, n));
 		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", view.optionOrientationProperty(), o, n));
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
 		view.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", view.optionZoomFactorProperty(), o, n));
