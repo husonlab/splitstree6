@@ -49,12 +49,6 @@
                         </tooltip>
                     </ChoiceBox>
 
-                    <Button fx:id="newLayoutButton" contentDisplay="CENTER" mnemonicParsing="false" text="New Layout">
-                        <tooltip>
-                            <Tooltip text="Rerun layout using different random seed"/>
-                        </tooltip>
-                    </Button>
-
                     <ToggleButton fx:id="layoutAlgorithmToggleButton" contentDisplay="CENTER" mnemonicParsing="false"
                                   text="Layout Algorithm"/>
 

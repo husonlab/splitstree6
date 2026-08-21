@@ -53,9 +53,6 @@ public class NetworkViewController {
 	private ChoiceBox<DiagramType> diagramCBox;
 
 	@FXML
-	private Button newLayoutButton;
-
-	@FXML
 	private Button rotateLeftButton;
 
 	@FXML
@@ -99,8 +96,6 @@ public class NetworkViewController {
 	@FXML
 	private void initialize() {
 		Platform.runLater(() -> {
-			MaterialIcons.setIcon(newLayoutButton, MaterialIcons.play_circle);
-
 			MaterialIcons.setIcon(rotateLeftButton, MaterialIcons.rotate_left);
 			MaterialIcons.setIcon(rotateRightButton, MaterialIcons.rotate_right);
 
@@ -175,10 +170,6 @@ public class NetworkViewController {
 
 	public ToggleButton getLayoutAlgorithmToggleButton() {
 		return layoutAlgorithmToggleButton;
-	}
-
-	public Button getNewLayoutButton() {
-		return newLayoutButton;
 	}
 
 	public Button getRotateLeftButton() {

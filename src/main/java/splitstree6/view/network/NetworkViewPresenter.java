@@ -168,23 +168,9 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		view.optionDiagramProperty().addListener(updateListener);
 		view.optionLayoutAlgorithmProperty().addListener(updateListener);
 
-		controller.getNewLayoutButton().setOnAction(e -> {
-			var oldValue = view.getOptionLayoutSeed();
-			var newValue = oldValue + 1;
-			view.getUndoManager().doAndAdd("layout", () -> {
-				view.optionLayoutSeedProperty().set(oldValue);
-				updateListener.invalidated(null);
-			}, () -> {
-				view.optionLayoutSeedProperty().set(newValue);
-				updateListener.invalidated(null);
-			});
-
-		});
-		controller.getNewLayoutButton().disableProperty().bind(view.emptyProperty());
-
-		// The layout algorithm used to be picked by the parity of the layout seed, so that the button above
-		// switched algorithm as well as reseeding and there was no way to ask for another attempt at the one
-		// on screen. It is an explicit option now, and this toggle is it. The icon swaps with the state, so
+		// The layout algorithm used to be picked by the parity of the layout seed, and reseeding was a button
+		// of its own, so that pressing it switched algorithm as well as reseeding. It is an explicit option
+		// now, and this toggle is it. The icon swaps with the state, so
 		// which algorithm is in use can be read without hovering: a scatter of points for MDS, which places
 		// points to match distances, and hub-and-spokes for the force-directed layout.
 		var algorithmToggle = controller.getLayoutAlgorithmToggleButton();
