@@ -56,7 +56,7 @@ import static splitstree6.layout.tree.LayoutUtils.normalize;
  * Daniel Huson, 4.2022
  */
 public class NetworkLayout {
-	public boolean verbose = true;
+	public boolean verbose = false;
 
 	/**
 	 * wall-clock budget, in milliseconds, for optimizing candidate drawings. The most promising candidate is
