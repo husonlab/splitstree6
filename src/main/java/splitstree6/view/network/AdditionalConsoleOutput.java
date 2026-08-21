@@ -24,6 +24,7 @@ import javafx.beans.InvalidationListener;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
+import splitstree6.data.NetworkBlock;
 
 public class AdditionalConsoleOutput {
 	// Temporary guard (off by default): the per-taxon-pair "Input distance / Path distance" dumps below are
@@ -39,21 +40,7 @@ public class AdditionalConsoleOutput {
 				reportAllDifferencesCharacters(view);
 			}
 			if (networkBlock != null && networkBlock.getInfoString().isBlank()) {
-				String info = "";
-				if (NetworkSequencesAnalyzer.isApplicable(networkBlock)) {
-					var analyzer = new NetworkSequencesAnalyzer(networkBlock);
-					var totalEdgeDistances = analyzer.totalEdgeDistances(networkBlock);
-					var realizedPairwiseDistances = analyzer.realizedPairwiseDistances(networkBlock);
-					var inputPairwiseDistances = analyzer.inputPairwiseDistances(networkBlock);
-					;
-					var excessDistance = realizedPairwiseDistances - inputPairwiseDistances;
-					info = "Total length: %d, excess: %d".formatted(totalEdgeDistances, excessDistance);
-				} else if (NetworkDistancesAnalyzer.isApplicable(networkBlock)) {
-					var analyzer = new NetworkDistancesAnalyzer();
-					var totalEdgeDistances = analyzer.totalEdgeDistances(networkBlock);
-					var distortion = analyzer.distortion(networkBlock);
-					info = "Total length: %s, distortion: %s".formatted(StringUtils.trim(totalEdgeDistances), StringUtils.trim(distortion));
-				}
+				var info = infoFor(networkBlock);
 				if (!info.isBlank()) {
 					System.err.println(info);
 					networkBlock.setInfoString(info);
@@ -89,6 +76,50 @@ public class AdditionalConsoleOutput {
 				}
 			});
 		});
+	}
+
+	/**
+	 * The info line for a network -- what the viewer shows under the drawing -- chosen by the kind of network it
+	 * declares itself to be. Public so that a headless tool can report exactly what the application would.
+	 * <p>
+	 * The kind is the authority (see {@link NetworkBlock.Type}), and only a network that does not know what it is
+	 * falls back to inspecting the workflow, as everything here used to do. That fallback is why a network read
+	 * from a file used to report NOTHING: both analyzers need a characters or distances block among its
+	 * ancestors, and a loaded network has neither. Its total length needs no ancestor at all, so it is reported
+	 * either way, and the measure that does need one is appended only when it can be had.
+	 */
+	public static String infoFor(NetworkBlock networkBlock) {
+		return switch (networkBlock.getNetworkType()) {
+			case HaplotypeNetwork -> haplotypeInfo(networkBlock);
+			case DistanceNetwork -> distanceInfo(networkBlock);
+			case Points -> ""; // a point cloud has no lengths to add up
+			case Other -> NetworkSequencesAnalyzer.isApplicable(networkBlock) ? haplotypeInfo(networkBlock)
+					: NetworkDistancesAnalyzer.isApplicable(networkBlock) ? distanceInfo(networkBlock) : "";
+		};
+	}
+
+	/** length in mutations, plus the excess over the sequence differences when the alignment can be reached */
+	private static String haplotypeInfo(NetworkBlock networkBlock) {
+		if (!NetworkSequencesAnalyzer.isApplicable(networkBlock))
+			return "Total length: %s".formatted(StringUtils.trim(totalLength(networkBlock)));
+		var analyzer = new NetworkSequencesAnalyzer(networkBlock);
+		var excess = analyzer.realizedPairwiseDistances(networkBlock) - analyzer.inputPairwiseDistances(networkBlock);
+		return "Total length: %d, excess: %d".formatted(analyzer.totalEdgeDistances(networkBlock), excess);
+	}
+
+	/** length, plus the distortion against the input distances when those can be reached */
+	private static String distanceInfo(NetworkBlock networkBlock) {
+		if (!NetworkDistancesAnalyzer.isApplicable(networkBlock))
+			return "Total length: %s".formatted(StringUtils.trim(totalLength(networkBlock)));
+		var analyzer = new NetworkDistancesAnalyzer();
+		return "Total length: %s, distortion: %s".formatted(StringUtils.trim(analyzer.totalEdgeDistances(networkBlock)),
+				StringUtils.trim(analyzer.distortion(networkBlock)));
+	}
+
+	/** the one thing every network can always say about itself */
+	private static double totalLength(NetworkBlock networkBlock) {
+		var graph = networkBlock.getGraph();
+		return graph.edgeStream().mapToDouble(graph::getWeight).sum();
 	}
 
 	public static void reportAllDifferencesCharacters(NetworkView view) {

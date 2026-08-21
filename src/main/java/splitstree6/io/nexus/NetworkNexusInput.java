@@ -43,7 +43,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			    [TITLE {title};]
 				[LINK {type} = {title};]
 				[DIMENSIONS [NVertices=number-of-nodes] [NEdges=number-of-edges];]
-					[TYPE {HaplotypeNetwork|Points|Other};]
+					[TYPE {HaplotypeNetwork|DistanceNetwork|Points|Other};]
 				[FORMAT
 				;]
 				[PROPERTIES
@@ -62,7 +62,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			END;
 			""";
 
-	public static final String DESCRIPTION = "Maintain a network, such as a haplotype network or just a set of points (for PCoA).\n";
+	public static final String DESCRIPTION = "Maintain a network, such as a haplotype network, a distance-realizing network, or just a set of points (for PCoA).\n";
 
 	@Override
 	public String getSyntax() {
@@ -114,9 +114,12 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				np.matchIgnoreCase("="); // backward compatibility
 			var typeString = np.getWordRespectCase().toUpperCase();
 			var type = StringUtils.valueOfIgnoreCase(NetworkBlock.Type.class, typeString);
+			// Lenient by design: a kind of network this version does not know about is not a broken file, it is a
+			// file from a later version. Treating it as Other keeps the network readable and lets consumers fall
+			// back to inspecting the workflow, whereas throwing here made adding any new type a breaking change.
 			if (type == null)
-				throw new IOExceptionWithLineNumber("Unknown network type: " + typeString, np.lineno());
-			networkBlock.setNetworkType(type);
+				System.err.println("Unrecognized network type '" + typeString + "' (line " + np.lineno() + "), using " + NetworkBlock.Type.Other);
+			networkBlock.setNetworkType(type); // null is coerced to Other
 			np.matchIgnoreCase(";");
 		}
 

@@ -23,8 +23,11 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.Basic;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IExperimental;
+import splitstree6.algorithms.characters.characters2network.Characters2Network;
+import splitstree6.algorithms.distances.distances2network.Distances2Network;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.cite.IHasCitations;
+import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.options.IOptionsCarrier;
@@ -108,6 +111,24 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 				warned.add(getName());
 			}
 			compute(progress, taxaBlock, inputBlock, outputBlock);
+			stampNetworkType(outputBlock);
+		}
+	}
+
+	/**
+	 * Fills in the kind of network an algorithm produces, when the algorithm did not say.
+	 * <p>
+	 * Only fills a gap -- an algorithm that set the type keeps it, so PCOA stays {@code Points}. Note this
+	 * cannot fire when {@code compute} is called directly rather than through the workflow, as the headless
+	 * tools and test harnesses do, so an algorithm that cares must still set the type itself; this is the safety
+	 * net that stops a new network algorithm from silently producing {@code Other}.
+	 */
+	private void stampNetworkType(T outputBlock) {
+		if (outputBlock instanceof NetworkBlock networkBlock && networkBlock.getNetworkType() == NetworkBlock.Type.Other) {
+			if (this instanceof Distances2Network)
+				networkBlock.setNetworkType(NetworkBlock.Type.DistanceNetwork);
+			else if (this instanceof Characters2Network)
+				networkBlock.setNetworkType(NetworkBlock.Type.HaplotypeNetwork);
 		}
 	}
 

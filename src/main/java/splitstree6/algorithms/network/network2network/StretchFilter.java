@@ -59,6 +59,14 @@ public class StretchFilter extends Network2Network {
 		return super.getToolTip(optionName);
 	}
 
+	/**
+	 * Not applicable to a point cloud: its edges carry no length to trade away (see {@link NetworkBlock.Type}).
+	 */
+	@Override
+	public boolean isApplicable(TaxaBlock taxa, NetworkBlock networkBlock) {
+		return super.isApplicable(taxa, networkBlock) && networkBlock.getNetworkType() != NetworkBlock.Type.Points;
+	}
+
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock inputData, NetworkBlock outputData) throws IOException {
 		outputData.copy(inputData);

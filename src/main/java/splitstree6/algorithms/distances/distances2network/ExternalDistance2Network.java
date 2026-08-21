@@ -191,6 +191,10 @@ public class ExternalDistance2Network extends Distances2Network implements IUses
 			networkBlock.getEdgeData(e).put("weight", StringUtils.trim(graph.getWeight(e)));
 		}
 
+		// A distance network even though its nodes may carry sequences: its weights are lengths, so distortion is
+		// the measure that means something for it (see NetworkBlock.Type).
+		networkBlock.setNetworkType(NetworkBlock.Type.DistanceNetwork);
+
 		CheckPairwiseDistances.apply(graph, distancesBlock, 0.000001);
 	}
 

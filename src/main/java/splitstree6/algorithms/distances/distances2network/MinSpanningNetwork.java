@@ -179,6 +179,10 @@ public class MinSpanningNetwork extends Distances2Network implements IUsesCharac
 			}
 		}
 
+		// A distance network even though its nodes may carry sequences: its weights are lengths, so distortion is
+		// the measure that means something for it (see NetworkBlock.Type).
+		networkBlock.setNetworkType(NetworkBlock.Type.DistanceNetwork);
+
 		if (isOptionMinSpanningTree())
 			networkBlock.setInfoString("Minimum spanning tree");
 		else

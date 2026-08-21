@@ -34,7 +34,22 @@ public class NetworkBlock extends DataBlock {
 	public static final String NODE_STATES_KEY = "states";
 	public static final String EDGE_SITES_KEY = "sites";
 
-	public enum Type {HaplotypeNetwork, Points, Other}
+	/**
+	 * what the edge weights of this network mean, and so how it should be drawn and reported on
+	 * <p>
+	 * A closed set of KINDS of object, not a cross of provenance and rendering: the question is what the network
+	 * realizes, not what it happens to be labelled with. A minimum spanning network is computed from distances
+	 * and is a {@code DistanceNetwork} even though it labels its nodes with sequences when it can find them --
+	 * its weights are lengths, so distortion is what means something for it.
+	 * <ul>
+	 * <li>{@code HaplotypeNetwork} -- weights are numbers of mutations; report length and excess
+	 * <li>{@code DistanceNetwork} -- weights are lengths realizing a metric; report length and distortion
+	 * <li>{@code Points} -- the edges carry no meaning and the nodes carry coordinates (PCoA): do not lay it out
+	 * and do not filter its edges
+	 * <li>{@code Other} -- unknown, the default; consumers fall back to inspecting the workflow
+	 * </ul>
+	 */
+	public enum Type {HaplotypeNetwork, DistanceNetwork, Points, Other}
 
 	private final PhyloGraph graph;
 	private final NodeArray<NodeData> node2data;
@@ -42,7 +57,9 @@ public class NetworkBlock extends DataBlock {
 
 	private String infoString = "";
 
-	private Type networkType;
+	// never null: the initializer, clear() and the null-coercing setter between them see to that, because
+	// NetworkLayout dereferences it and a block built outside the workflow has never been cleared
+	private Type networkType = Type.Other;
 
 	public NetworkBlock() {
 		graph = new PhyloGraph();
@@ -64,7 +81,7 @@ public class NetworkBlock extends DataBlock {
 		NodeArray<Node> oldNode2new = that.getGraph().newNodeArray();
 		EdgeArray<Edge> oldEdge2new = that.getGraph().newEdgeArray();
 		graph.copy(that.getGraph(), oldNode2new, oldEdge2new);
-		this.networkType = that.getNetworkType();
+		setNetworkType(that.getNetworkType()); // a filter keeps the kind of network it was given
 		for (var v : oldNode2new.keys()) {
 			getNodeData(oldNode2new.get(v)).putAll((that.getNodeData(v)));
 		}
@@ -93,8 +110,9 @@ public class NetworkBlock extends DataBlock {
 		return networkType;
 	}
 
+	/** null is taken to mean {@link Type#Other} -- an unknown kind, not a missing field */
 	public void setNetworkType(Type networkType) {
-		this.networkType = networkType;
+		this.networkType = (networkType == null ? Type.Other : networkType);
 	}
 
 	public NodeData getNodeData(Node v) {

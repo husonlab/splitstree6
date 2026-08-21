@@ -378,18 +378,30 @@ public class SimplifyFilter extends Network2Network {
 	}
 
 	/**
-	 * Excess when the network really carries sequences, distortion otherwise.
-	 * <p>
-	 * Deliberately does NOT consult {@code getNetworkType()}: RazorNet marks even a purely distance-based network
-	 * as {@code Type.HaplotypeNetwork} (bridge {@code RazorNet1.java:357}), so trusting the label would measure a
-	 * distance network in mutations it does not have. Having a sequence on every taxon node is the structural
-	 * test, and it works headless as well as in a workflow.
+	 * Excess for a haplotype network, distortion for anything else -- the network's declared kind is the
+	 * authority (see {@link NetworkBlock.Type}), because it is the only thing that says what the edge weights
+	 * MEAN. A network that does not know what it is falls back to the structural test: a sequence on every taxon
+	 * node. (Until 2026-08-21 that fallback was all there was, because every RazorNet network claimed to be a
+	 * haplotype network whether or not it had a single sequence in it.)
 	 */
 	private Damage resolveDamage(NetworkBlock block, List<Node> taxa) {
 		if (getOptionDamage() != Damage.Auto)
 			return getOptionDamage();
-		return taxa.stream().allMatch(v -> block.getNodeData(v).containsKey(NetworkBlock.NODE_STATES_KEY))
-				? Damage.Excess : Damage.Distortion;
+		return switch (block.getNetworkType()) {
+			case HaplotypeNetwork -> Damage.Excess;
+			case DistanceNetwork, Points -> Damage.Distortion;
+			case Other -> taxa.stream().allMatch(v -> block.getNodeData(v).containsKey(NetworkBlock.NODE_STATES_KEY))
+					? Damage.Excess : Damage.Distortion;
+		};
+	}
+
+	/**
+	 * Not applicable to a point cloud: its edges carry no length to trade away, so removing them by cost is
+	 * meaningless. Both this filter and {@link StretchFilter} would happily do it before 2026-08-21.
+	 */
+	@Override
+	public boolean isApplicable(TaxaBlock taxa, NetworkBlock networkBlock) {
+		return super.isApplicable(taxa, networkBlock) && networkBlock.getNetworkType() != NetworkBlock.Type.Points;
 	}
 
 	/**
