@@ -139,120 +139,123 @@ public class RadialLabelLayout {
 	 */
 	private void setupLayoutService() {
 		layoutService.setCallable(() -> {
-			// create graph:
-					var graph = new Graph();
-					var itemNodesMap = new HashMap<LayoutItem, ArrayList<Node>>();
-					var itemBestChoiceMap = new HashMap<LayoutItem, Choice>();
+			try {
+				// create graph:
+				var graph = new Graph();
+				var itemNodesMap = new HashMap<LayoutItem, ArrayList<Node>>();
+				var itemBestChoiceMap = new HashMap<LayoutItem, Choice>();
 
-					// nodes:
-					for (var item : items) {
-						for (var choice : computeChoices(item)) {
-							itemBestChoiceMap.putIfAbsent(item, choice);
-							var ok = true;
-							for (var avoid : avoidList) {
-								if (avoid.intersects(choice)) {
+				// nodes:
+				for (var item : items) {
+					for (var choice : computeChoices(item)) {
+						itemBestChoiceMap.putIfAbsent(item, choice);
+						var ok = true;
+						for (var avoid : avoidList) {
+							if (avoid.intersects(choice)) {
+								ok = false;
+								break;
+							}
+						}
+						if (ok) {
+							var v = graph.newNode();
+							v.setData(choice);
+							itemNodesMap.computeIfAbsent(item, k -> new ArrayList<>()).add(v);
+						}
+					}
+				}
+
+				// edges:
+				for (var v : graph.nodes()) {
+					var vBox = (Choice) v.getData();
+					for (var w : graph.nodes(v)) {
+						var wBox = (Choice) w.getData();
+						if (vBox.item() != wBox.item() && vBox.intersects(wBox))
+							graph.newEdge(v, w);
+					}
+				}
+
+				// greedily choose locations for as many items as possible:
+				var nodeList = new LinkedList<>(IteratorUtils.asCollection(IteratorUtils.randomize(graph.nodes(), new Random(666)), new LinkedList<>()));
+				nodeList.sort(RadialLabelLayout::compare);
+
+				var remainingItems = new ArrayList<>(items);
+				var selectedChoices = new ArrayList<Choice>();
+
+				while (!nodeList.isEmpty()) {
+					var v = nodeList.remove(0);
+					var mustReSort = (v.getDegree() > 0);
+					var item = ((Choice) v.getData()).item();
+					remainingItems.remove(item);
+
+					var choice = (Choice) v.getData();
+
+					Platform.runLater(() -> {
+						item.xSetter().accept(choice.x() - item.anchorX());
+						item.ySetter().accept(choice.y() - item.anchorY());
+					});
+					selectedChoices.add(choice);
+
+					// remove nodes from graph:
+					for (var w : v.adjacentNodes()) { // adjacent placements can't be used
+						if (w.getOwner() != null) {
+							graph.deleteNode(w);
+						}
+						nodeList.remove(w);
+					}
+					for (var w : itemNodesMap.get(item)) {
+						for (var e : w.adjacentEdges()) { // other placements of v no-longer compete with placements of other nodes
+							graph.deleteEdge(e);
+						}
+						if (w.getOwner() != null) {
+							graph.deleteNode(w);
+						}
+						nodeList.remove(w);
+					}
+					if (mustReSort)
+						nodeList.sort(RadialLabelLayout::compare);
+				}
+
+				// remaining items are pushed outward:
+				for (var item : remainingItems) {
+					var choice = itemBestChoiceMap.get(item);
+
+					var ok = false;
+					var deltaX = 5 * Math.cos(GeometryUtilsFX.deg2rad(orientation.apply(item.angle())));
+					var deltaY = 5 * Math.sin(GeometryUtilsFX.deg2rad(orientation.apply(item.angle())));
+
+					var x = choice.x();
+					var y = choice.y();
+					var i = 0;
+					while (!ok && i++ < 1000) {
+						ok = true;
+						for (var avoid : avoidList) {
+							if (avoid.intersects(choice)) {
+								ok = false;
+								break;
+							}
+						}
+						if (ok) {
+							for (var other : selectedChoices) {
+								if (other.intersects(choice)) {
 									ok = false;
 									break;
 								}
 							}
-							if (ok) {
-								var v = graph.newNode();
-								v.setData(choice);
-								itemNodesMap.computeIfAbsent(item, k -> new ArrayList<>()).add(v);
-							}
+						}
+						if (!ok) {
+							x += deltaX;
+							y += deltaY;
+							choice = choice.copyWithUpdatedXY(x, y);
 						}
 					}
-
-					// edges:
-					for (var v : graph.nodes()) {
-						var vBox = (Choice) v.getData();
-						for (var w : graph.nodes(v)) {
-							var wBox = (Choice) w.getData();
-							if (vBox.item() != wBox.item() && vBox.intersects(wBox))
-								graph.newEdge(v, w);
-						}
-					}
-
-					// greedily choose locations for as many items as possible:
-					var nodeList = new LinkedList<>(IteratorUtils.asCollection(IteratorUtils.randomize(graph.nodes(), new Random(666)), new LinkedList<>()));
-					nodeList.sort(RadialLabelLayout::compare);
-
-					var remainingItems = new ArrayList<>(items);
-					var selectedChoices = new ArrayList<Choice>();
-
-			while (!nodeList.isEmpty()) {
-						var v = nodeList.remove(0);
-						var mustReSort = (v.getDegree() > 0);
-						var item = ((Choice) v.getData()).item();
-						remainingItems.remove(item);
-
-						var choice = (Choice) v.getData();
-
-						Platform.runLater(() -> {
-							item.xSetter().accept(choice.x() - item.anchorX());
-							item.ySetter().accept(choice.y() - item.anchorY());
-						});
-						selectedChoices.add(choice);
-
-						// remove nodes from graph:
-						for (var w : v.adjacentNodes()) { // adjacent placements can't be used
-							if (w.getOwner() != null) {
-								graph.deleteNode(w);
-							}
-							nodeList.remove(w);
-						}
-						for (var w : itemNodesMap.get(item)) {
-							for (var e : w.adjacentEdges()) { // other placements of v no-longer compete with placements of other nodes
-								graph.deleteEdge(e);
-							}
-							if (w.getOwner() != null) {
-								graph.deleteNode(w);
-							}
-							nodeList.remove(w);
-						}
-						if (mustReSort)
-							nodeList.sort(RadialLabelLayout::compare);
-					}
-
-					// remaining items are pushed outward:
-					for (var item : remainingItems) {
-						var choice = itemBestChoiceMap.get(item);
-
-						var ok = false;
-						var deltaX = 5 * Math.cos(GeometryUtilsFX.deg2rad(orientation.apply(item.angle())));
-						var deltaY = 5 * Math.sin(GeometryUtilsFX.deg2rad(orientation.apply(item.angle())));
-
-						var x = choice.x();
-						var y = choice.y();
-						var i = 0;
-						while (!ok && i++ < 1000) {
-							ok = true;
-							for (var avoid : avoidList) {
-								if (avoid.intersects(choice)) {
-									ok = false;
-									break;
-								}
-							}
-							if (ok) {
-								for (var other : selectedChoices) {
-									if (other.intersects(choice)) {
-										ok = false;
-										break;
-									}
-								}
-							}
-							if (!ok) {
-								x += deltaX;
-								y += deltaY;
-								choice = choice.copyWithUpdatedXY(x, y);
-							}
-						}
-						var theChoice = choice;
-						Platform.runLater(() -> {
-							item.xSetter().accept(theChoice.x() - item.anchorX());
-							item.ySetter().accept(theChoice.y() - item.anchorY());
-						});
-						selectedChoices.add(choice);
+					var theChoice = choice;
+					Platform.runLater(() -> {
+						item.xSetter().accept(theChoice.x() - item.anchorX());
+						item.ySetter().accept(theChoice.y() - item.anchorY());
+					});
+					selectedChoices.add(choice);
+				}
+			} catch (Exception ignored) {
 					}
 					return true;
 				}
