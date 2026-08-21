@@ -47,6 +47,11 @@ public class HaplotypePresenter {
 				)
 		);
 
+		// The traits file belongs to one particular sequences file, so it cannot survive a change of that
+		// file. Wired here rather than in the controller, which is where ProgramProperties restores both
+		// fields from the last session - doing it there would clear the remembered traits file on startup.
+		controller.getSequencesField().textProperty().addListener(e -> controller.getTraitsField().clear());
+
 		controller.getBrowseSequencesBtn().setOnAction(e -> {
 			File f = chooseFile("Select Sequences File");
 			if (f != null) controller.getSequencesField().setText(f.getAbsolutePath());
@@ -65,7 +70,6 @@ public class HaplotypePresenter {
 			var result = new Result(
 					safe(controller.getSequencesField().getText()),
 					safe(controller.getTraitsField().getText()),
-					controller.getDistanceChoice().getSelectionModel().getSelectedItem(),
 					controller.getMethodChoice().getSelectionModel().getSelectedItem()
 			);
 			try {
@@ -75,8 +79,6 @@ public class HaplotypePresenter {
 			}
 			stage.close();
 		});
-
-		controller.getDistanceChoice().disableProperty().bind(controller.getMethodChoice().valueProperty().isEqualTo("MedianJoining"));
 	}
 
 	private File chooseFile(String title) {
@@ -94,6 +96,6 @@ public class HaplotypePresenter {
 	/**
 	 * Immutable result returned when user presses Apply.
 	 */
-	public record Result(String sequencesPath, String traitsPath, String distanceModel, String method) {
+	public record Result(String sequencesPath, String traitsPath, String method) {
 	}
 }

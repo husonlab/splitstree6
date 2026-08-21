@@ -32,13 +32,9 @@
                            GridPane.columnIndex="1"/>
                 <Button fx:id="browseTraitsBtn" text="Browse…" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
 
-                <!-- Row 3: Distances -->
-                <Label text="Distances" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <ChoiceBox fx:id="distanceChoice" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-
-                <!-- Row 4: Method -->
-                <Label text="Method" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <ChoiceBox fx:id="methodChoice" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <!-- Row 3: Method -->
+                <Label text="Method" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <ChoiceBox fx:id="methodChoice" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             </GridPane>
         </VBox>
     </center>

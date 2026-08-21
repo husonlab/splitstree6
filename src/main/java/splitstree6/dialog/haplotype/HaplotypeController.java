@@ -49,8 +49,6 @@ public class HaplotypeController {
 	private Button browseTraitsBtn;
 
 	@FXML
-	private ChoiceBox<String> distanceChoice;
-	@FXML
 	private ChoiceBox<String> methodChoice;
 
 	@FXML
@@ -61,9 +59,6 @@ public class HaplotypeController {
 	@FXML
 	private void initialize() {
 		// Populate choices with initial selections pre-selected
-		distanceChoice.getItems().setAll("Hamming", "TN93");
-		distanceChoice.getSelectionModel().selectFirst();
-
 		var methods = new ArrayList<String>();
 		if (AlgorithmList.isAvailable("RazorNet")) {
 			methods.add("RazorNet");
@@ -98,10 +93,6 @@ public class HaplotypeController {
 
 	public Button getBrowseTraitsBtn() {
 		return browseTraitsBtn;
-	}
-
-	public ChoiceBox<String> getDistanceChoice() {
-		return distanceChoice;
 	}
 
 	public ChoiceBox<String> getMethodChoice() {

@@ -33,7 +33,7 @@ import java.io.IOException;
 public class HaplotypeDialog {
 
 	/**
-	 * Shows the "Open Haplotype Data" dialog as a modal window.
+	 * Shows the "Import Haplotype Data" dialog as a modal window.
 	 *
 	 * @param owner owner window (nullable)
 	 * @throws IOException if FXML cannot be loaded
@@ -45,7 +45,7 @@ public class HaplotypeDialog {
 			HaplotypeController controller = loader.getController();
 
 			Stage stage = new Stage();
-			stage.setTitle("Open Haplotype Data");
+			stage.setTitle("Import Haplotype Data");
 			stage.initModality(Modality.APPLICATION_MODAL);
 			if (owner != null) stage.initOwner(owner);
 			stage.setScene(new Scene(root));

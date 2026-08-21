@@ -27,9 +27,7 @@ import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.AlgorithmList;
-import splitstree6.algorithms.characters.characters2distances.Characters2Distances;
 import splitstree6.algorithms.characters.characters2distances.HammingDistance;
-import splitstree6.algorithms.characters.characters2distances.nucleotide.TN93Distance;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
@@ -100,16 +98,14 @@ public class ImportHaplotypeApply {
 
 						switch (result.method()) {
 							case "RazorNet" -> {
-								var razor = AlgorithmList.create("RazorHaplotypeNetwork",
-										Map.of("distanceModel", result.distanceModel()));
+								var razor = AlgorithmList.create("RazorHaplotypeNetwork", Map.of());
 								workflow.newAlgorithmNode(Objects.requireNonNullElseGet(razor, MedianJoining::new),
 										workflow.getWorkingTaxaNode(),
 										workflow.getWorkingDataNode(),
 										networkNode);
 							}
 							case "TightSpanWalker" -> {
-								var tsw = AlgorithmList.create("TightSpanHaplotypeNetwork",
-										Map.of("distanceModel", result.distanceModel()));
+								var tsw = AlgorithmList.create("TightSpanHaplotypeNetwork", Map.of());
 								workflow.newAlgorithmNode(Objects.requireNonNullElseGet(tsw, MedianJoining::new),
 										workflow.getWorkingTaxaNode(),
 										workflow.getWorkingDataNode(),
@@ -117,11 +113,9 @@ public class ImportHaplotypeApply {
 							}
 							case "MinSpanningNetwork" -> {
 								var distancesNode = workflow.newDataNode(new DistancesBlock());
-								Characters2Distances distancesAlgorithm;
-								if (result.distanceModel().equalsIgnoreCase("tn93"))
-									distancesAlgorithm = new TN93Distance();
-								else distancesAlgorithm = new HammingDistance();
-								workflow.newAlgorithmNode(distancesAlgorithm, workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
+								// Hamming is the only distance that makes sense on haplotype data, which is
+								// why the dialog no longer offers a choice
+								workflow.newAlgorithmNode(new HammingDistance(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
 								workflow.newAlgorithmNode(new MinSpanningNetwork(), workflow.getWorkingTaxaNode(), distancesNode, networkNode);
 							}
 							default -> {
