@@ -189,7 +189,13 @@ public class SitesFormat extends Group {
 							};
 						}
 					}
-				} else if (data != null && sitesStyle == SitesStyle.Hatches && networkBlock.getGraph().hasEdgeWeights()) {
+					// Only on a haplotype network. An edge with no site list still knows how many mutations it carries,
+					// because there the weight IS the mutation count -- but on a distance network the weight is a
+					// LENGTH, and drawing that many hatches put hundreds of marks on a single edge (circle-n0020,
+					// whose weights run into the hundreds). Nothing could tell the two apart until the network type
+					// became authoritative on 2026-08-21, since every RazorNet network claimed to be a haplotype one.
+				} else if (data != null && sitesStyle == SitesStyle.Hatches && networkBlock.getGraph().hasEdgeWeights()
+						   && networkBlock.getNetworkType() == NetworkBlock.Type.HaplotypeNetwork) {
 					invalidationListener = a -> {
 						var count = Math.round(networkBlock.getGraph().getWeight(e));
 						getChildren().clear();

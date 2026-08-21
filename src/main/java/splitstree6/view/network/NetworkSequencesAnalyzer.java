@@ -73,8 +73,8 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 
 
 	public int inputPairwiseDistances(NetworkBlock networkBlock) {
-		if (!isApplicable(networkBlock))
-			throw new IllegalArgumentException("Characters required");
+		if (!hasNodeStates(networkBlock))
+			throw new IllegalArgumentException("Node sequences required");
 
 		var sum = 0;
 		var graph = networkBlock.getGraph();
@@ -93,8 +93,8 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 	}
 
 	public int totalEdgeDistances(NetworkBlock networkBlock) {
-		if (!isApplicable(networkBlock))
-			throw new IllegalArgumentException("Characters required");
+		if (!hasNodeStates(networkBlock))
+			throw new IllegalArgumentException("Node sequences required");
 
 		var graph = networkBlock.getGraph();
 
@@ -109,8 +109,8 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 	}
 
 	public int realizedPairwiseDistances(NetworkBlock networkBlock) {
-		if (!isApplicable(networkBlock))
-			throw new IllegalArgumentException("Characters required");
+		if (!hasNodeStates(networkBlock))
+			throw new IllegalArgumentException("Node sequences required");
 
 		var graph = networkBlock.getGraph();
 		var weights = new HashMap<Edge, Integer>();
@@ -268,10 +268,17 @@ public record NetworkSequencesAnalyzer(char gapChar, char missingChar, boolean u
 	/**
 	 * can we report on this network in terms of sequences? Requires both the characters the network was
 	 * computed from, somewhere up the workflow, and per-node sequences on the network itself.
+	 * <p>
+	 * This is the test for whether the WORKFLOW can supply what a report needs. The measures themselves only
+	 * need the sequences (see {@link #hasNodeStates}), so a caller holding the characters already can compute
+	 * them without a workflow at all.
 	 */
 	public static boolean isApplicable(NetworkBlock networkBlock) {
-		if (findAncestorCharactersBlock(networkBlock) == null)
-			return false;
+		return findAncestorCharactersBlock(networkBlock) != null && hasNodeStates(networkBlock);
+	}
+
+	/** does the network carry the per-node sequences the measures are computed from? */
+	public static boolean hasNodeStates(NetworkBlock networkBlock) {
 		var firstNode = networkBlock.getGraph().getFirstNode();
 		return firstNode != null && networkBlock.getNodeData(firstNode).containsKey(NetworkBlock.NODE_STATES_KEY);
 	}

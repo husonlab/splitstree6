@@ -24,6 +24,8 @@ import javafx.beans.InvalidationListener;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
+import splitstree6.data.CharactersBlock;
+import splitstree6.data.DistancesBlock;
 import splitstree6.data.NetworkBlock;
 
 public class AdditionalConsoleOutput {
@@ -89,31 +91,46 @@ public class AdditionalConsoleOutput {
 	 * either way, and the measure that does need one is appended only when it can be had.
 	 */
 	public static String infoFor(NetworkBlock networkBlock) {
+		return infoFor(networkBlock, null, null);
+	}
+
+	/**
+	 * As above, using data the caller already holds rather than looking for it up the workflow.
+	 * <p>
+	 * A command-line tool has no workflow to walk, so without this it could only ever report the total length,
+	 * and its output would say less than the application's for the very same network. Either argument may be
+	 * null, in which case that half falls back to the workflow. Same split as
+	 * {@link splitstree6.algorithms.IUsesCharacters} makes for algorithms.
+	 */
+	public static String infoFor(NetworkBlock networkBlock, DistancesBlock distancesBlock, CharactersBlock charactersBlock) {
 		return switch (networkBlock.getNetworkType()) {
-			case HaplotypeNetwork -> haplotypeInfo(networkBlock);
-			case DistanceNetwork -> distanceInfo(networkBlock);
+			case HaplotypeNetwork -> haplotypeInfo(networkBlock, charactersBlock);
+			case DistanceNetwork -> distanceInfo(networkBlock, distancesBlock);
 			case Points -> ""; // a point cloud has no lengths to add up
-			case Other -> NetworkSequencesAnalyzer.isApplicable(networkBlock) ? haplotypeInfo(networkBlock)
-					: NetworkDistancesAnalyzer.isApplicable(networkBlock) ? distanceInfo(networkBlock) : "";
+			case Other -> charactersBlock != null || NetworkSequencesAnalyzer.isApplicable(networkBlock) ? haplotypeInfo(networkBlock, charactersBlock)
+					: distancesBlock != null || NetworkDistancesAnalyzer.isApplicable(networkBlock) ? distanceInfo(networkBlock, distancesBlock) : "";
 		};
 	}
 
-	/** length in mutations, plus the excess over the sequence differences when the alignment can be reached */
-	private static String haplotypeInfo(NetworkBlock networkBlock) {
-		if (!NetworkSequencesAnalyzer.isApplicable(networkBlock))
+	/** length in mutations, plus the excess over the sequence differences when the alignment can be had */
+	private static String haplotypeInfo(NetworkBlock networkBlock, CharactersBlock charactersBlock) {
+		if (!NetworkSequencesAnalyzer.hasNodeStates(networkBlock)
+			|| (charactersBlock == null && !NetworkSequencesAnalyzer.isApplicable(networkBlock)))
 			return "Total length: %s".formatted(StringUtils.trim(totalLength(networkBlock)));
-		var analyzer = new NetworkSequencesAnalyzer(networkBlock);
+		var analyzer = (charactersBlock != null ? new NetworkSequencesAnalyzer(charactersBlock)
+				: new NetworkSequencesAnalyzer(networkBlock));
 		var excess = analyzer.realizedPairwiseDistances(networkBlock) - analyzer.inputPairwiseDistances(networkBlock);
 		return "Total length: %d, excess: %d".formatted(analyzer.totalEdgeDistances(networkBlock), excess);
 	}
 
-	/** length, plus the distortion against the input distances when those can be reached */
-	private static String distanceInfo(NetworkBlock networkBlock) {
-		if (!NetworkDistancesAnalyzer.isApplicable(networkBlock))
-			return "Total length: %s".formatted(StringUtils.trim(totalLength(networkBlock)));
+	/** length, plus the distortion against the input distances when those can be had */
+	private static String distanceInfo(NetworkBlock networkBlock, DistancesBlock distancesBlock) {
 		var analyzer = new NetworkDistancesAnalyzer();
-		return "Total length: %s, distortion: %s".formatted(StringUtils.trim(analyzer.totalEdgeDistances(networkBlock)),
-				StringUtils.trim(analyzer.distortion(networkBlock)));
+		var length = StringUtils.trim(analyzer.totalEdgeDistances(networkBlock));
+		if (distancesBlock == null && !NetworkDistancesAnalyzer.isApplicable(networkBlock))
+			return "Total length: %s".formatted(length);
+		var distances = (distancesBlock != null ? distancesBlock : NetworkDistancesAnalyzer.findDistancesBlock(networkBlock));
+		return "Total length: %s, distortion: %s".formatted(length, StringUtils.trim(analyzer.distortion(networkBlock, distances)));
 	}
 
 	/** the one thing every network can always say about itself */

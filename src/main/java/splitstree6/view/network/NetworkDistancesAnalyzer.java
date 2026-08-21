@@ -43,9 +43,8 @@ public record NetworkDistancesAnalyzer() {
 		return 2 * sum;
 	}
 
+	/** the total length: the sum of the edge weights. Needs no distances block -- any network can say this */
 	public double totalEdgeDistances(NetworkBlock networkBlock) {
-		if (!isApplicable(networkBlock))
-			throw new IllegalArgumentException("Distances required");
 		var sum = 0.0;
 		var graph = networkBlock.getGraph();
 		for (var e : graph.edges()) {
@@ -93,9 +92,14 @@ public record NetworkDistancesAnalyzer() {
 	 * (indeed for any scalar multiple of it); larger values mean more distortion.
 	 */
 	public double distortion(NetworkBlock networkBlock) {
-		if (!isApplicable(networkBlock))
-			throw new IllegalArgumentException("Distances required");
-		var distancesBlock = findDistancesBlock(networkBlock);
+		return distortion(networkBlock, findDistancesBlock(networkBlock));
+	}
+
+	/**
+	 * As above, against distances the caller already has, so that a command-line tool or a test needs no
+	 * workflow to walk up -- the same split {@link splitstree6.algorithms.IUsesCharacters} makes for algorithms.
+	 */
+	public double distortion(NetworkBlock networkBlock, DistancesBlock distancesBlock) {
 		var graph = networkBlock.getGraph();
 		var weights = new HashMap<Edge, Double>();
 		for (var e : graph.edges())

@@ -20,6 +20,8 @@
 package splitstree6.view.network;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -128,6 +130,7 @@ public class NetworkView implements IView {
 
 		var sitesFormat = new SitesFormat(undoManager);
 		sitesFormat.optionSitesStyleProperty().bindBidirectional(optionSitesStyle);
+		setupSitesStyleDefault();
 		networkBlock.addListener(e -> sitesFormat.setNetworkBlock(networkBlock.get()));
 		edgeShapeMap.addListener((InvalidationListener) e -> {
 			sitesFormat.getEdgeShapeMap().clear();
@@ -304,6 +307,49 @@ public class NetworkView implements IView {
 
 	public IntegerProperty optionTraitSizeProperty() {
 		return optionTraitSize;
+	}
+
+	/**
+	 * Picks the sites style from the kind of network, the first time one arrives.
+	 * <p>
+	 * Only once, and only if nothing has set the style for this view yet: a value from a loaded workflow, or a
+	 * click, always wins. {@code ProgramProperties} fills the property in the instance initializer, before this
+	 * listener exists, so a fresh view follows its own network rather than a preference the user last expressed
+	 * about some quite different network. Hatches are meaningless on a network whose weights are lengths rather
+	 * than mutations -- see {@link splitstree6.view.format.sites.SitesFormat} -- so saying {@code None} there is
+	 * simply telling the truth about what is being drawn; {@code Weights} and {@code Counts} remain available and
+	 * are unchanged for every kind.
+	 */
+	private void setupSitesStyleDefault() {
+		var chosen = new SimpleBooleanProperty(false);
+		optionSitesStyle.addListener((v, o, n) -> chosen.set(true));
+		networkBlock.addListener(new ChangeListener<>() {
+			@Override
+			public void changed(ObservableValue<? extends NetworkBlock> v, NetworkBlock o, NetworkBlock n) {
+				if (n != null) {
+					networkBlock.removeListener(this); // one shot
+					if (!chosen.get()) {
+						// not an edit: the undo manager marks the window dirty for anything undoable (see below),
+						// and a document must not look modified merely for having been opened
+						var recording = undoManager.isRecordChanges();
+						undoManager.setRecordChanges(false);
+						try {
+							optionSitesStyle.set(defaultSitesStyle(n.getNetworkType()));
+						} finally {
+							undoManager.setRecordChanges(recording);
+						}
+					}
+				}
+			}
+		});
+	}
+
+	/** what to show on the edges of a network of this kind, absent any choice by the user or the workflow */
+	public static SitesStyle defaultSitesStyle(NetworkBlock.Type type) {
+		return switch (type) {
+			case DistanceNetwork, Points -> SitesStyle.None;
+			case HaplotypeNetwork, Other -> SitesStyle.Hatches;
+		};
 	}
 
 	public SitesStyle getOptionSitesStyle() {
