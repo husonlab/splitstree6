@@ -47,6 +47,7 @@ import splitstree6.algorithms.distances.distances2trees.UPGMA;
 import splitstree6.algorithms.genomes.genome2distances.Mash;
 import splitstree6.algorithms.genomes.genomes2genomes.GenomesTaxaFilter;
 import splitstree6.algorithms.network.network2network.NetworkTaxaFilter;
+import splitstree6.algorithms.network.network2network.SimplifyFilter;
 import splitstree6.algorithms.network.network2network.StretchFilter;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
@@ -163,6 +164,7 @@ public class AlgorithmList {
 
 		add(algorithms, names, new NetworkFilter());
 		add(algorithms, names, new StretchFilter());
+		add(algorithms, names, new SimplifyFilter());
 		add(algorithms, names, new NormalizeRootedNetworks());
 		add(algorithms, names, new RootedConsensusTree());
 		add(algorithms, names, new RerootOrReorderTrees());

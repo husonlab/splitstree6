@@ -24,7 +24,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
@@ -47,9 +46,6 @@ import java.util.*;
  */
 public class StretchFilter extends Network2Network {
 	private final DoubleProperty optionMaxStretchPercent = new SimpleDoubleProperty(this, "optionMaxStretchPercent", 0.0);
-
-	private record NodeDist(Node node, double dist) {
-	}
 
 	@Override
 	public List<String> listOptions() {
@@ -84,7 +80,7 @@ public class StretchFilter extends Network2Network {
 			// reference: the taxon-to-taxon distances in the input network (shortest paths over all edges)
 			var ref = new HashMap<Node, Map<Node, Double>>();
 			for (var u : taxa)
-				ref.put(u, singleSource(graph, u, alive));
+				ref.put(u, NetworkSimplification.singleSource(graph, u, alive));
 
 			var factor = 1.0 + stretch;
 
@@ -110,7 +106,7 @@ public class StretchFilter extends Network2Network {
 
 			var changed = graph.getNumberOfEdges() < edges0;
 			if (changed)
-				cleanAndSmooth(graph, outputData, progress);
+				NetworkSimplification.cleanAndSmooth(graph, outputData, progress);
 
 			var achieved = maxAchievedStretch(graph, taxa, ref);
 			setShortDescription(String.format("stretch <= %.1f%%: removed %,d of %,d edges (max inflation used %.1f%%)",
@@ -129,7 +125,7 @@ public class StretchFilter extends Network2Network {
 	private static boolean withinStretch(PhyloGraph graph, List<Node> taxa, Set<Edge> alive, Map<Node, Map<Node, Double>> ref, double factor) {
 		for (var i = 0; i < taxa.size(); i++) {
 			var u = taxa.get(i);
-			var dist = singleSource(graph, u, alive);
+			var dist = NetworkSimplification.singleSource(graph, u, alive);
 			var refU = ref.get(u);
 			for (var j = i + 1; j < taxa.size(); j++) {
 				var v = taxa.get(j);
@@ -150,7 +146,7 @@ public class StretchFilter extends Network2Network {
 		var max = 1.0;
 		for (var i = 0; i < taxa.size(); i++) {
 			var u = taxa.get(i);
-			var dist = singleSource(graph, u, all);
+			var dist = NetworkSimplification.singleSource(graph, u, all);
 			var refU = ref.get(u);
 			for (var j = i + 1; j < taxa.size(); j++) {
 				var v = taxa.get(j);
@@ -161,95 +157,6 @@ public class StretchFilter extends Network2Network {
 			}
 		}
 		return max;
-	}
-
-	/**
-	 * Dijkstra single-source shortest paths over the {@code alive} edge set only (undirected, edge weight =
-	 * {@code graph.getWeight}). Returns node -&gt; distance; absent = unreachable.
-	 */
-	private static Map<Node, Double> singleSource(PhyloGraph graph, Node source, Set<Edge> alive) {
-		var dist = new HashMap<Node, Double>();
-		dist.put(source, 0.0);
-		var queue = new PriorityQueue<NodeDist>(Comparator.comparingDouble(NodeDist::dist));
-		queue.add(new NodeDist(source, 0.0));
-		while (!queue.isEmpty()) {
-			var cur = queue.poll();
-			if (cur.dist() > dist.getOrDefault(cur.node(), Double.MAX_VALUE))
-				continue; // stale
-			for (var e : cur.node().adjacentEdges()) {
-				if (!alive.contains(e))
-					continue;
-				var nbr = e.getOpposite(cur.node());
-				var nd = cur.dist() + graph.getWeight(e);
-				if (nd < dist.getOrDefault(nbr, Double.MAX_VALUE)) {
-					dist.put(nbr, nd);
-					queue.add(new NodeDist(nbr, nd));
-				}
-			}
-		}
-		return dist;
-	}
-
-	/**
-	 * Remove superfluous unlabeled (Steiner) nodes: drop degree-&le;1 danglers and dissolve degree-2 nodes into a
-	 * single edge (summed weight and, on a haplotype network, concatenated mutation list). Taxon nodes are never
-	 * touched. Iterates to convergence.
-	 */
-	private static void cleanAndSmooth(PhyloGraph graph, NetworkBlock block, ProgressListener progress) throws Exception {
-		var changed = true;
-		while (changed) {
-			changed = false;
-			for (var v : graph.nodeStream().toList()) {
-				if (graph.hasTaxa(v))
-					continue;
-				var degree = v.getDegree();
-				if (degree <= 1) {
-					graph.deleteNode(v);
-					changed = true;
-				} else if (degree == 2) {
-					var edges = new ArrayList<Edge>();
-					v.adjacentEdges().forEach(edges::add);
-					var v1 = edges.get(0).getOpposite(v);
-					var v2 = edges.get(1).getOpposite(v);
-					var weight = graph.getWeight(edges.get(0)) + graph.getWeight(edges.get(1));
-					// read the two mutation lists before deleting the node takes their edges with them
-					var sites = mergeSites(block.getEdgeData(edges.get(0)).get(NetworkBlock.EDGE_SITES_KEY),
-							block.getEdgeData(edges.get(1)).get(NetworkBlock.EDGE_SITES_KEY));
-					graph.deleteNode(v); // also removes its two edges
-					if (v1 != v2) {
-						var f = graph.newEdge(v1, v2);
-						graph.setWeight(f, weight);
-						block.getEdgeData(f).put("weight", StringUtils.trim((float) weight));
-						if (sites != null)
-							block.getEdgeData(f).put(NetworkBlock.EDGE_SITES_KEY, sites);
-					}
-					changed = true;
-				}
-				progress.checkForCancel();
-			}
-		}
-	}
-
-	/**
-	 * The mutation list for an edge that replaces a two-edge path: the two lists, concatenated in path order.
-	 * Returns null if either edge has no list, because then there is nothing faithful to write -- a network that
-	 * is not a haplotype network carries no mutation lists at all, and half a list would understate the merged
-	 * edge. (Left unset, the merged edge used to claim no mutations at all while carrying the summed weight.)
-	 * <p>
-	 * Deliberately <em>not</em> de-duplicated. The merged edge's weight has to be the sum of the two weights,
-	 * since that is what preserves the shortest-path distances this filter is bounding, so a site that mutates on
-	 * both edges -- a reversal, or two steps such as a &rarr; c &rarr; g -- must appear twice, or the mutations
-	 * drawn would no longer add up to the length drawn. Deliberately not sorted either: a site is not necessarily
-	 * a number, {@code QuasiMedianBase} writes the alignment's character labels.
-	 */
-	private static String mergeSites(String sites1, String sites2) {
-		if (sites1 == null || sites2 == null)
-			return null;
-		if (sites1.isBlank())
-			return sites2;
-		if (sites2.isBlank())
-			return sites1;
-		return sites1 + "," + sites2;
 	}
 
 	public double getOptionMaxStretchPercent() {
