@@ -21,6 +21,7 @@ package splitstree6.dialog.importing;
 
 import javafx.stage.FileChooser;
 import jloda.fx.util.AllFileFilter;
+import jloda.fx.util.FileChooserManager;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.NotificationManager;
@@ -53,10 +54,6 @@ public class ImportMultipleTrees {
 		final var fileChooser = new FileChooser();
 		fileChooser.setTitle("Import Multiple Trees in Newick/Nexus Format");
 
-		final var previousDir = new File(ProgramProperties.get("TreeImportDirectory", ""));
-		if (previousDir.isDirectory()) {
-			fileChooser.setInitialDirectory(previousDir.getParentFile());
-		}
 		var newickReader = new NewickReader();
 		var nexusReader = new NexusReader();
 
@@ -64,7 +61,7 @@ public class ImportMultipleTrees {
 		var nexusExtensionFilter = nexusReader.getExtensionFilter();
 		fileChooser.getExtensionFilters().addAll(TextFileFilter.getInstance(), newickExtensionFilter, nexusExtensionFilter, AllFileFilter.getInstance());
 		fileChooser.setSelectedExtensionFilter(newickExtensionFilter);
-		var files = fileChooser.showOpenMultipleDialog(mainWindow.getStage());
+		var files = FileChooserManager.showOpenMultipleDialog(mainWindow.getStage(), fileChooser, "TreeImportDirectory");
 		if (files != null && !files.isEmpty()) {
 			try {
 				// Write the concatenated trees into the system temp directory, NOT user.dir: when the app is

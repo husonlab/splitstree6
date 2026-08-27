@@ -303,16 +303,11 @@ public class MainWindowPresenter {
 		var loadingFile = new SimpleBooleanProperty(this, "loadingFile", false);
 
 		controller.getOpenMenuItem().setOnAction(e -> {
-			var previousDir = new File(ProgramProperties.get("InputDir", ""));
 			var fileChooser = new FileChooser();
-			if (previousDir.isDirectory())
-				fileChooser.setInitialDirectory(previousDir);
 			fileChooser.setTitle("Open input file");
 			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
-			var selectedFile = fileChooser.showOpenDialog(stage);
+			var selectedFile = FileChooserManager.showOpenDialog(stage, fileChooser, "InputDir");
 			if (selectedFile != null) {
-				if (!selectedFile.getParent().isBlank())
-					ProgramProperties.put("InputDir", selectedFile.getParent());
 				if (!loadingFile.get()) {
 					try {
 						loadingFile.set(true);

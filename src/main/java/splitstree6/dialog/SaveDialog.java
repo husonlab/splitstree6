@@ -21,6 +21,7 @@ package splitstree6.dialog;
 
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
+import jloda.fx.util.FileChooserManager;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.NotificationManager;
@@ -46,11 +47,8 @@ public class SaveDialog {
 		final var fileChooser = new FileChooser();
 		fileChooser.setTitle(asWorkflowOnly ? "Export SplitsTree6 Workflow" : "Save %s file".formatted(ProgramProperties.getProgramName()));
 
-		final var previousDir = new File(ProgramProperties.get("SaveDir", ""));
-		if (previousDir.isDirectory()) {
-			fileChooser.setInitialDirectory(previousDir);
-		} else
-			fileChooser.setInitialDirectory((new File(mainWindow.getFileName()).getParentFile()));
+		// fall back to the current document's folder; a folder remembered under "SaveDir" takes precedence
+		fileChooser.setInitialDirectory(new File(mainWindow.getFileName()).getParentFile());
 
 		if (!asWorkflowOnly) {
 			fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Files", "*.stree6", "*.nxs", "*.nex"));
@@ -60,7 +58,7 @@ public class SaveDialog {
 			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), "")));
 		}
 
-		var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
+		var selectedFile = FileChooserManager.showSaveDialog(mainWindow.getStage(), fileChooser, "SaveDir");
 		if (selectedFile != null) {
 			return save(mainWindow, asWorkflowOnly, selectedFile);
 		} else return false;

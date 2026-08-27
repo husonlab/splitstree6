@@ -28,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import jloda.fx.util.FileChooserManager;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
@@ -135,16 +136,14 @@ public class ExportDialogPresenter {
 		final var fileChooser = new FileChooser();
 		fileChooser.setTitle("Export SplitsTree6 data");
 
-		final var previousDir = new File(ProgramProperties.get("ExportDir", ""));
-		if (previousDir.isDirectory()) {
-			fileChooser.setInitialDirectory(previousDir);
-		} else
-			fileChooser.setInitialDirectory((new File(mainWindow.getFileName()).getParentFile()));
+		// fall back to the current document's folder; a folder remembered under "ExportDir" takes precedence
+		fileChooser.setInitialDirectory(new File(mainWindow.getFileName()).getParentFile());
 
 		fileChooser.getExtensionFilters().addAll(dataBlockWriter.getExtensionFilter());
 		fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), "-" + StringUtils.toLowerCaseWithUnderScores(dataNode.getTitle()))));
 
-		return fileChooser.showSaveDialog(mainWindow.getStage());
+		// showSaveDialog now also remembers the chosen folder under "ExportDir" (previously it was read but never written)
+		return FileChooserManager.showSaveDialog(mainWindow.getStage(), fileChooser, "ExportDir");
 	}
 
 	public void setupOptionControls(ExportDialogController controller, DataBlockWriter exporter) {
