@@ -37,6 +37,12 @@ public class Version {
 	static public String UPDATE_VERSION = VERSION;
 
 	public static String resolveVersion() {
+		// set by the packaged launcher (jpackage --java-options -Dapp.version=...); the reliable source for
+		// a released build, whether it is launched from the class path or the module path
+		var sys = System.getProperty("app.version");
+		if (sys != null && !sys.isBlank())
+			return sys;
+		// class-path fallback (e.g. running the plain jar): the Implementation-Version from the jar manifest
 		var pkg = Version.class.getPackage();
 		var v = (pkg != null) ? pkg.getImplementationVersion() : null;
 		return (v != null && !v.isBlank()) ? v : "dev";
