@@ -566,7 +566,8 @@ public class DensiTreeDrawer {
 	private static void postprocessLabels(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, Pane labelPane, ReadOnlyDoubleProperty fontScaleFactor) {
 		var references = new ArrayList<>();
 
-		for (var label : BasicFX.getAllRecursively(labelPane, RichTextLabel.class)) {
+		var allLabels = BasicFX.getAllRecursively(labelPane, RichTextLabel.class);
+		for (var label : allLabels) {
 			if (label.getUserData() instanceof Integer t) {
 				var taxon = taxaBlock.get(t);
 				//label.setOnMousePressed(mousePressedHandler);
@@ -585,7 +586,32 @@ public class DensiTreeDrawer {
 				if (taxonSelectionModel.isSelected(taxon)) {
 					label.setEffect(SelectionEffectBlue.getInstance());
 				}
-				DraggableUtils.setupDragMouseTranslate(label);
+				// dragging a label translates it; if the dragged taxon is selected, all selected labels move together
+				var dragStart = new double[2];
+				var dragLabels = new ArrayList<RichTextLabel>();
+				label.setOnMousePressed(e -> {
+					dragStart[0] = e.getSceneX();
+					dragStart[1] = e.getSceneY();
+					dragLabels.clear();
+					if (taxonSelectionModel.isSelected(taxon)) {
+						for (var other : allLabels) {
+							if (other.getUserData() instanceof Integer ot && taxonSelectionModel.isSelected(taxaBlock.get(ot)))
+								dragLabels.add(other);
+						}
+					} else
+						dragLabels.add(label);
+				});
+				label.setOnMouseDragged(e -> {
+					var dx = e.getSceneX() - dragStart[0];
+					var dy = e.getSceneY() - dragStart[1];
+					for (var dragged : dragLabels) {
+						dragged.setTranslateX(dragged.getTranslateX() + dx);
+						dragged.setTranslateY(dragged.getTranslateY() + dy);
+					}
+					dragStart[0] = e.getSceneX();
+					dragStart[1] = e.getSceneY();
+					e.consume();
+				});
 
 				InvalidationListener invalidationListener = e -> label.setText(taxon.getDisplayLabelOrName());
 				taxon.displayLabelProperty().addListener(new WeakInvalidationListener(invalidationListener));
