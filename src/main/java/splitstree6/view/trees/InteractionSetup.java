@@ -345,7 +345,8 @@ public class InteractionSetup {
 
 	private EventHandler<MouseEvent> createMouseClickedOnNodeHandler(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, Node v) {
 		return e -> {
-			if (v.getOwner() instanceof PhyloGraph graph) {
+			// ignore the click that ends a label drag, so dragging selected labels does not clear the selection
+			if (e.isStillSincePress() && v.getOwner() instanceof PhyloGraph graph) {
 				if (!e.isShiftDown() && ProgramProperties.isDesktop()) {
 					taxonSelectionModel.clearSelection();
 				}
