@@ -163,7 +163,7 @@ public class InteractionSetup {
 		// setup mouse interaction for new created node shapes
 		{
 			var mousePressedOnTaxonLabelHandler = createMousePressedOnTaxonLabelHandler();
-			var mouseDraggedOnTaxonLabelHandler = createMouseDraggedOnTaxonLabelHandler(taxaBlock, taxonSelectionModel, diagram, orientation, nodeShapeMap);
+			var mouseDraggedOnTaxonLabelHandler = createMouseDraggedOnTaxonLabelHandler(taxaBlock, taxonSelectionModel, nodeShapeMap);
 
 			var mouseEnteredHandler = createMouseEnteredNodeHandler();
 			var mouseExitedHandler = createMouseExitedNodeHandler();
@@ -285,7 +285,6 @@ public class InteractionSetup {
 	}
 
 	private EventHandler<MouseEvent> createMouseDraggedOnTaxonLabelHandler(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
-																		   TreeDiagramType diagram, StringProperty orientation,
 																		   ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
 		return me -> {
 			if (nodeShapeMap.keySet().iterator().next().getOwner() instanceof PhyloGraph graph) {
@@ -296,40 +295,13 @@ public class InteractionSetup {
 							var nodeShape = nodeShapeMap.get(v);
 							if (nodeShape != null && nodeShape.hasLabel()) {
 								var label = nodeShape.getLabel();
-								var dx = me.getScreenX() - mouseDownX;
-								var dy = me.getScreenY() - mouseDownY;
-
-								if (diagram != TreeDiagramType.RadialPhylogram) {
-									switch (orientation.get()) {
-										case "Rotate90Deg" -> {
-											var tmp = dx;
-											dx = -dy;
-											dy = tmp;
-										}
-										case "Rotate180Deg" -> {
-											dx = -dx;
-											dy = -dy;
-										}
-										case "Rotate270Deg" -> {
-											var tmp = dx;
-											dx = dy;
-											dy = -tmp;
-										}
-										case "FlipRotate0Deg" -> dx = -dx;
-										case "FlipRotate90Deg" -> {
-											var tmp = dx;
-											dx = dy;
-											dy = tmp;
-										}
-										case "FlipRotate180Deg" -> dy = -dy;
-										case "FlipRotate270Deg" -> {
-											var tmp = dx;
-											dx = -dy;
-											dy = -tmp;
-										}
-									}
-								}
-
+								// convert the drag from screen coordinates into the label's parent frame, so it is
+								// correct under any orientation (rotation and/or flip) of the tree pane
+								var parent = label.getParent();
+								var p0 = parent.screenToLocal(mouseDownX, mouseDownY);
+								var p1 = parent.screenToLocal(me.getScreenX(), me.getScreenY());
+								var dx = p1.getX() - p0.getX();
+								var dy = p1.getY() - p0.getY();
 								label.setLayoutX(label.getLayoutX() + dx);
 								label.setLayoutY(label.getLayoutY() + dy);
 							}
