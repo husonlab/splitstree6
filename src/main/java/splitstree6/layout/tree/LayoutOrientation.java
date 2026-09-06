@@ -130,7 +130,10 @@ public class LayoutOrientation {
 	}
 
 	public LayoutOrientation getFlipVertical() {
-		var newAngle = GeometryUtilsFX.modulo360(180 + alpha);
+		// screen vertical flip is S(!flip, 180 - alpha); the old 180 + alpha collided with getFlipHorizontal's
+		// 360 - alpha at odd multiples of 90 (both -> alpha 270 after a 90 rotation), so Flip Vertical then acted
+		// as Flip Horizontal. (This matches the correct sibling splitstree6.layout.LayoutOrientation.)
+		var newAngle = GeometryUtilsFX.modulo360(180 - alpha);
 		if (newAngle == 360)
 			newAngle = 0.0;
 		return new LayoutOrientation(!flip, newAngle);

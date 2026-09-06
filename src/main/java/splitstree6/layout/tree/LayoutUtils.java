@@ -209,6 +209,12 @@ public class LayoutUtils {
 	 * update a change of orientation to a node
 	 */
 	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, Predicate<javafx.scene.Node> keepLabelUnrotated, BooleanProperty changingOrientation, Runnable runAtFinished, boolean animate) {
+		if (RichTextLabel.DEBUG_UPRIGHT) {
+			var a0dbg = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
+			var flipDbg = (oldOrientation == null && newOrientation.flip()) || (oldOrientation != null && newOrientation.flip() != oldOrientation.flip());
+			System.err.printf("applyOrientation %s -> %s : angle0=%.0f flip=%s branch=%s%n",
+					oldOrientation, newOrientation, a0dbg, flipDbg, (Math.abs(a0dbg) == 180 && flipDbg) ? "SPECIAL" : "normal");
+		}
 		if (!changingOrientation.get()) {
 			changingOrientation.set(true);
 			final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
