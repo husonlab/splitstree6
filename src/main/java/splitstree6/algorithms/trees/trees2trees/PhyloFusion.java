@@ -243,9 +243,13 @@ public class PhyloFusion extends Trees2Trees {
 				TreeTracing.complete(network, taxonToTreeIds, allTreeIds);
 				if (network.getRoot().getOutDegree() == 1)
 					network.setWeight(network.getRoot().getFirstOutEdge(), 0.000001);
-				if (getOptionEdgeWeights() != EdgeWeights.None) {
+				if (getOptionEdgeWeights() != EdgeWeights.None && treesBlock.getTrees().stream().anyMatch(PhyloTree::hasEdgeWeights)) {
 					progress.setSubtask("edge weights");
+					//TracedEdgeWeights.apply(getOptionEdgeWeights().method(), treesBlock.getTrees(), network);
+					var edgeWeightsStart = System.nanoTime();
 					TracedEdgeWeights.apply(getOptionEdgeWeights().method(), treesBlock.getTrees(), network);
+					var edgeWeightsSeconds = (System.nanoTime() - edgeWeightsStart) / 1_000_000_000.0;
+					System.err.printf("Edge-weight calculation (%s): %.3f seconds%n", getOptionEdgeWeights(), edgeWeightsSeconds);
 					if (verbose)
 						TracedEdgeWeights.printFitStatistics(getOptionEdgeWeights().method(), treesBlock.getTrees(), network);
 				}

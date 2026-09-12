@@ -150,7 +150,25 @@ public class TracedEdgeWeights {
 		for (var f : network.edges())
 			x.put(f, model.addVariable("x_" + edgeId++).lower(0.0));
 
-		var objective = model.addExpression("sum_squared_residuals").weight(1.0);
+//		var objective = model.addExpression("sum_squared_residuals").weight(1.0);
+//		var rowId = 0;
+//		for (var treeId = 0; treeId < inputTrees.size(); treeId++) {
+//			var tree = inputTrees.get(treeId);
+//			var treeMapping = treeEdgeToNetworkEdges.get(treeId);
+//			for (var treeEdge : tree.edges()) {
+//				var covered = treeMapping.get(treeEdge);
+//				if (covered == null || covered.isEmpty())
+//					continue;
+//				var residual = model.addVariable("r_" + rowId);
+//				objective.set(residual, residual, 1.0); // minimise residual^2
+//				var equation = model.addExpression("eq_" + rowId).level(tree.getWeight(treeEdge));
+//				for (var networkEdge : covered)
+//					equation.set(x.get(networkEdge), 1.0);
+//				equation.set(residual, -1.0);
+//				rowId++;
+//			}
+//		}
+		var objective = model.addExpression("least_squares").weight(1.0);
 		var rowId = 0;
 		for (var treeId = 0; treeId < inputTrees.size(); treeId++) {
 			var tree = inputTrees.get(treeId);
@@ -159,12 +177,15 @@ public class TracedEdgeWeights {
 				var covered = treeMapping.get(treeEdge);
 				if (covered == null || covered.isEmpty())
 					continue;
-				var residual = model.addVariable("r_" + rowId);
-				objective.set(residual, residual, 1.0); // minimise residual^2
-				var equation = model.addExpression("eq_" + rowId).level(tree.getWeight(treeEdge));
-				for (var networkEdge : covered)
-					equation.set(x.get(networkEdge), 1.0);
-				equation.set(residual, -1.0);
+				var length = tree.getWeight(treeEdge);
+				// Expand (sum of covered edge lengths - length)^2.
+				for (var edgeA : covered) {
+					var variableA = x.get(edgeA);
+					objective.add(variableA, -2.0 * length);
+					for (var edgeB : covered) {
+						objective.add(variableA, x.get(edgeB), 1.0);
+					}
+				}
 				rowId++;
 			}
 		}
@@ -249,9 +270,13 @@ public class TracedEdgeWeights {
 		for (var treeId = 0; treeId < inputTrees.size(); treeId++) {
 			var tree = inputTrees.get(treeId);
 
+			// Fresh cache for each input tree: allowed edges differ between trees.
+			var taxaBelowCache = new HashMap<Node, BitSet>();
 			var displayedClusterToPath = new HashMap<BitSet, ArrayList<Edge>>();
+
 			for (var path : extractDisplayedEdgePaths(network, treeId)) {
-				var cluster = taxaReachableBelow(network, path.target(), treeId);
+				var cluster = taxaReachableBelow(
+						network, path.target(), treeId, taxaBelowCache);
 				if (!cluster.isEmpty())
 					displayedClusterToPath.put(cluster, path.networkEdges());
 			}
@@ -342,23 +367,28 @@ public class TracedEdgeWeights {
 			return TreeTracing.getTreeIds(e.getSource()).get(treeId) && TreeTracing.getTreeIds(e.getTarget()).get(treeId);
 	}
 
-	private static BitSet taxaReachableBelow(PhyloTree network, Node start, int treeId) {
+	private static BitSet taxaReachableBelow(
+			PhyloTree network, Node start, int treeId,
+			Map<Node, BitSet> cache) {
+
+		var cached = cache.get(start);
+		if (cached != null)
+			return cached;
+
 		var result = new BitSet();
-		var visited = new HashSet<Node>();
-		var stack = new Stack<Node>();
-		stack.push(start);
-		visited.add(start);
-		while (!stack.isEmpty()) {
-			var v = stack.pop();
-			if (network.hasTaxa(v)) {
-				for (var t : network.getTaxa(v))
-					result.set(t);
-			}
-			for (var e : v.outEdges()) {
-				if (isAllowedForTree(e, treeId) && visited.add(e.getTarget()))
-					stack.push(e.getTarget());
+
+		if (network.hasTaxa(start)) {
+			for (var taxon : network.getTaxa(start))
+				result.set(taxon);
+		}
+
+		for (var edge : start.outEdges()) {
+			if (isAllowedForTree(edge, treeId)) {
+				result.or(taxaReachableBelow(
+						network, edge.getTarget(), treeId, cache));
 			}
 		}
+		cache.put(start, result);
 		return result;
 	}
 
