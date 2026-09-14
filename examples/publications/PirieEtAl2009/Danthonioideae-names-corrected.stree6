@@ -1,32 +1,36 @@
 #nexus [SplitsTree6]
 
 BEGIN SPLITSTREE6;
-DIMENSIONS nDataNodes=6 nAlgorithms=4;
-PROGRAM version='SplitsTree App (version 6.7.9, built 25 May 2026)';
-WORKFLOW creationDate='1781414937655'; [Sun Jun 14 07:28:57 CEST 2026]
+DIMENSIONS nDataNodes=6 nAlgorithms=3;
+PROGRAM version='SplitsTree (version dev) - License GPL v3';
+WORKFLOW creationDate='1789395434925'; [Mon Sep 14 16:17:14 CEST 2026]
 END; [SPLITSTREE6]
 
 [!
 Pirie, M.D., Humphreys, A.M., Barker, N.P. & Linder, H.P. (2009).
 Reticulation, data combination, and inferring evolutionary history:
 an example from Danthonioideae (Poaceae). Systematic Biology 58: 612-628.
-https://academic.oup.com/sysbio/article/58/6/612/1635430
-]
+https://academic.oup.com/sysbio/article/58/6/612/1635430]
 
 [
+Input:
+Pirie, M.D., Humphreys, A.M., Barker, N.P. & Linder, H.P. (2009).
+Reticulation, data combination, and inferring evolutionary history:
+an example from Danthonioideae (Poaceae). Systematic Biology 58: 612-628.
+https://academic.oup.com/sysbio/article/58/6/612/1635430
+
 Methods:
-Analysis was performed using SplitsTree App 6.0.0 (Huson and Bryant 2024).
+Analysis was performed using SplitsTree (version dev)  (Huson and Bryant 2024 ; DH Huson and D. Bryant, The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods 21(10):1773-1774 2024.).
 The original input consisted of 69 taxa and 2 trees, partial.
 The Show Trees method was used (View=Tanglegram) so as to obtain a Tanglegram visualization (Huson 2025).
 
 References:
 Huson 2025: D.H. Huson. Displacement-Optimized Tanglegrams for Trees and Networks. Manuscript in preparation (2025).
-Huson and Bryant 2024: D.H. Huson and D. Bryant. The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods, 2024.
+Huson and Bryant 2024: DH Huson and D. Bryant, The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods 21(10):1773-1774 2024.
 ]
 
 BEGIN TAXA;
 TITLE 'Input Taxa';
-LINK ALGORITHM = 'Input Data Loader';
 DIMENSIONS ntax=69;
 TAXLABELS
 	[1] 'Centropodia_glauca'
@@ -105,7 +109,6 @@ END; [TAXA]
 
 BEGIN ALGORITHM;
 TITLE 'Taxa Filter';
-LINK ALGORITHM = 'Input Data Loader';
 NAME 'Taxa Filter';
 OPTIONS
 ;
@@ -192,7 +195,7 @@ END; [TAXA]
 
 BEGIN TREES;
 TITLE 'Input Trees';
-LINK ALGORITHM = 'Input Data Loader';
+LINK ALGORITHM = 'Taxa Filter';
 [Number of trees: 2]
 PROPERTIES partialTrees=yes rooted=yes;
 TRANSLATE
@@ -386,7 +389,7 @@ OPTIONS
 	Orientation = 'Rotate0Deg',
 	HorizontalZoomFactor = 0.62092132,
 	VerticalZoomFactor = 1,
-	FontScaleFactor = 1,
+	FontScaleFactor = 0.83333333,
 	ShowTreeNames = 'true',
 	ShowTreeInfo = 'false',
 	ShowInternalLabels = 'false',
