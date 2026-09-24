@@ -26,8 +26,10 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -106,7 +108,23 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		if (algorithm instanceof WeightsSlider weightsSlider) {
 			setupSplitsSlider(algorithmTab.getAlgorithmNode(), weightsSlider, controller.getMainPane());
 		} else {
-			for (var option : Option.getAllOptions(algorithm)) {
+			// The rows follow listOptions(): an option's name gives its row, and Option.SEPARATOR gives a horizontal
+			// rule, so an algorithm can set its advanced options apart from the basic ones. A name that matches no
+			// option is skipped, exactly as Option.getAllOptions skips it, so nothing changes for algorithms that
+			// never list the marker.
+			var name2option = Option.getName2Options(algorithm);
+			for (var listedObject : algorithm.listOptions()) { // raw Algorithm type here, hence the Object elements
+				var listed = listedObject.toString();
+				if (listed.equals(Option.SEPARATOR)) {
+					var separator = new Separator();
+					separator.setPadding(new Insets(6, 0, 6, 0));
+					separator.prefWidthProperty().bind(controller.getMainPane().widthProperty());
+					controller.getMainPane().getChildren().add(separator);
+					continue;
+				}
+				var option = name2option.get(listed.replaceAll("^option", "").replaceAll("Property$", ""));
+				if (option == null)
+					continue;
 				var control = OptionControlCreator.apply(option, changeListeners);
 				if (control != null) {
 					var label = new Label(StringUtils.fromCamelCase(option.getName()));

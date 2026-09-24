@@ -33,6 +33,14 @@ import java.util.stream.Collectors;
  * Daniel Huson, 2.2019
  */
 public class Option<T> {
+	/**
+	 * A marker for {@code listOptions()}: the algorithm tab draws a horizontal separator where this name appears,
+	 * so an algorithm can set its advanced options apart from the basic ones (RazorNet does this behind a
+	 * developer switch). Everything else that reads {@code listOptions()} -- the generated command-line flags,
+	 * the nexus option IO -- ignores it, because no option carries this name.
+	 */
+	public static final String SEPARATOR = "SEPARATOR";
+
 	private final Property<T> property;
 	private final String name;
 	private final String toolTipText;
