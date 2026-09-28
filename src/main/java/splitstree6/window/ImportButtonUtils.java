@@ -92,6 +92,18 @@ public class ImportButtonUtils {
 	}
 
 	public static void openString(String string) {
+		openStringAsNewWindow(string, null);
+	}
+
+	/**
+	 * opens the given string as a new document in a new window, giving the window the provided file name so that
+	 * the document is named and has a sensible default save location. If fileName is null or blank, the document
+	 * stays "Untitled".
+	 *
+	 * @param string   the document text
+	 * @param fileName the file name to assign to the new window, or null
+	 */
+	public static void openStringAsNewWindow(String string, String fileName) {
 		if (string != null && !string.isBlank()) {
 			var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
 			Platform.runLater(() -> {
@@ -100,7 +112,12 @@ public class ImportButtonUtils {
 					var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
 					if (inputEditorTab != null) {
 						((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(string);
-						Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
+						Platform.runLater(() -> {
+							// set before parseAndLoad(), which reads and then preserves the current file name
+							if (fileName != null && !fileName.isBlank())
+								mainWindow.setFileName(fileName);
+							((InputEditorView) inputEditorTab.getView()).parseAndLoad();
+						});
 					}
 				});
 			});

@@ -39,8 +39,8 @@ import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
 import jloda.fx.print.Print;
 import jloda.fx.service.UpdateService;
-import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.*;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.window.SplashScreen;
@@ -383,7 +383,13 @@ public class MainWindowPresenter {
 						(new TaxaNexusOutput()).write(w, output.getFirst());
 						(new TraitsNexusOutput()).write(w, output.getFirst(), output.getSecond());
 						(new CharactersNexusOutput()).write(w, output.getFirst(), output.getThird());
-						ImportButtonUtils.openString(w.toString());
+						// name the new document after the source, e.g. foo -> foo-haplotypes
+						var source = mainWindow.getFileName();
+						if (source == null || source.isBlank())
+							source = "Untitled";
+						var suffix = ".stree6";
+						var newFileName = FileUtils.replaceFileSuffix(source, "") + "-haplotypes" + suffix;
+						ImportButtonUtils.openStringAsNewWindow(w.toString(), newFileName);
 					} catch (IOException ex) {
 						NotificationManager.showError("Failed: " + ex.getMessage());
 					}
