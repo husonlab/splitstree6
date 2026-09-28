@@ -24,6 +24,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.control.ScrollPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
@@ -47,6 +48,8 @@ import splitstree6.view.utils.RubberBandSelector;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class NetworkViewPresenter implements IDisplayTabPresenter {
 	private final LongProperty updateCounter = new SimpleLongProperty(0L);
@@ -69,6 +72,8 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 	private final RubberBandSelector rubberBandSelection;
 	private boolean first = true;
+
+	private final NetworkGrid grid = new NetworkGrid();
 
 	/**
 	 * the network view presenter
@@ -118,7 +123,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				taxonLabelMap, nodeShapeMap, edgeShapeMap, view.optionLayoutSeedProperty());
 
 		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, view.getUndoManager(), view.optionEditsProperty(),
-				t -> mainWindow.getWorkingTaxa().get(t), nodeSelectionModel, edgeSelectionModel, mainWindow.getTaxonSelectionModel());
+				t -> mainWindow.getWorkingTaxa().get(t), nodeSelectionModel, edgeSelectionModel, mainWindow.getTaxonSelectionModel(), grid);
 
 		networkPane.setRunBeforeUpdate(() -> {
 			nodeSelectionModel.clearSelection();
@@ -130,6 +135,8 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
 			interactionSetup.apply(taxonLabelMap, nodeShapeMap, edgeShapeMap,
 					t -> (t >= 1 && t <= taxa.getNtax() ? taxa.get(t) : null), taxa::indexOf);
+			if (grid.isSnap())
+				snapAllToGrid(false); // a new drawing, while the grid is on
 			if (first) {
 				first = false;
 				if (view.getOptionEdits().length > 0) {
@@ -187,6 +194,19 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		Platform.runLater(() -> updateAlgorithmToggle.invalidated(null));
 		algorithmToggle.setOnAction(e -> view.setOptionLayoutAlgorithm(algorithmToggle.isSelected() ? LayoutAlgorithm.ForceDirected : LayoutAlgorithm.MDS));
 		algorithmToggle.disableProperty().bind(view.emptyProperty());
+
+		// The grid, to make it easy to pull a network into a rectilinear drawing by hand: switching it on snaps all
+		// nodes to the grid, as one edit that can be undone, and while it is on, dragged nodes move in grid steps
+		var gridToggle = controller.getGridToggleButton();
+		gridToggle.selectedProperty().bindBidirectional(grid.snapProperty());
+		gridToggle.setOnAction(e -> {
+			if (gridToggle.isSelected())
+				snapAllToGrid(true);
+		});
+		gridToggle.setTooltip(new Tooltip("Snap nodes to a grid: aligns all nodes, and dragged nodes then move in grid steps"));
+		gridToggle.disableProperty().bind(view.emptyProperty());
+		// zooming scales the node positions about the origin, and the grid has to scale with them
+		view.optionZoomFactorProperty().addListener((v, o, n) -> grid.scale(n.doubleValue() / o.doubleValue()));
 
 		controller.getZoomInButton().setOnAction(e -> view.setOptionZoomFactor(1.1 * view.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(view.emptyProperty().or(view.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
@@ -303,6 +323,45 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 	public void updateLabelLayout() {
 		Platform.runLater(() -> networkPane.layoutLabels(view.getOptionOrientation()));
+	}
+
+	/**
+	 * snaps all nodes to the grid, after choosing the grid for the current drawing
+	 *
+	 * @param undoable whether this is an edit that can be undone; undoing it also switches the grid off
+	 */
+	private void snapAllToGrid(boolean undoable) {
+		var networkBlock = view.getNetworkBlock();
+		var nodeShapeMap = view.getNodeShapeMap();
+		if (networkBlock == null || nodeShapeMap.isEmpty())
+			return;
+		var graph = networkBlock.getGraph();
+		var oldPositions = new LinkedHashMap<LabeledNodeShape, Point2D>(); // in node order, which breaks ties
+		for (var v : graph.nodes()) {
+			var shape = nodeShapeMap.get(v);
+			if (shape != null)
+				oldPositions.put(shape, new Point2D(shape.getTranslateX(), shape.getTranslateY()));
+		}
+		grid.setSpacing(NetworkGrid.computeSpacing(graph, view.getOptionDiagram(), v -> nodeShapeMap.containsKey(v) ? oldPositions.get(nodeShapeMap.get(v)) : null));
+		var newPositions = NetworkGrid.snapAll(oldPositions, grid.getSpacing());
+		setPositions(newPositions);
+		if (undoable) {
+			view.getUndoManager().add("snap to grid", () -> {
+				grid.setSnap(false);
+				setPositions(oldPositions);
+			}, () -> {
+				grid.setSnap(true);
+				setPositions(newPositions);
+			});
+		}
+	}
+
+	private void setPositions(Map<LabeledNodeShape, Point2D> positions) {
+		for (var entry : positions.entrySet()) {
+			entry.getKey().setTranslateX(entry.getValue().getX());
+			entry.getKey().setTranslateY(entry.getValue().getY());
+		}
+		updateLabelLayout();
 	}
 
 	public FindToolBar getFindToolBar() {

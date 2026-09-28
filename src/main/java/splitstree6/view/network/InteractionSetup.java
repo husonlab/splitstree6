@@ -50,6 +50,7 @@ import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.view.utils.NodeLabelDialog;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,8 @@ public class InteractionSetup {
 	private Map<Node, LabeledNodeShape> nodeShapeMap;
 	private Map<Edge, LabeledEdgeShape> edgeShapeMap;
 
+	private final NetworkGrid grid;
+
 	/**
 	 * constructor
 	 */
@@ -86,12 +89,13 @@ public class InteractionSetup {
 							Function<Integer, Taxon> idTaxonMap,
 							SelectionModel<Node> nodeSelectionModel,
 							SelectionModel<Edge> edgeSelectionModel,
-							SelectionModel<Taxon> taxonSelectionModel) {
+							SelectionModel<Taxon> taxonSelectionModel, NetworkGrid grid) {
 		this.stage = stage;
 		this.edits = edits;
 		this.undoManager = undoManager;
 		this.nodeSelectionModel = nodeSelectionModel;
 		this.edgeSelectionModel = edgeSelectionModel;
+		this.grid = grid;
 
 		this.taxonSelectionModel = taxonSelectionModel;
 
@@ -245,53 +249,61 @@ public class InteractionSetup {
 			});
 
 			var start = new Single<Point2D>();
-			var end = new Single<Point2D>();
 
-			var selectedShapes = new ArrayList<Group>();
+			// the nodes being moved, each with the position it had when the mouse went down
+			var startPositions = new HashMap<Group, Point2D>();
 
 			shape.setOnMousePressed(e -> {
-				mouseDownX = e.getScreenX();
-				mouseDownY = e.getScreenY();
-				start.set(new Point2D(mouseDownX, mouseDownY));
-				end.set(start.get());
+				start.set(new Point2D(e.getScreenX(), e.getScreenY()));
 
-				selectedShapes.clear();
-				for (var anode : nodeSelectionModel.getSelectedItems()) {
-					var one = nodeShapeMap.get(anode);
-					if (one != null)
-						selectedShapes.add(one);
+				// a drag moves the selected nodes, but only when it starts on one of them: dragging an unselected
+				// node does nothing
+				startPositions.clear();
+				if (nodeSelectionModel.isSelected(node)) {
+					for (var anode : nodeSelectionModel.getSelectedItems()) {
+						var one = nodeShapeMap.get(anode);
+						if (one != null)
+							startPositions.put(one, new Point2D(one.getTranslateX(), one.getTranslateY()));
+					}
 				}
 				e.consume();
 			});
 			if (shape.hasLabel())
 				shape.getLabel().setOnMouseClicked(shape.getOnMouseClicked());
 			shape.setOnMouseDragged(e -> {
-				var dx = e.getScreenX() - mouseDownX;
-				var dy = e.getScreenY() - mouseDownY;
-				for (var selected : selectedShapes) {
-					selected.setTranslateX(selected.getTranslateX() + dx);
-					selected.setTranslateY(selected.getTranslateY() + dy);
+				if (startPositions.containsKey(shape)) {
+					var delta = new Point2D(e.getScreenX(), e.getScreenY()).subtract(start.get());
+					if (grid.isSnap()) {
+						// in grid steps: the grabbed node goes to the grid point nearest the mouse, and the other
+						// selected nodes keep their offsets to it
+						var from = startPositions.get(shape);
+						delta = grid.snap(from.add(delta)).subtract(from);
+					}
+					for (var entry : startPositions.entrySet()) {
+						entry.getKey().setTranslateX(entry.getValue().getX() + delta.getX());
+						entry.getKey().setTranslateY(entry.getValue().getY() + delta.getY());
+					}
 				}
-					mouseDownX = e.getScreenX();
-					mouseDownY = e.getScreenY();
-					end.set(new Point2D(mouseDownX, mouseDownY));
 				e.consume();
 			});
 			shape.setOnMouseReleased(e -> {
-				if (selectedShapes.contains(shape)) {
-					var finalSelected = new ArrayList<>(selectedShapes);
-					if (!e.isStillSincePress()) {
+				if (startPositions.containsKey(shape) && !e.isStillSincePress()) {
+					var moved = new ArrayList<>(startPositions.keySet());
+					// the distance the nodes actually moved, which on the grid is not the distance the mouse moved
+					var dx = shape.getTranslateX() - startPositions.get(shape).getX();
+					var dy = shape.getTranslateY() - startPositions.get(shape).getY();
+					if (dx != 0 || dy != 0) {
 						undoManager.add("move nodes",
 								() -> {
-									for (var selected : finalSelected) {
-										selected.setTranslateX(selected.getTranslateX() - (end.get().getX() - start.get().getX()));
-										selected.setTranslateY(selected.getTranslateY() - (end.get().getY() - start.get().getY()));
+									for (var one : moved) {
+										one.setTranslateX(one.getTranslateX() - dx);
+										one.setTranslateY(one.getTranslateY() - dy);
 									}
 								},
 								() -> {
-									for (var selected : finalSelected) {
-										selected.setTranslateX(selected.getTranslateX() + (end.get().getX() - start.get().getX()));
-										selected.setTranslateY(selected.getTranslateY() + (end.get().getY() - start.get().getY()));
+									for (var one : moved) {
+										one.setTranslateX(one.getTranslateX() + dx);
+										one.setTranslateY(one.getTranslateY() + dy);
 									}
 								});
 					}

@@ -51,6 +51,7 @@
 
                     <ToggleButton fx:id="layoutAlgorithmToggleButton" contentDisplay="CENTER" mnemonicParsing="false"
                                   text="Layout Algorithm"/>
+                    <ToggleButton fx:id="gridToggleButton" contentDisplay="CENTER" mnemonicParsing="false" text="Grid"/>
 
                     <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
                     <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"

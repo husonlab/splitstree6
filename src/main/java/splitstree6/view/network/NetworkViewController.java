@@ -83,6 +83,9 @@ public class NetworkViewController {
 	private ToggleButton layoutAlgorithmToggleButton;
 
 	@FXML
+	private ToggleButton gridToggleButton;
+
+	@FXML
 	private ToggleButton settingsToggleButton;
 
 	@FXML
@@ -100,6 +103,8 @@ public class NetworkViewController {
 			MaterialIcons.setIcon(rotateRightButton, MaterialIcons.rotate_right);
 
 			MaterialIcons.setIcon(flipButton, MaterialIcons.flip);
+
+			MaterialIcons.setIcon(gridToggleButton, MaterialIcons.grid_on);
 
 			MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.more_vert);
 			MaterialIcons.setIcon(formatToggleButton, MaterialIcons.tune);
@@ -170,6 +175,10 @@ public class NetworkViewController {
 
 	public ToggleButton getLayoutAlgorithmToggleButton() {
 		return layoutAlgorithmToggleButton;
+	}
+
+	public ToggleButton getGridToggleButton() {
+		return gridToggleButton;
 	}
 
 	public Button getRotateLeftButton() {
