@@ -62,11 +62,18 @@ public class NetworkNexusOutput extends NexusIOBase implements INexusOutput<Netw
 				else
 					w.write(",\n");
 				w.write("\tid=" + v.getId());
-				if (graph.getLabel(v) != null && !graph.getLabel(v).trim().isEmpty()) {
-					w.write(" label='" + graph.getLabel(v).trim() + "'");
+				// one label per vertex: the graph label, else a label held in the node data (the SplitsTree4 and GML
+				// readers put one there). Writing both made every load and save of a network repeat the label
+				var nodeData = networkBlock.getNodeData(v);
+				var label = graph.getLabel(v);
+				if (label == null || label.isBlank())
+					label = nodeData.get(NetworkBlock.NodeData.BasicKey.label.name());
+				if (label != null && !label.isBlank()) {
+					w.write(" label='" + label.trim() + "'");
 				}
-				for (String key : networkBlock.getNodeData(v).keySet()) {
-					w.write(" " + key + "='" + networkBlock.getNodeData(v).get(key) + "'");
+				for (String key : nodeData.keySet()) {
+					if (!key.equals(NetworkBlock.NodeData.BasicKey.label.name()))
+						w.write(" " + key + "='" + nodeData.get(key) + "'");
 				}
 			}
 			w.write("\n;\n");
@@ -84,7 +91,8 @@ public class NetworkNexusOutput extends NexusIOBase implements INexusOutput<Netw
 				w.write(" sid=" + e.getSource().getId());
 				w.write(" tid=" + e.getTarget().getId());
 
-				if (graph.getLabel(e) != null && !graph.getLabel(e).isBlank()) {
+				var hasLabel = graph.getLabel(e) != null && !graph.getLabel(e).isBlank();
+				if (hasLabel) {
 					w.write(" label='" + graph.getLabel(e).trim() + "'");
 				}
 				if (graph.hasEdgeWeights() && !networkBlock.getEdgeData(e).containsKey("weight")) {
@@ -97,7 +105,9 @@ public class NetworkNexusOutput extends NexusIOBase implements INexusOutput<Netw
 					w.write(" probability='" + graph.getProbability(e) + "'");
 				}
 				for (var key : networkBlock.getEdgeData(e).keySet()) {
-					w.write(" " + key + "='" + networkBlock.getEdgeData(e).get(key) + "'");
+					// as for vertices, an edge has at most one label
+					if (!(hasLabel && key.equals(NetworkBlock.EdgeData.BasicKey.label.name())))
+						w.write(" " + key + "='" + networkBlock.getEdgeData(e).get(key) + "'");
 				}
 			}
 			w.write("\n;\n");

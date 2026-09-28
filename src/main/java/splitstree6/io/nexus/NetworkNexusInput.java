@@ -158,18 +158,24 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				var v = graph.newNode();
 				id2node.put(id, v);
 
+				var hasLabel = false;
 				while (!np.peekMatchAnyTokenIgnoreCase(", ;")) {
 					var key = np.getWordRespectCase();
 					np.matchIgnoreCase("=");
 					var value = np.getWordRespectCase();
-					networkBlock.getNodeData(v).put(key, value);
+					// the label is kept as the graph label only: the writer writes the graph label and then all node
+					// data, so a copy in the node data would come out as a second label. Files loaded and saved again
+					// from 9.2024 on do repeat it; the first occurrence, taken from the graph label, is the one used
+					if (!key.equals("label"))
+						networkBlock.getNodeData(v).put(key, value);
 					if (key.equals("tid") && NumberUtils.isInteger(value) && !taxaBlock.getLabels().isEmpty()) {
 						var taxId = NumberUtils.parseInt(value);
 						if (taxId <= 0 || taxId > taxaBlock.getNtax())
 							throw new IOExceptionWithLineNumber("Invalid tax id: " + taxId, np.lineno());
 						graph.addTaxon(v, taxId);
 						graph.setLabel(v, taxaBlock.getLabel(taxId));
-					} else if (key.equals("label")) {
+					} else if (key.equals("label") && !hasLabel) {
+						hasLabel = true;
 						graph.setLabel(v, value);
 						if (taxaBlock.getLabels().isEmpty()) {
 							taxonNamesFound.add(value);
