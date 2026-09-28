@@ -31,6 +31,7 @@ import jloda.fx.find.FindToolBar;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.*;
+import jloda.fx.window.NotificationManager;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
@@ -39,6 +40,8 @@ import javafx.scene.control.Tooltip;
 import jloda.fx.icons.MaterialIcons;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.network.LayoutAlgorithm;
+import splitstree6.layout.network.NetworkLayout;
+import splitstree6.layout.network.RectilinearLayout;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -48,8 +51,10 @@ import splitstree6.view.utils.RubberBandSelector;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.ToDoubleFunction;
 
 public class NetworkViewPresenter implements IDisplayTabPresenter {
 	private final LongProperty updateCounter = new SimpleLongProperty(0L);
@@ -74,6 +79,13 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	private boolean first = true;
 
 	private final NetworkGrid grid = new NetworkGrid();
+	private final BooleanProperty straightening = new SimpleBooleanProperty(this, "straightening", false);
+
+	/**
+	 * time allowed for straightening; networks of up to about a hundred nodes need less and then always come out
+	 * the same, see {@link RectilinearLayout}
+	 */
+	private static final long STRAIGHTEN_BUDGET_MILLIS = 2000;
 
 	/**
 	 * the network view presenter
@@ -207,6 +219,11 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		gridToggle.disableProperty().bind(view.emptyProperty());
 		// zooming scales the node positions about the origin, and the grid has to scale with them
 		view.optionZoomFactorProperty().addListener((v, o, n) -> grid.scale(n.doubleValue() / o.doubleValue()));
+
+		var straightenButton = controller.getStraightenButton();
+		straightenButton.setOnAction(e -> straighten());
+		straightenButton.setTooltip(new Tooltip("Straighten: move the nodes on the grid so that edges run horizontally, vertically or diagonally, with few crossings"));
+		straightenButton.disableProperty().bind(view.emptyProperty().or(straightening));
 
 		controller.getZoomInButton().setOnAction(e -> view.setOptionZoomFactor(1.1 * view.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(view.emptyProperty().or(view.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
@@ -354,6 +371,73 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				setPositions(newPositions);
 			});
 		}
+	}
+
+	/**
+	 * straightens the drawing on the grid, see {@link RectilinearLayout}, and switches the grid on, so that the
+	 * drawing can then be adjusted by hand in grid steps. The search runs in the background; its result is applied
+	 * as one edit that can be undone, unless the drawing changed in the meantime
+	 */
+	private void straighten() {
+		var networkBlock = view.getNetworkBlock();
+		var nodeShapeMap = view.getNodeShapeMap();
+		if (networkBlock == null || nodeShapeMap.isEmpty())
+			return;
+		var graph = networkBlock.getGraph();
+		var shapes = new LinkedHashMap<Node, LabeledNodeShape>();
+		var oldPositions = new LinkedHashMap<LabeledNodeShape, Point2D>(); // in node order, which breaks ties
+		for (var v : graph.nodes()) {
+			var shape = nodeShapeMap.get(v);
+			if (shape == null)
+				return; // not drawn yet
+			shapes.put(v, shape);
+			oldPositions.put(shape, new Point2D(shape.getTranslateX(), shape.getTranslateY()));
+		}
+		var oldSnap = grid.isSnap();
+		var oldSpacing = grid.getSpacing();
+		var spacing = (oldSnap && oldSpacing > 0 ? oldSpacing : NetworkGrid.computeSpacing(graph, view.getOptionDiagram(), v -> oldPositions.get(shapes.get(v))));
+		var snapped = NetworkGrid.snapAll(oldPositions, spacing);
+		var start = new HashMap<Node, RectilinearLayout.GridPoint>();
+		for (var v : graph.nodes()) {
+			var p = snapped.get(shapes.get(v));
+			start.put(v, new RectilinearLayout.GridPoint((int) Math.round(p.getX() / spacing), (int) Math.round(p.getY() / spacing)));
+		}
+		// target lengths in grid steps: a grid step is half the unit of the lengths the layout gives the edges
+		ToDoubleFunction<Edge> targetLength;
+		if (view.getOptionDiagram() == DiagramType.Network) {
+			var scaling = NetworkLayout.setupScaling(graph);
+			targetLength = e -> 2 * scaling.applyAsDouble(e);
+		} else
+			targetLength = e -> 2.0;
+		var search = RectilinearLayout.prepare(graph, start, targetLength); // reads the graph here, on the FX thread
+
+		straightening.set(true);
+		AService.run(() -> search.run(STRAIGHTEN_BUDGET_MILLIS), result -> {
+			straightening.set(false);
+			for (var v : shapes.keySet()) {
+				var shape = shapes.get(v);
+				if (nodeShapeMap.get(v) != shape || shape.getTranslateX() != oldPositions.get(shape).getX() || shape.getTranslateY() != oldPositions.get(shape).getY())
+					return; // redrawn or edited while the search ran
+			}
+			var newPositions = new LinkedHashMap<LabeledNodeShape, Point2D>();
+			for (var v : shapes.keySet())
+				newPositions.put(shapes.get(v), new Point2D(spacing * result.get(v).x(), spacing * result.get(v).y()));
+			grid.setSpacing(spacing);
+			grid.setSnap(true);
+			setPositions(newPositions);
+			view.getUndoManager().add("straighten", () -> {
+				grid.setSpacing(oldSpacing);
+				grid.setSnap(oldSnap);
+				setPositions(oldPositions);
+			}, () -> {
+				grid.setSpacing(spacing);
+				grid.setSnap(true);
+				setPositions(newPositions);
+			});
+		}, ex -> {
+			straightening.set(false);
+			NotificationManager.showError("Straighten failed: " + ex.getMessage());
+		});
 	}
 
 	private void setPositions(Map<LabeledNodeShape, Point2D> positions) {
