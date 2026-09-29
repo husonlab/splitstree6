@@ -76,6 +76,10 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 	private boolean colorSchemeSet = false;
 
+	// the taxa list's own vertical scroll bar that the sequence scroll bar is currently bound to (it can appear
+	// late and be recreated, so we track it and rebind when it changes); see ensureAlignmentScrollBarsSynced()
+	private ScrollBar boundTaxaVerticalScrollBar = null;
+
 	public AlignmentViewPresenter(MainWindow mainWindow, AlignmentView view) {
 		this.mainWindow = mainWindow;
 		this.view = view;
@@ -131,6 +135,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					controller.getTaxaListView().getItems().add(taxon);
 				}
 			}
+			// the list's vertical scroll bar may only now be needed and created, so (re)bind it
+			Platform.runLater(() -> ensureAlignmentScrollBarsSynced(controller));
 		};
 		view.inputTaxaNodeValidProperty().addListener(updateTaxaListener);
 
@@ -236,7 +242,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 							view.setOptionColorScheme(ColorScheme.Diamond11);
 						}
 						colorSchemeSet = true;
-					} else if ((inputCharacters.getDataType() == CharactersType.DNA || inputCharacters.getDataType() == CharactersType.RNA)) {
+					} else if (inputCharacters.getDataType() != null && inputCharacters.getDataType().isNucleotides()) {
 						if (!colorSchemeSet || view.getOptionColorScheme() != ColorScheme.Nucleotide && view.getOptionColorScheme() != ColorScheme.Random && view.getOptionColorScheme() != ColorScheme.None) {
 							view.setOptionColorScheme(ColorScheme.Nucleotide);
 						}
@@ -551,21 +557,13 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		controller.getFilterMenu().disableProperty().bind(workflow.runningProperty());
 
-		Platform.runLater(() -> {
-			var taxonHBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.HORIZONTAL);
-			if (taxonHBar != null) {
-				controller.getLeftBottomPane().prefHeightProperty().bind(new When(taxonHBar.visibleProperty()).then(0).otherwise(16));
-			}
-
-			var taxonVBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.VERTICAL);
-			if (taxonVBar != null) {
-				controller.getVerticalScrollBar().visibleProperty().bind(taxonVBar.visibleProperty());
-				controller.getVerticalScrollBar().minProperty().bind(taxonVBar.minProperty());
-				controller.getVerticalScrollBar().maxProperty().bind(taxonVBar.maxProperty());
-				controller.getVerticalScrollBar().visibleAmountProperty().bind(taxonVBar.visibleAmountProperty());
-				taxonVBar.valueProperty().bindBidirectional(controller.getVerticalScrollBar().valueProperty());
-			}
-		});
+		// keep the taxa list (left) and the sequence canvas (right) scrolling together. The list's own vertical
+		// scroll bar can appear only once there are enough taxa to require scrolling, and can be recreated (for
+		// example when the list is re-skinned), so we (re)establish the binding whenever it changes rather than
+		// only once -- otherwise the two scroll bars become detached and scrolling one no longer scrolls the other.
+		Platform.runLater(() -> ensureAlignmentScrollBarsSynced(controller));
+		controller.getTaxaListView().skinProperty().addListener((v, o, n) -> Platform.runLater(() -> ensureAlignmentScrollBarsSynced(controller)));
+		controller.getTaxaListView().heightProperty().addListener((v, o, n) -> Platform.runLater(() -> ensureAlignmentScrollBarsSynced(controller)));
 
 
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
@@ -749,6 +747,32 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public boolean allowFindReplace() {
 		return false;
+	}
+
+	/**
+	 * makes the sequence (right-hand) vertical scroll bar track the taxa list's (left-hand) own vertical scroll bar,
+	 * (re)binding whenever that scroll bar first appears or is recreated. Idempotent and cheap: it does nothing while
+	 * already bound to the current scroll bar. This keeps the two panes scrolling together instead of drifting apart.
+	 */
+	private void ensureAlignmentScrollBarsSynced(AlignmentViewController controller) {
+		// bottom spacer under the taxa list: reserve the scroll-bar's height only while the list has no horizontal bar
+		var taxonHBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.HORIZONTAL);
+		if (taxonHBar != null && !controller.getLeftBottomPane().prefHeightProperty().isBound()) {
+			controller.getLeftBottomPane().prefHeightProperty().bind(new When(taxonHBar.visibleProperty()).then(0).otherwise(16));
+		}
+
+		var taxonVBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.VERTICAL);
+		if (taxonVBar != null && taxonVBar != boundTaxaVerticalScrollBar) {
+			var sequenceVBar = controller.getVerticalScrollBar();
+			if (boundTaxaVerticalScrollBar != null)
+				boundTaxaVerticalScrollBar.valueProperty().unbindBidirectional(sequenceVBar.valueProperty());
+			sequenceVBar.visibleProperty().bind(taxonVBar.visibleProperty());
+			sequenceVBar.minProperty().bind(taxonVBar.minProperty());
+			sequenceVBar.maxProperty().bind(taxonVBar.maxProperty());
+			sequenceVBar.visibleAmountProperty().bind(taxonVBar.visibleAmountProperty());
+			taxonVBar.valueProperty().bindBidirectional(sequenceVBar.valueProperty());
+			boundTaxaVerticalScrollBar = taxonVBar;
+		}
 	}
 
 	private static void setupColorSchemeMenu(ObjectProperty<ColorScheme> colorSchemeProperty, MenuButton menuButton) {

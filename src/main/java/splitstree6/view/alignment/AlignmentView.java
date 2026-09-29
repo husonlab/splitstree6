@@ -37,7 +37,6 @@ import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFil
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -177,7 +176,7 @@ public class AlignmentView implements IView {
 				var inputCharacters = getInputCharacters();
 				if (inputCharacters != null) {
 					setActiveSites(BitSetUtils.asBitSet(BitSetUtils.range(1, inputCharacters.getNchar() + 1)));
-					nucleotideData.set(inputCharacters.getDataType() == CharactersType.DNA || inputCharacters.getDataType() == CharactersType.RNA);
+					nucleotideData.set(inputCharacters.getDataType() != null && inputCharacters.getDataType().isNucleotides());
 					consensusSequence.set(null);
 					AService.run(inputCharacters::computeConsensusSequence, consensusSequence::set, e -> NotificationManager.showError("Consensus failed: " + e));
 				}
