@@ -61,6 +61,13 @@ public class NetworkBlock extends DataBlock {
 	// NetworkLayout dereferences it and a block built outside the workflow has never been cleared
 	private Type networkType = Type.Other;
 
+	// when true, the nodes already carry x/y coordinates (in their NodeData) that describe a layout to be used as
+	// is, rather than one to be computed. It is set when a network is read with coordinates for all of its nodes
+	// (see NetworkNexusInput), so that a network exported "As Network..." from a split network or tree opens with
+	// the coordinates it was drawn with; picking a layout algorithm in the viewer clears it. Not itself written to
+	// file -- it is re-derived on read from the presence of the coordinates -- but it is carried across a filter.
+	private boolean useProvidedNodeCoordinates = false;
+
 	public NetworkBlock() {
 		graph = new PhyloGraph();
 		node2data = new NodeArray<>(graph);
@@ -73,7 +80,31 @@ public class NetworkBlock extends DataBlock {
 		node2data.clear();
 		edge2data.clear();
 		networkType = Type.Other;
+		useProvidedNodeCoordinates = false;
 		infoString = "";
+	}
+
+	public boolean isUseProvidedNodeCoordinates() {
+		return useProvidedNodeCoordinates;
+	}
+
+	public void setUseProvidedNodeCoordinates(boolean useProvidedNodeCoordinates) {
+		this.useProvidedNodeCoordinates = useProvidedNodeCoordinates;
+	}
+
+	/**
+	 * does every node carry both an x and a y coordinate in its NodeData? Readers use this to decide whether the
+	 * network arrives with a layout to keep (see {@link #isUseProvidedNodeCoordinates()}).
+	 */
+	public boolean hasCoordinatesForAllNodes() {
+		if (graph.getNumberOfNodes() == 0)
+			return false;
+		for (var v : graph.nodes()) {
+			var data = getNodeData(v);
+			if (!data.containsKey(NodeData.BasicKey.x.name()) || !data.containsKey(NodeData.BasicKey.y.name()))
+				return false;
+		}
+		return true;
 	}
 
 	public void copy(NetworkBlock that) {
@@ -82,6 +113,7 @@ public class NetworkBlock extends DataBlock {
 		EdgeArray<Edge> oldEdge2new = that.getGraph().newEdgeArray();
 		graph.copy(that.getGraph(), oldNode2new, oldEdge2new);
 		setNetworkType(that.getNetworkType()); // a filter keeps the kind of network it was given
+		setUseProvidedNodeCoordinates(that.isUseProvidedNodeCoordinates()); // and keeps its provided coordinates
 		for (var v : oldNode2new.keys()) {
 			getNodeData(oldNode2new.get(v)).putAll((that.getNodeData(v)));
 		}

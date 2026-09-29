@@ -112,6 +112,9 @@ public class GMLReader extends NetworkReader {
 				}
 			}
 		}
+
+		// if every node carries x and y, use these coordinates as the layout as-is rather than computing one
+		networkBlock.setUseProvidedNodeCoordinates(networkBlock.hasCoordinatesForAllNodes());
 	}
 
 	@Override

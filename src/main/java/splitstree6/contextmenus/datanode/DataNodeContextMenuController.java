@@ -36,6 +36,9 @@ public class DataNodeContextMenuController {
 	private MenuItem exportMenuItem;
 
 	@FXML
+	private MenuItem asNetworkMenuItem;
+
+	@FXML
 	private Menu addTreeMenu;
 
 	@FXML
@@ -50,6 +53,10 @@ public class DataNodeContextMenuController {
 
 	public MenuItem getShowTextMenuItem() {
 		return showTextMenuItem;
+	}
+
+	public MenuItem getAsNetworkMenuItem() {
+		return asNetworkMenuItem;
 	}
 
 	public MenuItem getExportMenuItem() {

@@ -251,6 +251,9 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			createStar(taxaBlock, graph);
 		}
 
+		// if every node carries x and y, use these coordinates as the layout as-is rather than computing one
+		networkBlock.setUseProvidedNodeCoordinates(networkBlock.hasCoordinatesForAllNodes());
+
 		return taxonNamesFound;
 	}
 

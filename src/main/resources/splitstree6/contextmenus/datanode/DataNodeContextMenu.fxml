@@ -29,6 +29,7 @@
             <items>
                 <MenuItem fx:id="showTextMenuItem" mnemonicParsing="false" text="Show Text..."/>
                 <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Export..."/>
+                <MenuItem fx:id="asNetworkMenuItem" mnemonicParsing="false" text="As Network..."/>
                 <SeparatorMenuItem mnemonicParsing="false"/>
                 <Menu fx:id="addTreeMenu" text="Add Tree"/>
                 <Menu fx:id="addNetworkMenu" text="Add Network"/>

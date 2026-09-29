@@ -121,6 +121,15 @@ public class NetworkLayout {
 					var y = Double.parseDouble(networkBlock.getNodeData(v).get(NetworkBlock.NodeData.BasicKey.y.name()));
 					nodePointMap.put(v, new Point2D(x, y));
 				}
+			} else if (networkBlock.isUseProvidedNodeCoordinates() && networkBlock.hasCoordinatesForAllNodes()) {
+				// the network arrived with a layout (e.g. exported "As Network..." from a split network): open with
+				// those coordinates as-is; the user can then re-layout, straighten or snap to a grid
+				for (var v : graph.nodes()) {
+					var data = networkBlock.getNodeData(v);
+					var x = Double.parseDouble(data.get(NetworkBlock.NodeData.BasicKey.x.name()));
+					var y = Double.parseDouble(data.get(NetworkBlock.NodeData.BasicKey.y.name()));
+					nodePointMap.put(v, new Point2D(x, y));
+				}
 			} else {
 				computeBestLayout(progress, graph, edgeWeightFunction, randomLayoutSeed, algorithm, nodePointMap);
 			}

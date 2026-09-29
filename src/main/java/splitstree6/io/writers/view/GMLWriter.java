@@ -28,6 +28,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.view.network.NetworkView;
 import splitstree6.view.splits.viewer.SplitsView;
+import splitstree6.view.trees.treeview.TreeView;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -106,6 +107,31 @@ public class GMLWriter extends ViewWriterBase {
 						};
 				var comment = "Exported from %s: %,d nodes, %,d edges,".formatted(ProgramProperties.getProgramName(), graph.getNumberOfNodes(), graph.getNumberOfEdges());
 				var graphLabel = (graph.getName() != null ? graph.getName() : networkView.getName());
+				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
+						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
+			}
+		} else if (view instanceof TreeView treeView) {
+			var graph = treeView.getTree();
+			if (graph != null) {
+				var nodeShapeMap = treeView.getNodeShapeMap();
+				var labelNodes = List.of("label", "x", "y");
+				BiFunction<String, Node, String> labelNodeValue = (label, v) -> {
+					var shape = nodeShapeMap.get(v);
+					return switch (label) {
+						case "label" -> (shape != null && shape.getLabel() != null) ? shape.getLabel().getRawText()
+								: (graph.hasTaxa(v) ? taxaBlock.getLabel(graph.getTaxon(v)) : null);
+						case "x" -> shape != null ? StringUtils.trim("%.4f", shape.getTranslateX()) : null;
+						case "y" -> shape != null ? StringUtils.trim("%.4f", shape.getTranslateY()) : null;
+						default -> null;
+					};
+				};
+				var labelEdges = List.of("weight");
+				BiFunction<String, Edge, String> labelEdgeValue = (label, e) -> switch (label) {
+					case "weight" -> StringUtils.trim("%.8f", graph.getWeight(e));
+					default -> null;
+				};
+				var comment = "Exported from %s: %,d nodes, %,d edges".formatted(ProgramProperties.getProgramName(), graph.getNumberOfNodes(), graph.getNumberOfEdges());
+				var graphLabel = (graph.getName() != null ? graph.getName() : treeView.getName());
 				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
 						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
 			}

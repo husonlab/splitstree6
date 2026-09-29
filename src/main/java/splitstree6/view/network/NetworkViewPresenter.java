@@ -185,6 +185,12 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		networkBlock.addListener(updateListener);
 		view.optionDiagramProperty().addListener(updateListener);
+		// choosing a layout algorithm replaces any coordinates the network arrived with (added before the redraw
+		// listener, so the flag is cleared before drawNetwork() runs); a resize keeps the provided coordinates
+		view.optionLayoutAlgorithmProperty().addListener((v, o, n) -> {
+			if (view.getNetworkBlock() != null)
+				view.getNetworkBlock().setUseProvidedNodeCoordinates(false);
+		});
 		view.optionLayoutAlgorithmProperty().addListener(updateListener);
 
 		// The layout algorithm used to be picked by the parity of the layout seed, and reseeding was a button
