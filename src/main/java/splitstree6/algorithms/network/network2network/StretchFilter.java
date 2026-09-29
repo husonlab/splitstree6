@@ -45,7 +45,7 @@ import java.util.*;
  * Daniel Huson, 2026
  */
 public class StretchFilter extends Network2Network {
-	private final DoubleProperty optionMaxStretchPercent = new SimpleDoubleProperty(this, "optionMaxStretchPercent", 0.0);
+	private final DoubleProperty optionMaxStretchPercent = new SimpleDoubleProperty(this, "optionMaxStretchPercent", 10.0);
 
 	@Override
 	public List<String> listOptions() {
