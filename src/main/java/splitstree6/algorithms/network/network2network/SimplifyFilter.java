@@ -49,10 +49,11 @@ import java.util.*;
  * <p>
  * <b>Why least-cost-first, and why the curve can be trusted.</b> Removing edges can only lengthen shortest
  * paths, so for a fixed edge the cost of removing it is non-decreasing as other edges go. Hence the achieved
- * damage T(k) after k removals is non-decreasing in k: at each step we take the minimum over a subset of edges
+ * deviation T(k) after k removals is non-decreasing in k: at each step we take the minimum over a subset of edges
  * whose costs have only risen, with the previous minimum gone. T(k) is therefore a genuine monotone cost curve,
  * a large jump in it means the edge just removed was carrying geodesics nothing else can carry -- real
- * structure, not redundancy -- and the knee of the curve is a meaningful default. That monotonicity is also
+ * structure, not redundancy -- and the knee of the curve, where the default target Balanced stops, is a
+ * meaningful place to stop. That monotonicity is also
  * what makes the search affordable: a stale cost is a lower bound, so a lazy greedy over a priority queue
  * usually needs one evaluation per step instead of one per edge per step.
  * <p>
@@ -69,15 +70,21 @@ public class SimplifyFilter extends Network2Network {
 	 */
 	public enum Target {
 		/**
-		 * report the trade-off and change nothing. The default, because adding this node to a workflow should
-		 * not silently throw away a quarter of the network -- it should show what the choices cost, so the user
-		 * picks a target once and informed, which is the whole point of the filter
+		 * report the trade-off and change nothing, so that a target can be picked once and informed. The default
+		 * until 9.2026, because a node added to a workflow should not silently remove edges, and Balanced can remove
+		 * a good share of them (10 of 54 on the first dusky dolphins network in the RazorNet examples). Balanced is
+		 * the default now, and the table it prints shows what every other choice would cost
 		 */
 		None,
-		/** no number to choose: stop where the cost curve turns up */
-		Knee,
-		/** stop before the damage exceeds this percent: distortion - 1, or excess relative to the input total */
-		MaxDamagePercent,
+		/**
+		 * the default, with no number to choose: the step that removes the largest share of the chain's edges for
+		 * the smallest share of its total rise in deviation, that is, where further simplification starts to cost
+		 * more than it gains. Called Knee, after the knee of the cost curve, until 9.2026; a workflow saved with
+		 * 'Knee' reads as the default, which is this target
+		 */
+		Balanced,
+		/** stop before the deviation exceeds this percent: distortion - 1, or excess relative to the input total */
+		MaxDeviationPercent,
 		/** stop at this many drawn edges */
 		MaxEdges,
 		/** stop at this many independent cycles; 0 gives a tree */
@@ -87,26 +94,27 @@ public class SimplifyFilter extends Network2Network {
 	}
 
 	/**
-	 * what "damage" means. Auto picks Excess for a haplotype network and Distortion for anything else.
+	 * what "deviation" means: how far the simplified network departs from its input. Auto picks Excess for a
+	 * haplotype network and Distortion for anything else. Called Damage until 9.2026
 	 */
-	public enum Damage {Auto, Distortion, Excess}
+	public enum Deviation {Auto, Distortion, Excess}
 
 	// a removal costs this many times the median cost so far before it counts as a jump, i.e. as having cut
 	// into structure rather than redundancy. 5 is deliberately loose: a false alarm would send the user to a
 	// smaller network than they asked for, and the flag is advisory in any case.
-	// how much more damage than the knee before the report says so. Advisory: the target is still honoured.
-	private static final double PAST_KNEE_FACTOR = 2.0;
+	// how much more deviation than at the balanced step before the report says so. Advisory: the target is still honoured.
+	private static final double PAST_BALANCED_FACTOR = 2.0;
 	private static final int TABLE_ROWS = 12;
 
-	private final ObjectProperty<Target> optionTarget = new SimpleObjectProperty<>(this, "optionTarget", Target.None);
+	private final ObjectProperty<Target> optionTarget = new SimpleObjectProperty<>(this, "optionTarget", Target.Balanced);
 	private final DoubleProperty optionTargetValue = new SimpleDoubleProperty(this, "optionTargetValue", 0.0);
-	private final ObjectProperty<Damage> optionDamage = new SimpleObjectProperty<>(this, "optionDamage", Damage.Auto);
-	private final DoubleProperty optionDamageQuantilePercent = new SimpleDoubleProperty(this, "optionDamageQuantilePercent", 100.0);
+	private final ObjectProperty<Deviation> optionDeviation = new SimpleObjectProperty<>(this, "optionDeviation", Deviation.Auto);
+	private final DoubleProperty optionDeviationQuantilePercent = new SimpleDoubleProperty(this, "optionDeviationQuantilePercent", 100.0);
 	private final BooleanProperty optionReportTable = new SimpleBooleanProperty(this, "optionReportTable", true);
 
 	/** one link of the chain: the state after removing the first {@code index} edges, cheapest first */
 	private record Step(int index, Edge removed, Measures measures, int cycles, int edges, int nodes, double length) {
-		double damage() {
+		double deviation() {
 			return measures.statistic();
 		}
 	}
@@ -126,19 +134,19 @@ public class SimplifyFilter extends Network2Network {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionTarget.getName(), optionTargetValue.getName(), optionDamage.getName(),
-				optionDamageQuantilePercent.getName(), optionReportTable.getName());
+		return List.of(optionTarget.getName(), optionTargetValue.getName(), optionDeviation.getName(),
+				optionDeviationQuantilePercent.getName(), optionReportTable.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
 		if (optionTarget.getName().equals(optionName))
-			return "what to aim for: None (the default) reports the trade-off and leaves the network alone, so you can read off what each choice would cost; Knee stops automatically where the cost curve turns up; MaxDamagePercent, MaxEdges, MaxCycles and EdgeReductionPercent stop at the target value below";
+			return "what to aim for: Balanced (the default) stops where further simplification would cost more than it gains; None reports the trade-off and leaves the network alone, so you can read off what each choice would cost; MaxDeviationPercent, MaxEdges, MaxCycles and EdgeReductionPercent stop at the target value below";
 		else if (optionTargetValue.getName().equals(optionName))
-			return "the value the target is aiming at: a percent for MaxDamagePercent and EdgeReductionPercent, a count of drawn edges for MaxEdges, a count of independent cycles for MaxCycles (0 = a tree). Ignored for Knee";
-		else if (optionDamage.getName().equals(optionName))
-			return "what simplification costs: Distortion = how far pairwise distances are stretched; Excess = how far the mutations drawn exceed the sequence differences (haplotype networks); Auto = Excess for a haplotype network, Distortion otherwise";
-		else if (optionDamageQuantilePercent.getName().equals(optionName))
+			return "the value the target is aiming at: a percent for MaxDeviationPercent and EdgeReductionPercent, a count of drawn edges for MaxEdges, a count of independent cycles for MaxCycles (0 = a tree). Ignored for Balanced and None";
+		else if (optionDeviation.getName().equals(optionName))
+			return "how far the simplified network departs from its input: Distortion = how far pairwise distances are stretched; Excess = how far the mutations drawn exceed the sequence differences (haplotype networks); Auto = Excess for a haplotype network, Distortion otherwise";
+		else if (optionDeviationQuantilePercent.getName().equals(optionName))
 			return "for Distortion: bound this percentile of the pairwise stretches rather than the worst pair (100 = the worst pair). One stubborn pair can otherwise hold the whole filter back; 95 typically removes many more edges at the same apparent faithfulness";
 		else if (optionReportTable.getName().equals(optionName))
 			return "print the whole trade-off table -- cycles, edges, length, distortion and excess along the chain -- so the target can be chosen once, informed, instead of by trial and error";
@@ -158,8 +166,8 @@ public class SimplifyFilter extends Network2Network {
 			}
 			var edges0 = graph.getNumberOfEdges();
 
-			var measure = resolveDamage(outputData, taxa);
-			var quantile = (measure == Damage.Excess ? 100.0 : Math.max(1.0, Math.min(100.0, getOptionDamageQuantilePercent())));
+			var measure = resolveDeviation(outputData, taxa);
+			var quantile = (measure == Deviation.Excess ? 100.0 : Math.max(1.0, Math.min(100.0, getOptionDeviationQuantilePercent())));
 
 			var alive = new HashSet<Edge>();
 			graph.edges().forEach(alive::add);
@@ -179,9 +187,9 @@ public class SimplifyFilter extends Network2Network {
 			// asked of the INPUT block: it is the one with a workflow node, so it is the one that can find the
 			// characters up the workflow. outputData is a fresh copy and its node is not set until this returns.
 			// The taxon sequences are the same in both, so the total is the same.
-			var inputMutations = (measure == Damage.Excess ? inputPairwiseMutations(inputData) : null);
+			var inputMutations = (measure == Deviation.Excess ? inputPairwiseMutations(inputData) : null);
 			var baseline = measures(reference, reference, measure, quantile, inputMutations);
-			damageScale = (measure == Damage.Excess ? pairwiseTotal(reference, inputMutations) : 0);
+			deviationScale = (measure == Deviation.Excess ? pairwiseTotal(reference, inputMutations) : 0);
 
 			// the input as it is DRAWN -- smoothed, so its edge and cycle counts are the ones a size target is
 			// stated against, and the ones the table's first row has to be comparable with
@@ -190,14 +198,14 @@ public class SimplifyFilter extends Network2Network {
 			var chain = buildChain(progress, graph, outputData, taxa, alive, reference, measure, quantile, inputMutations, baseline);
 
 			var choice = chooseStep(chain, inputStep);
-			var knee = knee(chain);
+			var balanced = balancedStep(chain);
 
 			for (var i = 0; i <= choice; i++)
 				graph.deleteEdge(chain.get(i).removed());
 			if (choice >= 0)
 				NetworkSimplification.cleanAndSmooth(graph, outputData, progress);
 
-			report(chain, inputStep, choice, knee, measure, quantile, inputMutations != null);
+			report(chain, inputStep, choice, balanced, measure, quantile, inputMutations != null);
 		} catch (IOException ex) {
 			throw ex;
 		} catch (Exception ex) {
@@ -212,7 +220,7 @@ public class SimplifyFilter extends Network2Network {
 	 * further edges can never reconnect them.
 	 */
 	private List<Step> buildChain(ProgressListener progress, PhyloGraph graph, NetworkBlock block, List<Node> taxa,
-								  Set<Edge> alive, double[][] reference, Damage measure, double quantile,
+								  Set<Edge> alive, double[][] reference, Deviation measure, double quantile,
 								  Double inputMutations, Measures baseline) throws Exception {
 		record Entry(Edge edge, double cost, Measures measures, int stamp) {
 		}
@@ -250,13 +258,13 @@ public class SimplifyFilter extends Network2Network {
 		return chain;
 	}
 
-	/** the chain entry for a state: its damage, and what the network would actually look like once smoothed */
+	/** the chain entry for a state: its deviation, and what the network would actually look like once smoothed */
 	private static Step step(int index, Edge removed, Measures measures, PhyloGraph graph, NetworkBlock block,
 							 Set<Edge> alive, List<Node> taxa) throws Exception {
 		// cycles are invariant under smoothing (it removes a node and an edge at a time), but the edge and node
 		// counts and the length are not, and "at most 60 edges" means 60 DRAWN edges -- so measure a copy that
 		// has actually been smoothed. On the size of network this filter is for, that is a fraction of the cost
-		// of one damage evaluation.
+		// of one deviation evaluation.
 		var copy = new PhyloGraph();
 		try (NodeArray<Node> oldNode2new = graph.newNodeArray(); EdgeArray<Edge> oldEdge2new = graph.newEdgeArray()) {
 			copy.copy(graph, oldNode2new, oldEdge2new);
@@ -315,7 +323,7 @@ public class SimplifyFilter extends Network2Network {
 	 * Every measure of a state, from one pass over the taxon pairs: the statistic the target is stated in, the
 	 * worst-pair distortion, and the excess in mutations.
 	 */
-	private static Measures measures(double[][] distances, double[][] reference, Damage measure, double quantile, Double inputMutations) {
+	private static Measures measures(double[][] distances, double[][] reference, Deviation measure, double quantile, Double inputMutations) {
 		var n = distances.length;
 
 		// UNORDERED pairs, because that is what NetworkSequencesAnalyzer sums over -- its loop runs
@@ -341,7 +349,7 @@ public class SimplifyFilter extends Network2Network {
 			worst = Math.max(worst, ratios[i]);
 
 		double statistic;
-		if (measure == Damage.Excess) {
+		if (measure == Deviation.Excess) {
 			statistic = excess;
 		} else if (quantile >= 100.0 || k == 0) {
 			statistic = worst;
@@ -384,14 +392,14 @@ public class SimplifyFilter extends Network2Network {
 	 * node. (Until 2026-08-21 that fallback was all there was, because every RazorNet network claimed to be a
 	 * haplotype network whether or not it had a single sequence in it.)
 	 */
-	private Damage resolveDamage(NetworkBlock block, List<Node> taxa) {
-		if (getOptionDamage() != Damage.Auto)
-			return getOptionDamage();
+	private Deviation resolveDeviation(NetworkBlock block, List<Node> taxa) {
+		if (getOptionDeviation() != Deviation.Auto)
+			return getOptionDeviation();
 		return switch (block.getNetworkType()) {
-			case HaplotypeNetwork -> Damage.Excess;
-			case DistanceNetwork, Points -> Damage.Distortion;
+			case HaplotypeNetwork -> Deviation.Excess;
+			case DistanceNetwork, Points -> Deviation.Distortion;
 			case Other -> taxa.stream().allMatch(v -> block.getNodeData(v).containsKey(NetworkBlock.NODE_STATES_KEY))
-					? Damage.Excess : Damage.Distortion;
+					? Deviation.Excess : Deviation.Distortion;
 		};
 	}
 
@@ -409,7 +417,7 @@ public class SimplifyFilter extends Network2Network {
 	 * chain, so they cannot disagree with one another -- but the two families of target read the chain from
 	 * opposite ends.
 	 * <p>
-	 * A <b>damage bound</b> asks how far we may go: damage only rises along the chain, so it wants the LARGEST
+	 * A <b>deviation bound</b> asks how far we may go: deviation only rises along the chain, so it wants the LARGEST
 	 * prefix still within the bound. A <b>size target</b> asks for a network of a given shape: edges and cycles
 	 * only fall along the chain, so it wants the SMALLEST prefix that reaches it -- going further would throw
 	 * away structure the target never asked to lose. Conflating the two (the first version did) turns
@@ -422,8 +430,8 @@ public class SimplifyFilter extends Network2Network {
 		var value = getOptionTargetValue();
 		return switch (getOptionTarget()) {
 			case None -> -1;
-			case Knee -> knee(chain);
-			case MaxDamagePercent -> largestPrefixWithin(chain, s -> damagePercent(s.damage()) <= value + 1e-9);
+			case Balanced -> balancedStep(chain);
+			case MaxDeviationPercent -> largestPrefixWithin(chain, s -> deviationPercent(s.deviation()) <= value + 1e-9);
 			case MaxEdges -> smallestPrefixReaching(chain, s -> s.edges() <= value + 1e-9, inputStep);
 			case MaxCycles -> smallestPrefixReaching(chain, s -> s.cycles() <= value + 1e-9, inputStep);
 			case EdgeReductionPercent -> smallestPrefixReaching(chain,
@@ -459,19 +467,20 @@ public class SimplifyFilter extends Network2Network {
 	// set by chooseStep: false when a size target could not be reached even by simplifying all the way
 	private boolean targetReached = true;
 
-	// what MaxDamagePercent is a percent OF. For distortion the scale is implicit (the percent is simply the
+	// what MaxDeviationPercent is a percent OF. For distortion the scale is implicit (the percent is simply the
 	// inflation, distortion - 1); for excess it is the input pairwise total, so the target reads "the distances
 	// drawn may exceed the sequence differences by at most this percent". Set before the target is applied.
-	private double damageScale = 0;
+	private double deviationScale = 0;
 
-	/** the damage of a state in the percent the targets speak in */
-	private double damagePercent(double damage) {
-		return (damageScale > 0 ? 100.0 * damage / damageScale : 100.0 * (damage - 1.0));
+	/** the deviation of a state in the percent the targets speak in */
+	private double deviationPercent(double deviation) {
+		return (deviationScale > 0 ? 100.0 * deviation / deviationScale : 100.0 * (deviation - 1.0));
 	}
 
 	/**
-	 * Where the cost curve turns up: the point furthest below the chord joining its two ends -- the classical
-	 * elbow.
+	 * The step the Balanced target stops at: where the cost curve turns up, the point furthest below the chord
+	 * joining its two ends -- the classical knee, or elbow. With both axes scaled to the chain, that is the step
+	 * maximizing the share of the removals made minus the share of the total rise in deviation incurred.
 	 * <p>
 	 * An earlier version instead took the step before the first removal costing more than a few times the median
 	 * cost so far. That fires far too early, and for a reason inherent to removing edges cheapest-first: most
@@ -480,18 +489,18 @@ public class SimplifyFilter extends Network2Network {
 	 * collapse -- excess 1,975 to 10,651 in one step -- came fifty removals later. The chord is scale-free and
 	 * needs no threshold.
 	 */
-	private static int knee(List<Step> chain) {
+	private static int balancedStep(List<Step> chain) {
 		if (chain.size() < 3)
 			return chain.size() - 1;
-		var first = chain.get(0).damage();
-		var last = chain.get(chain.size() - 1).damage();
+		var first = chain.get(0).deviation();
+		var last = chain.get(chain.size() - 1).deviation();
 		if (last - first < 1e-12)
 			return chain.size() - 1; // nothing costs anything: simplify all the way
 		var best = 0;
 		var bestGap = -1.0;
 		for (var i = 0; i < chain.size(); i++) {
 			var t = (double) i / (chain.size() - 1);
-			var gap = (first + t * (last - first)) - chain.get(i).damage();
+			var gap = (first + t * (last - first)) - chain.get(i).deviation();
 			if (gap > bestGap) {
 				bestGap = gap;
 				best = i;
@@ -505,7 +514,7 @@ public class SimplifyFilter extends Network2Network {
 		var best = -1;
 		var bestDelta = 0.0;
 		for (var i = 1; i < chain.size(); i++) {
-			var delta = chain.get(i).damage() - chain.get(i - 1).damage();
+			var delta = chain.get(i).deviation() - chain.get(i - 1).deviation();
 			if (delta > bestDelta) {
 				bestDelta = delta;
 				best = i;
@@ -514,23 +523,23 @@ public class SimplifyFilter extends Network2Network {
 		return best;
 	}
 
-	private void report(List<Step> chain, Step inputStep, int choice, int knee, Damage measure, double quantile,
+	private void report(List<Step> chain, Step inputStep, int choice, int balanced, Deviation measure, double quantile,
 						boolean excessAgainstSequences) {
 		var jump = steepest(chain);
 		var chosen = (choice >= 0 ? chain.get(choice) : inputStep);
 
 		if (isOptionReportTable() && !chain.isEmpty()) {
-			System.err.printf("Simplify filter: %s damage%s; %,d removals available%n",
-					measure == Damage.Excess ? (excessAgainstSequences ? "excess (against the sequences)" : "excess (against the input network)")
+			System.err.printf("Simplify filter: %s deviation%s; %,d removals available%n",
+					measure == Deviation.Excess ? (excessAgainstSequences ? "excess (against the sequences)" : "excess (against the input network)")
 							: (quantile >= 100 ? "distortion (worst pair)" : "distortion (%.0fth percentile)".formatted(quantile)),
 					"", chain.size());
 			System.err.printf("  %5s %7s %7s %10s %11s %9s %10s%n", "step", "cycles", "edges", "length",
 					"distortion", "excess", quantile >= 100 ? "" : "q%.0f".formatted(quantile));
 			printRow(inputStep, quantile, "");
 			var previous = inputStep;
-			for (var index : tableRows(chain, choice, knee, jump)) {
+			for (var index : tableRows(chain, choice, balanced, jump)) {
 				var s = chain.get(index);
-				var mark = (index == choice ? " <- chosen" : "") + (index == knee ? " <- knee" : "")
+				var mark = (index == choice ? " <- chosen" : "") + (index == balanced ? " <- balanced" : "")
 						   + (index == jump ? " <- jump" : "");
 				// a removal of an edge that smoothing discards anyway changes nothing drawn; printing the same
 				// row again would only make the table look like it is offering a choice that it is not
@@ -545,17 +554,17 @@ public class SimplifyFilter extends Network2Network {
 		var buf = new StringBuilder();
 		buf.append(switch (getOptionTarget()) {
 			case None -> "no target (reporting only)";
-			case Knee -> "knee";
-			case MaxDamagePercent -> "damage <= %s%%".formatted(StringUtils.trim(getOptionTargetValue()));
+			case Balanced -> "balanced";
+			case MaxDeviationPercent -> "deviation <= %s%%".formatted(StringUtils.trim(getOptionTargetValue()));
 			case MaxEdges -> "at most %s edges".formatted(StringUtils.trim(getOptionTargetValue()));
 			case MaxCycles -> "at most %s cycles".formatted(StringUtils.trim(getOptionTargetValue()));
 			case EdgeReductionPercent -> "remove %s%% of edges".formatted(StringUtils.trim(getOptionTargetValue()));
 		});
 		if (choice < 0) {
 			buf.append(switch (getOptionTarget()) {
-				case None -> ": network unchanged; the knee is at %,d cycles, %,d edges, %s".formatted(
-						chain.get(knee).cycles(), chain.get(knee).edges(), describe(chain.get(knee), measure));
-				case Knee -> ": network unchanged (nothing worth removing)";
+				case None -> ": network unchanged; Balanced would stop at %,d cycles, %,d edges, %s".formatted(
+						chain.get(balanced).cycles(), chain.get(balanced).edges(), describe(chain.get(balanced), measure));
+				case Balanced -> ": network unchanged (nothing worth removing)";
 				default -> ": network unchanged (the input already meets it)";
 			});
 		} else {
@@ -567,29 +576,29 @@ public class SimplifyFilter extends Network2Network {
 			if (!Double.isNaN(chosen.measures().excess()))
 				buf.append(", excess %s".formatted(StringUtils.trim((float) chosen.measures().excess())));
 			if (quantile < 100)
-				buf.append(", %.0fth-percentile stretch %.3f".formatted(quantile, chosen.damage()));
-			// "have I gone too far?" answered against the knee rather than against a per-step threshold: the
+				buf.append(", %.0fth-percentile stretch %.3f".formatted(quantile, chosen.deviation()));
+			// "have I gone too far?" answered against the balanced step rather than against a per-step threshold: the
 			// question is not whether some removal was expensive but whether the network being drawn now costs
-			// much more than the one at the elbow did.
-			var kneeDamage = chain.get(knee).damage();
-			var ratio = (Math.abs(kneeDamage) > 1e-9 ? chosen.damage() / kneeDamage : (chosen.damage() > 1e-9 ? Double.POSITIVE_INFINITY : 1.0));
-			if (choice > knee && ratio > PAST_KNEE_FACTOR) {
-				buf.append("; WARNING %.1f times the damage at the knee".formatted(ratio));
-				System.err.printf("WARNING (Simplify filter): this target goes %d removals past the knee, and costs %.1f times as much.%n",
-						choice - knee, ratio);
-				System.err.printf("         chosen (step %d): %,d cycles, %,d edges, %s%n", choice, chosen.cycles(), chosen.edges(), describe(chosen, measure));
-				System.err.printf("         knee   (step %d): %,d cycles, %,d edges, %s%n", knee, chain.get(knee).cycles(), chain.get(knee).edges(), describe(chain.get(knee), measure));
+			// much more than the balanced one did.
+			var balancedDeviation = chain.get(balanced).deviation();
+			var ratio = (Math.abs(balancedDeviation) > 1e-9 ? chosen.deviation() / balancedDeviation : (chosen.deviation() > 1e-9 ? Double.POSITIVE_INFINITY : 1.0));
+			if (choice > balanced && ratio > PAST_BALANCED_FACTOR) {
+				buf.append("; WARNING %.1f times the deviation of the balanced step".formatted(ratio));
+				System.err.printf("WARNING (Simplify filter): this target goes %d removals past the balanced step, and costs %.1f times as much.%n",
+						choice - balanced, ratio);
+				System.err.printf("         chosen   (step %d): %,d cycles, %,d edges, %s%n", choice, chosen.cycles(), chosen.edges(), describe(chosen, measure));
+				System.err.printf("         balanced (step %d): %,d cycles, %,d edges, %s%n", balanced, chain.get(balanced).cycles(), chain.get(balanced).edges(), describe(chain.get(balanced), measure));
 				if (jump > 0)
 					System.err.printf("         The single steepest removal is step %d, which alone cost %s: that edge was carrying%n         geodesics nothing else can carry, so past it the network hides structure the data supports.%n",
-							jump, measure == Damage.Excess
-									? "%s extra mutations".formatted(StringUtils.trim((float) (chain.get(jump).damage() - chain.get(jump - 1).damage())))
-									: "%.3f of stretch".formatted(chain.get(jump).damage() - chain.get(jump - 1).damage()));
+							jump, measure == Deviation.Excess
+									? "%s extra mutations".formatted(StringUtils.trim((float) (chain.get(jump).deviation() - chain.get(jump - 1).deviation())))
+									: "%.3f of stretch".formatted(chain.get(jump).deviation() - chain.get(jump - 1).deviation()));
 			}
 		}
 		setShortDescription(buf.toString());
 	}
 
-	private static String describe(Step s, Damage measure) {
+	private static String describe(Step s, Deviation measure) {
 		return "distortion %.3f%s".formatted(s.measures().distortion(),
 				Double.isNaN(s.measures().excess()) ? "" : ", excess %s".formatted(StringUtils.trim((float) s.measures().excess())));
 	}
@@ -599,15 +608,15 @@ public class SimplifyFilter extends Network2Network {
 				s.cycles(), s.edges(), StringUtils.trim((float) s.length()),
 				"%.3f".formatted(s.measures().distortion()),
 				Double.isNaN(s.measures().excess()) ? "-" : StringUtils.trim((float) s.measures().excess()),
-				quantile >= 100 ? "" : "%.3f".formatted(s.damage()), mark);
+				quantile >= 100 ? "" : "%.3f".formatted(s.deviation()), mark);
 	}
 
-	/** the rows worth printing: evenly spread over the chain, plus the chosen step, the knee and the jump */
-	private static List<Integer> tableRows(List<Step> chain, int choice, int knee, int jump) {
+	/** the rows worth printing: evenly spread over the chain, plus the chosen step, the balanced step and the jump */
+	private static List<Integer> tableRows(List<Step> chain, int choice, int balanced, int jump) {
 		var rows = new TreeSet<Integer>();
 		for (var i = 0; i < TABLE_ROWS; i++)
 			rows.add((int) Math.round((double) i * (chain.size() - 1) / (TABLE_ROWS - 1)));
-		for (var index : List.of(choice, knee, jump)) {
+		for (var index : List.of(choice, balanced, jump)) {
 			if (index >= 0 && index < chain.size())
 				rows.add(index);
 		}
@@ -630,20 +639,20 @@ public class SimplifyFilter extends Network2Network {
 		return optionTargetValue;
 	}
 
-	public Damage getOptionDamage() {
-		return optionDamage.get();
+	public Deviation getOptionDeviation() {
+		return optionDeviation.get();
 	}
 
-	public ObjectProperty<Damage> optionDamageProperty() {
-		return optionDamage;
+	public ObjectProperty<Deviation> optionDeviationProperty() {
+		return optionDeviation;
 	}
 
-	public double getOptionDamageQuantilePercent() {
-		return optionDamageQuantilePercent.get();
+	public double getOptionDeviationQuantilePercent() {
+		return optionDeviationQuantilePercent.get();
 	}
 
-	public DoubleProperty optionDamageQuantilePercentProperty() {
-		return optionDamageQuantilePercent;
+	public DoubleProperty optionDeviationQuantilePercentProperty() {
+		return optionDeviationQuantilePercent;
 	}
 
 	public boolean isOptionReportTable() {
