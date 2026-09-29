@@ -25,7 +25,6 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.CharactersType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -107,8 +106,7 @@ public class StockholmReader extends CharactersReader {
 			}
 		}
 		var states = StringUtils.toString(stateSet, "");
-		characters.setSymbols(states);
-		characters.setDataType(CharactersType.guessType(states));
+		characters.setDataTypeAndSymbolsFromStates(states, getMissing());
 	}
 
 	@Override

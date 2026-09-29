@@ -264,14 +264,35 @@ public class CharactersBlock extends DataBlock {
 		this.dataType = dataType;
 		if (symbols.isBlank())
 			resetSymbols();
-		if (false) {
-			if (dataType == CharactersType.DNA || dataType == CharactersType.RNA)
-				setMissingCharacter('n');
-			else if (dataType == CharactersType.Protein)
-				setMissingCharacter('x');
-			else
-				setMissingCharacter('?');
+	}
+
+	/**
+	 * sets the data type, symbols and missing character from the states observed in the matrix (all symbols other
+	 * than the gap and missing characters), as determined by a reader when auto-detecting the type.
+	 * <p>
+	 * Besides the straightforward case, this recognizes a nucleotide alignment whose only symbol beyond A, C, G, T
+	 * (or U) is N, and reads it as DNA (or RNA) with N as the missing character, rather than as a
+	 * "...withAmbiguityCodes" type that carries N among its symbols. N stands for an unknown base and is treated
+	 * as missing throughout, so this yields the cleaner and more accurate declaration
+	 * (datatype=DNA missing=n symbols="acgt") for such data. It applies only when the reader has not already fixed
+	 * a missing character (missingFromReader == 0), i.e. when no other missing symbol such as '?' is present.
+	 *
+	 * @param states            the observed states, e.g. "acgt" or "acgnt"
+	 * @param missingFromReader the missing character the reader determined, or 0 if none was seen
+	 */
+	public void setDataTypeAndSymbolsFromStates(String states, char missingFromReader) {
+		var symbols = states.toLowerCase();
+		var type = CharactersType.guessType(CharactersType.union(symbols));
+		var missing = missingFromReader;
+		if (missing == 0 && (type == CharactersType.DNAwithAmbiguityCodes || type == CharactersType.RNAwithAmbiguityCodes)
+			&& symbols.replaceAll("[acgtu]", "").equals("n")) {
+			type = (type == CharactersType.DNAwithAmbiguityCodes ? CharactersType.DNA : CharactersType.RNA);
+			symbols = symbols.replace("n", "");
+			missing = 'n';
 		}
+		setSymbols(symbols);
+		setDataType(type);
+		setMissingCharacter(missing); // no-op when 0
 	}
 
 	public boolean isDiploid() {

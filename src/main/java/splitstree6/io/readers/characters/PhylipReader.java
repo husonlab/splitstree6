@@ -25,7 +25,6 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.CharactersType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -143,10 +142,8 @@ public class PhylipReader extends CharactersReader {
 				characters.setDimension(nTax, nChar);
 
 				var states = computeStates(sequences, getMissing(), getGap());
-				characters.setSymbols(states);
-				characters.setDataType(CharactersType.guessType(states));
 				characters.setGapCharacter(getGap());
-				characters.setMissingCharacter(getMissing());
+				characters.setDataTypeAndSymbolsFromStates(states, getMissing());
 
 				for (int i = 0; i < sequences.size(); i++) {
 					var seq = sequences.get(i);
@@ -218,10 +215,8 @@ public class PhylipReader extends CharactersReader {
 				characters.setDimension(nTax, nChar);
 
 				var states = computeStates(sequences, getMissing(), getGap());
-				characters.setSymbols(states);
-				characters.setDataType(CharactersType.guessType(states));
 				characters.setGapCharacter(getGap());
-				characters.setMissingCharacter(getMissing());
+				characters.setDataTypeAndSymbolsFromStates(states, getMissing());
 
 				for (var i = 0; i < sequences.size(); i++) {
 					var seq = sequences.get(i);

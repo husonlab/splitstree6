@@ -28,7 +28,6 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.CharactersType;
 
 import java.io.File;
 import java.io.IOException;
@@ -148,8 +147,7 @@ public class FastAReader extends CharactersReader {
 			}
 		}
 		var states = StringUtils.toString(stateSet, "");
-		characters.setSymbols(states);
-		characters.setDataType(CharactersType.guessType(CharactersType.union(states)));
+		characters.setDataTypeAndSymbolsFromStates(states, getMissing());
 	}
 
 	private static String cutLabel(String infoLine) {

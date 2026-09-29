@@ -113,11 +113,11 @@ public class MSFReader extends CharactersReader {
 		int labelsCounter = 1;
 
 		var states = PhylipReader.computeStates(taxa2seq.values(), getMissing(), getGap());
-		characters.setSymbols(states);
-		if (dataType == CharactersType.Standard || dataType == CharactersType.Protein)
+		if (dataType == CharactersType.Standard || dataType == CharactersType.Protein) {
+			characters.setSymbols(states);
 			characters.setDataType(dataType);
-		else // find out whether DNA or RNA
-			characters.setDataType(CharactersType.guessType(states));
+		} else // find out whether DNA or RNA (treating N as missing)
+			characters.setDataTypeAndSymbolsFromStates(states, getMissing());
 
 		for (var label : taxa2seq.keySet()) {
 			if (taxa2seq.get(label).length() != nchar)

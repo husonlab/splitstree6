@@ -25,7 +25,6 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.CharactersType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -126,10 +125,8 @@ public class ClustalImporter extends CharactersReader {
 
 		characters.setDimension(ntax, nchar);
 		var states = PhylipReader.computeStates(taxa2seq.values(), getMissing(), getGap());
-		characters.setSymbols(states);
-		characters.setDataType(CharactersType.guessType(states));
 		characters.setGapCharacter(getGap());
-		characters.setMissingCharacter(getMissing());
+		characters.setDataTypeAndSymbolsFromStates(states, getMissing());
 
 		for (int i = 0; i < labels.size(); i++) {
 			var seq = taxa2seq.get(labels.get(i));
