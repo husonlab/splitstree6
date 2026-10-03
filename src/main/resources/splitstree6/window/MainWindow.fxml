@@ -594,7 +594,7 @@
             </VBox>
         </top>
         <center>
-            <AnchorPane BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="centerAnchorPane" BorderPane.alignment="CENTER">
                 <BorderPane.margin>
                     <Insets right="2.0" top="2.0"/>
                 </BorderPane.margin>

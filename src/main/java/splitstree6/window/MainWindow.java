@@ -29,6 +29,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import jloda.fx.icons.MaterialIcons;
@@ -295,6 +296,13 @@ public class MainWindow implements IMainWindow {
 
 	public ReadOnlyBooleanProperty emptyProperty() {
 		return empty;
+	}
+
+	@Override
+	public Pane getNotificationPane() {
+		// the document area, not the whole window: the root pane's bottom 30 pixels are the status
+		// bar, and a notification stacked at the bottom of the window would sit on top of it
+		return controller.getCenterAnchorPane();
 	}
 
 	public Parent getRoot() {

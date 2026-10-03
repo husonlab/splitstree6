@@ -418,6 +418,9 @@ public class MainWindowController {
 	private MenuItem openManualInBrowserMenuItem;
 
 	@FXML
+	private AnchorPane centerAnchorPane;
+
+	@FXML
 	private SplitPane mainSplitPane;
 
 	@FXML
@@ -1090,6 +1093,10 @@ public class MainWindowController {
 
 	public MenuItem getAboutMenuItem() {
 		return aboutMenuItem;
+	}
+
+	public AnchorPane getCenterAnchorPane() {
+		return centerAnchorPane;
 	}
 
 	public SplitPane getMainSplitPane() {
