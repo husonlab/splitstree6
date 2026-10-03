@@ -139,6 +139,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 
 		final var graph = networkBlock.getGraph();
 		final var id2node = new TreeMap<Integer, Node>();
+		final var nodeIdsInUse = new BitSet();
 
 		np.matchAnyTokenIgnoreCase("VERTICES NODES"); // nodes deprecated
 
@@ -155,7 +156,10 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				if (id2node.containsKey(id))
 					throw new IOExceptionWithLineNumber("Multiple occurrence of node id: " + id, np.lineno());
 
-				var v = graph.newNode();
+				// a vertex keeps the id that it has in the file, where it can: a network view saves its edits by
+				// vertex id, and they have to reach the same vertices when the file is opened again
+				var v = (isKeepable(id, nNodes) && !nodeIdsInUse.get(id) ? graph.newNode(null, id) : graph.newNode());
+				nodeIdsInUse.set(v.getId());
 				id2node.put(id, v);
 
 				var hasLabel = false;
@@ -191,6 +195,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		np.matchIgnoreCase(";");
 
 		final var id2edge = new TreeMap<Integer, Edge>();
+		final var edgeIdsInUse = new BitSet();
 
 		np.matchIgnoreCase("EDGES");
 		{
@@ -219,7 +224,9 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				final var source = id2node.get(sid);
 				final var target = id2node.get(tid);
 
-				final var e = graph.newEdge(source, target);
+				// as for vertices: an edge keeps its id, which the edits of a view name
+				final var e = (isKeepable(id, nEdges) && !edgeIdsInUse.get(id) ? graph.newEdge(source, target, null, id) : graph.newEdge(source, target));
+				edgeIdsInUse.set(e.getId());
 				id2edge.put(id, e);
 
 				if (np.peekMatchIgnoreCase("label")) {
@@ -255,6 +262,15 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		networkBlock.setUseProvidedNodeCoordinates(networkBlock.hasCoordinatesForAllNodes());
 
 		return taxonNamesFound;
+	}
+
+	/**
+	 * can a vertex or edge keep the id that it has in the file? Not an id that is not positive, and not one far
+	 * beyond the number of vertices or edges, as the arrays of a graph are indexed by id; such an item gets the
+	 * next free id
+	 */
+	private static boolean isKeepable(int id, int numberOfItems) {
+		return id >= 1 && id <= Math.max(1000000L, 10L * numberOfItems);
 	}
 
 	/**
