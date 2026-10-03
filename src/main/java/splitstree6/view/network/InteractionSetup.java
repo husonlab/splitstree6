@@ -233,6 +233,16 @@ public class InteractionSetup {
 	}
 
 	/**
+	 * records the position of a node that has moved, and with it the positions of all nodes that have none yet:
+	 * a node without a saved position is placed by the layout again when the file is opened, and that layout is
+	 * fitted to the window and need not come out as before
+	 */
+	private void recordPosition(Node node, LabeledNodeShape shape) {
+		var updated = NetworkEdits.addTranslateNodeEdits(edits.get(), List.of(node), shape.getTranslateX(), shape.getTranslateY());
+		edits.set(NetworkEdits.addMissingNodePositions(updated, nodeShapeMap));
+	}
+
+	/**
 	 * setup network mouse interaction
 	 */
 	public void apply(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap) {
@@ -241,12 +251,8 @@ public class InteractionSetup {
 
 		for (var node : nodeShapeMap.keySet()) {
 			var shape = nodeShapeMap.get(node);
-			shape.translateXProperty().addListener((v, o, n) -> {
-				edits.set(NetworkEdits.addTranslateNodeEdits(edits.get(), List.of(node), shape.getTranslateX(), shape.getTranslateY()));
-			});
-			shape.translateYProperty().addListener((v, o, n) -> {
-				edits.set(NetworkEdits.addTranslateNodeEdits(edits.get(), List.of(node), shape.getTranslateX(), shape.getTranslateY()));
-			});
+			shape.translateXProperty().addListener((v, o, n) -> recordPosition(node, shape));
+			shape.translateYProperty().addListener((v, o, n) -> recordPosition(node, shape));
 
 			var start = new Single<Point2D>();
 

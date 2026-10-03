@@ -32,8 +32,11 @@ import jloda.util.StringUtils;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * maintains string array recording network edits
@@ -129,6 +132,25 @@ public class NetworkEdits {
 
 	public static String[] addLayoutNodeLabelEdits(String[] editsString, Collection<Node> nodes, double layoutX, double layoutY) {
 		return addEdits(editsString, nodes.stream().map(n -> Edit.createLayoutNodeLabelEdit(n.getId(), layoutX, layoutY)).toList());
+	}
+
+	/**
+	 * adds the position of every node that has none, so that a drawing in which any node has been moved is saved
+	 * with the positions of all its nodes
+	 */
+	public static String[] addMissingNodePositions(String[] editsString, Map<Node, LabeledNodeShape> nodeShapeMap) {
+		var withPosition = new HashSet<Integer>();
+		for (var editString : editsString) {
+			var edit = Edit.parse(editString);
+			if (edit != null && edit.code().equals("mn"))
+				withPosition.add(edit.id());
+		}
+		var missing = new ArrayList<Edit>();
+		for (var entry : nodeShapeMap.entrySet()) {
+			if (!withPosition.contains(entry.getKey().getId()))
+				missing.add(Edit.createTranslateNodeEdit(entry.getKey().getId(), entry.getValue().getTranslateX(), entry.getValue().getTranslateY()));
+		}
+		return missing.isEmpty() ? editsString : addEdits(editsString, missing);
 	}
 
 	public static String[] addEdits(String[] editsString, Collection<Edit> newEdits) {
