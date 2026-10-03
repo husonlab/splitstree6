@@ -256,5 +256,8 @@ module splitstreesix {
 	exports splitstree6.view.format.taxlabel;
 	exports splitstree6.view.alignment;
 	exports splitstree6.cite;
+	exports splitstree6.algorithms.network.network2network;
+	exports splitstree6.algorithms.distances.distances2splits;
+	exports splitstree6.layout.splits.algorithms;
 
 }

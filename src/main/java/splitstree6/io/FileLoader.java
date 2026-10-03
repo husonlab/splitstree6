@@ -53,7 +53,7 @@ public class FileLoader {
 			RecentFilesManager.getInstance().insertRecentFile(fileName);
 		} else {
 			if (editorTab != null) {
-				NotificationManager.showWarning("Input editor is not empty, will open in new Window");
+				NotificationManager.showInformation("Input editor is not empty, will open in new Window");
 			}
 
 			var newWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(mainWindow);

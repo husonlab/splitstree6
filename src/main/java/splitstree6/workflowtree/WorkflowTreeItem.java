@@ -19,6 +19,7 @@
 
 package splitstree6.workflowtree;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
@@ -29,6 +30,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import jloda.fx.icons.MaterialIcons;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.FileUtils;
 import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
@@ -58,6 +60,20 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		label.textProperty().bind(Bindings.createStringBinding(() -> FileUtils.getFileNameWithoutPath(mainWindow.getFileName()), mainWindow.fileNameProperty()));
 		label.setGraphic(MaterialIcons.graphic("source"));
 		setGraphic(label);
+
+		if (ProgramProperties.isDesktop()) {
+			// on the desktop, show the document's full file path as a tooltip on the file node, but only while the
+			// document is actually associated with a file (an unsaved "Untitled" document has none)
+			tooltip.textProperty().bind(mainWindow.fileNameProperty());
+			InvalidationListener updateTooltip = e -> {
+				if (FileUtils.fileExistsAndIsNonEmpty(mainWindow.getFileName()))
+					Tooltip.install(label, tooltip);
+				else
+					Tooltip.uninstall(label, tooltip);
+			};
+			mainWindow.fileNameProperty().addListener(updateTooltip);
+			updateTooltip.invalidated(null);
+		}
 
 		label.setOnMouseClicked(e -> {
 			if (mainWindow.isEmpty() && e.getClickCount() == 2) {
