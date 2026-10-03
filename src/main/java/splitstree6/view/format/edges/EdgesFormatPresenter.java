@@ -74,10 +74,11 @@ public class EdgesFormatPresenter {
 						var undoList = new UndoableRedoableCommandList("line width");
 						var width = n.doubleValue();
 						var edits = new ArrayList<TreeEdits.Edit>();
+						var positions = TreeEdits.edgePositions(edgeSelectionModel.getSelectedItems());
 
 						for (var edge : edgeSelectionModel.getSelectedItems()) {
 							if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
-								edits.add(new TreeEdits.Edit('w', edge.getId(), width));
+								edits.add(new TreeEdits.Edit('w', positions.get(edge), width));
 								var oldWidth = shape.getStrokeWidth();
 								undoList.add(shape.strokeWidthProperty(), oldWidth, width);
 							}
@@ -98,12 +99,13 @@ public class EdgesFormatPresenter {
 				var undoList = new UndoableRedoableCommandList("line color");
 				var color = controller.getColorPicker().getValue();
 				var edits = new ArrayList<TreeEdits.Edit>();
+				var positions = TreeEdits.edgePositions(edgeSelectionModel.getSelectedItems());
 
 				for (var edge : edgeSelectionModel.getSelectedItems()) {
 					if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 						var oldColor = shape.getStroke();
 						if (!color.equals(oldColor)) {
-							edits.add(new TreeEdits.Edit('c', edge.getId(), color));
+							edits.add(new TreeEdits.Edit('c', positions.get(edge), color));
 
 							var hasGraphEdgeStyleClass = shape.getStyleClass().contains("graph-edge");
 							undoList.add(() -> {

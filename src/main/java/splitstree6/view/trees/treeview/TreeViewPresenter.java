@@ -66,6 +66,7 @@ import splitstree6.window.MainWindow;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.Arrays;
 
 /**
  * single tree presenter
@@ -297,9 +298,10 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 							treePane.set(pane);
 							pane.setRunAfterUpdate(() -> {
 								if (view.getOptionEdits().length > 0) {
-									TreeEdits.applyEdits(view.getOptionEdits(), view.getEdgeShapeMap());
-									if (false)
-										Platform.runLater(() -> TreeEdits.clearEdits(view.optionEditsProperty()));
+									// edits from an older file name their edges by id; they come back named by position
+									var edits = TreeEdits.applyEdits(view.getOptionEdits(), view.getEdgeShapeMap());
+									if (!Arrays.equals(edits, view.getOptionEdits()))
+										view.setOptionEdits(edits);
 								}
 								updateCounter.set(updateCounter.get() + 1);
 							});
