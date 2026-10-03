@@ -53,6 +53,11 @@ public class StretchFilter extends Network2Network {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Removes edges from a network while keeping every pairwise taxon distance within a stated percentage of its value in the input.";
+	}
+
+	@Override
 	public String getToolTip(String optionName) {
 		if (optionMaxStretchPercent.getName().equals(optionName))
 			return "remove edges while keeping every pairwise taxon distance within this percent of its value in the input network (0 = keep the network unchanged)";

@@ -139,6 +139,11 @@ public class SimplifyFilter extends Network2Network {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Simplifies a network by removing edges, stopping at a stated deviation, edge count or cycle count.";
+	}
+
+	@Override
 	public String getToolTip(String optionName) {
 		if (optionTarget.getName().equals(optionName))
 			return "what to aim for: Balanced (the default) stops where further simplification would cost more than it gains; None reports the trade-off and leaves the network alone, so you can read off what each choice would cost; MaxDeviationPercent, MaxEdges, MaxCycles and EdgeReductionPercent stop at the target value below";
