@@ -154,6 +154,33 @@ public class OptionIO {
 	/**
 	 * write options
 	 */
+	/**
+	 * what an algorithm says about one of its options, asked for the way that algorithm expects to be asked
+	 * <p>
+	 * The classes are not consistent about it. Most compare the name they are handed against the bare option
+	 * name ("Target"), which is what this method has always passed. Some compare it against their property's
+	 * name ("optionTarget") and so never matched, falling through to the base getToolTip, which hands the name
+	 * straight back: 16 options had a tooltip written for them that was never shown anywhere. And some build
+	 * the text out of whatever they are given, so asking with the wrong spelling yields "set the option min
+	 * number trees" rather than "set the min number trees".
+	 * <p>
+	 * So: ask with the bare name, exactly as before, and only when that yields nothing ask again with the
+	 * prefixed one. Nothing that answered before can change its answer.
+	 *
+	 * @return the description, or null if the algorithm has none for this option
+	 */
+	private static String describeOption(Algorithm<?, ?> algorithm, String name) {
+		var usage = algorithm.getToolTip(name);
+		if (usage != null && !usage.equals(name) && usage.length() > 2)
+			return usage;
+		var prefixed = "option" + name;
+		usage = algorithm.getToolTip(prefixed);
+		if (usage != null && usage.length() > 2 && !usage.equals(prefixed)
+			&& !usage.equals(StringUtils.fromCamelCase(prefixed)))
+			return usage;
+		return null;
+	}
+
 	public static String optionsUsage(IOptionsCarrier optionsCarrier) {
 		var buf = new StringBuilder();
 		if (optionsCarrier != null) {
@@ -169,8 +196,8 @@ public class OptionIO {
 						} else
 							buf.append(" <").append(option.getOptionValueType().toString()).append(">");
 						if (optionsCarrier instanceof Algorithm<?, ?> algorithm) {
-							var usage = algorithm.getToolTip(name);
-							if (usage != null && !usage.equals(name) && usage.length() > 2) {
+							var usage = describeOption(algorithm, name);
+							if (usage != null) {
 								buf.append(" - %s".formatted(usage.substring(0, 1).toLowerCase() + usage.substring(1)));
 							}
 						}
