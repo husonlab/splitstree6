@@ -149,7 +149,7 @@ public class TN93Distance extends Characters2Distances {
 
 	@Override
 	public String getCitation() {
-		return "Tamura & Nei, 1993;K Tamura and M Nei. Estimation of the number of nucleotide substitutions in the control region of mitochondrial DNA in humans and chimpanzees. Molecular Biology and Evolution, 10(3), 512–526, 1993";
+		return "Tamura & Nei 1993;K Tamura and M Nei. Estimation of the number of nucleotide substitutions in the control region of mitochondrial DNA in humans and chimpanzees. Molecular Biology and Evolution, 10(3), 512–526, 1993";
 	}
 
 	@Override

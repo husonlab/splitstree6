@@ -89,7 +89,7 @@ public class RobinsonFouldsDistances extends Trees2ReportBase {
 
 	@Override
 	public String getCitation() {
-		return "Robinson & Foulds (1981);DF Robinson and LR Foulds. Comparison of phylogenetic trees. Mathematical Biosciences. 53(1–2):131–147, 1981.";
+		return "Robinson & Foulds 1981;DF Robinson and LR Foulds. Comparison of phylogenetic trees. Mathematical Biosciences. 53(1–2):131–147, 1981.";
 	}
 
 	@Override
