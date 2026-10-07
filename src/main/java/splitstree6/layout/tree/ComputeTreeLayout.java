@@ -30,12 +30,14 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
+import jloda.phylo.CommentData;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.phylogeny.dolayout.NetworkDisplacementOptimization;
 import jloda.phylogeny.layout.Averaging;
 import jloda.phylogeny.layout.LayoutRootedPhylogeny;
 import jloda.util.IteratorUtils;
+import splitstree6.compute.phylofusion.TreeTracing;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -84,13 +86,23 @@ public class ComputeTreeLayout {
 		if (optimizeReticulationEdges && tree.hasReticulateEdges()) {
 				LSAUtils.setLSAChildrenAndTransfersMap(tree);
 				var reticulateMap = new HashMap<Node, List<Node>>();
+				var multiplicityMap=new HashMap<Node,HashMap<Node,Integer>>();
 				for (var e : tree.edges()) {
 					if (tree.isReticulateEdge(e) && !tree.isTransferAcceptorEdge(e)) {
+						var multiplicity=1;
+						if(tree.getData(e) instanceof CommentData data) {
+							var trees=data.getIntSetValue("TT");
+							if (trees.isPresent()) {
+								multiplicity=Math.max(1,trees.get().cardinality());
+							}
+						}
 						reticulateMap.computeIfAbsent(e.getSource(), k -> new ArrayList<>()).add(e.getTarget());
+						multiplicityMap.computeIfAbsent(e.getSource(),k->new HashMap<>()).put(e.getTarget(),multiplicity);
 						reticulateMap.computeIfAbsent(e.getTarget(), k -> new ArrayList<>()).add(e.getSource());
+						multiplicityMap.computeIfAbsent(e.getTarget(),k->new HashMap<>()).put(e.getSource(),multiplicity);
 					}
 				}
-				var result = NetworkDisplacementOptimization.apply(tree.getRoot(), tree.getLSAChildrenMap()::get, reticulateMap::get, diagram.isRadialOrCircular(), () -> false);
+				var result = NetworkDisplacementOptimization.apply(tree.getRoot(), tree.getLSAChildrenMap()::get, reticulateMap::get,(v,w)->multiplicityMap.get(v).get(w),diagram.isRadialOrCircular(),new Random(666), () -> false);
 				tree.getLSAChildrenMap().clear();
 				tree.getLSAChildrenMap().putAll(result);
 				optimizeReticulationEdges = false;
