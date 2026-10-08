@@ -304,9 +304,9 @@ public class PhyloFusion extends Trees2Trees {
 		if (getOptionGroupNonSeparated()) {
 			// tree tracing (Banu Cetinkaya): grouping keeps tree order and count but may replace the tree objects,
 			// so carry the represented ids across positionally
-			var idsBefore = tracedTreeIds != null ? trees.stream().map(this::idsOf).toList() : null;
+			var idsBefore = (tracedTreeIds != null ? trees.stream().map(this::idsOf).toList() : null);
 			repGroupMap.putAll(groupNonSeparatedTaxa(taxa, trees, taxLabelMap));
-			if (tracedTreeIds != null) {
+			if (tracedTreeIds != null && idsBefore != null) {
 				for (var i = 0; i < trees.size(); i++)
 					tracedTreeIds.put(trees.get(i), idsBefore.get(i));
 			}
