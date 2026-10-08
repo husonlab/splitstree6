@@ -179,7 +179,7 @@ public class TreePane extends StackPane {
 
 			var optimizeReticulationEdgesFinal = (optimizeReticulationEdges || (phyloTree.hasReticulateEdges() && !phyloTree.hasLSAChildrenMap()));
 
-			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, scaling, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap, optimizeReticulationEdgesFinal, true);
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, scaling, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap, optimizeReticulationEdgesFinal, true,false);
 		});
 
 		service.setOnSucceeded(a -> {

@@ -37,7 +37,6 @@ import jloda.phylogeny.dolayout.NetworkDisplacementOptimization;
 import jloda.phylogeny.layout.Averaging;
 import jloda.phylogeny.layout.LayoutRootedPhylogeny;
 import jloda.util.IteratorUtils;
-import splitstree6.compute.phylofusion.TreeTracing;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -62,7 +61,7 @@ public class ComputeTreeLayout {
 	 */
 	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, Averaging averaging,
 							   LayoutRootedPhylogeny.Scaling cladogramScaling, double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap,
-							   Map<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges, boolean reticulateEdgesAreSpecial) {
+							   Map<Edge, LabeledEdgeShape> edgeShapeMap, boolean optimizeReticulationEdges, boolean reticulateEdgesAreSpecial, boolean useReticulateEdgeMultiplicities) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
 
@@ -90,7 +89,7 @@ public class ComputeTreeLayout {
 				for (var e : tree.edges()) {
 					if (tree.isReticulateEdge(e) && !tree.isTransferAcceptorEdge(e)) {
 						var multiplicity=1;
-						if(tree.getData(e) instanceof CommentData data) {
+						if(useReticulateEdgeMultiplicities && tree.getData(e) instanceof CommentData data) {
 							var trees=data.getIntSetValue("TT");
 							if (trees.isPresent()) {
 								multiplicity=Math.max(1,trees.get().cardinality());
