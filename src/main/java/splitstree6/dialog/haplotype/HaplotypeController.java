@@ -23,13 +23,16 @@ package splitstree6.dialog.haplotype;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import jloda.fx.util.ProgramProperties;
 import splitstree6.algorithms.AlgorithmList;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
+import splitstree6.utils.CollapseIdenticalHyplotypes;
 
 import java.util.ArrayList;
 
@@ -50,6 +53,8 @@ public class HaplotypeController {
 
 	@FXML
 	private ChoiceBox<String> methodChoice;
+	@FXML
+	private CheckBox completeSitesCheckBox;
 
 	@FXML
 	private Button cancelBtn;
@@ -73,6 +78,8 @@ public class HaplotypeController {
 
 		ProgramProperties.track("HaplotypeSequencesFile", sequencesField.textProperty(), "");
 		ProgramProperties.track("HaplotypeTraitsFile", traitsField.textProperty(), "");
+		completeSitesCheckBox.selectedProperty().bindBidirectional(CollapseIdenticalHyplotypes.completeSitesOnlyProperty);
+		completeSitesCheckBox.setTooltip(new Tooltip("Drop every column in which some sequence has a gap, a missing or an ambiguous character before comparing sequences, as PopART does; otherwise every pair is compared at the sites that both sequences have"));
 	}
 
 	public Node getRoot() {
@@ -97,6 +104,10 @@ public class HaplotypeController {
 
 	public ChoiceBox<String> getMethodChoice() {
 		return methodChoice;
+	}
+
+	public CheckBox getCompleteSitesCheckBox() {
+		return completeSitesCheckBox;
 	}
 
 	public Button getCancelBtn() {

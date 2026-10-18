@@ -70,7 +70,8 @@ public class HaplotypePresenter {
 			var result = new Result(
 					safe(controller.getSequencesField().getText()),
 					safe(controller.getTraitsField().getText()),
-					controller.getMethodChoice().getSelectionModel().getSelectedItem()
+					controller.getMethodChoice().getSelectionModel().getSelectedItem(),
+					controller.getCompleteSitesCheckBox().isSelected()
 			);
 			try {
 				ImportHaplotypeApply.apply(result);
@@ -96,6 +97,6 @@ public class HaplotypePresenter {
 	/**
 	 * Immutable result returned when user presses Apply.
 	 */
-	public record Result(String sequencesPath, String traitsPath, String method) {
+	public record Result(String sequencesPath, String traitsPath, String method, boolean completeSitesOnly) {
 	}
 }

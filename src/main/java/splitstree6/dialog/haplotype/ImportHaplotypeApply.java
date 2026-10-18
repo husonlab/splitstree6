@@ -75,7 +75,7 @@ public class ImportHaplotypeApply {
 			FileUtils.checkFileReadableNonEmpty(result.traitsPath());
 			originalTaxa.setTraitsBlock(readTraits(new File(result.traitsPath()), originalTaxa));
 		}
-		var data = CollapseIdenticalHyplotypes.apply(originalTaxa, originalCharacters);
+		var data = CollapseIdenticalHyplotypes.apply(originalTaxa, originalCharacters, result.completeSitesOnly());
 		if (true) {
 			if (data != null) {
 				var taxaBlock = data.getFirst();

@@ -19,6 +19,9 @@
 
 package splitstree6.utils;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Graph;
 import jloda.graph.algorithms.ConnectedComponents;
@@ -30,6 +33,7 @@ import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
+import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.Taxon;
 
 import java.io.IOException;
@@ -37,26 +41,55 @@ import java.util.*;
 
 /**
  * any two sequences are considered to belong to the same haplotype if they are connected by a chain of sequences
- * in which any two consecutive sequences have Hamming distance 0
- * Daniel Huson, updated 9.2024
+ * in which any two consecutive sequences have Hamming distance 0. Which sites the Hamming distance compares is a
+ * choice: all sites, where a site with a gap or a missing character in either sequence is left out of that pair
+ * (the default), or only the sites that are complete in every sequence, where every column in which some sequence
+ * has a gap, a missing or an ambiguous character is dropped, as PopART does. The two can differ: two sequences that
+ * differ only at a site that a third sequence lacks are two haplotypes under the first rule and one under the second.
+ * Daniel Huson, updated 9.2024, 10.2026
  */
 public class CollapseIdenticalHyplotypes {
 	/**
-	 * collapse identical haplotypes
+	 * the last choice of the sites compared, remembered between sessions and shared by the menu item and the
+	 * haplotype import dialog: true for only the sites complete in every sequence, false for all sites
+	 */
+	public static final BooleanProperty completeSitesOnlyProperty = new SimpleBooleanProperty(null, "completeSitesOnly", false);
+
+	static {
+		ProgramProperties.track("HaplotypeCompleteSitesOnly", completeSitesOnlyProperty, false);
+	}
+
+	/**
+	 * collapse identical haplotypes, comparing all sites pairwise
 	 *
 	 * @param inputTaxa       taxa
 	 * @param inputCharacters characters
 	 * @return new taxa block, traits block and characters block
 	 */
 	public static Triplet<TaxaBlock, TraitsBlock, CharactersBlock> apply(TaxaBlock inputTaxa, CharactersBlock inputCharacters) {
+		return apply(inputTaxa, inputCharacters, false);
+	}
+
+	/**
+	 * collapse identical haplotypes
+	 *
+	 * @param inputTaxa         taxa
+	 * @param inputCharacters   characters
+	 * @param completeSitesOnly compare the sequences only at the sites that are complete in every sequence, that is,
+	 *                          drop every column in which some sequence has a gap, a missing or an ambiguous character,
+	 *                          as PopART does; otherwise compare every pair at the sites that both sequences have
+	 * @return new taxa block, traits block and characters block
+	 */
+	public static Triplet<TaxaBlock, TraitsBlock, CharactersBlock> apply(TaxaBlock inputTaxa, CharactersBlock inputCharacters, boolean completeSitesOnly) {
 		var taxLabelMap = new TreeMap<Integer, List<String>>();
 		for (var t = 1; t <= inputTaxa.getNtax(); t++) {
 			taxLabelMap.computeIfAbsent(t, k -> new ArrayList<>()).add(inputTaxa.getLabel(t));
 		}
 
+		var compared = (completeSitesOnly ? restrictToCompleteSites(inputCharacters) : inputCharacters);
 		var distancesBlock = new DistancesBlock();
 		try {
-			(new HammingDistance()).compute(new ProgressPercentage(), inputTaxa, inputCharacters, distancesBlock);
+			(new HammingDistance()).compute(new ProgressPercentage(), inputTaxa, compared, distancesBlock);
 		} catch (IOException ignored) {
 			// can't happen because progress-percentage can't be canceled
 		}
@@ -177,8 +210,47 @@ public class CollapseIdenticalHyplotypes {
 					}
 				}
 			}
-			NotificationManager.showInformation("Unique haplotypes: " + outputTaxa.getNtax());
+			NotificationManager.showInformation("Unique haplotypes: " + outputTaxa.getNtax()
+												+ (completeSitesOnly ? " (compared at the %,d of %,d sites complete in every sequence)".formatted(compared.getNchar(), inputCharacters.getNchar()) : ""));
 		}
 		return new Triplet<>(outputTaxa, outputTraits, outputCharacters);
+	}
+
+	/**
+	 * the alignment restricted to the columns in which no sequence has a gap, a missing or an ambiguous character
+	 *
+	 * @param characters the alignment
+	 * @return a new characters block with those columns, in order
+	 */
+	public static CharactersBlock restrictToCompleteSites(CharactersBlock characters) {
+		var ntax = characters.getNtax();
+		var complete = new ArrayList<Integer>();
+		for (var c = 1; c <= characters.getNchar(); c++) {
+			var ok = true;
+			for (var t = 1; t <= ntax && ok; t++)
+				ok = !isIncomplete(characters.get(t, c), characters);
+			if (ok)
+				complete.add(c);
+		}
+		var result = new CharactersBlock();
+		result.setDimension(ntax, complete.size());
+		result.setDataType(characters.getDataType());
+		result.setGapCharacter(characters.getGapCharacter());
+		result.setMissingCharacter(characters.getMissingCharacter());
+		var matrix = result.getMatrix();
+		for (var t = 1; t <= ntax; t++)
+			for (var k = 0; k < complete.size(); k++)
+				matrix[t - 1][k] = characters.get(t, complete.get(k));
+		return result;
+	}
+
+	/**
+	 * a gap, the missing character or, for nucleotides, a code that stands for more than one base, and 'x' for proteins
+	 */
+	private static boolean isIncomplete(char ch, CharactersBlock characters) {
+		var lower = Character.toLowerCase(ch);
+		return lower == Character.toLowerCase(characters.getGapCharacter()) || lower == Character.toLowerCase(characters.getMissingCharacter())
+			   || (characters.getDataType().isNucleotides() && "nryswkmbdhv".indexOf(lower) >= 0)
+			   || (characters.getDataType() == CharactersType.Protein && lower == 'x');
 	}
 }

@@ -375,7 +375,10 @@ public class MainWindowPresenter {
 
 		controller.getGroupIdenticalHaplotypesMenuItem().setOnAction(e -> {
 			if (workflow.getWorkingDataBlock() instanceof CharactersBlock charactersBlock) {
-				var output = CollapseIdenticalHyplotypes.apply(workflow.getWorkingTaxaBlock(), charactersBlock);
+				var completeSitesOnly = askWhichSitesToCompare(mainWindow.getStage());
+				if (completeSitesOnly == null)
+					return;
+				var output = CollapseIdenticalHyplotypes.apply(workflow.getWorkingTaxaBlock(), charactersBlock, completeSitesOnly);
 				if (output != null) {
 					try {
 						var w = new StringWriter();
@@ -1039,5 +1042,27 @@ public class MainWindowPresenter {
 				}
 			}
 		}
+	}
+
+	/**
+	 * asks which sites Group Identical Haplotypes compares, and remembers the answer for the next time
+	 *
+	 * @return true for only the sites complete in every sequence, false for all sites pairwise, null if cancelled
+	 */
+	private static Boolean askWhichSitesToCompare(Stage stage) {
+		var allSites = "All sites, pairwise (a site with a gap or missing data in either sequence is skipped)";
+		var completeSites = "Only sites complete in every sequence (as PopART: columns with a gap, missing or ambiguous data are dropped)";
+		var remembered = CollapseIdenticalHyplotypes.completeSitesOnlyProperty.get();
+		var dialog = new ChoiceDialog<>(remembered ? completeSites : allSites, List.of(allSites, completeSites));
+		dialog.initOwner(stage);
+		dialog.setTitle("Group Identical Haplotypes");
+		dialog.setHeaderText("Two sequences are identical if they differ at none of the sites compared");
+		dialog.setContentText("Sites compared:");
+		var answer = dialog.showAndWait();
+		if (answer.isEmpty())
+			return null;
+		var completeSitesOnly = answer.get().equals(completeSites);
+		CollapseIdenticalHyplotypes.completeSitesOnlyProperty.set(completeSitesOnly);
+		return completeSitesOnly;
 	}
 }
