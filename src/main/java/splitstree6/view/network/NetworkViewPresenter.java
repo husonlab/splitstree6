@@ -86,6 +86,11 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	 * the same, see {@link RectilinearLayout}
 	 */
 	private static final long STRAIGHTEN_BUDGET_MILLIS = 2000;
+	/**
+	 * the gap between a node's outline and its label after straightening, when every label goes to the bottom
+	 * right of its node
+	 */
+	private static final double LABEL_GAP = 3;
 
 	/**
 	 * the network view presenter
@@ -228,7 +233,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		var straightenButton = controller.getStraightenButton();
 		straightenButton.setOnAction(e -> straighten());
-		straightenButton.setTooltip(new Tooltip("Straighten: move the nodes on the grid so that edges run horizontally, vertically or diagonally, with few crossings"));
+		straightenButton.setTooltip(new Tooltip("Straighten: move the nodes on the grid so that edges run horizontally, vertically or diagonally, with few crossings, and put every label at the bottom right of its node"));
 		straightenButton.disableProperty().bind(view.emptyProperty().or(straightening));
 
 		controller.getZoomInButton().setOnAction(e -> view.setOptionZoomFactor(1.1 * view.getOptionZoomFactor()));
@@ -430,15 +435,15 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				newPositions.put(shapes.get(v), new Point2D(spacing * result.get(v).x(), spacing * result.get(v).y()));
 			grid.setSpacing(spacing);
 			grid.setSnap(true);
-			setPositions(newPositions);
+			setPositions(newPositions, true);
 			view.getUndoManager().add("straighten", () -> {
 				grid.setSpacing(oldSpacing);
 				grid.setSnap(oldSnap);
-				setPositions(oldPositions);
+				setPositions(oldPositions, false);
 			}, () -> {
 				grid.setSpacing(spacing);
 				grid.setSnap(true);
-				setPositions(newPositions);
+				setPositions(newPositions, true);
 			});
 		}, ex -> {
 			straightening.set(false);
@@ -447,11 +452,22 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	}
 
 	private void setPositions(Map<LabeledNodeShape, Point2D> positions) {
+		setPositions(positions, false);
+	}
+
+	/**
+	 * moves the nodes and then places the labels: radially, as the layout does, or every label at the bottom
+	 * right of its node, which suits a straightened drawing
+	 */
+	private void setPositions(Map<LabeledNodeShape, Point2D> positions, boolean labelsBottomRight) {
 		for (var entry : positions.entrySet()) {
 			entry.getKey().setTranslateX(entry.getValue().getX());
 			entry.getKey().setTranslateY(entry.getValue().getY());
 		}
-		updateLabelLayout();
+		if (labelsBottomRight)
+			NetworkLayout.placeLabelsBottomRight(positions.keySet(), LABEL_GAP);
+		else
+			updateLabelLayout();
 	}
 
 	public FindToolBar getFindToolBar() {

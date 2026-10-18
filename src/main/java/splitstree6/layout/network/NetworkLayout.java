@@ -492,6 +492,28 @@ public class NetworkLayout {
 		return labelLayout;
 	}
 
+	/**
+	 * places every label at the bottom right of its node, as haplotype networks are often labelled by hand: the
+	 * top left corner of the label goes to the point of the node's outline 45 degrees below right, plus a gap.
+	 * The label stays bound to the node, so it follows when the node is moved, and a label that was moved by
+	 * hand returns to its node. Used after straightening; a new layout places the labels radially again.
+	 *
+	 * @param shapes the node shapes, each with its label, if any
+	 * @param gap    the gap between the node's outline and the label, in pixels
+	 */
+	public static void placeLabelsBottomRight(Collection<LabeledNodeShape> shapes, double gap) {
+		for (var shape : shapes) {
+			var label = shape.getLabel();
+			if (label != null) {
+				var offset = 0.5 * Math.max(shape.prefWidth(0), shape.prefHeight(0)) / Math.sqrt(2) + gap;
+				label.setLayoutX(0);
+				label.setLayoutY(0);
+				label.translateXProperty().bind(shape.translateXProperty().add(offset));
+				label.translateYProperty().bind(shape.translateYProperty().add(offset));
+			}
+		}
+	}
+
 	public static ToDoubleFunction<Edge> setupScaling(PhyloGraph graph) {
 		var epsilon = 0.00001;
 		var minNonZero = graph.edgeStream().mapToDouble(graph::getWeight).filter(x -> x > epsilon).min().orElse(1.0);
