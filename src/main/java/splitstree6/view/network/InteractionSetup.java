@@ -323,10 +323,14 @@ public class InteractionSetup {
 			var shape = entry.getValue();
 			shape.setOnMouseClicked(e -> {
 				if (e.isStillSincePress()) {
-					if (!e.isShiftDown() && !e.isShortcutDown() && ProgramProperties.isDesktop()) {
-						nodeSelectionModel.clearSelection();
+					// shift or the shortcut key toggles the node, as a click on its label does; a plain click selects it alone
+					if (e.isShiftDown() || e.isShortcutDown())
+						nodeSelectionModel.toggleSelection(v);
+					else {
+						if (ProgramProperties.isDesktop())
+							nodeSelectionModel.clearSelection();
+						nodeSelectionModel.select(v);
 					}
-					nodeSelectionModel.select(v);
 					e.consume();
 				}
 			});
@@ -420,10 +424,13 @@ public class InteractionSetup {
 				var shape = entry.getValue();
 				shape.setOnMouseClicked(e -> {
 					if (e.isStillSincePress()) {
-						if (!e.isShiftDown() && !e.isShortcutDown() && ProgramProperties.isDesktop()) {
-							edgeSelectionModel.clearSelection();
+						if (e.isShiftDown() || e.isShortcutDown())
+							edgeSelectionModel.toggleSelection(edge);
+						else {
+							if (ProgramProperties.isDesktop())
+								edgeSelectionModel.clearSelection();
+							edgeSelectionModel.select(edge);
 						}
-						edgeSelectionModel.select(edge);
 						if (e.getClickCount() == 2 && edgeSelectionModel.isSelected(edge)) {
 							var fromSource = new HashSet<Node>();
 							var fromTarget = new HashSet<Node>();
