@@ -29,6 +29,7 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
+import splitstree6.layout.network.NetworkLayout;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 
@@ -39,8 +40,14 @@ import java.util.HashSet;
 import java.util.Map;
 
 /**
- * maintains string array recording network edits
- * Daniel Huson, 8.2023
+ * maintains the string array that records the edits of a network drawing, saved with the view and applied again
+ * when the drawing is reopened: {@code ew:<edge id>:<width>} and {@code es:<edge id>:<colour>} for an edge's
+ * stroke, {@code mn:<node id>:<x>,<y>} for a node's position, and {@code lp:<node id>:<x>,<y>} for a label's
+ * offset from its node, which is recorded for every label once any label has been placed, by hand or by
+ * Straighten, so that a reload puts the labels back whatever the layout does then. Files written before
+ * 2026-10-18 hold {@code ml:<node id>:<x>,<y>} instead, a label's layout offset on top of the automatic
+ * placement, which is still read.
+ * Daniel Huson, 8.2023, 10.2026
  */
 public class NetworkEdits {
 	/**
@@ -94,7 +101,19 @@ public class NetworkEdits {
 						}
 
 					}
-					case "ml" -> {
+					case "lp" -> { // the label's offset from its node
+						var offset = edit.parameterAsPoint2D();
+						for (var n : labeledNodeShapeMap.keySet()) {
+							if (n.getId() == id) {
+								var labeledNodeShape = labeledNodeShapeMap.get(n);
+								if (labeledNodeShape != null && labeledNodeShape.getLabel() != null) {
+									Platform.runLater(() -> placeLabel(labeledNodeShape, offset.getX(), offset.getY()));
+									break;
+								}
+							}
+						}
+					}
+					case "ml" -> { // files written before 2026-10-18: the label's layout offset, on top of whatever the layout binds
 						var layout = edit.parameterAsPoint2D();
 						for (var n : labeledNodeShapeMap.keySet()) {
 							if (n.getId() == id) {
@@ -130,8 +149,59 @@ public class NetworkEdits {
 		return addEdits(editsString, nodes.stream().map(n -> Edit.createTranslateNodeEdit(n.getId(), translateX, translateY)).toList());
 	}
 
-	public static String[] addLayoutNodeLabelEdits(String[] editsString, Collection<Node> nodes, double layoutX, double layoutY) {
-		return addEdits(editsString, nodes.stream().map(n -> Edit.createLayoutNodeLabelEdit(n.getId(), layoutX, layoutY)).toList());
+	/**
+	 * records the position of the label of each of the nodes as its offset from the node, which is what a reload
+	 * restores, whatever the layout does then
+	 */
+	public static String[] addLabelPositionEdits(String[] editsString, Map<Node, LabeledNodeShape> nodeShapeMap, Collection<Node> nodes) {
+		var edits = new ArrayList<Edit>();
+		for (var node : nodes) {
+			var shape = nodeShapeMap.get(node);
+			if (shape != null && shape.getLabel() != null)
+				edits.add(Edit.createLabelPositionEdit(node.getId(), labelOffsetX(shape), labelOffsetY(shape)));
+		}
+		return edits.isEmpty() ? editsString : addEdits(editsString, edits);
+	}
+
+	/**
+	 * adds the position of every label that has none, so that a drawing in which any label has been placed is
+	 * saved with the positions of all its labels
+	 */
+	public static String[] addMissingLabelPositions(String[] editsString, Map<Node, LabeledNodeShape> nodeShapeMap) {
+		var withPosition = new HashSet<Integer>();
+		for (var editString : editsString) {
+			var edit = Edit.parse(editString);
+			if (edit != null && edit.code().equals("lp"))
+				withPosition.add(edit.id());
+		}
+		var missing = new ArrayList<Edit>();
+		for (var entry : nodeShapeMap.entrySet()) {
+			var shape = entry.getValue();
+			if (shape.getLabel() != null && !withPosition.contains(entry.getKey().getId()))
+				missing.add(Edit.createLabelPositionEdit(entry.getKey().getId(), labelOffsetX(shape), labelOffsetY(shape)));
+		}
+		return missing.isEmpty() ? editsString : addEdits(editsString, missing);
+	}
+
+	/**
+	 * places the label at the given offset from its node, bound to the node so that it follows when the node moves
+	 */
+	public static void placeLabel(LabeledNodeShape shape, double offsetX, double offsetY) {
+		var label = shape.getLabel();
+		label.setLayoutX(0);
+		label.setLayoutY(0);
+		label.translateXProperty().bind(shape.translateXProperty().add(offsetX));
+		label.translateYProperty().bind(shape.translateYProperty().add(offsetY));
+		NetworkLayout.setPinned(label, true); // the radial layout may still finish after this, and must not undo it
+	}
+
+	/** the label's offset from its node: the translation that the layout bound plus the layout coordinates of a drag */
+	private static double labelOffsetX(LabeledNodeShape shape) {
+		return shape.getLabel().getTranslateX() + shape.getLabel().getLayoutX() - shape.getTranslateX();
+	}
+
+	private static double labelOffsetY(LabeledNodeShape shape) {
+		return shape.getLabel().getTranslateY() + shape.getLabel().getLayoutY() - shape.getTranslateY();
 	}
 
 	/**
@@ -195,9 +265,9 @@ public class NetworkEdits {
 					StringUtils.trim("%.2f", translateY)));
 		}
 
-		public static Edit createLayoutNodeLabelEdit(int id, double layoutX, double layoutY) {
-			return new Edit("ml", id, "%s,%s".formatted(StringUtils.trim("%.2f", layoutX),
-					StringUtils.trim("%.2f", layoutY)));
+		public static Edit createLabelPositionEdit(int id, double offsetX, double offsetY) {
+			return new Edit("lp", id, "%s,%s".formatted(StringUtils.trim("%.2f", offsetX),
+					StringUtils.trim("%.2f", offsetY)));
 		}
 
 		public static Edit parse(String editString) {

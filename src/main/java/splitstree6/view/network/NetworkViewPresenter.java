@@ -149,6 +149,10 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		});
 
 		networkPane.setRunAfterUpdate(() -> {
+			// the edits as read from the file, taken before the listeners that record edits are installed: the label
+			// layout finishes in its own service, and when it applies its offsets the listeners would otherwise
+			// overwrite the saved label positions before they are applied
+			var savedEdits = view.getOptionEdits();
 			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
 			interactionSetup.apply(taxonLabelMap, nodeShapeMap, edgeShapeMap,
 					t -> (t >= 1 && t <= taxa.getNtax() ? taxa.get(t) : null), taxa::indexOf);
@@ -156,11 +160,11 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				snapAllToGrid(false); // a new drawing, while the grid is on
 			if (first) {
 				first = false;
-				if (view.getOptionEdits().length > 0) {
+				if (savedEdits.length > 0) {
 					AService.run(() -> {
 						Thread.sleep(700); // wait long enough for all label layouting to finish
 						Platform.runLater(() -> {
-							NetworkEdits.applyEdits(view.getOptionEdits(), nodeShapeMap, edgeShapeMap);
+							NetworkEdits.applyEdits(savedEdits, nodeShapeMap, edgeShapeMap);
 							NetworkEdits.clearEdits(view.optionEditsProperty());
 						});
 						return null;
@@ -350,6 +354,11 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	}
 
 	public void updateLabelLayout() {
+		// an explicit layout of the labels releases the labels that a saved edit or Straighten had pinned
+		for (var shape : view.getNodeShapeMap().values()) {
+			if (shape.getLabel() != null)
+				NetworkLayout.setPinned(shape.getLabel(), false);
+		}
 		Platform.runLater(() -> networkPane.layoutLabels(view.getOptionOrientation()));
 	}
 

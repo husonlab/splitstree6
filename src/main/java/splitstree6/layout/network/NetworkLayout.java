@@ -20,6 +20,7 @@
 package splitstree6.layout.network;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -217,14 +218,8 @@ public class NetworkLayout {
 						var translateYProperty = labeledNode.translateYProperty();
 
 						labelLayout.addItem(translateXProperty, translateYProperty, nodeAngleMap.getOrDefault(v, 0.0), label.widthProperty(), label.heightProperty(),
-								xOffset -> {
-									label.setLayoutX(0);
-									label.translateXProperty().bind(translateXProperty.add(xOffset));
-								},
-								yOffset -> {
-									label.setLayoutY(0);
-									label.translateYProperty().bind(translateYProperty.add(yOffset));
-								});
+								xOffset -> applyLayoutOffsetX(label, translateXProperty, xOffset),
+								yOffset -> applyLayoutOffsetY(label, translateYProperty, yOffset));
 
 						labelLayout.addAvoidable(() -> labeledNode.getTranslateX() - 0.5 * labeledNode.prefWidth(0), () -> labeledNode.getTranslateY() - 0.5 * labeledNode.prefHeight(0), () -> labeledNode.prefWidth(0), () -> labeledNode.prefHeight(0));
 					}
@@ -493,6 +488,42 @@ public class NetworkLayout {
 	}
 
 	/**
+	 * the key of the property that marks a label whose position was set by a saved edit or by Straighten. The
+	 * radial label layout runs in its own service and may finish after such a position has been applied, so it
+	 * leaves a pinned label where it is; an explicit layout of the labels releases the pins first.
+	 */
+	public static final String PINNED_LABEL = "pinned-label";
+
+	public static boolean isPinned(RichTextLabel label) {
+		return Boolean.TRUE.equals(label.getProperties().get(PINNED_LABEL));
+	}
+
+	public static void setPinned(RichTextLabel label, boolean pinned) {
+		if (pinned)
+			label.getProperties().put(PINNED_LABEL, Boolean.TRUE);
+		else
+			label.getProperties().remove(PINNED_LABEL);
+	}
+
+	/**
+	 * what the radial label layout does with an offset it computed: binds the label to its node at that offset,
+	 * unless the label is pinned
+	 */
+	public static void applyLayoutOffsetX(RichTextLabel label, ReadOnlyDoubleProperty nodeTranslateX, double xOffset) {
+		if (!isPinned(label)) {
+			label.setLayoutX(0);
+			label.translateXProperty().bind(nodeTranslateX.add(xOffset));
+		}
+	}
+
+	public static void applyLayoutOffsetY(RichTextLabel label, ReadOnlyDoubleProperty nodeTranslateY, double yOffset) {
+		if (!isPinned(label)) {
+			label.setLayoutY(0);
+			label.translateYProperty().bind(nodeTranslateY.add(yOffset));
+		}
+	}
+
+	/**
 	 * places every label at the bottom right of its node, as haplotype networks are often labelled by hand: the
 	 * top left corner of the label goes to the point of the node's outline 45 degrees below right, plus a gap.
 	 * The label stays bound to the node, so it follows when the node is moved, and a label that was moved by
@@ -510,6 +541,7 @@ public class NetworkLayout {
 				label.setLayoutY(0);
 				label.translateXProperty().bind(shape.translateXProperty().add(offset));
 				label.translateYProperty().bind(shape.translateYProperty().add(offset));
+				setPinned(label, true);
 			}
 		}
 	}

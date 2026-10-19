@@ -243,6 +243,15 @@ public class InteractionSetup {
 	}
 
 	/**
+	 * records the position of a node's label as its offset from the node, and, if asked, the positions of all
+	 * labels that have none yet
+	 */
+	private void recordLabelPosition(Node node, boolean withMissing) {
+		var updated = NetworkEdits.addLabelPositionEdits(edits.get(), nodeShapeMap, List.of(node));
+		edits.set(withMissing ? NetworkEdits.addMissingLabelPositions(updated, nodeShapeMap) : updated);
+	}
+
+	/**
 	 * setup network mouse interaction
 	 */
 	public void apply(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap) {
@@ -346,12 +355,14 @@ public class InteractionSetup {
 					var label = taxonLabelMap.get(id);
 					if (label != null) {
 						var node = graph.getTaxon2Node(id);
-						label.layoutXProperty().addListener((v, o, n) -> {
-							edits.set(NetworkEdits.addLayoutNodeLabelEdits(edits.get(), List.of(node), label.getLayoutX(), label.getLayoutY()));
-						});
-						label.layoutYProperty().addListener((v, o, n) -> {
-							edits.set(NetworkEdits.addLayoutNodeLabelEdits(edits.get(), List.of(node), label.getLayoutX(), label.getLayoutY()));
-						});
+						// a label is saved by its offset from its node. A drag by hand changes the layout coordinates: it
+						// records this label and brings every other label along, so that a reload restores the drawing
+						// whole. A change of the translation, which the layout, Straighten and a move of the node bind,
+						// records this label alone.
+						label.layoutXProperty().addListener((v, o, n) -> recordLabelPosition(node, true));
+						label.layoutYProperty().addListener((v, o, n) -> recordLabelPosition(node, true));
+						label.translateXProperty().addListener((v, o, n) -> recordLabelPosition(node, false));
+						label.translateYProperty().addListener((v, o, n) -> recordLabelPosition(node, false));
 
 						var shape = nodeShapeMap.get(node);
 						var taxon = idTaxonMap.apply(id);
