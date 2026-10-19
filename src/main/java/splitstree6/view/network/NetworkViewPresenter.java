@@ -430,6 +430,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		} else
 			targetLength = e -> 2.0;
 		var search = RectilinearLayout.prepare(graph, start, targetLength); // reads the graph here, on the FX thread
+		var oldLabelOffsets = NetworkLayout.labelOffsets(shapes.values()); // so that undo puts the labels back as they were
 
 		straightening.set(true);
 		AService.run(() -> search.run(STRAIGHTEN_BUDGET_MILLIS), result -> {
@@ -444,15 +445,18 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				newPositions.put(shapes.get(v), new Point2D(spacing * result.get(v).x(), spacing * result.get(v).y()));
 			grid.setSpacing(spacing);
 			grid.setSnap(true);
-			setPositions(newPositions, true);
+			setPositions(newPositions);
+			NetworkLayout.placeLabelsBottomRight(newPositions.keySet(), LABEL_GAP);
 			view.getUndoManager().add("straighten", () -> {
 				grid.setSpacing(oldSpacing);
 				grid.setSnap(oldSnap);
-				setPositions(oldPositions, false);
+				setPositions(oldPositions);
+				NetworkLayout.placeLabels(oldLabelOffsets);
 			}, () -> {
 				grid.setSpacing(spacing);
 				grid.setSnap(true);
-				setPositions(newPositions, true);
+				setPositions(newPositions);
+				NetworkLayout.placeLabelsBottomRight(newPositions.keySet(), LABEL_GAP);
 			});
 		}, ex -> {
 			straightening.set(false);
@@ -460,23 +464,15 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		});
 	}
 
-	private void setPositions(Map<LabeledNodeShape, Point2D> positions) {
-		setPositions(positions, false);
-	}
-
 	/**
-	 * moves the nodes and then places the labels: radially, as the layout does, or every label at the bottom
-	 * right of its node, which suits a straightened drawing
+	 * moves the nodes; the labels are bound to their nodes and follow, keeping their offsets, so snapping to the
+	 * grid or straightening does not disturb a placement, by hand or otherwise
 	 */
-	private void setPositions(Map<LabeledNodeShape, Point2D> positions, boolean labelsBottomRight) {
+	private void setPositions(Map<LabeledNodeShape, Point2D> positions) {
 		for (var entry : positions.entrySet()) {
 			entry.getKey().setTranslateX(entry.getValue().getX());
 			entry.getKey().setTranslateY(entry.getValue().getY());
 		}
-		if (labelsBottomRight)
-			NetworkLayout.placeLabelsBottomRight(positions.keySet(), LABEL_GAP);
-		else
-			updateLabelLayout();
 	}
 
 	public FindToolBar getFindToolBar() {

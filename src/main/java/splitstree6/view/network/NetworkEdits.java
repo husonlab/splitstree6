@@ -184,24 +184,19 @@ public class NetworkEdits {
 	}
 
 	/**
-	 * places the label at the given offset from its node, bound to the node so that it follows when the node moves
+	 * places the label at the given offset from its node, bound to the node and pinned against the radial label
+	 * layout, which may still finish after this and must not undo it
 	 */
 	public static void placeLabel(LabeledNodeShape shape, double offsetX, double offsetY) {
-		var label = shape.getLabel();
-		label.setLayoutX(0);
-		label.setLayoutY(0);
-		label.translateXProperty().bind(shape.translateXProperty().add(offsetX));
-		label.translateYProperty().bind(shape.translateYProperty().add(offsetY));
-		NetworkLayout.setPinned(label, true); // the radial layout may still finish after this, and must not undo it
+		NetworkLayout.placeLabel(shape, offsetX, offsetY);
 	}
 
-	/** the label's offset from its node: the translation that the layout bound plus the layout coordinates of a drag */
 	private static double labelOffsetX(LabeledNodeShape shape) {
-		return shape.getLabel().getTranslateX() + shape.getLabel().getLayoutX() - shape.getTranslateX();
+		return NetworkLayout.labelOffsetX(shape);
 	}
 
 	private static double labelOffsetY(LabeledNodeShape shape) {
-		return shape.getLabel().getTranslateY() + shape.getLabel().getLayoutY() - shape.getTranslateY();
+		return NetworkLayout.labelOffsetY(shape);
 	}
 
 	/**

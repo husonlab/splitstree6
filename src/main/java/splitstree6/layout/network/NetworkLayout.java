@@ -534,16 +534,53 @@ public class NetworkLayout {
 	 */
 	public static void placeLabelsBottomRight(Collection<LabeledNodeShape> shapes, double gap) {
 		for (var shape : shapes) {
-			var label = shape.getLabel();
-			if (label != null) {
+			if (shape.getLabel() != null) {
 				var offset = 0.5 * Math.max(shape.prefWidth(0), shape.prefHeight(0)) / Math.sqrt(2) + gap;
-				label.setLayoutX(0);
-				label.setLayoutY(0);
-				label.translateXProperty().bind(shape.translateXProperty().add(offset));
-				label.translateYProperty().bind(shape.translateYProperty().add(offset));
-				setPinned(label, true);
+				placeLabel(shape, offset, offset);
 			}
 		}
+	}
+
+	/**
+	 * places the label at the given offset from its node, bound to the node so that it follows when the node
+	 * moves, and pinned against the radial label layout
+	 */
+	public static void placeLabel(LabeledNodeShape shape, double offsetX, double offsetY) {
+		var label = shape.getLabel();
+		label.setLayoutX(0);
+		label.setLayoutY(0);
+		label.translateXProperty().bind(shape.translateXProperty().add(offsetX));
+		label.translateYProperty().bind(shape.translateYProperty().add(offsetY));
+		setPinned(label, true);
+	}
+
+	/**
+	 * places each label at the given offset from its node, see {@link #placeLabel}
+	 */
+	public static void placeLabels(Map<LabeledNodeShape, Point2D> offsets) {
+		for (var entry : offsets.entrySet())
+			placeLabel(entry.getKey(), entry.getValue().getX(), entry.getValue().getY());
+	}
+
+	/**
+	 * the offset of each node's label from the node: the translation that the layout or a placement bound plus
+	 * the layout coordinates of a drag by hand; nodes without a label are left out
+	 */
+	public static Map<LabeledNodeShape, Point2D> labelOffsets(Collection<LabeledNodeShape> shapes) {
+		var offsets = new LinkedHashMap<LabeledNodeShape, Point2D>();
+		for (var shape : shapes) {
+			if (shape.getLabel() != null)
+				offsets.put(shape, new Point2D(labelOffsetX(shape), labelOffsetY(shape)));
+		}
+		return offsets;
+	}
+
+	public static double labelOffsetX(LabeledNodeShape shape) {
+		return shape.getLabel().getTranslateX() + shape.getLabel().getLayoutX() - shape.getTranslateX();
+	}
+
+	public static double labelOffsetY(LabeledNodeShape shape) {
+		return shape.getLabel().getTranslateY() + shape.getLabel().getLayoutY() - shape.getTranslateY();
 	}
 
 	public static ToDoubleFunction<Edge> setupScaling(PhyloGraph graph) {
