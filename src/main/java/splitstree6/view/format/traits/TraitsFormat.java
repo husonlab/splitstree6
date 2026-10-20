@@ -55,6 +55,12 @@ import splitstree6.window.MainWindow;
  */
 public class TraitsFormat extends Pane {
 	public static final String ALL = "*All*";
+	/**
+	 * stands for "no trait is shown". Needed as a marker rather than an empty list because
+	 * OptionIO.writeOptions omits an option whose value writes as the empty string, which an empty
+	 * list does, so switching every trait off was lost on save and the defaults came back.
+	 */
+	public static final String NONE = "*None*";
 
 	private final TraitsFormatController controller;
 	private final TraitsFormatPresenter presenter;
@@ -124,11 +130,18 @@ public class TraitsFormat extends Pane {
 	}
 
 	public boolean isAllTraitsActive() {
-		return getOptionActiveTraits().length == 1 && getOptionActiveTraits()[0].equals(ALL) || getOptionActiveTraits().length > 0 && traitsBlock.get() != null && getOptionActiveTraits().length >= traitsBlock.get().getNumberNumericalTraits();
+		if (isNoneTraitsActive())
+			return false; // the NONE marker is one entry long, and would otherwise count as a full list
+		var active = getOptionActiveTraits();
+		return active.length == 1 && active[0].equals(ALL)
+			   || traitsBlock.get() != null && active.length >= traitsBlock.get().getNumberNumericalTraits();
 	}
 
 	public boolean isNoneTraitsActive() {
-		return getOptionActiveTraits().length == 0;
+		var active = getOptionActiveTraits();
+		// an empty list is a view that has never had its traits set; NONE is the user having switched
+		// them all off. Both show nothing, but only the second one survives being written to a file
+		return active.length == 0 || active.length == 1 && active[0].equals(NONE);
 	}
 
 	public boolean isTraitActive(String traitName) {
@@ -186,7 +199,7 @@ public class TraitsFormat extends Pane {
 						legend.getActive().clear();
 						if (isAllTraitsActive()) {
 							legend.getActive().addAll(traitsBlock.getNumericalTraitLabels());
-						} else {
+						} else if (!isNoneTraitsActive()) { // or the marker itself would be listed as a trait
 							for (var active : getOptionActiveTraits()) {
 								legend.getActive().add(active);
 							}

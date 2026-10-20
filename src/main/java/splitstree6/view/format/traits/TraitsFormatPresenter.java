@@ -70,7 +70,9 @@ public class TraitsFormatPresenter {
 							// name, so removing one from it changed nothing and the trait came back on. Expand to
 							// the explicit list of traits first, and take the one being switched off out of that.
 							var basis = (format.isAllTraitsActive() ? activeTraitLabels(format) : oldState);
-							var newState = StringUtils.addOrRemove(basis, label, menuItem.isSelected());
+							var remaining = StringUtils.addOrRemove(basis, label, menuItem.isSelected());
+							// an empty list is not written to the file at all, so say "none" explicitly
+							var newState = (remaining.length == 0 ? new String[]{TraitsFormat.NONE} : remaining);
 							undoManager.doAndAdd("activate trait", () -> format.setOptionActiveTraits(oldState), () -> format.setOptionActiveTraits(newState));
 						});
 						traitMenuItems.add(menuItem);
@@ -87,7 +89,7 @@ public class TraitsFormatPresenter {
 		});
 		controller.getShowNoneMenuItem().setOnAction(e -> {
 			var oldState = format.getOptionActiveTraits().clone();
-			var newState = new String[0];
+			var newState = new String[]{TraitsFormat.NONE};
 			undoManager.doAndAdd("deactivate all traits", () -> format.setOptionActiveTraits(oldState), () -> format.setOptionActiveTraits(newState));
 		});
 
