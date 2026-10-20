@@ -271,8 +271,14 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		Platform.runLater(this::setupMenuItems);
 
+		// Switch all traits on, but only for a view that has never had them set: an empty list is what a
+		// new view starts with. This used to run whatever the view already held, so a selection restored
+		// from a file was overwritten with every trait a moment after it was read, and switching a trait
+		// off never survived a reopen. A deliberate "none" is the NONE marker, not an empty list, so it
+		// is left alone too.
 		RunAfterAWhile.applyInFXThread(this, () -> {
-			if (mainWindow.getWorkflow().getWorkingTaxaBlock() != null && mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock() != null
+			if (view.getOptionActiveTraits().length == 0
+				&& mainWindow.getWorkflow().getWorkingTaxaBlock() != null && mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock() != null
 				&& mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().size() > 0) {
 				view.optionActiveTraitsProperty().set(mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().getTraitLabels().toArray(new String[0]));
 			}
