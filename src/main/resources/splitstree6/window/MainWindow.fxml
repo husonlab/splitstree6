@@ -109,9 +109,9 @@
                                 <MenuItem fx:id="exportTaxonDisplayLabelsMenuItem" mnemonicParsing="false"
                                           text="Taxon Display Labels..."
                                           userData="Export the taxon display labels to a text file"/>
-                                <SeparatorMenuItem mnemonicParsing="false"/>
                                 <MenuItem fx:id="exportTaxonTraitsMenuItem" text="Taxon Traits..."
                                           userData="Export the taxon traits to a text file"/>
+                                <SeparatorMenuItem mnemonicParsing="false"/>
                                 <MenuItem fx:id="exportWorkflowMenuItem" text="Export Workflow..."
                                           userData="Export the current analysis as a workflow"/>
                             </items>
