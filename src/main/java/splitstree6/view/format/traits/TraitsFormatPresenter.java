@@ -66,7 +66,11 @@ public class TraitsFormatPresenter {
 						menuItem.setSelected(true);
 						menuItem.selectedProperty().addListener((b, o, n) -> {
 							var oldState = format.getOptionActiveTraits().clone();
-							var newState = StringUtils.addOrRemove(oldState, label, menuItem.isSelected());
+							// While all traits are active the state is the marker *All*, which contains no trait
+							// name, so removing one from it changed nothing and the trait came back on. Expand to
+							// the explicit list of traits first, and take the one being switched off out of that.
+							var basis = (format.isAllTraitsActive() ? activeTraitLabels(format) : oldState);
+							var newState = StringUtils.addOrRemove(basis, label, menuItem.isSelected());
 							undoManager.doAndAdd("activate trait", () -> format.setOptionActiveTraits(oldState), () -> format.setOptionActiveTraits(newState));
 						});
 						traitMenuItems.add(menuItem);
@@ -115,5 +119,16 @@ public class TraitsFormatPresenter {
 				format.updateNodes();
 			}));
 		});
+	}
+
+	/**
+	 * the traits that the marker {@code *All*} stands for: the ones that are actually drawn
+	 * <p>
+	 * Needed because the active-traits option holds that marker rather than a list while everything is on,
+	 * and a trait cannot be taken out of a list it is not in.
+	 */
+	private static String[] activeTraitLabels(TraitsFormat format) {
+		var traitsBlock = format.getTraitsBlock();
+		return (traitsBlock != null ? traitsBlock.getNumericalTraitLabels().toArray(new String[0]) : new String[0]);
 	}
 }
