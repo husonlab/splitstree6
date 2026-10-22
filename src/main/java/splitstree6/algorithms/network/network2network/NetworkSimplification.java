@@ -37,7 +37,7 @@ import java.util.Set;
  * What every lossy network filter needs: shortest paths over a subset of the edges, and the tidy-up that turns
  * a network with edges removed back into a drawable one.
  * <p>
- * Shared by {@link StretchFilter} and {@link SimplifyFilter} so that a correction made for one -- such as the
+ * Shared by {@link StretchFilter} and {@link ShaveFilter} so that a correction made for one -- such as the
  * merged-edge mutation labels of 2026-08-19 -- does not have to be made twice.
  * <p>
  * Daniel Huson, 2026

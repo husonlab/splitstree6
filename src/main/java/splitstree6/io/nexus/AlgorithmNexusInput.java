@@ -27,6 +27,7 @@ import splitstree6.options.OptionIO;
 import splitstree6.workflow.Algorithm;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * algorithm nexus input
@@ -85,12 +86,17 @@ public class AlgorithmNexusInput extends NexusIOBase {
 	}
 
 	/**
+	 * algorithms renamed after workflows naming them may have been saved: former simple class name to current one
+	 */
+	private static final Map<String, String> FORMER_NAMES = Map.of("SimplifyFilter", "ShaveFilter");
+
+	/**
 	 * creates an instance of the named algorithm
 	 *
 	 * @return instance or null
 	 */
 	public static Algorithm createAlgorithmFromName(String algorithmName) {
-		var algorithms = AlgorithmList.list(algorithmName);
+		var algorithms = AlgorithmList.list(FORMER_NAMES.getOrDefault(algorithmName, algorithmName));
 		if (!algorithms.isEmpty())
 			return algorithms.get(0);
 		else

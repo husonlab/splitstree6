@@ -1,5 +1,5 @@
 /*
- *  SimplifyFilter.java Copyright (C) 2026 Daniel H. Huson
+ *  ShaveFilter.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Simplify filter: lossy sparsification of a network towards a goal the user states in the units they care
+ * Shave filter: lossy sparsification of a network towards a goal the user states in the units they care
  * about -- a distortion or excess they are willing to tolerate, a number of edges, a number of cycles -- rather
  * than by hunting for a stretch percentage.
  * <p>
@@ -64,7 +64,7 @@ import java.util.*;
  * <p>
  * Daniel Huson, 2026
  */
-public class SimplifyFilter extends Network2Network {
+public class ShaveFilter extends Network2Network {
 	/**
 	 * what the user is asking for. Every one of these is a threshold on the same chain of removals.
 	 */
@@ -140,7 +140,7 @@ public class SimplifyFilter extends Network2Network {
 
 	@Override
 	public String getShortDescription() {
-		return "Simplifies a network by removing edges, stopping at a stated deviation, edge count or cycle count.";
+		return "Shaves edges off a network, cheapest first, stopping at a stated deviation, edge count or cycle count.";
 	}
 
 	@Override
@@ -234,7 +234,7 @@ public class SimplifyFilter extends Network2Network {
 		for (var e : alive)
 			queue.add(new Entry(e, baseline.statistic(), baseline, -1)); // a valid lower bound for every edge
 
-		progress.setSubtask("Simplify filter");
+		progress.setSubtask("Shave filter");
 		progress.setMaximum(alive.size());
 		progress.setProgress(0);
 
@@ -534,7 +534,7 @@ public class SimplifyFilter extends Network2Network {
 		var chosen = (choice >= 0 ? chain.get(choice) : inputStep);
 
 		if (isOptionReportTable() && !chain.isEmpty()) {
-			System.err.printf("Simplify filter: %s deviation%s; %,d removals available%n",
+			System.err.printf("Shave filter: %s deviation%s; %,d removals available%n",
 					measure == Deviation.Excess ? (excessAgainstSequences ? "excess (against the sequences)" : "excess (against the input network)")
 							: (quantile >= 100 ? "distortion (worst pair)" : "distortion (%.0fth percentile)".formatted(quantile)),
 					"", chain.size());
@@ -589,7 +589,7 @@ public class SimplifyFilter extends Network2Network {
 			var ratio = (Math.abs(balancedDeviation) > 1e-9 ? chosen.deviation() / balancedDeviation : (chosen.deviation() > 1e-9 ? Double.POSITIVE_INFINITY : 1.0));
 			if (choice > balanced && ratio > PAST_BALANCED_FACTOR) {
 				buf.append("; WARNING %.1f times the deviation of the balanced step".formatted(ratio));
-				System.err.printf("WARNING (Simplify filter): this target goes %d removals past the balanced step, and costs %.1f times as much.%n",
+				System.err.printf("WARNING (Shave filter): this target goes %d removals past the balanced step, and costs %.1f times as much.%n",
 						choice - balanced, ratio);
 				System.err.printf("         chosen   (step %d): %,d cycles, %,d edges, %s%n", choice, chosen.cycles(), chosen.edges(), describe(chosen, measure));
 				System.err.printf("         balanced (step %d): %,d cycles, %,d edges, %s%n", balanced, chain.get(balanced).cycles(), chain.get(balanced).edges(), describe(chain.get(balanced), measure));
