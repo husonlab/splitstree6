@@ -239,6 +239,8 @@ public class SplitNetworkLayout {
 				nodesGroup.getChildren().add(labeledNode);
 
 				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
+				// a taxon whose mark is meant as its node (node="true" in the mark) is drawn as that mark
+				LabeledNodeShape.useNodeMark(labeledNode, isRootNode ? null : label, () -> new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5), Icebergs.enabled());
 
 				if (graph.getNumberOfTaxa(v) == 1) {
 					labeledNode.setUserData(taxaBlock.get(graph.getTaxon(v)));

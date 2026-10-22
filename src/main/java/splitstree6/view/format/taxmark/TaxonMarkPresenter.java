@@ -61,6 +61,26 @@ public class TaxonMarkPresenter {
 		controller.getAddButton().disableProperty().bind(controller.getFillColorPicker().valueProperty().isNull()
 				.or(controller.getShapeCBox().valueProperty().isNull()).or(emptySelection));
 
+		// the mark as the node: the same mark with node="true", which the views draw in place of the node's circle and the
+		// label does not show
+		controller.getNodeButton().setOnAction(e -> {
+			var fill = controller.getFillColorPicker().getValue();
+			var shape = controller.getShapeCBox().getValue();
+			if (fill != null && shape != null) {
+				var undoList = new UndoableRedoableCommandList("mark as node");
+
+				for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
+					var oldLabel = taxon.getDisplayLabelOrName();
+					var newLabel = "<mark shape=\"" + shape.name() + "\" fill=\"" + ColorUtilsFX.toStringCSS(fill) + "\" stroke=\"lightgray\" node=\"true\">" + RichTextLabel.removeMark(oldLabel);
+					undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
+				}
+				if (undoList.size() > 0)
+					undoManager.doAndAdd(undoList);
+			}
+		});
+		controller.getNodeButton().disableProperty().bind(controller.getFillColorPicker().valueProperty().isNull()
+				.or(controller.getShapeCBox().valueProperty().isNull()).or(emptySelection));
+
 		controller.getClearColorButton().setOnAction(e -> {
 			var undoList = new UndoableRedoableCommandList("clear marks");
 

@@ -70,7 +70,22 @@
                                 </children>
                             </HBox>
                             <Button fx:id="addButton" mnemonicParsing="false" text="Add" AnchorPane.rightAnchor="2.0"
-                                    AnchorPane.topAnchor="0.0"/>
+                                    AnchorPane.topAnchor="0.0">
+                                <tooltip>
+                                    <Tooltip text="Add the mark next to the labels of the selected taxa"/>
+                                </tooltip>
+                            </Button>
+                        </children>
+                    </AnchorPane>
+                    <AnchorPane>
+                        <children>
+                            <Label text="Mark as the node" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="5.0"/>
+                            <Button fx:id="nodeButton" mnemonicParsing="false" text="Node" AnchorPane.rightAnchor="2.0"
+                                    AnchorPane.topAnchor="0.0">
+                                <tooltip>
+                                    <Tooltip text="Draw the mark as the node of each selected taxon, in place of its circle (network, tree and split network views); Delete restores the circle"/>
+                                </tooltip>
+                            </Button>
                         </children>
                     </AnchorPane>
                 </VBox>

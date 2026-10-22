@@ -24,6 +24,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.Icebergs;
 import jloda.fx.util.DraggableUtils;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Edge;
@@ -159,6 +160,8 @@ public class ComputeTreeLayout {
 			var label = LayoutUtils.getLabel(taxonLabelMap, tree, v);
 
 			var nodeShape = new LabeledNodeShape(label, shape);
+			// a taxon whose mark is meant as its node (node="true" in the mark) is drawn as that mark
+			LabeledNodeShape.useNodeMark(nodeShape, label, () -> new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5), Icebergs.enabled());
 			nodeGroup.getChildren().add(nodeShape);
 			nodeShapeMap.put(v, nodeShape);
 

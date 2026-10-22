@@ -288,6 +288,23 @@ public class InteractionSetup {
 			shape.setOnMouseDragged(e -> {
 				if (startPositions.containsKey(shape)) {
 					var delta = new Point2D(e.getScreenX(), e.getScreenY()).subtract(start.get());
+					if (e.isShiftDown() && startPositions.size() == 1 && node.getDegree() == 1) {
+						// shift-drag of a leaf: the leaf keeps the length of its edge and moves on the circle around its
+						// neighbour, towards the mouse; the grid is not used
+						var neighbour = nodeShapeMap.get(node.getFirstAdjacentEdge().getOpposite(node));
+						if (neighbour != null) {
+							var center = new Point2D(neighbour.getTranslateX(), neighbour.getTranslateY());
+							var from = startPositions.get(shape);
+							var direction = from.add(delta).subtract(center);
+							if (direction.magnitude() > 0) {
+								var target = center.add(direction.normalize().multiply(from.distance(center)));
+								shape.setTranslateX(target.getX());
+								shape.setTranslateY(target.getY());
+							}
+							e.consume();
+							return;
+						}
+					}
 					if (grid.isSnap()) {
 						// in grid steps: the grabbed node goes to the grid point nearest the mouse, and the other
 						// selected nodes keep their offsets to it

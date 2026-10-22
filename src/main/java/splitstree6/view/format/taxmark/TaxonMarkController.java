@@ -48,6 +48,9 @@ public class TaxonMarkController {
 	private ChoiceBox<NodeShape> shapeCBox;
 
 	@FXML
+	private Button nodeButton;
+
+	@FXML
 	private void initialize() {
 		shapeCBox.getItems().addAll(NodeShape.values());
 	}
@@ -74,5 +77,9 @@ public class TaxonMarkController {
 
 	public Button getAddButton() {
 		return addButton;
+	}
+
+	public Button getNodeButton() {
+		return nodeButton;
 	}
 }

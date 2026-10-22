@@ -27,6 +27,7 @@ import jloda.fx.util.Icebergs;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.function.Supplier;
 
 public class LabeledNodeShape extends Group {
 	private RichTextLabel label;
@@ -90,6 +91,31 @@ public class LabeledNodeShape extends Group {
 		if (label != null)
 			list.add(label);
 		return list;
+	}
+
+	/**
+	 * uses the mark of the label as the shape of the node when the label asks for it (a mark with node="true"), and the
+	 * default shape otherwise; follows the text of the label, so that marking a taxon as a node, or unmarking it, changes
+	 * the node at once
+	 *
+	 * @param nodeShape    the node
+	 * @param label        the label of the node, may be null
+	 * @param defaultShape makes the shape of the node without a node mark
+	 * @param useIceBerg   as in setShape
+	 */
+	public static void useNodeMark(LabeledNodeShape nodeShape, RichTextLabel label, Supplier<Shape> defaultShape, boolean useIceBerg) {
+		if (label != null) {
+			Runnable update = () -> {
+				var mark = RichTextLabel.getNodeMark(label.getText());
+				nodeShape.setShape(mark != null ? mark : defaultShape.get(), useIceBerg);
+			};
+			if (RichTextLabel.isNodeMark(label.getText()))
+				update.run();
+			label.textProperty().addListener((v, o, n) -> {
+				if (RichTextLabel.isNodeMark(o) || RichTextLabel.isNodeMark(n))
+					update.run();
+			});
+		}
 	}
 
 	public Shape getShape() {

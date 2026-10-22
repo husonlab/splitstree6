@@ -27,6 +27,7 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.*;
@@ -47,6 +48,7 @@ import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.RadialLabelLayout;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
 import static splitstree6.layout.tree.LayoutUtils.computeFontHeightGraphWidthHeight;
@@ -175,14 +177,15 @@ public class NetworkLayout {
 						labeledNode.setTaxa(BitSetUtils.asBitSet(graph.getTaxa(v)));
 
 					var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
-					if (false && graph.getNumberOfEdges() == 0 && label != null) { // todo: allow user to use marks for nodes
-						labeledNode.setShape(RichTextLabel.getMark(label.getText()));
-					} else {
+					Supplier<Shape> defaultShape = () -> {
 						var circle = new Circle(v.getDegree() == 1 ? 3 : 2);
 						circle.setFill(Color.WHITE);
 						circle.setStroke(Color.BLACK);
-						labeledNode.setShape(circle, true);
-					}
+						return circle;
+					};
+					labeledNode.setShape(defaultShape.get(), true);
+					// a taxon whose mark is meant as its node (node="true" in the mark) is drawn as that mark
+					LabeledNodeShape.useNodeMark(labeledNode, label, defaultShape, true);
 
 					if (false) {
 						for (var node : labeledNode.getChildren()) {
