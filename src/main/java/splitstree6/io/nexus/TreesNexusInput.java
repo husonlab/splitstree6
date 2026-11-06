@@ -56,8 +56,8 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 
 	public static final String DESCRIPTION = """
 			This block maintains a list of trees. These can be rooted or unrooted
-			phylogenetic trees, or rooted phylogenetic networks. Trees can
-			partial in the sense that they need to contain all taxa.
+			phylogenetic trees, or rooted phylogenetic networks. Trees can be
+			partial in the sense that they need not contain all taxa.
 			""";
 
 	@Override
