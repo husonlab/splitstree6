@@ -1,0 +1,13 @@
+# Example documents bundled with the program, shown in the File->Examples menu.
+#
+#   <resource> [| <display name> [| <real file name>]]
+#
+# Every resource ends in .dat so that it is bundled on every platform; the real name is the
+# resource name with that .dat stripped. All examples are complete SplitsTree6 documents, so
+# that they can be loaded from memory without being written to a temporary file.
+
+buttercups-cytochromeC.stree6.dat | Buttercups cytochrome C (Neighbor Net)
+dusky-dolphins.stree6.dat         | Dusky dolphins mtDNA (Split Decomposition)
+popart-example.stree6.dat         | PopART example (Median Joining)
+candida-orthopsilosis.stree6.dat  | Candida orthopsilosis hybrids (Median Joining)
+Nymphoides-PhyloFusion.stree6.dat | Nymphoides gene trees (PhyloFusion)

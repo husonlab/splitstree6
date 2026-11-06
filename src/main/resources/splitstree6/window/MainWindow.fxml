@@ -47,6 +47,7 @@
                             </accelerator>
                         </MenuItem>
                         <Menu fx:id="openRecentMenu" text="Open Recent"/>
+                        <Menu fx:id="examplesMenu" text="Examples"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="replaceDataMenuItem" text="Replace Data..."
                                   userData="Replace the current input data">

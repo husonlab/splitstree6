@@ -21,6 +21,7 @@ package splitstree6.tabs.inputeditor;
 
 import javafx.application.Platform;
 import jloda.fx.icons.MaterialIcons;
+import jloda.util.FileUtils;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.window.MainWindow;
@@ -54,6 +55,17 @@ public class InputEditorTab extends ViewTab {
 
 	public void importFromFile(String fileName) {
 		inputEditorView.importFromFile(fileName);
+		Platform.runLater(() -> {
+			inputEditorView.getController().getCodeArea().clearHistory();
+		});
+	}
+
+	/**
+	 * replace the editor content by text that was never on disk, e.g. a bundled example; the document is named after the given file name
+	 */
+	public void importText(String fileName, String text) {
+		inputEditorView.replaceText(text);
+		getMainWindow().setFileName(FileUtils.getFileBaseName(fileName));
 		Platform.runLater(() -> {
 			inputEditorView.getController().getCodeArea().clearHistory();
 		});

@@ -171,6 +171,9 @@ module splitstreesix {
 
 	opens splitstree6.main;
 
+	opens splitstree6.examples;
+	exports splitstree6.examples;
+
 	opens splitstree6.view.trees.treepages;
 	opens splitstree6.view.trees.tanglegram;
 	opens splitstree6.view.trees.treeview;

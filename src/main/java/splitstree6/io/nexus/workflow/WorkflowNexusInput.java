@@ -43,6 +43,7 @@ import splitstree6.workflow.*;
 import java.io.*;
 import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 /**
@@ -53,7 +54,18 @@ public class WorkflowNexusInput {
 	public static final String WORKFLOW_FILE_SUFFIX = ".wflow6";
 
 	public static boolean isApplicable(String fileName) {
-		try (NexusStreamParser np = new NexusStreamParser(new FileReader(fileName))) {
+		try (var reader = new FileReader(fileName)) {
+			return isApplicable(reader);
+		} catch (IOException ex) {
+			return false;
+		}
+	}
+
+	/**
+	 * does the reader provide a SplitsTree6 document? Consumes the beginning of the reader
+	 */
+	public static boolean isApplicable(Reader reader) {
+		try (NexusStreamParser np = new NexusStreamParser(reader)) {
 			if (np.peekMatchIgnoreCase("#nexus")) {
 				np.matchIgnoreCase("#nexus");
 				return np.peekMatchBeginBlock(SplitsTree6Block.BLOCK_NAME);
@@ -65,6 +77,16 @@ public class WorkflowNexusInput {
 	}
 
 	public static void open(MainWindow mainWindow, String fileName, Consumer<Throwable> exceptionHandler, Runnable runOnSuccess) {
+		open(mainWindow, fileName, () -> new FileReader(fileName), exceptionHandler, runOnSuccess);
+	}
+
+	/**
+	 * opens a document that is supplied by a reader rather than read from the named file, e.g. a bundled example.
+	 * The file name is used to name the document and to decide whether it is a workflow-only file; it need not exist
+	 *
+	 * @param readerSupplier supplies a fresh reader on the document
+	 */
+	public static void open(MainWindow mainWindow, String fileName, Callable<Reader> readerSupplier, Consumer<Throwable> exceptionHandler, Runnable runOnSuccess) {
 		// Workflow-only files (.wflow6) are a SplitsTree6 power-user feature;
 		// host applications that are extensions of SplitsTree6 don't support them.
 		if (isWorkflowFile(fileName) && AppProfile.getProfile().isExtension()) {
@@ -84,7 +106,7 @@ public class WorkflowNexusInput {
 			var inputWorkFlow = newWorkflow;
 			var service = new AService<Workflow>(mainWindow.getController().getBottomFlowPane());
 			service.setCallable(() -> {
-				try (var reader = new BufferedReader(new FileReader(fileName))) {
+				try (var reader = new BufferedReader(readerSupplier.call())) {
 					input(service.getProgressListener(), inputWorkFlow, reader);
 				}
 				return inputWorkFlow;

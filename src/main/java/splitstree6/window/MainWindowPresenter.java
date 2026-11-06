@@ -92,6 +92,7 @@ import splitstree6.dialog.importing.ImportMultipleTrees;
 import splitstree6.dialog.importing.ImportTaxonDisplayLabels;
 import splitstree6.dialog.importing.ImportTaxonTraits;
 import splitstree6.dialog.importing.ImportTreeNames;
+import splitstree6.examples.ExamplesSupport;
 import splitstree6.io.FileLoader;
 import splitstree6.io.nexus.CharactersNexusOutput;
 import splitstree6.io.nexus.TaxaNexusOutput;
@@ -211,10 +212,14 @@ public class MainWindowPresenter {
 
 		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
 
+		// bundled examples are complete .stree6 documents and are loaded from memory, never written to disk
+		ExamplesSupport.install(controller.getExamplesMenu(), (name, text) -> FileLoader.applyText(mainWindow, name, text, ex -> NotificationManager.showError("Open example failed: " + ex)));
+		controller.getExamplesMenu().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
+
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 
 		applyToAllMenuItems(controller.getMenuBar(),
-				m -> !List.of("File", "Edit", "Import", "Window", "Open Recent", "Help").contains(m.getText()),
+				m -> !List.of("File", "Edit", "Import", "Window", "Open Recent", "Examples", "Help").contains(m.getText()),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(mainWindow.emptyProperty())));
 		applyToAllMenuItems(controller.getMenuBar(),
 				m -> m.getText().equals("Edit"),
@@ -775,7 +780,7 @@ public class MainWindowPresenter {
 		while (!stack.isEmpty()) {
 			var item = stack.pop();
 			if (item instanceof Menu menu) {
-				if (menu != controller.getOpenRecentMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
+				if (menu != controller.getOpenRecentMenu() && menu != controller.getExamplesMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
 					stack.addAll(menu.getItems());
 			} else if (!(item instanceof SeparatorMenuItem)) {
 				item.onActionProperty().unbind();
@@ -792,7 +797,7 @@ public class MainWindowPresenter {
 		while (!stack.isEmpty()) {
 			var item = stack.pop();
 			if (item instanceof Menu menu) {
-				if (menu != controller.getOpenRecentMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
+				if (menu != controller.getOpenRecentMenu() && menu != controller.getExamplesMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
 					stack.addAll(menu.getItems());
 			} else if (!(item instanceof SeparatorMenuItem)) {
 				if (item.getOnAction() != null && !item.disableProperty().isBound()) {

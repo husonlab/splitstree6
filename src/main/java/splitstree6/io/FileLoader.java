@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
+import jloda.util.FileUtils;
 import jloda.util.ProgramExecutorService;
 import splitstree6.dialog.importdialog.ImportDialog;
 import splitstree6.io.nexus.workflow.WorkflowNexusInput;
@@ -32,6 +33,7 @@ import splitstree6.window.MainWindow;
 import splitstree6.workflow.WorkflowSetup;
 
 import java.io.File;
+import java.io.StringReader;
 import java.util.function.Consumer;
 
 /**
@@ -71,6 +73,35 @@ public class FileLoader {
 					ImportDialog.show(newWindow, fileName);
 				}
 			}
+			ProgramExecutorService.submit(200, () -> Platform.runLater(() -> newWindow.getStage().toFront()));
+		}
+	}
+
+	/**
+	 * open a SplitsTree6 document that is held in memory rather than on disk, e.g. a bundled example.
+	 * The document is named after the given file name, but is not written to disk, not added to the recent files
+	 * and not associated with a file, so that saving it asks for a location rather than writing anywhere
+	 *
+	 * @param fileName the name for the document; only its last component is used, the file need not exist
+	 * @param text     the complete SplitsTree6 nexus document
+	 */
+	public static void applyText(MainWindow mainWindow, String fileName, String text, Consumer<Throwable> exceptionHandler) {
+		var name = FileUtils.getFileNameWithoutPath(fileName);
+		if (!WorkflowNexusInput.isApplicable(new StringReader(text))) {
+			NotificationManager.showError("Not a SplitsTree6 document: " + name);
+			return;
+		}
+		var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+		if (editorTab != null && editorTab.isEmpty()) {
+			editorTab.importText(name, text);
+		} else {
+			if (editorTab != null) {
+				NotificationManager.showInformation("Input editor is not empty, will open in new Window");
+			}
+			var newWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(mainWindow);
+			WorkflowNexusInput.open(newWindow, name, () -> new StringReader(text), exceptionHandler, null);
+			// not backed by a file: Save must behave like Save As, and the save dialog must not look for the directory of a file that does not exist
+			newWindow.setHasSplitsTree6File(false);
 			ProgramExecutorService.submit(200, () -> Platform.runLater(() -> newWindow.getStage().toFront()));
 		}
 	}

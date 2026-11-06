@@ -58,6 +58,9 @@ public class MainWindowController {
 	private Menu openRecentMenu;
 
 	@FXML
+	private Menu examplesMenu;
+
+	@FXML
 	private MenuItem importTaxonTraitsMenuItem;
 
 	@FXML
@@ -613,6 +616,10 @@ public class MainWindowController {
 
 	public Menu getOpenRecentMenu() {
 		return openRecentMenu;
+	}
+
+	public Menu getExamplesMenu() {
+		return examplesMenu;
 	}
 
 	public MenuItem getImportTaxonTraitsMenuItem() {
