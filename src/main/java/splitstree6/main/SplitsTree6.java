@@ -69,6 +69,7 @@ public class SplitsTree6 extends Application {
 	 */
 	public static void main(String[] args) {
 		ProgramProperties.setUseGUI(true);
+		System.setProperty("shut.up.ojAlgo", "true"); // suppress the ojAlgo hardware-profile notice, must be set before ojAlgo initializes
 		Basic.restoreSystemOut(System.err); // send system out to system err
 		Basic.startCollectionStdErr();
 
