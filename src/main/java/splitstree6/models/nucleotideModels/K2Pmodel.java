@@ -1,5 +1,5 @@
 /*
- *  K2Pmodel.java Copyright (C) 2024 Daniel H. Huson
+ *  K2Pmodel.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,75 +17,67 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Created on 11-Jun-2004
- *
- * To change the template for this generated file go to
- * MainWindow&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 package splitstree6.models.nucleotideModels;
-
 
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 
 /**
- * K2PDistance model
- * Miguel and David Bryant, 2005
+ * the Kimura (1980) two-parameter model of nucleotide substitution: all four bases are equally frequent and
+ * transitions (A to G, C to T and back) occur at kappa times the rate of transversions
+ * Daniel Huson, 11.2026
  */
 public class K2Pmodel extends NucleotideModel {
+	/**
+	 * constructor
+	 *
+	 * @param tsTvRatio expected ratio of the number of transitions to the number of transversions
+	 */
+	public K2Pmodel(double tsTvRatio) {
+		var frequencies = new double[]{0.25, 0.25, 0.25, 0.25};
+		// each base has one transition partner and two transversion partners, so the expected proportion of
+		// transitions among all substitutions is kappa / (kappa + 2), and the requested ratio gives kappa = 2 ratio
+		var kappa = 2.0 * tsTvRatio;
+		var q = new double[4][4];
+		for (var a = 0; a < 4; a++) {
+			for (var b = 0; b < 4; b++) {
+				if (a != b)
+					q[a][b] = (HKY85model.isTransition(a, b) ? kappa : 1.0) * frequencies[b];
+			}
+		}
+		setRateMatrix(q, frequencies);
+		normaliseQ();
+	}
 
 	/**
-	 * Constructor taking the expected rate of transitions versus transversions (rather
-	 * than the parameter kappa in Swofford et al, pg 435.)
-	 * We first compute the corresponding kappa, fill in Q according to the standard model.
+	 * the Kimura two-parameter distance -1/2 log(1 - 2P - Q) - 1/4 log(1 - 2Q), where P and Q are the proportions
+	 * of sites that differ by a transition and by a transversion, respectively. Under the model, 1 - 2P - Q and
+	 * 1 - 2Q are the expected values of exp(-4 alpha t) and exp(-4 beta t) over the sites, so invariable sites and
+	 * gamma-distributed rates enter by replacing the logarithm with the inverse moment-generating function
+	 *
+	 * @param F divergence matrix, F[a][b] is the proportion of sites showing state a in one sequence and b in the other
+	 * @return distance
 	 */
-	public K2Pmodel(double TsTv) {
-		final double[] basefreqs = {0.25, 0.25, 0.25, 0.25};
-
-		/* We have the identity
-		 *    TsTv = kappa/2
-		 * which we solve to get kappa
-		 */
-		final double kappa = TsTv * 2;
-
-		final double[][] Q = new double[4][4];
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				if (i != j) {
-					Q[i][j] = basefreqs[j];
+	@Override
+	public double exactDistance(double[][] F) throws SaturatedDistancesException {
+		var transitions = 0.0;
+		var transversions = 0.0;
+		for (var a = 0; a < 4; a++) {
+			for (var b = 0; b < 4; b++) {
+				if (a != b) {
+					if (HKY85model.isTransition(a, b))
+						transitions += F[a][b];
+					else
+						transversions += F[a][b];
 				}
 			}
 		}
-
-		Q[0][2] *= kappa;
-		Q[1][3] *= kappa;
-		Q[3][1] *= kappa;
-		Q[2][0] *= kappa;
-
-		setRateMatrix(Q, basefreqs);
-		normaliseQ();
-
+		var p = getPropInvariableSites();
+		var gamma = getGamma();
+		return -0.5 * mInverse(1.0 - 2.0 * transitions - transversions, p, gamma) - 0.25 * mInverse(1.0 - 2.0 * transversions, p, gamma);
 	}
 
-	/**
-	 * is this a group valued model
-	 *
-	 * @return true, if group valued model
-	 */
+	@Override
 	public boolean isGroupBased() {
 		return true;
 	}
-
-
-	@Override
-	public double exactDistance(double[][] F) throws SaturatedDistancesException {
-		double P = F[0][2] + F[1][3] + F[2][0] + F[3][1];
-		double Q = F[0][1] + F[0][3] + F[1][0] + F[1][2];
-		Q += F[2][1] + F[2][3] + F[3][0] + F[3][2];
-		double dist = 0.5 * mInverse(1 / (1 - (2 * P) - Q), getPropInvariableSites(), getGamma());
-		dist += 0.25 * mInverse(1 / (1 - (2 * Q)), getPropInvariableSites(), getGamma());
-		return dist;
-	}
-
 }
-
