@@ -1,5 +1,5 @@
 /*
- *  BunemanTree.java Copyright (C) 2024 Daniel H. Huson
+ *  BunemanTree.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,6 +19,7 @@
 
 package splitstree6.algorithms.distances.distances2splits;
 
+import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.IToCompatibleSplits;
 import splitstree6.algorithms.utils.SplitsBlockUtilities;
@@ -33,14 +34,20 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 /**
- * Implements the buneman tree
+ * computes the Buneman tree (Buneman 1971, Bandelt and Dress 1992) of a distance matrix.
  * <p>
- * Created on 2007-09-11
- *
- * @author Daniel Huson, David Bryant, Tobias Kloepper and Daria Evseeva
+ * The Buneman index of a split A|B is the minimum, over all choices of a, a' in A and b, b' in B, of
+ * 1/2 (min{d(a,b) + d(a',b'), d(a,b') + d(a',b)} - d(a,a') - d(b,b')), where a = a' and b = b' are allowed.
+ * The splits with positive index are always pairwise compatible and so form a tree; each is weighted by its index.
+ * <p>
+ * Daniel Huson, 11.2026
  */
-
 public class BunemanTree extends Distances2Splits implements IToCompatibleSplits {
+	/**
+	 * indices that are not larger than this are treated as zero, to absorb rounding error
+	 */
+	public static final double TOLERANCE = 1e-8;
+
 	@Override
 	public String getCitation() {
 		return "Bandelt & Dress 1992; HJ Bandelt and AWM Dress. A canonical decomposition theory for metrics on a finite set. " +
@@ -57,132 +64,89 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 		if (SplitsBlockUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
 			return;
 
-		ArrayList<ASplit> previousSplits = new ArrayList<>(); // list of previously computed splits
-		ArrayList<ASplit> nextSplits; // current list of splits
-
-		// ProgressDialog pd = new ProgressDialog("Split Decomposition...",""); //Set new progress bar.
-		// doc.setProgressListener(pd);
-		progress.setMaximum(taxaBlock.getNtax());    //initialize maximum progress
+		var ntax = taxaBlock.getNtax();
+		progress.setMaximum(ntax);
 		progress.setProgress(0);
 
-		final BitSet previousTaxa = new BitSet(); // taxa already processed
-		final int ntax = taxaBlock.getNtax();
-
-		previousTaxa.set(1);
-
-		for (int t = 2; t <= ntax; t++) {
-			nextSplits = new ArrayList<>(t); // restart current list of splits
-
-			// System.err.println("Processing: "+t);
-			// Does t vs previous set of taxa form a split?
+		// Taxa are added one at a time. Restricting a split to fewer taxa removes quartets from the minimum and so
+		// can only increase its index. Hence every split of the taxa 1..t with positive index either is {t} | {1..t-1},
+		// or restricts to a split of the taxa 1..t-1 with positive index. So the splits for 1..t are obtained by
+		// placing t on either side of each split for 1..t-1, keeping those whose index stays positive, together
+		// with the split that separates t from all the others
+		var splits = new ArrayList<ASplit>(); // the splits of taxa 1..t that have a positive index, weighted by index
+		for (var t = 2; t <= ntax; t++) {
+			var extended = new ArrayList<ASplit>();
 			{
-				final BitSet At = new BitSet();
-				At.set(t);
-				final float wgt = getIsolationIndex(t, At, previousTaxa, distancesBlock);
-				if (wgt > 0) {
-					nextSplits.add(new ASplit((BitSet) At.clone(), t, wgt));
-					// System.err.println("Adding (step 3) " + nextSplits.get(nextSplits.size() - 1));
+				var singleton = BitSetUtils.asBitSet(t);
+				var others = new BitSet();
+				others.set(1, t);
+				var index = minIndexOverQuartetsContaining(t, singleton, others, distancesBlock);
+				if (index > TOLERANCE)
+					extended.add(new ASplit(singleton, t, index));
+			}
+			for (var split : splits) {
+				var a = split.getA();
+				var b = split.getB();
+				// the quartets that do not involve t are already accounted for by the index of the split on 1..t-1
+				{
+					var aWithT = (BitSet) a.clone();
+					aWithT.set(t);
+					var index = Math.min(split.getWeight(), minIndexOverQuartetsContaining(t, aWithT, b, distancesBlock));
+					if (index > TOLERANCE)
+						extended.add(new ASplit(aWithT, t, index));
+				}
+				{
+					var bWithT = (BitSet) b.clone();
+					bWithT.set(t);
+					var index = Math.min(split.getWeight(), minIndexOverQuartetsContaining(t, bWithT, a, distancesBlock));
+					if (index > TOLERANCE)
+						extended.add(new ASplit((BitSet) a.clone(), t, index));
 				}
 			}
-
-			// consider all previously computed splits:
-			for (final ASplit previousSplit : previousSplits) {
-				final BitSet A = previousSplit.getA();
-				final BitSet B = getComplement(previousSplit.getA(), t - 1);
-
-				// is Au{t} vs B a split?
-				{
-					A.set(t);
-					final double wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, A, B, distancesBlock));
-					if (wgt > 0) {
-						nextSplits.add(new ASplit((BitSet) A.clone(), t, wgt));
-						// System.err.println("Adding (step 1) " +nextSplits.get(nextSplits.size()-1));
-					}
-					A.set(t, false);
-				}
-
-				// is A vs Bu{t} a split?
-				{
-					B.set(t);
-					final double wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, B, A, distancesBlock));
-					if (wgt > 0) {
-						nextSplits.add(new ASplit((BitSet) B.clone(), t, wgt));
-						// System.err.println("Adding (step 2) " +nextSplits.get(nextSplits.size()-1));
-					}
-				}
-			}
-			previousSplits = nextSplits;
-
-			previousTaxa.set(t);
-
-			progress.incrementProgress();
+			splits = extended;
+			progress.setProgress(t);
 		}
 
-		// add all missing trivial
-		previousSplits.addAll(SplitsBlockUtilities.createAllMissingTrivial(previousSplits, ntax, 0.0));
-
-		// copy splits to splits
-		splitsBlock.getSplits().addAll(previousSplits);
+		splits.addAll(SplitsBlockUtilities.createAllMissingTrivial(splits, ntax, 0.0));
+		splitsBlock.getSplits().addAll(splits);
 
 		splitsBlock.setFit(SplitsBlockUtilities.computeSplitDecompositionFit(distancesBlock, splitsBlock.getSplits()));
-		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
-		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
+		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(ntax, splitsBlock.getSplits()));
+		splitsBlock.setCompatibility(Compatibility.compute(ntax, splitsBlock.getSplits(), splitsBlock.getCycle()));
+		progress.setProgress(ntax);
 	}
 
-
 	/**
-	 * Returns the isolation index for Au{x} vs B
+	 * computes the minimum Buneman index over all quartets t,a | b,b' with a in A (a = t is allowed) and
+	 * b, b' in B (b = b' is allowed)
 	 *
-	 * @param t maximal taxon index, assumed to be contained in set A
-	 * @param A set A
-	 * @param B set B
-	 * @param d Distance matrix
-	 * @return the isolation index
+	 * @param t         taxon, must be contained in A
+	 * @param A         the side containing t
+	 * @param B         the other side
+	 * @param distances distances
+	 * @return the minimum index, returned early once it is known not to be positive
 	 */
-	public static float getIsolationIndex(int t, BitSet A, BitSet B, DistancesBlock d) {
-		float min_val = Float.MAX_VALUE;
-
-		for (int i = 1; i <= t; i++) {
-			if (A.get(i)) {
-				for (int j = 1; j <= t; j++)
-					if (B.get(j)) {
-						for (int k = j; k <= t; k++) {
-							if (B.get(k)) {
-								float val = getIsolationIndex(t, i, j, k, d);
-								if (val < min_val) {
-									if (val <= 0.0000001)
-										return 0;
-									min_val = val;
-								}
-							}
-						}
-					}
+	public static double minIndexOverQuartetsContaining(int t, BitSet A, BitSet B, DistancesBlock distances) {
+		var min = Double.POSITIVE_INFINITY;
+		for (var a : BitSetUtils.members(A)) {
+			for (var b : BitSetUtils.members(B)) {
+				for (var b2 : BitSetUtils.members(B, b)) {
+					min = Math.min(min, quartetIndex(t, a, b, b2, distances));
+					if (min <= TOLERANCE)
+						return min;
+				}
 			}
 		}
-		return min_val;
+		return min;
 	}
 
 	/**
-	 * Returns the isolation index of i,j vs k,l
-	 *
-	 * @param i a taxon
-	 * @param j a taxon
-	 * @param k a taxon
-	 * @param m a taxon
-	 * @param d Distance matrix
-	 * @return the isolation index
+	 * computes the Buneman index of the quartet a,a' | b,b', that is, half the amount by which the smaller of the
+	 * two crossing sums d(a,b) + d(a',b') and d(a,b') + d(a',b) exceeds d(a,a') + d(b,b')
 	 */
-	public static float getIsolationIndex(int i, int j, int k, int m, DistancesBlock d) {
-		return (float)
-				(0.5 * (Math.min(d.get(i, k) + d.get(j, m), d.get(i, m) + d.get(j, k))
-						- d.get(i, j) - d.get(k, m)));
-	}
-
-	private static BitSet getComplement(BitSet A, int ntax) {
-		BitSet result = new BitSet();
-		for (int t = A.nextClearBit(1); t != -1 && t <= ntax; t = A.nextClearBit(t + 1))
-			result.set(t);
-		return result;
+	public static double quartetIndex(int a, int a2, int b, int b2, DistancesBlock d) {
+		var crossing = Math.min(d.get(a, b) + d.get(a2, b2), d.get(a, b2) + d.get(a2, b));
+		return 0.5 * (crossing - d.get(a, a2) - d.get(b, b2));
 	}
 
 	@Override

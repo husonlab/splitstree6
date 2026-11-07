@@ -1,5 +1,5 @@
 /*
- *  JCmodel.java Copyright (C) 2024 Daniel H. Huson
+ *  JCmodel.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,45 +19,45 @@
 
 package splitstree6.models.nucleotideModels;
 
-/**
- * @author Miguel Jett�
- * June 10th 2004
- * <p/>
- * Jukes Cantor model of evolution.
- */
+import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 
+/**
+ * the Jukes-Cantor (1969) model of nucleotide substitution: all four bases are equally frequent and
+ * every substitution occurs at the same rate
+ * Daniel Huson, 11.2026
+ */
 public class JCmodel extends NucleotideModel {
 	public JCmodel() {
-		super();
-
-		double[] basefreqs = {0.25, 0.25, 0.25, 0.25};
-
-		double[][] Q = new double[4][4];
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				if (i != j) {
-					Q[i][j] = basefreqs[j];
-				}
+		var frequencies = new double[]{0.25, 0.25, 0.25, 0.25};
+		// a rate of one third per off-diagonal entry gives one expected substitution per unit time
+		var q = new double[4][4];
+		for (var a = 0; a < 4; a++) {
+			for (var b = 0; b < 4; b++) {
+				q[a][b] = (a == b ? -1.0 : 1.0 / 3.0);
 			}
 		}
-
-		setRateMatrix(Q, basefreqs);
+		setRateMatrix(q, frequencies);
 		normaliseQ();
-
 	}
-
-	public double exactDistance(double[][] F) {
-		final double D = 1 - (F[0][0] + F[1][1] + F[2][2] + F[3][3]);
-		final double B = 0.75;
-		return -B * mInverse(1 - D / B, getPropInvariableSites(), getGamma());
-	}
-
 
 	/**
-	 * is this a group valued model
+	 * the Jukes-Cantor distance -3/4 log(1 - 4/3 p), where p is the proportion of differing sites;
+	 * invariable sites and gamma-distributed rates enter through the inverse moment-generating function
 	 *
-	 * @return true, if group valued model
+	 * @param F divergence matrix, F[a][b] is the proportion of sites showing state a in one sequence and b in the other
+	 * @return distance
 	 */
+	@Override
+	public double exactDistance(double[][] F) throws SaturatedDistancesException {
+		var identical = 0.0;
+		for (var a = 0; a < 4; a++) {
+			identical += F[a][a];
+		}
+		var p = 1.0 - identical;
+		return -0.75 * mInverse(1.0 - p / 0.75, getPropInvariableSites(), getGamma());
+	}
+
+	@Override
 	public boolean isGroupBased() {
 		return true;
 	}

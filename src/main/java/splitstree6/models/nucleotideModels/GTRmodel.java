@@ -1,5 +1,5 @@
 /*
- *  GTRmodel.java Copyright (C) 2024 Daniel H. Huson
+ *  GTRmodel.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,12 +17,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Created on 11-Jun-2004
- *
- * To change the template for this generated file go to
- * MainWindow&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 package splitstree6.models.nucleotideModels;
 
 import jama.EigenvalueDecomposition;
@@ -30,96 +24,69 @@ import jama.Matrix;
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 
 /**
- * @author Mig
- * <p/>
- * To change the template for this generated type comment go to
- * MainWindow&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * the general time-reversible model of nucleotide substitution (Tavaré 1986), in which the rate of change
+ * from state a to state b is Q[a][b] = s[a][b] pi[b] for symmetric exchangeabilities s and base frequencies pi
+ * Daniel Huson, 11.2026
  */
 public class GTRmodel extends NucleotideModel {
-	private final double[][] Q;
-
 	/**
-	 * General time reversible model
+	 * constructor. The supplied rate matrix need not be time reversible: its exchangeabilities
+	 * rates[a][b] / frequencies[b] are averaged with those of the reverse changes, which makes them symmetric
 	 *
-	 * @param basefreqs Takes a provisional Q matrix and the base frequencies. Under the GTRDistance properties, the matrix
-	 *                  Pi Q is symmetric. We enforce this as follows:
-	 *                  FOR OFF-DIAGONAL
-	 *                  First we construct X = PiQ
-	 *                  Replace X by (X + X')/2.0,
-	 *                  Fill in Q = Pi^{-1} X
-	 *                  Equivalently, Q_ij <- (Pi_i Q_ij + Pi_j Q_ji)/2.0 * Pi_i^{-1}
-	 *                  FOR DIAGONAL
-	 *                  Q_ii <= -\sum_{j \neq i} Q_{ij}
+	 * @param rates       rate matrix, in the order A, C, G, T; the diagonal is ignored
+	 * @param frequencies base frequencies, in the order A, C, G, T
 	 */
-	public GTRmodel(double[][] QMatrix, double[] basefreqs) {
-		Q = new double[4][4];
-		for (int i = 0; i < 4; i++) {
-			double rowsum = 0.0;
-			for (int j = 0; j < 4; j++) {
-				if (i != j) {
-					Q[i][j] = (basefreqs[i] * QMatrix[i][j] + basefreqs[j] * QMatrix[j][i]) / (2.0 * basefreqs[i]);
-					rowsum += Q[i][j];
+	public GTRmodel(double[][] rates, double[] frequencies) {
+		var q = new double[4][4];
+		for (var a = 0; a < 4; a++) {
+			for (var b = 0; b < 4; b++) {
+				if (a != b) {
+					var exchangeability = 0.5 * (rates[a][b] / frequencies[b] + rates[b][a] / frequencies[a]);
+					q[a][b] = exchangeability * frequencies[b];
 				}
 			}
-			Q[i][i] = -rowsum;
 		}
-
-		setRateMatrix(Q, basefreqs);
+		setRateMatrix(q, frequencies);
 		normaliseQ();
-
 	}
 
-	@Override
-	/* Exact distance - pg 456 in Swofford et al.
-	 * Let Pi denote the diagonal matrix with base frequencies down the
-	 * diagonal. The standard formula is
+	/**
+	 * the general time-reversible distance d = -trace(Pi log(Pi^{-1} F)) (Rodríguez et al. 1990), where Pi is the
+	 * diagonal matrix of base frequencies and F is the divergence matrix, symmetrized.
+	 * The matrix Pi^{-1/2} F Pi^{-1/2} is symmetric and has the same eigenvalues as Pi^{-1} F, so we diagonalize
+	 * it as V L V^T and obtain the distance as -sum_a pi[a] sum_k V[a][k]^2 g(L[k]), where g is the logarithm,
+	 * or more generally the inverse moment-generating function that accounts for invariable sites and
+	 * gamma-distributed rates
 	 *
-	 * dist = -trace(Pi log(Pi^{-1} F))
-	 *
-	 * The problem is that Pi^{-1}F will probably not be symmetric, so taking the
-	 * logarithm is difficult. However we can use an alternative formula:
-	 *
-	 * dist = -trace(Pi^{1/2} log(Pi^{-1/2} (F'+F)/2 Pi^{-1/2}) Pi^{1/2} )
-	 *
-	 * Then we will be taking the log (or inverse MGF) of a symmetric matrix.
+	 * @param F divergence matrix, F[a][b] is the proportion of sites showing state a in one sequence and b in the other
+	 * @return distance
 	 */
+	@Override
 	public double exactDistance(double[][] F) throws SaturatedDistancesException {
+		var pi = getNormedBaseFreq();
+		var sqrtPi = new double[4];
+		for (var a = 0; a < 4; a++) {
+			sqrtPi[a] = Math.sqrt(pi[a]);
+		}
 
-		final int n = 4;
-		final double[] sqrtpi = new double[n];
-		final double[] baseFreq = getNormedBaseFreq();
-
-		for (int i = 0; i < n; i++)
-			sqrtpi[i] = Math.sqrt(baseFreq[i]);
-		final Matrix X = new Matrix(n, n);
-
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j <= i; j++) {
-				double Xij = (F[i][j] + F[j][i]) / (2.0 * sqrtpi[i] * sqrtpi[j]);
-				X.set(i, j, Xij);
-				if (i != j)
-					X.set(j, i, Xij);
+		var symmetric = new Matrix(4, 4);
+		for (var a = 0; a < 4; a++) {
+			for (var b = 0; b < 4; b++) {
+				symmetric.set(a, b, 0.5 * (F[a][b] + F[b][a]) / (sqrtPi[a] * sqrtPi[b]));
 			}
 		}
 
-		/* Compute M^{-1}(Q)  */
-		final EigenvalueDecomposition EX = new EigenvalueDecomposition(X);
-		final double[] D = EX.getRealEigenvalues();
-		final double[][] V = (EX.getV().getArrayCopy());
-		for (int i = 0; i < 4; i++)
-			D[i] = mInverse(D[i], getPropInvariableSites(), getGamma());
+		var eigen = new EigenvalueDecomposition(symmetric);
+		var eigenvalues = eigen.getRealEigenvalues();
+		var eigenvectors = eigen.getV().getArray();
 
-		/* Now evaluate trace(pi^{1/2} V D V^T pi^{1/2}) */
-
-		double dist = 0.0;
-		for (int i = 0; i < 4; i++) {
-			double x = 0.0;
-			for (int j = 0; j < 4; j++) {
-				x += baseFreq[i] * V[i][j] * V[i][j] * D[j];
+		var distance = 0.0;
+		for (var k = 0; k < 4; k++) {
+			var transformed = mInverse(eigenvalues[k], getPropInvariableSites(), getGamma());
+			for (var a = 0; a < 4; a++) {
+				distance -= pi[a] * eigenvectors[a][k] * eigenvectors[a][k] * transformed;
 			}
-			dist -= x;
 		}
-
-		return dist;
+		return distance;
 	}
 }

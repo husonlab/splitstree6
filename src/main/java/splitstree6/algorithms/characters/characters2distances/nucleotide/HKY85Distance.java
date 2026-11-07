@@ -1,5 +1,5 @@
 /*
- *  HKY85Distance.java Copyright (C) 2024 Daniel H. Huson
+ *  HKY85Distance.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -26,17 +26,12 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.models.nucleotideModels.HKY85model;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Computes the Hasegawa, Kishino and Yano distance for a set of characters.
- * <p>
- * Created on 12-Jun-2004
- *
- * @author Mig
+ * computes maximum-likelihood distances under the Hasegawa-Kishino-Yano (1985) model
+ * Daniel Huson, 11.2026
  */
-
 public class HKY85Distance extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
@@ -52,25 +47,23 @@ public class HKY85Distance extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("optionTsTvRatio", "optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams");
+		return List.of("optionTsTvRatio", "optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams");
 	}
 
 	public HKY85Distance() {
-		super();
 		setOptionUseML_Distances(true);
 	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
-
-		progress.setTasks("HKY85Distance distance", "Computing...");
+		progress.setTasks("HKY85 distance", "Computing...");
 
 		var model = new HKY85model(getOptionBaseFrequencies(), getOptionTsTvRatio());
 		model.setPropInvariableSites(getOptionPropInvariableSites());
 		model.setGamma(DEFAULT_GAMMA);
 
+		// the model has no closed-form distance, so distances are always estimated by maximum likelihood
 		setOptionUseML_Distances(true);
-		model.apply(progress, charactersBlock, distancesBlock, isOptionUseML_Distances());
-		// there is no exact formular
+		model.apply(progress, charactersBlock, distancesBlock, true);
 	}
 }

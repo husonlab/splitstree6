@@ -1,5 +1,5 @@
 /*
- *  UPGMA.java Copyright (C) 2024 Daniel H. Huson
+ *  UPGMA.java Copyright (C) 2026 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -21,6 +21,7 @@ package splitstree6.algorithms.distances.distances2trees;
 
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
+import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.trees.IToSingleTree;
@@ -29,17 +30,14 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
+import java.util.BitSet;
 
 /**
- * UPGMA classic n³ version
- * <p>
- * Created on 2010-02-04
- *
- * @author Christian Rausch, David Bryant, Daniel Huson
+ * UPGMA, the unweighted pair group method with arithmetic mean (Sokal and Michener 1958): average-linkage
+ * clustering that repeatedly merges the two closest clusters, producing a rooted ultrametric tree
+ * Daniel Huson, 11.2026
  */
-
 public class UPGMA extends Distances2Trees implements IToSingleTree {
-
 	@Override
 	public String getCitation() {
 		return "Sokal & Michener 1958; " +
@@ -60,114 +58,97 @@ public class UPGMA extends Distances2Trees implements IToSingleTree {
 	}
 
 	/**
-	 * compute the UPGMA tree
+	 * computes the UPGMA tree
+	 *
+	 * @param progress  progress listener
+	 * @param taxaBlock taxa
+	 * @param distances distances
+	 * @return rooted ultrametric tree
 	 */
 	public static PhyloTree computeUPGMATree(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distances) throws CanceledException {
-		final var tree = new PhyloTree();
+		var ntax = distances.getNtax();
+		var tree = new PhyloTree();
 		tree.setName("UPGMA-tree");
-		final var ntax = distances.getNtax();
 
-		final var subtrees = new Node[ntax + 1];
-		final var sizes = new int[ntax + 1];
+		// each cluster is represented by the root of its subtree, the number of taxa in it and its height above the leaves
+		var roots = new Node[ntax + 1];
+		var sizes = new int[ntax + 1];
 		var heights = new double[ntax + 1];
-
+		var clusters = new BitSet();
 		for (var t = 1; t <= ntax; t++) {
-			final var v = tree.newNode();
-			subtrees[t] = v;
+			var v = tree.newNode();
 			tree.setLabel(v, taxaBlock.getLabel(t));
 			tree.addTaxon(v, t);
+			roots[t] = v;
 			sizes[t] = 1;
+			clusters.set(t);
 		}
 
-		final var d = new double[ntax + 1][ntax + 1];// distance matix
-
-		//Initialise d
-		//Compute the closest values for each taxa.
+		// average distances between clusters, initially the given distances
+		var d = new double[ntax + 1][ntax + 1];
 		for (var i = 1; i <= ntax; i++) {
 			for (var j = i + 1; j <= ntax; j++) {
-				//d[i][j] = d[j][i] = (distances.get(i, j) + distances.get(j, i)) / 2.0;
-				final var sum = distances.get(i, j) + distances.get(j, i);
-				if (sum == distances.get(i, j) || sum == distances.get(j, i)) {
-					d[i][j] = d[j][i] = sum;
-				} else {
-					d[i][j] = d[j][i] = sum / 2.0;
-				}
+				d[i][j] = d[j][i] = symmetrize(distances.get(i, j), distances.get(j, i));
 			}
 		}
 
 		progress.setMaximum(ntax);
-		for (var clusters = ntax; clusters > 2; clusters--) {
-			var i_min = 0;
-			var j_min = 0;
-			//Find closest pair.
-			double d_min = Double.POSITIVE_INFINITY;
-			for (int i = 1; i <= clusters; i++) {
-				for (int j = i + 1; j <= clusters; j++) {
-					double dij = d[i][j];
-					if (i_min == 0 || dij < d_min) {
-						i_min = i;
-						j_min = j;
-						d_min = dij;
+		progress.setProgress(0);
+
+		while (clusters.cardinality() > 1) {
+			// find the two closest clusters, taking the first pair in index order if there are several
+			var bestI = -1;
+			var bestJ = -1;
+			var best = Double.POSITIVE_INFINITY;
+			for (var i : BitSetUtils.members(clusters)) {
+				for (var j : BitSetUtils.members(clusters, i + 1)) {
+					if (bestI == -1 || d[i][j] < best) {
+						bestI = i;
+						bestJ = j;
+						best = d[i][j];
 					}
 				}
 			}
 
-			final var height = d_min / 2.0;
+			// the new cluster sits at half the distance between its two parts and each part hangs below it by the
+			// difference in height, which is never negative because average linkage produces no inversions
+			var height = 0.5 * best;
+			var u = tree.newNode();
+			tree.setWeight(tree.newEdge(u, roots[bestI]), Math.max(0.0, height - heights[bestI]));
+			tree.setWeight(tree.newEdge(u, roots[bestJ]), Math.max(0.0, height - heights[bestJ]));
 
-			final var v = tree.newNode();
-			final var e = tree.newEdge(v, subtrees[i_min]);
-			tree.setWeight(e, Math.max(height - heights[i_min], 0.0));
-			final var f = tree.newEdge(v, subtrees[j_min]);
-			tree.setWeight(f, Math.max(height - heights[j_min], 0.0));
-
-			subtrees[i_min] = v;
-			subtrees[j_min] = null;
-			heights[i_min] = height;
-
-
-			final var size_i = sizes[i_min];
-			final var size_j = sizes[j_min];
-			sizes[i_min] = size_i + size_j;
-
-			for (var k = 1; k <= ntax; k++) {
-				if ((k == i_min) || k == j_min) continue;
-				final var dki = (d[k][i_min] * size_i + d[k][j_min] * size_j) / ((double) (size_i + size_j));
-				d[k][i_min] = d[i_min][k] = dki;
-			}
-
-			//Copy the top row of the matrix and arrays into the empty j_min row/column.
-			if (j_min < clusters) {
-				for (var k = 1; k <= clusters; k++) {
-					d[j_min][k] = d[k][j_min] = d[clusters][k];
+			// the distance from any other cluster to the merged one is the size-weighted mean of its distances to the two parts
+			for (var k : BitSetUtils.members(clusters)) {
+				if (k != bestI && k != bestJ) {
+					d[bestI][k] = d[k][bestI] = (sizes[bestI] * d[bestI][k] + sizes[bestJ] * d[bestJ][k]) / (sizes[bestI] + sizes[bestJ]);
 				}
-				d[j_min][j_min] = 0.0;
-				subtrees[j_min] = subtrees[clusters];
-				sizes[j_min] = sizes[clusters];
-				heights[j_min] = heights[clusters];
 			}
+			roots[bestI] = u;
+			sizes[bestI] += sizes[bestJ];
+			heights[bestI] = height;
+			clusters.clear(bestJ);
 
 			progress.incrementProgress();
 		}
 
-		final var brother = 1;
-
-		var sister = brother + 1;
-		while (subtrees[sister] == null)
-			sister++;
-
-		final var root = tree.newNode();
-		final var left = tree.newEdge(root, subtrees[brother]);
-		final var right = tree.newEdge(root, subtrees[sister]);
-
-		final var halfTotal = 0.5 * (d[brother][sister]); // fixed
-		tree.setWeight(left, halfTotal - heights[brother]);
-		tree.setWeight(right, halfTotal - heights[sister]);
-
-		tree.setRoot(root);
-
+		if (ntax > 0)
+			tree.setRoot(roots[clusters.nextSetBit(1)]);
+		progress.setProgress(ntax);
 		return tree;
 	}
 
+	/**
+	 * the input distance between two taxa, averaged over both orientations; a matrix in which only one
+	 * triangle has been filled in is accepted
+	 */
+	private static double symmetrize(double dij, double dji) {
+		if (dij == 0.0)
+			return dji;
+		else if (dji == 0.0)
+			return dij;
+		else
+			return 0.5 * (dij + dji);
+	}
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, DistancesBlock parent) {
