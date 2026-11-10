@@ -58,10 +58,12 @@ import splitstree6.utils.TreesUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
+import splitstree6.view.utils.RubberBandSelector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.List;
 
 import static splitstree6.layout.tree.TreeDiagramType.*;
 
@@ -85,6 +87,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 	private final FindToolBar findToolBar;
 
 	private final ObjectProperty<Dimension2D> treePaneDimensions = new SimpleObjectProperty<>(new Dimension2D(0, 0));
+
+	private RubberBandSelector rubberBandSelector; // a reference is kept so that it is not garbage collected
 
 	public TanglegramViewPresenter(MainWindow mainWindow, TanglegramView view, ObjectProperty<Bounds> targetBounds, ObservableList<PhyloTree> trees) {
 		this.mainWindow = mainWindow;
@@ -138,6 +142,12 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				nodeShapeMap2, updateRequested2);
 
 		controller.getRightPane().getChildren().add(tree2Pane);
+
+		// long-press then drag anywhere in the tanglegram to box-select taxa in either tree or in both
+		if (controller.getScrollPane().getContent() instanceof Pane pane) {
+			rubberBandSelector = RubberBandSelector.createForTaxa(pane, List.of(nodeShapeMap1, nodeShapeMap2),
+					mainWindow::getWorkingTaxa, mainWindow.getTaxonSelectionModel());
+		}
 
 		final ObservableList<String> treeNames = FXCollections.observableArrayList();
 		trees.addListener((InvalidationListener) e -> treeNames.setAll(trees.stream().map(Graph::getName).collect(Collectors.toList())));

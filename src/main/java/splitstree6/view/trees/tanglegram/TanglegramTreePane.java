@@ -68,7 +68,7 @@ public class TanglegramTreePane extends Group {
 						treePane = new TreePane(mainWindow, scrollPane, undoManager, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 								optionDiagram.get(), labelByEdges.get(), optionAveraging.get(), LayoutRootedPhylogeny.Scaling.LateBranching,
 								optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
-								null, nodeShapeMap, FXCollections.observableHashMap(), false, true);
+								null, nodeShapeMap, FXCollections.observableHashMap(), false, false); // the tanglegram view has one rubber band for both trees
 
 						changingOrientation.bind(treePane.changingOrientationProperty());
 						treePane.setRunAfterUpdate(getRunAfterUpdate());

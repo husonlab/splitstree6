@@ -21,7 +21,18 @@ package splitstree6.dialog.exporting.data;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.event.Event;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.ZoomEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -46,6 +57,15 @@ public class ExportDialog {
 		var loader = new ExtendedFXMLLoader<ExportDialogController>(ExportDialogController.class);
 		ExportDialogController controller = loader.getController();
 
+		// in a mobile app, the window's root pane is embedded in the app's frame, so the scene to use is the one
+		// that the root pane is showing in, not the scene of the window's own stage
+		var rootPane = mainWindow.getController().getRootPane();
+		if (!ProgramProperties.isDesktop() && rootPane != null && rootPane.getScene() != null
+			&& rootPane.getScene().getRoot() instanceof Pane host) {
+			showInWindow(mainWindow, dataNode, controller, loader.getRoot(), host);
+			return;
+		}
+
 		var scene = new Scene(loader.getRoot());
 
 		var stage = new Stage();
@@ -66,6 +86,50 @@ public class ExportDialog {
 	/**
 	 * create a menu item for this dialog
 	 */
+	/**
+	 * On a mobile device, a second stage is neither modal nor can it be dismissed by tapping next to it. So the
+	 * dialog is shown inside the main window instead, on a backdrop that covers the whole window: the backdrop
+	 * keeps all taps away from the user interface below it, and a tap on the backdrop closes the dialog.
+	 */
+	private static void showInWindow(MainWindow mainWindow, DataNode dataNode, ExportDialogController controller, Parent dialog, Pane host) {
+		var backdrop = new StackPane(dialog);
+		backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.35);");
+		dialog.setStyle("-fx-background-color: -fx-background; -fx-background-radius: 8; -fx-border-color: -fx-box-border;"
+						+ " -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.2, 0, 2);");
+		if (dialog instanceof Region region) {
+			region.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+			// leave room for the on-screen keyboard: place the dialog in the upper part of the window
+			StackPane.setAlignment(region, Pos.TOP_CENTER);
+			StackPane.setMargin(region, new Insets(80, 10, 10, 10));
+		}
+
+		Runnable close = () -> host.getChildren().remove(backdrop);
+		backdrop.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+			if (e.getTarget() == backdrop)
+				close.run();
+			e.consume();
+		});
+		// nothing gets through to the window below
+		backdrop.addEventHandler(MouseEvent.ANY, Event::consume);
+		backdrop.addEventHandler(ScrollEvent.ANY, Event::consume);
+		backdrop.addEventHandler(ZoomEvent.ANY, Event::consume);
+
+		new ExportDialogPresenter(mainWindow, controller, close, dataNode);
+
+		if (host instanceof AnchorPane) {
+			AnchorPane.setTopAnchor(backdrop, 0.0);
+			AnchorPane.setBottomAnchor(backdrop, 0.0);
+			AnchorPane.setLeftAnchor(backdrop, 0.0);
+			AnchorPane.setRightAnchor(backdrop, 0.0);
+		} else if (!(host instanceof StackPane)) {
+			backdrop.setManaged(false);
+			backdrop.resizeRelocate(0, 0, host.getWidth(), host.getHeight());
+			host.widthProperty().addListener((v, o, n) -> backdrop.resizeRelocate(0, 0, host.getWidth(), host.getHeight()));
+			host.heightProperty().addListener((v, o, n) -> backdrop.resizeRelocate(0, 0, host.getWidth(), host.getHeight()));
+		}
+		host.getChildren().add(backdrop);
+	}
+
 	public static MenuItem createMenuItem(MainWindow mainWindow, DataNode dataNode, ReadOnlyBooleanProperty empty) {
 		var menuItem = new MenuItem("Export data...");
 		menuItem.setOnAction(e -> ExportDialog.show(mainWindow, dataNode));

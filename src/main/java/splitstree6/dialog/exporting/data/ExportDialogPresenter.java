@@ -56,9 +56,21 @@ public class ExportDialogPresenter {
 	public static StringProperty fileName = new SimpleStringProperty("");
 	public static StringProperty mobileDirectory = new SimpleStringProperty("");
 
+	/**
+	 * presenter for a dialog that is shown in its own stage
+	 */
 	public ExportDialogPresenter(MainWindow mainWindow, ExportDialogController controller, Stage stage, DataNode dataNode) {
+		this(mainWindow, controller, () -> {
+			stage.hide();
+			MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
+		}, dataNode);
 		MainWindowManager.getInstance().addAuxiliaryWindow(mainWindow, stage);
+	}
 
+	/**
+	 * presenter for a dialog that is closed by the given method, e.g. one shown inside the main window
+	 */
+	public ExportDialogPresenter(MainWindow mainWindow, ExportDialogController controller, Runnable closeDialog, DataNode dataNode) {
 		fileName.set("");
 
 		var exporter = new SimpleObjectProperty<DataBlockWriter>();
@@ -98,10 +110,7 @@ public class ExportDialogPresenter {
 				controller.getFileTextField().setText(file.getPath());
 		});
 
-		controller.getCancelButton().setOnAction(e -> {
-			stage.hide();
-			MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
-		});
+		controller.getCancelButton().setOnAction(e -> closeDialog.run());
 
 		dataNode.titleProperty().addListener(e -> controller.getTitleLabel().setText("Export '%s' of type '%s'"
 				.formatted(dataNode.getTitle(), dataNode.getClass().getSimpleName())));
@@ -115,8 +124,7 @@ public class ExportDialogPresenter {
 				}
 				FileUtils.checkFileWritable(fileName, true);
 				exporter.get().write(fileName, mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock());
-				MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
-				stage.hide();
+				closeDialog.run();
 				System.err.println("Exported " + dataNode.getTitle() + " to file: " + FileUtils.getFileNameWithoutPath(fileName));
 				ExportDialogPresenter.fileName.set(fileName);
 			} catch (Exception ex) {

@@ -36,6 +36,7 @@ import jloda.fx.find.FindToolBar;
 import jloda.fx.qr.QRViewUtils;
 import jloda.fx.qr.TreeNewickQR;
 import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.PinchDirection;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.MainWindowManager;
@@ -126,14 +127,17 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
+		// a pinch with the fingers side by side zooms horizontally, one above the other zooms vertically and a
+		// diagonal pinch zooms both; radial and circular diagrams always zoom in both directions
+		var pinchDirection = PinchDirection.install(controller.getCenterPane());
 		controller.getCenterPane().setOnZoom(e -> {
-			if ((e.getZoomFactor() < 1 && view.getOptionHorizontalZoomFactor() * e.getZoomFactor() > 0.2)
-				|| (e.getZoomFactor() > 1 && view.getOptionHorizontalZoomFactor() * e.getZoomFactor() < 5)) {
-				view.setOptionHorizontalZoomFactor(e.getZoomFactor() * view.getOptionHorizontalZoomFactor());
-				if (view.getOptionDiagram().isRadialOrCircular()) {
-					view.setOptionVerticalZoomFactor(e.getZoomFactor() * view.getOptionVerticalZoomFactor());
-				}
-			}
+			var factor = e.getZoomFactor();
+			var radialOrCircular = view.getOptionDiagram().isRadialOrCircular();
+			var direction = pinchDirection.getDirection();
+			if ((radialOrCircular || direction.isHorizontal()) && inZoomRange(view.getOptionHorizontalZoomFactor() * factor, factor))
+				view.setOptionHorizontalZoomFactor(factor * view.getOptionHorizontalZoomFactor());
+			if ((radialOrCircular || direction.isVertical()) && inZoomRange(view.getOptionVerticalZoomFactor() * factor, factor))
+				view.setOptionVerticalZoomFactor(factor * view.getOptionVerticalZoomFactor());
 		});
 
 		controller.getJitterMenuItem().selectedProperty().bindBidirectional(view.optionJitterProperty());
@@ -309,5 +313,12 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public boolean allowFindReplace() {
 		return true;
+	}
+
+	/**
+	 * may the zoom factor be changed to the given value? Zooming out stops at 0.2 and zooming in at 5
+	 */
+	private static boolean inZoomRange(double newValue, double factor) {
+		return (factor < 1 && newValue > 0.2) || (factor > 1 && newValue < 5);
 	}
 }

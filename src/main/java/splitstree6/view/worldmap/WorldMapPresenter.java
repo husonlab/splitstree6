@@ -98,10 +98,12 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		});
 
 		controller.getZoomToFitButton().setOnAction(e -> {
-			var paneRect = worldMap1.localToScreen(worldMap1.getBoundsInLocal());
-			var dataRect = worldMap1.getDataRectangle().localToScreen(worldMap1.getDataRectangle().getBoundsInLocal());
+			// scene rather than screen coordinates: only the ratio of the two rectangles is used, and screen
+			// coordinates are not available (null) while the view is not showing in a window
+			var paneRect = worldMap1.localToScene(worldMap1.getBoundsInLocal());
+			var dataRect = worldMap1.getDataRectangle().localToScene(worldMap1.getDataRectangle().getBoundsInLocal());
 
-			if (!worldMap1.getUserItems().getChildren().isEmpty() && dataRect.getHeight() > 0 && dataRect.getWidth() > 0) {
+			if (paneRect != null && dataRect != null && !worldMap1.getUserItems().getChildren().isEmpty() && dataRect.getHeight() > 0 && dataRect.getWidth() > 0) {
 				var scale = Math.min(paneRect.getWidth() / dataRect.getWidth(), paneRect.getHeight() / dataRect.getHeight());
 				if (scale > 0) {
 					zoom.set(scale);

@@ -105,17 +105,11 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		dataNodeSelected.addListener((v, o, n) -> {
-			if (n && treeView.getSelectionModel().getSelectedItem() instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof DataNode<?> dataNode) {
-				controller.getAddMenuButton().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, workflowTreeView.getUndoManager(), dataNode));
-			} else {
-				controller.getAddMenuButton().getItems().clear();
-			}
-		});
-
+		// the items of the add-algorithm menu belong to the selected data node, so they are rebuilt whenever the
+		// selected item changes, also when the selection moves from one data node to another
 		treeView.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			if (n instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof DataNode<?> dataNode) {
-				dataNodeSelected.set(true);
+				controller.getAddMenuButton().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, workflowTreeView.getUndoManager(), dataNode));
 			} else {
 				controller.getAddMenuButton().getItems().clear();
 			}

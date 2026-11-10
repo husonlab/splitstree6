@@ -22,6 +22,7 @@ package splitstree6.view.utils;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.control.SeparatorMenuItem;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.ProgramProperties;
 import splitstree6.data.ViewBlock;
 import splitstree6.dialog.exporting.data.ExportDialog;
 import splitstree6.window.MainWindow;
@@ -40,9 +41,15 @@ public class ExportUtils {
 
 		var mainController = mainWindow.getController();
 
-		mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
-				mainController.getCopyImageMenuItem(), new SeparatorMenuItem(), mainController.getPrintMenuItem(),
-				new SeparatorMenuItem(), mainController.getExportImageMenuItem(),
-				ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty), new SeparatorMenuItem(), mainController.getShowQRCodeMenuItem()), false));
+		if (ProgramProperties.isDesktop()) {
+			mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
+					mainController.getCopyImageMenuItem(), new SeparatorMenuItem(), mainController.getPrintMenuItem(),
+					new SeparatorMenuItem(), mainController.getExportImageMenuItem(),
+					ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty), new SeparatorMenuItem(), mainController.getShowQRCodeMenuItem()), false));
+		} else { // no printing and no file dialogs on a mobile device; images are shared via Copy Image
+			mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
+					mainController.getCopyImageMenuItem(), new SeparatorMenuItem(),
+					ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty), new SeparatorMenuItem(), mainController.getShowQRCodeMenuItem()), false));
+		}
 	}
 }
