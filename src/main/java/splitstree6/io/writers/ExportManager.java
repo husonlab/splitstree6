@@ -19,6 +19,7 @@
 
 package splitstree6.io.writers;
 
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
@@ -148,7 +149,8 @@ public class ExportManager {
 	public void exportFile(String fileName, TaxaBlock taxaBlock, DataBlock dataBlock, String exporterName) throws IOException {
 		exportFile(FileUtils.getOutputWriterPossiblyZIPorGZIP(fileName), taxaBlock, dataBlock, exporterName);
 		RecentFilesManager.getInstance().insertRecentFile(fileName);
-		NotificationManager.showInformation(String.format("Wrote %,d bytes to file: %s", (new File(fileName)).length(), fileName));
+		NotificationManager.showInformation(String.format("Wrote %,d bytes to file: %s", (new File(fileName)).length(),
+				ProgramProperties.isDesktop() ? fileName : FileUtils.getFileNameWithoutPath(fileName)));
 	}
 
 	/**

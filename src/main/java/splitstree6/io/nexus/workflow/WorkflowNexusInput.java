@@ -21,6 +21,7 @@ package splitstree6.io.nexus.workflow;
 
 import javafx.application.Platform;
 import jloda.fx.util.AService;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
 import jloda.util.Basic;
 import jloda.util.FileUtils;
@@ -114,7 +115,7 @@ public class WorkflowNexusInput {
 			service.setOnSucceeded(e -> {
 				var resultWorkflow = service.getValue();
 				mainWindow.setFileName(fileName);
-				NotificationManager.showInformation("Loaded file: " + fileName + ", workflow nodes: " + resultWorkflow.size());
+				NotificationManager.showInformation("Loaded file: " + (ProgramProperties.isDesktop() ? fileName : FileUtils.getFileNameWithoutPath(fileName)) + ", workflow nodes: " + resultWorkflow.size());
 				workflow.shallowCopy(resultWorkflow);
 
 				if (!isWorkflowFile(fileName)) {

@@ -67,7 +67,7 @@ public class WorkflowNexusOutput {
 		}
 		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(fileName)) {
 			final var count = save(workflow, w, asWorkflowOnly);
-			NotificationManager.showInformation("Saved " + count + " blocks to: " + fileName);
+			NotificationManager.showInformation("Saved " + count + " blocks to: " + (ProgramProperties.isDesktop() ? fileName : FileUtils.getFileNameWithoutPath(fileName)));
 		}
 	}
 
