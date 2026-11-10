@@ -276,7 +276,7 @@ public class RubberBandSelector {
 			if (selecting) {
 				var local = canvas.sceneToLocal(e.getTouchPoint().getSceneX(), e.getTouchPoint().getSceneY());
 				finishSelection(local.getX(), local.getY(), e.isShiftDown());
-				e.consume();
+				// not consumed: an enclosing scroll pane has to see the release, or it keeps its scroll bars showing
 			}
 		});
 		// A drag on a touch screen also arrives as a scroll gesture, which would pan the enclosing scroll pane under

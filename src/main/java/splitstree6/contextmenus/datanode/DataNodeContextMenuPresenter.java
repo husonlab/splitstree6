@@ -101,6 +101,36 @@ public class DataNodeContextMenuPresenter {
 	}
 
 	/**
+	 * the items of the context menu that apply to the data of a node, rather than add something to the workflow:
+	 * Show Text..., Export... and, for a split network view or a tree view, As Network... They are also offered by
+	 * the + button of the workflow side bar, so that they can be reached without a context menu, which matters for
+	 * view nodes, to which no algorithm can be added.
+	 */
+	public static List<MenuItem> createDataMenuItems(MainWindow mainWindow, DataNode dataNode) {
+		var notReady = dataNode.validProperty().not().or(dataNode.allParentsValidProperty().not());
+		var result = new ArrayList<MenuItem>();
+
+		var showTextMenuItem = new MenuItem("Show Text...");
+		showTextMenuItem.setOnAction(e -> mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true));
+		showTextMenuItem.disableProperty().bind(notReady);
+		result.add(showTextMenuItem);
+
+		var exportMenuItem = new MenuItem("Export...");
+		exportMenuItem.setOnAction(e -> ExportDialog.show(mainWindow, dataNode));
+		exportMenuItem.disableProperty().bind(notReady);
+		result.add(exportMenuItem);
+
+		if (dataNode.getDataBlock() instanceof ViewBlock viewBlock
+			&& (viewBlock.getView() instanceof SplitsView || viewBlock.getView() instanceof TreeView)) {
+			var asNetworkMenuItem = new MenuItem("As Network...");
+			asNetworkMenuItem.setOnAction(e -> exportViewAsNetwork(mainWindow, viewBlock));
+			asNetworkMenuItem.disableProperty().bind(notReady);
+			result.add(asNetworkMenuItem);
+		}
+		return result;
+	}
+
+	/**
 	 * exports the view to GML and opens it as a new network document named after the source, e.g. foo -> foo-network
 	 */
 	private static void exportViewAsNetwork(MainWindow mainWindow, ViewBlock viewBlock) {

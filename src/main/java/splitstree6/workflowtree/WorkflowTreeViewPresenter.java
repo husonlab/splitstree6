@@ -20,6 +20,9 @@
 package splitstree6.workflowtree;
 
 import javafx.beans.binding.Bindings;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.MenuItem;
+import java.util.ArrayList;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
@@ -48,6 +51,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static splitstree6.contextmenus.datanode.DataNodeContextMenuPresenter.createAddAlgorithmMenuItems;
+import static splitstree6.contextmenus.datanode.DataNodeContextMenuPresenter.createDataMenuItems;
 
 public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
@@ -105,11 +109,19 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		// the items of the add-algorithm menu belong to the selected data node, so they are rebuilt whenever the
-		// selected item changes, also when the selection moves from one data node to another
+		// The items of the + menu belong to the selected data node, so they are rebuilt whenever the selected item
+		// changes, also when the selection moves from one data node to another. First come the items that apply to
+		// the data itself (Show Text, Export and, for a view, As Network), then the algorithms that can be added.
+		// A view node has no algorithms, but with the first group its menu is not empty and the button is enabled.
 		treeView.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			if (n instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof DataNode<?> dataNode) {
-				controller.getAddMenuButton().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, workflowTreeView.getUndoManager(), dataNode));
+				var items = new ArrayList<MenuItem>(createDataMenuItems(mainWindow, dataNode));
+				var algorithmItems = createAddAlgorithmMenuItems(mainWindow, workflowTreeView.getUndoManager(), dataNode);
+				if (!algorithmItems.isEmpty()) {
+					items.add(new SeparatorMenuItem());
+					items.addAll(algorithmItems);
+				}
+				controller.getAddMenuButton().getItems().setAll(items);
 			} else {
 				controller.getAddMenuButton().getItems().clear();
 			}
