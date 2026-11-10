@@ -19,6 +19,7 @@
 
 package splitstree6.algorithms.characters.characters2trees;
 
+import splitstree6.algorithms.IDesktopOnly;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -41,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ExternalProgram extends Characters2Trees {
+public class ExternalProgram extends Characters2Trees implements IDesktopOnly {
 
 	public enum CharactersFormat {Phylip, Nexus, FastA}
 

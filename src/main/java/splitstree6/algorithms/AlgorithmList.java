@@ -20,6 +20,7 @@
 package splitstree6.algorithms;
 
 
+import jloda.fx.util.ProgramProperties;
 import splitstree6.algorithms.characters.characters2characters.CharactersFilter;
 import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter;
 import splitstree6.algorithms.characters.characters2distances.*;
@@ -231,6 +232,11 @@ public class AlgorithmList {
 		if (filter != null) {
 			algorithms.removeIf(a -> !filter.test(a));
 		}
+
+		// algorithms that only work on a desktop, because they run an external program, are not offered elsewhere;
+		// one is still found by its name, so that a document that uses it can be opened
+		if (names.isEmpty() && !ProgramProperties.isDesktop())
+			algorithms.removeIf(a -> a instanceof IDesktopOnly);
 
 		return algorithms;
 	}

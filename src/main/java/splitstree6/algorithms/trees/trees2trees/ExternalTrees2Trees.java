@@ -19,6 +19,7 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
+import splitstree6.algorithms.IDesktopOnly;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -43,7 +44,7 @@ import java.util.concurrent.Executors;
  * this runs an external trees to trees program
  * Daniel Huson, 8.2024
  */
-public class ExternalTrees2Trees extends Trees2Trees implements IExperimental {
+public class ExternalTrees2Trees extends Trees2Trees implements IExperimental, IDesktopOnly {
 	private final StringProperty optionExecutable = new SimpleStringProperty(this, "optionExecutable", "");
 	private final BooleanProperty optionWeights = new SimpleBooleanProperty(this, "optionWeights", true);
 

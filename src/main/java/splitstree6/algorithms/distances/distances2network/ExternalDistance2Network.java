@@ -20,6 +20,7 @@
 
 package splitstree6.algorithms.distances.distances2network;
 
+import splitstree6.algorithms.IDesktopOnly;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -41,7 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public class ExternalDistance2Network extends Distances2Network implements IUsesCharacters<DistancesBlock, NetworkBlock> { // implements IExperimental {
+public class ExternalDistance2Network extends Distances2Network implements IUsesCharacters<DistancesBlock, NetworkBlock>, IDesktopOnly { // implements IExperimental {
 	private final StringProperty optionExecutablePath = new SimpleStringProperty(this, "optionExecutablePath");
 	private final StringProperty optionCallFormat = new SimpleStringProperty(this, "optionCallFormat");
 	private final StringProperty optionTmpDirectory = new SimpleStringProperty(this, "optionTmpDirectory");

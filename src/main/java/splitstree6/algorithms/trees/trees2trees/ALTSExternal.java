@@ -19,6 +19,7 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
+import splitstree6.algorithms.IDesktopOnly;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import jloda.fx.util.ProgramProperties;
@@ -46,7 +47,7 @@ import java.util.regex.Pattern;
  * this runs the ALTSExternal algorithm externally
  * Daniel Huson, 7.2023
  */
-public class ALTSExternal extends Trees2Trees implements IExperimental {
+public class ALTSExternal extends Trees2Trees implements IExperimental, IDesktopOnly {
 	private final StringProperty optionALTSExecutableFile = new SimpleStringProperty(this, "optionALTSExecutableFile", "");
 
 	{
