@@ -190,7 +190,9 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		controller.getScrollPane().setContent(networkPane);
 
-		updateListener = e -> networkPane.drawNetwork();
+		// drawn after a short while, as in the splits view: several of these changes usually arrive together, and
+		// when a document is opened, the window is still being laid out when the network arrives
+		updateListener = e -> RunAfterAWhile.apply(networkPane, () -> Platform.runLater(networkPane::drawNetwork));
 
 		networkBlock.addListener(updateListener);
 		view.optionDiagramProperty().addListener(updateListener);

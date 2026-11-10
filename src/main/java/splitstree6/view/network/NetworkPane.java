@@ -38,6 +38,7 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.Basic;
@@ -63,6 +64,8 @@ public class NetworkPane extends StackPane {
 	private final ChangeListener<Number> fontScaleChangeListener;
 	private final ChangeListener<LayoutOrientation> orientChangeListener;
 	private final InvalidationListener layoutLabelsListener;
+	private InvalidationListener waitForSizeListener;
+	private final Object waitForSizeKey = new Object();
 
 
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
@@ -214,6 +217,28 @@ public class NetworkPane extends StackPane {
 	}
 
 	public void drawNetwork() {
+		if (getPrefWidth() <= 0 || getPrefHeight() <= 0) {
+			// The pane has not been given its size yet, which happens when a document opens faster than its window
+			// is laid out. A network laid out for no room at all is squeezed into a few pixels, so draw it once
+			// the size is known and has stopped changing (the first size is often not the final one)
+			if (waitForSizeListener == null) {
+				waitForSizeListener = e -> {
+					if (getPrefWidth() > 0 && getPrefHeight() > 0) {
+						RunAfterAWhile.applyInFXThread(waitForSizeKey, () -> {
+							if (waitForSizeListener != null && getPrefWidth() > 0 && getPrefHeight() > 0) {
+								prefWidthProperty().removeListener(waitForSizeListener);
+								prefHeightProperty().removeListener(waitForSizeListener);
+								waitForSizeListener = null;
+								drawNetwork();
+							}
+						});
+					}
+				};
+				prefWidthProperty().addListener(waitForSizeListener);
+				prefHeightProperty().addListener(waitForSizeListener);
+			}
+			return;
+		}
 		if (!service.isRunning())
 			service.restart();
 		else {
