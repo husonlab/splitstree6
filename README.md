@@ -8,7 +8,7 @@ As this is the sixth major reimplementation of SplitsTree, this is also known as
 
 One main aim of this program is to make it easy to compute both trees and networks, hopefully encouraging researchers to use phylogenetic networks when appropriate. A second aim is to bring together the calculation of both unrooted and rooted trees and networks into one program. Moreover, the program explicitly supports the import and export of data in many different formats, making it easy to use the program in collaboration with other programs.
 
-> We are currently beta testing an iOS version... if you would like to try out SplitsTree on your iPad (or even iPhone ;-)), then please contact Daniel Huson for a link to Apple Testflight.
+> SplitsTree is also available as an app for iPhone and iPad: see the [SplitsTree App page](https://husonlab.github.io/mobile-apps/splitstree.html) for a description of the app and how to get it.
 
 
 ## User manual
