@@ -54,6 +54,8 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.window.MainWindow;
 
+import java.util.function.BooleanSupplier;
+
 /**
  * network pane
  * Daniel Huson, 4.2022
@@ -66,6 +68,12 @@ public class NetworkPane extends StackPane {
 	private final InvalidationListener layoutLabelsListener;
 	private InvalidationListener waitForSizeListener;
 	private final Object waitForSizeKey = new Object();
+
+	private volatile double drawnWidth; // the size of the pane that the network was last laid out for
+	private volatile double drawnHeight;
+	private BooleanSupplier mayRefit = () -> false;
+	private final InvalidationListener refitListener;
+	private final Object refitKey = new Object();
 
 
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
@@ -115,8 +123,12 @@ public class NetworkPane extends StackPane {
 			if (taxaBlock.get() == null || networkBlock.get() == null)
 				return new Group();
 
+			var width = getPrefWidth();
+			var height = getPrefHeight();
 			var result = networkLayout.apply(service.getProgressListener(), taxaBlock.get(), networkBlock.get(), diagram.get(), layoutAlgorithm.get(),
-					getPrefWidth() - 4, getPrefHeight() - 16, taxonLabelMap, nodeShapeMap, edgeShapeMap, layoutSeed.get());
+					width - 4, height - 16, taxonLabelMap, nodeShapeMap, edgeShapeMap, layoutSeed.get());
+			drawnWidth = width;
+			drawnHeight = height;
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());
@@ -152,6 +164,35 @@ public class NetworkPane extends StackPane {
 		});
 
 		service.setOnFailed(a -> System.err.println("Draw network failed: " + service.getException()));
+
+		// The network is laid out for the size that the pane has at that time. That size is often not the one the
+		// pane ends up with: a document opens while its window is still being laid out, and on a phone a network is
+		// usually computed while the side bar takes up half of the screen. So, once the size has changed and stopped
+		// changing, the network is laid out again, as long as that is allowed (see setMayRefit)
+		refitListener = e -> RunAfterAWhile.applyInFXThread(refitKey, () -> {
+			if (isRefitNeeded() && mayRefit.getAsBoolean())
+				drawNetwork();
+		});
+		prefWidthProperty().addListener(refitListener);
+		prefHeightProperty().addListener(refitListener);
+	}
+
+	/**
+	 * has the size of the pane changed noticeably since the network was laid out?
+	 */
+	private boolean isRefitNeeded() {
+		final var tolerance = 0.05;
+		return drawnWidth > 0 && drawnHeight > 0 && getPrefWidth() > 0 && getPrefHeight() > 0
+			   && (Math.abs(getPrefWidth() - drawnWidth) > tolerance * drawnWidth || Math.abs(getPrefHeight() - drawnHeight) > tolerance * drawnHeight);
+	}
+
+	/**
+	 * sets the condition under which the network is laid out again when the size of the pane has changed. Laying out
+	 * again discards a zoom and the positions that nodes and labels were moved to, so this should hold only as long as
+	 * the user has not changed the drawing
+	 */
+	public void setMayRefit(BooleanSupplier mayRefit) {
+		this.mayRefit = mayRefit;
 	}
 
 	public void updateScale(double factor, Pane pane) {

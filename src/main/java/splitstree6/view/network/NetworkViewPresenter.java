@@ -77,6 +77,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 	private final RubberBandSelector rubberBandSelection;
 	private boolean first = true;
+	private boolean restoredEdits = false; // the document came with positions for the nodes or labels of this view
 
 	private final NetworkGrid grid = new NetworkGrid();
 	private final BooleanProperty straightening = new SimpleBooleanProperty(this, "straightening", false);
@@ -139,6 +140,9 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				view.optionZoomFactorProperty(), view.optionFontScaleFactorProperty(),
 				taxonLabelMap, nodeShapeMap, edgeShapeMap, view.optionLayoutSeedProperty());
 
+		// the network follows the size of the pane until the user zooms it or moves something
+		networkPane.setMayRefit(() -> view.getOptionZoomFactor() == 1.0 && !restoredEdits && !view.getUndoManager().isUndoable());
+
 		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, view.getUndoManager(), view.optionEditsProperty(),
 				t -> mainWindow.getWorkingTaxa().get(t), nodeSelectionModel, edgeSelectionModel, mainWindow.getTaxonSelectionModel(), grid);
 
@@ -161,6 +165,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			if (first) {
 				first = false;
 				if (savedEdits.length > 0) {
+					restoredEdits = true;
 					AService.run(() -> {
 						Thread.sleep(700); // wait long enough for all label layouting to finish
 						Platform.runLater(() -> {
