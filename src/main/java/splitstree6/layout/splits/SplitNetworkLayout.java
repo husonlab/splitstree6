@@ -232,7 +232,13 @@ public class SplitNetworkLayout {
 				var isRootNode = (rootSplit > 0 && v.getDegree() == 1 && graph.getSplit(v.getFirstAdjacentEdge()) == rootSplit);
 				var point = nodePointMap.get(v);
 
-				var labeledNode = new LabeledNodeShape(new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5));
+				var circle = new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5);
+				var labeledNode = new LabeledNodeShape(circle);
+				// only a node that carries taxa reacts to the mouse; an iceberg on any other node would only take
+				// presses away from the edges around it
+				var useIceberg = Icebergs.enabled() && !isRootNode && graph.getNumberOfTaxa(v) > 0;
+				if (!useIceberg)
+					labeledNode.setShape(circle, false);
 				labeledNode.setTranslateX(point.getX());
 				labeledNode.setTranslateY(point.getY());
 
@@ -240,7 +246,7 @@ public class SplitNetworkLayout {
 
 				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 				// a taxon whose mark is meant as its node (node="true" in the mark) is drawn as that mark
-				LabeledNodeShape.useNodeMark(labeledNode, isRootNode ? null : label, () -> new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5), Icebergs.enabled());
+				LabeledNodeShape.useNodeMark(labeledNode, isRootNode ? null : label, () -> new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5), useIceberg);
 
 				if (graph.getNumberOfTaxa(v) == 1) {
 					labeledNode.setUserData(taxaBlock.get(graph.getTaxon(v)));
