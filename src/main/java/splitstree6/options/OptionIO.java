@@ -44,6 +44,11 @@ public class OptionIO {
 		if (np.peekMatchIgnoreCase("OPTIONS")) {
 			np.matchIgnoreCase("OPTIONS");
 
+			// an OPTIONS statement with nothing after it, not even its semicolon: two of the example documents of the
+			// iOS app, version 6.9.8, were shipped like this
+			if (np.peekMatchIgnoreCase("END"))
+				return;
+
 			if (!np.peekMatchIgnoreCase(";")) {
 				final var allOptionsCarried = new ArrayList<>(Option.getAllOptions(optionsCarrier));
 				if (!allOptionsCarried.isEmpty()) {
