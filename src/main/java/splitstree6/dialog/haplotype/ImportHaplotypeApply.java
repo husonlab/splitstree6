@@ -98,7 +98,7 @@ public class ImportHaplotypeApply {
 
 						switch (result.method()) {
 							case "RazorNet" -> {
-								var razor = AlgorithmList.create("RazorHaplotypeNetwork", Map.of());
+								var razor = AlgorithmList.create("RazorHaploNet", Map.of());
 								workflow.newAlgorithmNode(Objects.requireNonNullElseGet(razor, MedianJoining::new),
 										workflow.getWorkingTaxaNode(),
 										workflow.getWorkingDataNode(),
