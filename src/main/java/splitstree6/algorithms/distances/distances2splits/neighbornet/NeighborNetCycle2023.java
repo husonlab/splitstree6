@@ -161,12 +161,15 @@ public class NeighborNetCycle2023 {
 
 					var sumP = 0.0;
 					var sumQ = 0.0;
+					// the sum for P runs over all components other than P, including Q, and vice versa: this is the
+					// neighbor-joining criterion of Theorem 2. (As printed, the paper excludes both P and Q from
+					// both sums, and that is not consistent on circular distances.)
 					for (var is = 0; is < components.size(); is++) {
-						if (is != ip && is != iq) {
-							var S = components.get(is);
+						var S = components.get(is);
+						if (is != ip)
 							sumP += averageD(D, P, S);
+						if (is != iq)
 							sumQ += averageD(D, Q, S);
-						}
 					}
 
 					var adjustedD = (components.size() - 2) * averageD(D, P, Q) - sumP - sumQ;
@@ -255,6 +258,7 @@ public class NeighborNetCycle2023 {
 		var q1 = Q.first();
 		var q2 = Q.second();
 
+		// no factor 1/2 here, although the paper prints one: with it, the result is not consistent on circular distances
 		var p1R = D[p1][q1] + D[p1][q2];
 		var p2R = D[p2][q1] + D[p2][q2];
 		var q1R = D[p1][q1] + D[p2][q1];
@@ -329,7 +333,7 @@ public class NeighborNetCycle2023 {
 	 */
 	public static int[] createArrayUpwardCount(int n) {
 		var array = new int[n + 1];
-		for (var i = 0; i < n; i++)
+		for (var i = 0; i <= n; i++)
 			array[i] = i;
 		return array;
 	}
