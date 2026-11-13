@@ -152,29 +152,27 @@ public class NeighborNetCycle2023 {
 		if (components.size() == 2) {
 			pair = new Pair<>(0, 1);
 		} else {
+			// row sums: for each component, the sum of its distances to all other components.
+			// For P, this includes Q, and vice versa: this is the neighbor-joining criterion of Theorem 2.
+			// (As printed, the paper excludes both P and Q from both sums, and that is not consistent on circular distances.)
+			var rowSum = new double[components.size()];
+			for (var ip = 0; ip < components.size(); ip++) {
+				var P = components.get(ip);
+				var sum = 0.0;
+				for (var is = 0; is < components.size(); is++) {
+					if (is != ip)
+						sum += averageD(D, P, components.get(is));
+				}
+				rowSum[ip] = sum;
+			}
+
 			var best = Double.MAX_VALUE;
 			for (var ip = 0; ip < components.size(); ip++) {
 				var P = components.get(ip);
-				//System.err.println("R[{"+StringUtils.toString(P)+"}]="+R[i]);
 				for (var iq = ip + 1; iq < components.size(); iq++) {
 					var Q = components.get(iq);
 
-					var sumP = 0.0;
-					var sumQ = 0.0;
-					// the sum for P runs over all components other than P, including Q, and vice versa: this is the
-					// neighbor-joining criterion of Theorem 2. (As printed, the paper excludes both P and Q from
-					// both sums, and that is not consistent on circular distances.)
-					for (var is = 0; is < components.size(); is++) {
-						var S = components.get(is);
-						if (is != ip)
-							sumP += averageD(D, P, S);
-						if (is != iq)
-							sumQ += averageD(D, Q, S);
-					}
-
-					var adjustedD = (components.size() - 2) * averageD(D, P, Q) - sumP - sumQ;
-
-					// System.err.println("["+P+"]["+Q+"]="+adjustedD);
+					var adjustedD = (components.size() - 2) * averageD(D, P, Q) - rowSum[ip] - rowSum[iq];
 
 					if (adjustedD < best) {
 						pair = new Pair<>(ip, iq);
