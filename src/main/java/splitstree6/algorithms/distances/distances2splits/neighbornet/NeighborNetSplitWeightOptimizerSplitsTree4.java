@@ -493,8 +493,6 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 					pg += pg_i * pg_i;
 				}
 
-				System.err.println("Exiting old Active Set. pg = " + pg);
-
 				return; /* We have arrived at the constrained optimum */
 			} else
 				active[min_i] = false;

@@ -70,7 +70,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public String getCitation() {
 		return "Bryant & Moulton 2004; " +
 			   "D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. " +
-			   "Molecular Biology and Evolution, 21(2):255– 265, 2004.;" +
+			   "Molecular Biology and Evolution, 21(2):255–265, 2004.;" +
 			   "Bryant & Huson 2023;D. Bryant and DH Huson, NeighborNet- improved algorithms and implementation. Front. Bioinform. 3, 2023.";
 	}
 
@@ -87,6 +87,21 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		progress.setMaximum(-1);
 		long start = System.currentTimeMillis();
+
+		// the optimization does not terminate, or returns weights that mean nothing, if a distance is not a finite number
+		var largestDistance = 0.0;
+		for (var s = 1; s <= distancesBlock.getNtax(); s++) {
+			for (var t = s + 1; t <= distancesBlock.getNtax(); t++) {
+				var value = distancesBlock.get(s, t);
+				if (Double.isNaN(value) || Double.isInfinite(value))
+					throw new IOException("Neighbor Net: the distance between '%s' and '%s' is %s".formatted(taxaBlock.getLabel(s), taxaBlock.getLabel(t),
+							Double.isNaN(value) ? "not a number" : "infinite"));
+				largestDistance = Math.max(largestDistance, value);
+			}
+		}
+		// split weights up to this value are discarded; relative to the largest distance, so that multiplying all distances
+		// by a constant does not change which splits are kept
+		final var scale = (largestDistance > 0 ? largestDistance : 1.0);
 
 		var cycle = switch (getOptionCircularOrdering()) {
 			case SplitsTree4 ->
@@ -124,6 +139,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		var params = new NeighborNetSplitWeightsClean.NNLSParams();
 		params.activeCleanup = getOptionActiveCleanup();
+		params.cutoff *= scale;
 
 		if (getOptionInferenceAlgorithm() == InferenceAlgorithm.ActiveSet)
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.ACTIVESET;
@@ -148,7 +164,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 //			for(int i=0;i<splits2.size();i++)
 //				System.err.println(splits2.get(i));
 		} else
-			splits = NeighborNetSplitWeightOptimizerSplitsTree4.apply(cycle, distancesBlock);
+			splits = NeighborNetSplitWeightOptimizerSplitsTree4.computeWeightedSplits(cycle, distancesBlock,
+					new NeighborNetSplitWeightOptimizerSplitsTree4.Options("ols", 0.000001 * scale));
 
 		progress.setTasks("NNet", "post-analysis");
 
@@ -205,7 +222,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		return optionActiveCleanup;
 	}
 
-	public void isOptionActiveCleanup(boolean active) {
+	public void setOptionActiveCleanup(boolean active) {
 		this.optionActiveCleanup.set(active);
 	}
 
