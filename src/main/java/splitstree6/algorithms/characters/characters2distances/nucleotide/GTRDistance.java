@@ -48,7 +48,7 @@ public class GTRDistance extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("optionPropInvariableSites", "optionSetSiteVarParams", "optionRateMatrix", "optionUseML_Distances");
+		return Arrays.asList("optionPropInvariableSites", "optionSetSiteVarParams", "optionRateMatrix", "optionBaseFrequencies", "optionSetBaseFrequencies", "optionUseML_Distances");
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class GTRDistance extends Nucleotides2DistancesBase {
 
 		progress.setTasks("GTRDistance Distance", "Computing...");
 
-		var model = new GTRmodel(getOptionRateMatrix(), getOptionBaseFrequencies());
+		var model = new GTRmodel(getOptionRateMatrix(), computeBaseFrequencies(charactersBlock));
 		model.setPropInvariableSites(getOptionPropInvariableSites());
 		model.setGamma(DEFAULT_GAMMA);
 

@@ -40,7 +40,7 @@ import java.io.IOException;
 public class GeneSharingDistance extends Characters2Distances {
 	@Override
 	public String getCitation() { // is this the correct citation?
-		return "Snel et al 1997; B. Snel, P. Bork and MA Huynen. Genome phylogeny based on gene content, Nature Genetics, 21:108-110, 1997.";
+		return "Snel et al 1999; B. Snel, P. Bork and MA Huynen. Genome phylogeny based on gene content, Nature Genetics, 21:108-110, 1999.";
 	}
 
 	@Override

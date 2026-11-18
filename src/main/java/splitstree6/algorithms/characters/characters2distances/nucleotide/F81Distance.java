@@ -56,7 +56,7 @@ public class F81Distance extends Nucleotides2DistancesBase {
 
 		progress.setTasks("Felsenstein 1981 distance", "Computing...");
 
-		final F81model model = new F81model(getOptionBaseFrequencies());
+		final F81model model = new F81model(computeBaseFrequencies(charactersBlock));
 
 		model.setPropInvariableSites(getOptionPropInvariableSites());
 		model.setGamma(DEFAULT_GAMMA);

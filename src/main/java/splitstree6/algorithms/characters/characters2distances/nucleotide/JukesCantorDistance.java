@@ -35,7 +35,7 @@ import java.util.List;
 public class JukesCantorDistance extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Jukes & Cantor 1969; TH Jukes and CR Cantor. Evolution of Protein Molecules. New York: Academic Press., 21–132, 1996.";
+		return "Jukes & Cantor 1969; TH Jukes and CR Cantor. Evolution of Protein Molecules. New York: Academic Press, 21–132, 1969.";
 	}
 
 	@Override

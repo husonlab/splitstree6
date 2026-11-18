@@ -92,6 +92,16 @@ public interface SubstitutionModel {
 	 */
 	int getNstates();
 
+	/**
+	 * The states of this model, in the order in which the model numbers them, as lower-case characters, so that
+	 * observed frequencies can be handed to the model in that order.
+	 *
+	 * @return the states, or null if the model takes the states in whatever order the data has them
+	 */
+	default String getStates() {
+		return null;
+	}
+
 	//boolean isGroupBased();
 }
 

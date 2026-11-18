@@ -29,6 +29,7 @@ import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.Pair;
 import jloda.util.parse.NexusStreamParser;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.characters.characters2distances.ProteinMLDistance;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.*;
 import splitstree6.io.nexus.AlgorithmNexusInput;
@@ -273,6 +274,7 @@ public class WorkflowNexusInput {
 						final Algorithm algorithm = algorithmAndLink.getFirst();
 						final DataNode parentDataNode = titleNodeMap.get(algorithmAndLink.getSecond());
 						workflow.newAlgorithmNode(algorithm, workflow.getWorkingTaxaNode(), parentDataNode, newDataNode);
+						warnIfResultsAreOutdated(splitsTree6Block.getOptionVersion(), algorithm, parentDataNode);
 					}
 					titleNodeMap.put(dataInput.getTitle(), newDataNode);
 				}
@@ -284,6 +286,40 @@ public class WorkflowNexusInput {
 		}
 	}
 
+
+	/**
+	 * Rule for files written by earlier versions: up to version 6.10.0, Protein ML distances were computed with the
+	 * amino acids in the wrong order whenever the symbols of the alignment were not in the order used by the
+	 * substitution models, which was the case for all alignments read from FASTA, phylip, Clustal, MSF or Stockholm.
+	 * Such a file holds the distances, and everything computed from them, as they were computed then. We recognize
+	 * the case by the version that wrote the file and by the order of the symbols, and say so; running the
+	 * algorithm again gives the correct result.
+	 */
+	private static void warnIfResultsAreOutdated(String programVersion, Algorithm algorithm, DataNode parentDataNode) {
+		if (algorithm instanceof ProteinMLDistance && parentDataNode != null && parentDataNode.getDataBlock() instanceof CharactersBlock characters
+			&& isOlderThan(programVersion, 6, 10, 1) && !characters.getStateSymbols().equalsIgnoreCase("arndcqeghilkmfpstwyv")) {
+			NotificationManager.showWarning("This file was written by an earlier version of the program, in which Protein ML Distance "
+											+ "gave incorrect distances for this alignment (amino acids in the order '" + characters.getStateSymbols() + "').\n"
+											+ "The distances, and all results computed from them, are shown as stored. Run Protein ML Distance again to update them.");
+		}
+	}
+
+	/**
+	 * is the given program description, such as 'SplitsTree App (version 6.3.23, built 4 Jun 2024)', that of a
+	 * version older than the given one? False if no version number can be found
+	 */
+	static boolean isOlderThan(String programVersion, int major, int minor, int patch) {
+		var matcher = java.util.regex.Pattern.compile("version\\s+(\\d+)\\.(\\d+)\\.(\\d+)").matcher(programVersion == null ? "" : programVersion);
+		if (!matcher.find())
+			return false;
+		var numbers = new int[]{Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3))};
+		var given = new int[]{major, minor, patch};
+		for (var i = 0; i < 3; i++) {
+			if (numbers[i] != given[i])
+				return numbers[i] < given[i];
+		}
+		return false;
+	}
 
 	private static boolean isWorkflowFile(String inputFile) {
 		return inputFile.toLowerCase().endsWith(WORKFLOW_FILE_SUFFIX) || inputFile.toLowerCase().endsWith(WORKFLOW_FILE_SUFFIX + ".gz");

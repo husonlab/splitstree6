@@ -32,6 +32,7 @@ import splitstree6.models.SubstitutionModel;
 
 public class PairwiseCompare { // todo: add support for character weights
 	private final int numStates;
+	private final String stateSymbols; // the states, in the order in which fCount is indexed
 	private int numNotMissing;
 	private final double[][] fCount; /* Stored as doubles, to handle ambiguities and character weights*/
 
@@ -41,7 +42,8 @@ public class PairwiseCompare { // todo: add support for character weights
 
 	// TODO: SOMETHING SLOWS DOWN THE ALGORITHM WHILE OPEN AMBIG. CHARACTERS. NEED TO FIND OUT!
 	public PairwiseCompare(final CharactersBlock characters, final int i, final int j) throws SplitsException {
-		numStates = characters.getStateSymbols().length();
+		stateSymbols = characters.getStateSymbols().toLowerCase();
+		numStates = stateSymbols.length();
 		// The fCount matrix has rows and columns for missing and gap states as well
 		fCount = new double[numStates + 2][numStates + 2];
 		calculatePairwiseCompare(characters, i, j, false);
@@ -49,7 +51,8 @@ public class PairwiseCompare { // todo: add support for character weights
 
 	public PairwiseCompare(final CharactersBlock characters, final int i, final int j, boolean isIgnoreAmbiguous)
 			throws SplitsException {
-		numStates = characters.getStateSymbols().length();
+		stateSymbols = characters.getStateSymbols().toLowerCase();
+		numStates = stateSymbols.length();
 		fCount = new double[numStates + 2][numStates + 2];
 		calculatePairwiseCompare(characters, i, j, isIgnoreAmbiguous);
 	}
@@ -236,6 +239,53 @@ public class PairwiseCompare { // todo: add support for character weights
 	}
 
 	/**
+	 * Frequency matrix with its rows and columns in a given order of states.
+	 * <p>
+	 * A substitution model numbers its states in an order of its own (a, c, g, t for nucleotides; a, r, n, d, ... for
+	 * amino acids), whereas the states of a characters block are in the order of its symbols, and that is the order
+	 * in which they were declared or, for data read from FASTA, phylip, Clustal, MSF or Stockholm, the alphabetical
+	 * order of the characters that occur. Handing getF() to a model therefore gave the model the wrong states
+	 * whenever the two orders differed, which was the case for all protein data read from those formats, and a
+	 * matrix that was too small whenever a state did not occur at all.
+	 * <p>
+	 * A state of the given order that is not a state of the characters gets an empty row and column, states of the
+	 * characters that are not in the given order are left out, and 't' and 'u' stand for the same state.
+	 *
+	 * @param order the states, in the order in which the caller numbers them
+	 * @return proportions, or null if the two sequences have nothing that can be compared
+	 */
+	public double[][] getF(String order) {
+		final int n = order.length();
+		final int[] index = new int[n];
+		for (int i = 0; i < n; i++) {
+			final char ch = Character.toLowerCase(order.charAt(i));
+			index[i] = stateSymbols.indexOf(ch);
+			if (index[i] < 0 && ch == 't')
+				index[i] = stateSymbols.indexOf('u');
+			else if (index[i] < 0 && ch == 'u')
+				index[i] = stateSymbols.indexOf('t');
+		}
+		final double[][] F = new double[n][n];
+		double Fsum = 0.0;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (index[i] >= 0 && index[j] >= 0) {
+					F[i][j] = fCount[index[i]][index[j]];
+					Fsum += F[i][j];
+				}
+			}
+		}
+		if (Fsum <= 0.0)
+			return null;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				F[i][j] /= Fsum;
+			}
+		}
+		return F;
+	}
+
+	/**
 	 * Returns negative log likelihood of a given F matrix and t value
 	 *
 	 * @return negative log likelihood [double]
@@ -300,7 +350,8 @@ public class PairwiseCompare { // todo: add support for character weights
 
 		//TODO: Replace the golden arc method with Brent's algorithm
 		final int nStates = model.getNstates();
-		final double[][] fullF = getF();
+		// in the model's order of states, if it has one
+		final double[][] fullF = (model.getStates() != null ? getF(model.getStates()) : getF());
 
 		if (fullF == null)
 			return -1;

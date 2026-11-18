@@ -64,8 +64,8 @@ public class F84Model extends NucleotideModel {
 		double piY = baseFreqs[1] + baseFreqs[3];
 		Q[0][2] *= (1.0 + K / piR);
 		Q[1][3] *= (1.0 + K / piY);
-		Q[3][1] *= (1.0 + K / piR);
-		Q[2][0] *= (1.0 + K / piY);
+		Q[3][1] *= (1.0 + K / piY);
+		Q[2][0] *= (1.0 + K / piR);
 
 		setRateMatrix(Q, baseFreqs);
 		normaliseQ();

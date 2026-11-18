@@ -75,7 +75,7 @@ public class ProteinMLDistance extends Characters2Distances {
 		if (optionName.equals(optionPropInvariableSites.getName())) {
 			return "Proportion of invariable sites";
 		} else if (optionName.equals(optionGamma.getName())) {
-			return "Alpha parameter for gamma distribution. Negative gamma = Equal rates";
+			return "Alpha (shape) parameter of the gamma distribution of rates across sites. Zero or negative = equal rates";
 		} else if (optionName.equals(optionModel.getName())) {
 			return "Choose an amino acid substitution model";
 		} else

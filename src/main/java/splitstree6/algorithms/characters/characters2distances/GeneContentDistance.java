@@ -21,6 +21,7 @@ package splitstree6.algorithms.characters.characters2distances;
 
 import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
@@ -48,16 +49,14 @@ public class GeneContentDistance extends Characters2Distances {
 	public String getToolTip(String optionName) {
 		if (!optionName.startsWith("option"))
 			optionName = "option" + optionName;
-		if (optionName.equals("optionMethod"))
-			return "Choose Maximum likelihood distance estimation (Huson and Steel 2004, eq. 4), or shared genes distance (Snel et al, 1997)";
-		else
-			return optionName;
+		return super.getToolTip(optionName);
 	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) {
 		final var geneSets = computeGeneSets(charactersBlock);
 		computeMLE(distancesBlock, taxaBlock.getNtax(), geneSets);
+		FixUndefinedDistances.apply(distancesBlock);
 	}
 
 	/**
@@ -85,7 +84,9 @@ public class GeneContentDistance extends Characters2Distances {
 				var alphaIJ = ((double) BitSetUtils.intersection(genes[i], genes[j]).cardinality()) / m;
 				var beta = 1.0 + alphaIJ - alpha[i] - alpha[j];
 				var arg = 0.5 * (beta + Math.sqrt(beta * beta + 4.0 * alphaIJ * alphaIJ));
-				var d = (arg < 0.0000001 ? 1.0 : -Math.log(arg));
+				// saturated: the distance is undefined (it used to be reported as 1, which is less than the
+				// distance between two genomes that share half of their genes)
+				var d = (arg < 0.0000001 ? -1.0 : -Math.log(arg));
 				dist.set(i, j, d);
 				dist.set(j, i, d);
 			}

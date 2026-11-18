@@ -20,6 +20,7 @@
 package splitstree6.algorithms.characters.characters2distances;
 
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
@@ -53,7 +54,7 @@ public class BaseFreqDistance extends Characters2Distances {
 		for (int s = 1; s <= ntax; s++) {
 			//System.err.print(taxaBlock.getLabel(s) + "\t");
 			double count = 0;
-			for (int i = 1; i < charactersBlock.getNchar(); i++) {
+			for (int i = 1; i <= charactersBlock.getNchar(); i++) { // up to and including the last site, which used to be left out
 				int x = symbols.indexOf(charactersBlock.get(s, i));
 				if (x >= 0) {
 					double weight = charactersBlock.getCharacterWeight(i);
@@ -72,17 +73,20 @@ public class BaseFreqDistance extends Characters2Distances {
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = s + 1; t <= ntax; t++) {
 				double p = 0.0;
+				var defined = !Double.isNaN(baseFreqs[s][0]) && !Double.isNaN(baseFreqs[t][0]);
 				for (int i = 0; i < nstates; i++) {
 					double pi_i = baseFreqs[s][i];
 					double pihat_i = baseFreqs[t][i];
 					p += Math.abs(pi_i - pihat_i);
 				}
 
-				distancesBlock.set(s, t, p);
-				distancesBlock.set(t, s, p);
+				// a sequence without any state has no frequencies: 0/0 above, and the distance is undefined
+				distancesBlock.set(s, t, defined ? p : -1);
+				distancesBlock.set(t, s, defined ? p : -1);
 			}
 			progress.incrementProgress();
 		}
+		FixUndefinedDistances.apply(distancesBlock);
 		progress.close();
 	}
 

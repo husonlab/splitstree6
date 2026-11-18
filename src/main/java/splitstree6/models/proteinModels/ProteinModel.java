@@ -99,7 +99,8 @@ public abstract class ProteinModel implements SubstitutionModel {
 		double[] expD = new double[20];
 		for (int i = 0; i < 20; i++) {
 			if (this.gamma > 0)
-				expD[i] = Math.pow(1.0 - gamma * evals[i] * t, -1.0 - gamma);
+				// gamma-distributed rates with shape gamma and mean 1: moment-generating function (1 - x/gamma)^(-gamma)
+				expD[i] = Math.pow(1.0 - evals[i] * t / gamma, -gamma);
 			else
 				expD[i] = Math.exp(evals[i] * t);
 		}
@@ -157,7 +158,7 @@ public abstract class ProteinModel implements SubstitutionModel {
 	 */
 	public double getQ(int i, int j) {
 		double Xij = 0.0;
-		for (int k = 0; k < 4; k++) {
+		for (int k = 0; k < 20; k++) {
 			Xij += evecs[i][k] * evals[k] * evecs[j][k];
 
 		}
@@ -209,6 +210,14 @@ public abstract class ProteinModel implements SubstitutionModel {
 
 	public int getNstates() {
 		return 20;
+	}
+
+	/**
+	 * the twenty amino acids, in the order in which the rate matrices and frequencies of all protein models are given
+	 */
+	@Override
+	public String getStates() {
+		return "arndcqeghilkmfpstwyv";
 	}
 
 	/**

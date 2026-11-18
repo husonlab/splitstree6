@@ -48,7 +48,7 @@ public class UpholtRestrictionDistance extends Characters2Distances {
 	@Override
 	public String getToolTip(String optionName) {
 		if (optionName.equals(optionRestrictionSiteLength.getName()))
-			return "Expected length of restriction site (~4-8 bp)";
+			return "Length of the restriction site in bp. The default is 1; restriction enzymes typically recognize 4-8 bp";
 		else
 			return optionName;
 	}
@@ -56,7 +56,7 @@ public class UpholtRestrictionDistance extends Characters2Distances {
 	@Override
 	public String getCitation() {
 		return "Upholt 1977; WB Upholt. Estimation of DNA sequence divergence from comparison of restriction endonuclease digests. " +
-			   "Nucleic Acids Res., 4(5):1257-65, 1997.";
+			   "Nucleic Acids Res., 4(5):1257-65, 1977.";
 	}
 
 	@Override

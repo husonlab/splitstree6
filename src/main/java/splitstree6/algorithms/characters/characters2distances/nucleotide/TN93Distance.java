@@ -75,6 +75,9 @@ public class TN93Distance extends Characters2Distances {
 		for (int i = 0; i < s1.length(); i++) {
 			char x = Character.toUpperCase(s1.charAt(i));
 			char y = Character.toUpperCase(s2.charAt(i));
+			// RNA: uracil takes the place of thymine
+			if (x == 'U') x = 'T';
+			if (y == 'U') y = 'T';
 			if (!isACGT(x) || !isACGT(y)) continue;
 
 			switch (x) {
@@ -107,27 +110,31 @@ public class TN93Distance extends Characters2Distances {
 		double piR = piA + piG;
 		double piY = piC + piT;
 
-		if (piA == 0 || piC == 0 || piG == 0 || piT == 0 || piR == 0 || piY == 0)
-			return Double.NaN;
-
 		double P1 = ag / (double) compatibleSites;
 		double P2 = ct / (double) compatibleSites;
 		double Q = tv / (double) compatibleSites;
 
-		// Standard TN93 (Tamura & Nei 1993)
-		double w1 = 1.0 - piR * P1 / (2.0 * piA * piG) - Q / (2.0 * piR);
-		double w2 = 1.0 - piY * P2 / (2.0 * piC * piT) - Q / (2.0 * piY);
-		double w3 = 1.0 - Q / (2.0 * piR * piY);
-
-		if (w1 <= 0 || w2 <= 0 || w3 <= 0) return Double.NaN;
-
-		double k1 = 2.0 * piA * piG / piR;
-		double k2 = 2.0 * piC * piT / piY;
-		double k3 = 2.0 * (piR * piY
-						   - piA * piG * piY / piR
-						   - piC * piT * piR / piY);
-
-		return -k1 * Math.log(w1) - k2 * Math.log(w2) - k3 * Math.log(w3);
+		// Standard TN93 (Tamura & Nei 1993). Each of the three terms is left out if a base that it involves does not
+		// occur in either sequence: there are then no substitutions of that kind, and the term is zero in the limit.
+		// (All three used to be required, so that two short or low-complexity sequences lacking one of the four
+		// bases had no distance, even when they were identical)
+		double distance = 0.0;
+		if (piA > 0 && piG > 0) {
+			double w1 = 1.0 - piR * P1 / (2.0 * piA * piG) - Q / (2.0 * piR);
+			if (w1 <= 0) return Double.NaN;
+			distance -= (2.0 * piA * piG / piR) * Math.log(w1);
+		}
+		if (piC > 0 && piT > 0) {
+			double w2 = 1.0 - piY * P2 / (2.0 * piC * piT) - Q / (2.0 * piY);
+			if (w2 <= 0) return Double.NaN;
+			distance -= (2.0 * piC * piT / piY) * Math.log(w2);
+		}
+		if (piR > 0 && piY > 0) {
+			double w3 = 1.0 - Q / (2.0 * piR * piY);
+			if (w3 <= 0) return Double.NaN;
+			distance -= 2.0 * (piR * piY - piA * piG * piY / piR - piC * piT * piR / piY) * Math.log(w3);
+		}
+		return distance;
 	}
 
 	private static boolean isACGT(char b) {

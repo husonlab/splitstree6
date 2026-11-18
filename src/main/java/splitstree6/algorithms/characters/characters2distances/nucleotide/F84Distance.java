@@ -47,7 +47,7 @@ public class F84Distance extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
+		return Arrays.asList("optionTsTvRatio", "optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}
 
 
@@ -57,7 +57,7 @@ public class F84Distance extends Nucleotides2DistancesBase {
 		progress.setTasks("Felsenstein 1984 distance", "Computing...");
 		progress.setMaximum(taxaBlock.getNtax());
 
-		final F84Model model = new F84Model(getOptionBaseFrequencies(), getOptionTsTvRatio());
+		final F84Model model = new F84Model(computeBaseFrequencies(charactersBlock), getOptionTsTvRatio());
 		model.setPropInvariableSites(getOptionPropInvariableSites());
 		model.setGamma(DEFAULT_GAMMA);
 

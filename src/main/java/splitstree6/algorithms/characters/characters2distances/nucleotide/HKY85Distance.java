@@ -58,12 +58,11 @@ public class HKY85Distance extends Nucleotides2DistancesBase {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 		progress.setTasks("HKY85 distance", "Computing...");
 
-		var model = new HKY85model(getOptionBaseFrequencies(), getOptionTsTvRatio());
+		var model = new HKY85model(computeBaseFrequencies(charactersBlock), getOptionTsTvRatio());
 		model.setPropInvariableSites(getOptionPropInvariableSites());
 		model.setGamma(DEFAULT_GAMMA);
 
 		// the model has no closed-form distance, so distances are always estimated by maximum likelihood
-		setOptionUseML_Distances(true);
 		model.apply(progress, charactersBlock, distancesBlock, true);
 	}
 }

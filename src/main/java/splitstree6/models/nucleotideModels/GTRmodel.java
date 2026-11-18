@@ -51,8 +51,10 @@ public class GTRmodel extends NucleotideModel {
 	}
 
 	/**
-	 * the general time-reversible distance d = -trace(Pi log(Pi^{-1} F)) (Rodríguez et al. 1990), where Pi is the
-	 * diagonal matrix of base frequencies and F is the divergence matrix, symmetrized.
+	 * the general time-reversible distance d = -trace(Pi log(Pi^{-1} F)) (Rodríguez et al. 1990), where F is the
+	 * divergence matrix, symmetrized, and Pi is the diagonal matrix of the base frequencies of the two sequences.
+	 * The rate matrix and the base frequencies of the model do not enter, they are used for maximum-likelihood
+	 * distances only.
 	 * The matrix Pi^{-1/2} F Pi^{-1/2} is symmetric and has the same eigenvalues as Pi^{-1} F, so we diagonalize
 	 * it as V L V^T and obtain the distance as -sum_a pi[a] sum_k V[a][k]^2 g(L[k]), where g is the logarithm,
 	 * or more generally the inverse moment-generating function that accounts for invariable sites and
@@ -63,16 +65,28 @@ public class GTRmodel extends NucleotideModel {
 	 */
 	@Override
 	public double exactDistance(double[][] F) throws SaturatedDistancesException {
-		var pi = getNormedBaseFreq();
-		var sqrtPi = new double[4];
-		for (var a = 0; a < 4; a++) {
-			sqrtPi[a] = Math.sqrt(pi[a]);
-		}
-
-		var symmetric = new Matrix(4, 4);
+		// the base frequencies are those of the two sequences, that is, the marginals of the symmetrized divergence
+		// matrix: with any other frequencies the formula does not give zero for two identical sequences
+		var pi = new double[4];
 		for (var a = 0; a < 4; a++) {
 			for (var b = 0; b < 4; b++) {
-				symmetric.set(a, b, 0.5 * (F[a][b] + F[b][a]) / (sqrtPi[a] * sqrtPi[b]));
+				pi[a] += 0.5 * (F[a][b] + F[b][a]);
+			}
+		}
+		// leave out bases that occur in neither sequence, they would give a division by zero
+		var present = new int[4];
+		var n = 0;
+		for (var a = 0; a < 4; a++) {
+			if (pi[a] > 0.0)
+				present[n++] = a;
+		}
+
+		var symmetric = new Matrix(n, n);
+		for (var a = 0; a < n; a++) {
+			for (var b = 0; b < n; b++) {
+				var x = present[a];
+				var y = present[b];
+				symmetric.set(a, b, 0.5 * (F[x][y] + F[y][x]) / Math.sqrt(pi[x] * pi[y]));
 			}
 		}
 
@@ -81,10 +95,10 @@ public class GTRmodel extends NucleotideModel {
 		var eigenvectors = eigen.getV().getArray();
 
 		var distance = 0.0;
-		for (var k = 0; k < 4; k++) {
+		for (var k = 0; k < n; k++) {
 			var transformed = mInverse(eigenvalues[k], getPropInvariableSites(), getGamma());
-			for (var a = 0; a < 4; a++) {
-				distance -= pi[a] * eigenvectors[a][k] * eigenvectors[a][k] * transformed;
+			for (var a = 0; a < n; a++) {
+				distance -= pi[present[a]] * eigenvectors[a][k] * eigenvectors[a][k] * transformed;
 			}
 		}
 		return distance;

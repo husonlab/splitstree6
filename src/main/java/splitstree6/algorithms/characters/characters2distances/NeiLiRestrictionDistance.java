@@ -48,7 +48,7 @@ public class NeiLiRestrictionDistance extends Characters2Distances {
 
 	@Override
 	public String getCitation() {
-		return "Nei & Li 1979;M Nei and WH Li. Mathematical model for studying genetic variation in terms of restriction endonucleases, PNAS 79(1):5269-5273, 1979.";
+		return "Nei & Li 1979;M Nei and WH Li. Mathematical model for studying genetic variation in terms of restriction endonucleases, PNAS 76(10):5269-5273, 1979.";
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class NeiLiRestrictionDistance extends Characters2Distances {
 	@Override
 	public String getToolTip(String optionName) {
 		if (optionName.equals(optionRestrictionSiteLength.getName()))
-			return "Expected length of restriction site (4-8 bp)";
+			return "Length of the restriction site in bp. The default is 1; restriction enzymes typically recognize 4-8 bp";
 		else
 			return optionName;
 	}

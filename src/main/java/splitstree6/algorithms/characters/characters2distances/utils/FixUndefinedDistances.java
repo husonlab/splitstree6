@@ -39,9 +39,12 @@ public class FixUndefinedDistances {
 		var ntax = distancesBlock.getNtax();
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = 1; t <= ntax; t++) {
-				if (isUndefined(distancesBlock.get(s, t)))
-					numUndefined++;
-				else
+				if (distancesBlock.get(s, t) == 0.0)
+					distancesBlock.set(s, t, 0.0); // a formula may give -0.0, which would be written as "-0"
+				if (isUndefined(distancesBlock.get(s, t))) {
+					if (s < t)
+						numUndefined++; // count each pair of taxa once
+				} else
 					maxValue = Math.max(maxValue, distancesBlock.get(s, t));
 			}
 		}

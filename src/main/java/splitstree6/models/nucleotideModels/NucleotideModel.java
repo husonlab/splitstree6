@@ -176,7 +176,9 @@ public abstract class NucleotideModel implements SubstitutionModel {
 			if (gamma <= 0.0)
 				expD[i] = Math.exp(evals[i] * t);
 			else
-				expD[i] = Math.pow(1.0 - gamma * evals[i] * t, -1.0 - gamma);
+				// rates follow a gamma distribution with shape gamma and mean 1, whose moment-generating function
+				// is (1 - x/gamma)^(-gamma); mInverse() below is its inverse
+				expD[i] = Math.pow(1.0 - evals[i] * t / gamma, -gamma);
 		}
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -289,6 +291,14 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	 */
 	public int getNstates() {
 		return 4;
+	}
+
+	/**
+	 * the four bases, in the order in which all nucleotide models number them
+	 */
+	@Override
+	public String getStates() {
+		return "acgt";
 	}
 
 	/**
@@ -434,10 +444,13 @@ public abstract class NucleotideModel implements SubstitutionModel {
 					}
 				} else {
 					//Exact distance
-					final double[][] F = seqPair.getF();
+					final double[][] F = seqPair.getF(getStates());
 					if (F != null) {
 						try {
-							dist = exactDistance(F);
+							// exactDistance() gives the distance for the sites that vary. As in the maximum
+							// likelihood case, we report the expected number of substitutions per site over all
+							// sites, of which a proportion of invariable sites undergoes none
+							dist = exactDistance(F) * getRate();
 						} catch (SaturatedDistancesException ignored) {
 						}
 					}

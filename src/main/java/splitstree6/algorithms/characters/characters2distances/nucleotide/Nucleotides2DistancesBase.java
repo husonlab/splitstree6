@@ -47,7 +47,7 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 
 	protected final static double[] DEFAULT_BASE_FREQ = {0.25, 0.25, 0.25, 0.25};  //Use the exact distance by default - transforms without exact distances should set useML = false
 
-	protected final static double DEFAULT_TSTV_RATIO = 2.0;  //default is no difference between transitions and transversions
+	protected final static double DEFAULT_TSTV_RATIO = 2.0;  // by default, twice as many transitions as transversions are expected
 	protected final static double DEFAULT_AC_VS_AT = 2.0;
 	protected final static double[][] DEFAULT_RATE_MATRIX = {{-3, 1, 1, 1}, {1, -3, 1, 1}, {1, 1, -3, 1}, {1, 1, 1, -3}};
 
@@ -80,7 +80,8 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 					"Use maximum likelihood estimation of distances (rather than exact distances)";
 			case "optionTsTvRatio" -> "Ratio of transitions vs transversions";
 			case "optionBaseFrequencies" -> "Base frequencies (in order ACGT/U)";
-			case "optionRateMatrix" -> "Rate matrix for GTRDistance (in order ACGT/U)";
+			case "optionRateMatrix" ->
+					"Rate matrix for GTRDistance (in order ACGT/U), used for maximum likelihood distances only";
 			case "optionSetBaseFrequencies" ->
 					"Set base frequencies to default values, or to estimations from characters (using Capture-recapture for invariable sites)";
 			case "optionSetSiteVarParams" ->
@@ -141,6 +142,38 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 			}
 		};
 		optionSetBaseFrequenciesProperty().addListener(listenerSetBaseFrequencies);
+	}
+
+	/**
+	 * gets the base frequencies to use: those set as an option or, if optionSetBaseFrequencies is fromChars, those
+	 * of the characters at hand. The latter makes the choice fromChars hold wherever the algorithm runs: it used to
+	 * act only through a listener of the user interface that copied the estimate into optionBaseFrequencies once,
+	 * so that a workflow run from the command line, or run again on other data, kept whatever values it had.
+	 *
+	 * @return base frequencies, in the order A, C, G, T/U
+	 */
+	protected double[] computeBaseFrequencies(CharactersBlock characters) throws IOException {
+		if (getOptionSetBaseFrequencies() != SetParameters.fromChars)
+			return getOptionBaseFrequencies();
+		var counts = new double[4];
+		var total = 0.0;
+		for (var t = 1; t <= characters.getNtax(); t++) {
+			for (var i = 1; i <= characters.getNchar(); i++) {
+				var ch = Character.toLowerCase(characters.get(t, i));
+				var state = "acgt".indexOf(ch == 'u' ? 't' : ch);
+				if (state >= 0) {
+					counts[state]++;
+					total++;
+				}
+			}
+		}
+		for (var state = 0; state < 4; state++) {
+			// a frequency of zero cannot be used: the rate matrix of the model is not defined for it
+			if (counts[state] == 0)
+				throw new IOException("Cannot estimate base frequencies from characters: '" + "ACGT".charAt(state) + "' does not occur");
+			counts[state] /= total;
+		}
+		return counts;
 	}
 
 	@Override

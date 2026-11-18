@@ -67,7 +67,9 @@ public class JaccardDistance extends Characters2Distances {
 					double a = F[1][1];
 
 					if (a + b + c > 0.0) {
-						dist = 1.0 - 2 * a / (2 * a + b + c);
+						// one minus the Jaccard index a / (a + b + c). (This used to be 1 - 2a / (2a + b + c), which is
+						// the Dice distance)
+						dist = 1.0 - a / (a + b + c);
 					}
 				}
 				distancesBlock.set(s, t, dist);
