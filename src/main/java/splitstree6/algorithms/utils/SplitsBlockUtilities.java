@@ -105,7 +105,7 @@ public class SplitsBlockUtilities {
 				dsum += dij;
 			}
 		}
-		return (float) Math.max(0, 100.0 * (1.0 - ssum / dsum));
+		return (float) (dsum > 0 ? Math.max(0, 100.0 * (1.0 - ssum / dsum)) : (ssum == 0 ? 100.0 : 0.0));
 	}
 
 

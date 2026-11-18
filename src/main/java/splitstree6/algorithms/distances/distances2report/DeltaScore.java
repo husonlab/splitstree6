@@ -119,8 +119,8 @@ public class DeltaScore extends Distances2ReportBase {
 			}
 		}
 		var n = selectedTaxa.length;
-		var ntriples = (n - 1) * (n - 2) * (n - 3) / 6;     //Number of triples containing a given taxon
-		var nquads = ntriples * n / 4;     //Number of 4-sets
+		var ntriples = (n - 1.0) * (n - 2.0) * (n - 3.0) / 6.0;     //Number of triples containing a given taxon
+		var nquads = ntriples * n / 4.0;     //Number of 4-sets
 
 		for (var i = 0; i < n; i++) {
 			taxonAverages[0][i] /= ntriples;

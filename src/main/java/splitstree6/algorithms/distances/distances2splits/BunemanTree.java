@@ -44,7 +44,7 @@ import java.util.BitSet;
  */
 public class BunemanTree extends Distances2Splits implements IToCompatibleSplits {
 	/**
-	 * indices that are not larger than this are treated as zero, to absorb rounding error
+	 * indices that are not larger than this times the largest distance are treated as zero, to absorb rounding error
 	 */
 	public static final double TOLERANCE = 1e-8;
 
@@ -65,6 +65,11 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 			return;
 
 		var ntax = taxaBlock.getNtax();
+		var largest = 0.0;
+		for (var i = 1; i <= ntax; i++)
+			for (var j = i + 1; j <= ntax; j++)
+				largest = Math.max(largest, distancesBlock.get(i, j));
+		final var tolerance = TOLERANCE * (largest > 0 ? largest : 1.0);
 		progress.setMaximum(ntax);
 		progress.setProgress(0);
 
@@ -80,8 +85,8 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 				var singleton = BitSetUtils.asBitSet(t);
 				var others = new BitSet();
 				others.set(1, t);
-				var index = minIndexOverQuartetsContaining(t, singleton, others, distancesBlock);
-				if (index > TOLERANCE)
+				var index = minIndexOverQuartetsContaining(t, singleton, others, distancesBlock, tolerance);
+				if (index > tolerance)
 					extended.add(new ASplit(singleton, t, index));
 			}
 			for (var split : splits) {
@@ -91,15 +96,15 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 				{
 					var aWithT = (BitSet) a.clone();
 					aWithT.set(t);
-					var index = Math.min(split.getWeight(), minIndexOverQuartetsContaining(t, aWithT, b, distancesBlock));
-					if (index > TOLERANCE)
+					var index = Math.min(split.getWeight(), minIndexOverQuartetsContaining(t, aWithT, b, distancesBlock, tolerance));
+					if (index > tolerance)
 						extended.add(new ASplit(aWithT, t, index));
 				}
 				{
 					var bWithT = (BitSet) b.clone();
 					bWithT.set(t);
-					var index = Math.min(split.getWeight(), minIndexOverQuartetsContaining(t, bWithT, a, distancesBlock));
-					if (index > TOLERANCE)
+					var index = Math.min(split.getWeight(), minIndexOverQuartetsContaining(t, bWithT, a, distancesBlock, tolerance));
+					if (index > tolerance)
 						extended.add(new ASplit((BitSet) a.clone(), t, index));
 				}
 			}
@@ -127,12 +132,19 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 	 * @return the minimum index, returned early once it is known not to be positive
 	 */
 	public static double minIndexOverQuartetsContaining(int t, BitSet A, BitSet B, DistancesBlock distances) {
+		return minIndexOverQuartetsContaining(t, A, B, distances, TOLERANCE);
+	}
+
+	/**
+	 * as above, with the value up to which an index is treated as zero
+	 */
+	public static double minIndexOverQuartetsContaining(int t, BitSet A, BitSet B, DistancesBlock distances, double tolerance) {
 		var min = Double.POSITIVE_INFINITY;
 		for (var a : BitSetUtils.members(A)) {
 			for (var b : BitSetUtils.members(B)) {
 				for (var b2 : BitSetUtils.members(B, b)) {
 					min = Math.min(min, quartetIndex(t, a, b, b2, distances));
-					if (min <= TOLERANCE)
+					if (min <= tolerance)
 						return min;
 				}
 			}

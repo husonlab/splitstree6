@@ -25,7 +25,6 @@ import javafx.beans.value.ChangeListener;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.ReportBlock;
-import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.workflow.Algorithm;
@@ -82,7 +81,7 @@ abstract public class Distances2ReportBase extends Algorithm<DistancesBlock, Rep
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock block, ReportBlock reportBlock) throws IOException {
-		reportBlock.setInputBlockName(SplitsBlock.BLOCK_NAME);
+		reportBlock.setInputBlockName(DistancesBlock.BLOCK_NAME);
 
 		// The view is optional. Guard it so that a report can be computed headless - from a
 		// tool, a test or a language binding - where there is no toolkit, no view tab and no

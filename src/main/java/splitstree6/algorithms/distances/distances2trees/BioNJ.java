@@ -82,7 +82,14 @@ public class BioNJ extends Distances2Trees implements IToSingleTree {
 			taxaHashMap.put(tax[t].toString(), v);
 		}
 
-		if (nTax <= 1)
+		if (nTax == 1)
+			tree.setRoot(tree.getFirstNode());
+		if (nTax == 2) {
+			var e = tree.newEdge(taxaHashMap.get("1"), taxaHashMap.get("2"));
+			tree.setWeight(e, distances.get(1, 2));
+			tree.setRoot(e.getSource());
+		}
+		if (nTax <= 2)
 			return tree;
 
 		final var h = new double[nTax + 1][nTax + 1];// distance matrix
@@ -171,7 +178,7 @@ public class BioNJ extends Distances2Trees implements IToSingleTree {
 			else {
 				lambda = 0.0;
 				for (var i = 1; i <= nTax; i++) {
-					if ((i_min != i) && (j_min != i) && (h[0][i] != 0.0))
+					if ((i_min != i) && (j_min != i) && active.get(i))
 						lambda += var[i_min][i] - var[j_min][i];
 				}
 				lambda = 0.5 + lambda / (2.0 * (actual - 2) * var_min);

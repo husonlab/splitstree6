@@ -73,19 +73,22 @@ public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 			alive.set(t - 1);
 		}
 
-		if (ntax <= 1)
+		if (ntax <= 1) {
+			if (ntax == 1)
+				tree.setRoot(nodes[0]);
 			return tree;
+		}
 
 		progressListener.setMaximum(ntax);
 		progressListener.setProgress(0);
 
-		final var matrix = new float[ntax][ntax]; // 0-based
+		final var matrix = new double[ntax][ntax]; // 0-based
 
-		final var rowSum = new float[ntax]; // 0-based
+		final var rowSum = new double[ntax]; // 0-based
 
 		for (var i : BitSetUtils.members(alive)) {
 			for (var j : BitSetUtils.members(alive, i + 1)) {
-				matrix[i][j] = matrix[j][i] = (float) distances.get(i + 1, j + 1);
+				matrix[i][j] = matrix[j][i] = distances.get(i + 1, j + 1);
 			}
 		}
 
@@ -98,7 +101,7 @@ public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 		while (alive.cardinality() > 2) {
 			var minI = -1;
 			var minJ = -1;
-			var minQ = Float.MAX_VALUE;
+			var minQ = Double.MAX_VALUE;
 
 			if (verbose) {
 				System.err.println("\nTaxa: " + alive.cardinality());
@@ -134,7 +137,7 @@ public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 
 
 			final var u = tree.newNode();
-			final var weightIU = 0.5f * matrix[minI][minJ] + 0.5f * (rowSum[minI] - rowSum[minJ]) / (alive.cardinality() - 2);
+			final var weightIU = 0.5 * matrix[minI][minJ] + 0.5 * (rowSum[minI] - rowSum[minJ]) / (alive.cardinality() - 2);
 			tree.setWeight(tree.newEdge(u, nodes[minI]), weightIU);
 			final var weightJU = matrix[minI][minJ] - weightIU;
 			tree.setWeight(tree.newEdge(u, nodes[minJ]), weightJU);
@@ -150,7 +153,7 @@ public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 			}
 
 			for (var k : BitSetUtils.members(alive)) {
-				matrix[minI][k] = matrix[k][minI] = (float) (0.5 * (matrix[minI][k] + matrix[minJ][k] - matrix[minI][minJ]));
+				matrix[minI][k] = matrix[k][minI] = 0.5 * (matrix[minI][k] + matrix[minJ][k] - matrix[minI][minJ]);
 			}
 
 			for (var k : BitSetUtils.members(alive)) {
@@ -168,6 +171,11 @@ public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 			var i = BitSetUtils.min(alive);
 			var j = BitSetUtils.max(alive);
 
+			if (tree.hasTaxa(nodes[i]) && !tree.hasTaxa(nodes[j])) { // root the tree at an inner node, if there is one
+				var tmp = i;
+				i = j;
+				j = tmp;
+			}
 			tree.setWeight(tree.newEdge(nodes[i], nodes[j]), matrix[i][j]);
 			tree.setRoot(nodes[i]);
 		}
@@ -178,8 +186,8 @@ public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 		return tree;
 	}
 
-	private float computeRowSum(BitSet alive, int i, float[][] matrix) {
-		var r = 0f;
+	private double computeRowSum(BitSet alive, int i, double[][] matrix) {
+		var r = 0.0;
 		for (var j : BitSetUtils.members(alive)) {
 			r += matrix[i][j];
 		}

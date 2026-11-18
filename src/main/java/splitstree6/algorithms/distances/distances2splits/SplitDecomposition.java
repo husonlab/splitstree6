@@ -66,6 +66,13 @@ public class SplitDecomposition extends Distances2Splits {
 
 		previousTaxa.set(1);
 
+		// isolation indices that are not larger than this are treated as zero; relative to the largest distance
+		var largest = 0.0;
+		for (var i = 1; i <= ntax; i++)
+			for (var j = i + 1; j <= ntax; j++)
+				largest = Math.max(largest, distancesBlock.get(i, j));
+		final var threshold = (float) (0.0000001 * (largest > 0 ? largest : 1.0));
+
 		for (var t = 2; t <= ntax; t++) {
 			nextSplits = new ArrayList<>(t); // restart current list of splits
 
@@ -75,7 +82,7 @@ public class SplitDecomposition extends Distances2Splits {
 			{
 				final var At = new BitSet();
 				At.set(t);
-				final var wgt = getIsolationIndex(t, At, previousTaxa, distancesBlock);
+				final var wgt = getIsolationIndex(t, At, previousTaxa, distancesBlock, threshold);
 				if (wgt > 0) {
 					nextSplits.add(new ASplit((BitSet) At.clone(), t, wgt));
 					// System.err.println("Adding (step 3) " + nextSplits.get(nextSplits.size() - 1));
@@ -90,7 +97,7 @@ public class SplitDecomposition extends Distances2Splits {
 				// is Au{t} vs B a split?
 				{
 					A.set(t);
-					var wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, A, B, distancesBlock));
+					var wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, A, B, distancesBlock, threshold));
 					if (wgt > 0) {
 						nextSplits.add(new ASplit((BitSet) A.clone(), t, wgt));
 						// System.err.println("Adding (step 1) " +nextSplits.get(nextSplits.size()-1));
@@ -101,7 +108,7 @@ public class SplitDecomposition extends Distances2Splits {
 				// is A vs Bu{t} a split?
 				{
 					B.set(t);
-					var wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, B, A, distancesBlock));
+					var wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, B, A, distancesBlock, threshold));
 					if (wgt > 0) {
 						nextSplits.add(new ASplit((BitSet) B.clone(), t, wgt));
 						// System.err.println("Adding (step 2) " +nextSplits.get(nextSplits.size()-1));
@@ -139,6 +146,15 @@ public class SplitDecomposition extends Distances2Splits {
 	 * @return the isolation index
 	 */
 	public static float getIsolationIndex(int t, BitSet A, BitSet B, DistancesBlock d) {
+		return getIsolationIndex(t, A, B, d, 0.0000001f);
+	}
+
+	/**
+	 * Returns the isolation index for Au{x} vs B
+	 *
+	 * @param threshold values that are not larger than this are treated as zero
+	 */
+	public static float getIsolationIndex(int t, BitSet A, BitSet B, DistancesBlock d, float threshold) {
 		var min_val = Float.MAX_VALUE;
 
 		for (var i = 1; i <= t; i++) {
@@ -149,7 +165,7 @@ public class SplitDecomposition extends Distances2Splits {
 							if (B.get(k)) {
 								var val = getIsolationIndex(t, i, j, k, d);
 								if (val < min_val) {
-									if (val <= 0.0000001)
+									if (val <= threshold)
 										return 0;
 									min_val = val;
 								}

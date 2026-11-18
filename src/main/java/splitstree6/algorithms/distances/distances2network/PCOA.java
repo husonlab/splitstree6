@@ -55,7 +55,7 @@ public class PCOA extends Distances2Network {
 
 	@Override
 	public String getCitation() {
-		return "Gower 1966; JC Gower,. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53(3-4):325-338, 1996.";
+		return "Gower 1966; JC Gower. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53(3-4):325-338, 1966.";
 	}
 
 	@Override
@@ -107,8 +107,12 @@ public class PCOA extends Distances2Network {
 
 		numberOfPositiveEigenValues = 0;
 		Matrix positiveEigenValues = eigenValueDecomposition.getD();
+		// eigenvalues that are positive only by rounding error are not counted
+		var largestEigenValue = 0.0;
+		for (int i = 0; i < rank; i++)
+			largestEigenValue = Math.max(largestEigenValue, positiveEigenValues.get(i, i));
 		for (int i = 0; i < rank; i++) {
-			if (positiveEigenValues.get(i, i) > 0)
+			if (positiveEigenValues.get(i, i) > 1e-10 * largestEigenValue)
 				numberOfPositiveEigenValues++;
 			else
 				positiveEigenValues.set(i, i, 0);
@@ -162,19 +166,22 @@ public class PCOA extends Distances2Network {
 		}
 		done = true;
 
-		setOptionFirstCoordinate(Math.min(numberOfPositiveEigenValues, getOptionFirstCoordinate()));
-		setOptionSecondCoordinate(Math.min(numberOfPositiveEigenValues, getOptionSecondCoordinate()));
 
 		progress.incrementProgress();
 
 		networkBlock.setNetworkType(NetworkBlock.Type.Points);
 
 		final PhyloGraph graph = networkBlock.getGraph();
-		System.err.printf("Stress: %.6f%n", getStress(getOptionFirstCoordinate() - 1, getOptionSecondCoordinate() - 1));
+		// a coordinate for which there is no positive eigenvalue is zero for all taxa
+		final var first = getOptionFirstCoordinate() - 1;
+		final var second = getOptionSecondCoordinate() - 1;
+		if (first < numberOfPositiveEigenValues && second < numberOfPositiveEigenValues)
+			System.err.printf("Stress: %.6f%n", getStress(first, second));
 
 
 		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
-			final double[] coordinates = getProjection(getOptionFirstCoordinate() - 1, getOptionSecondCoordinate() - 1, taxaBlock.get(t).getName());
+			final double[] vector = vectors[t - 1];
+			final double[] coordinates = {first < vector.length ? vector[first] : 0.0, second < vector.length ? vector[second] : 0.0};
 			final var v = graph.newNode(t);
 			graph.addTaxon(v, t);
 			graph.setLabel(v, taxaBlock.get(t).getDisplayLabelOrName());
@@ -184,8 +191,8 @@ public class PCOA extends Distances2Network {
 		progress.incrementProgress();
 
 		networkBlock.setInfoString("PCOA on %,d taxa,  PC-%d (%s%%) vs PC-%d (%s%%)".formatted(taxaBlock.getNtax(),
-				getOptionFirstCoordinate(), StringUtils.trim("%.1f", percentExplained[getOptionFirstCoordinate() - 1]),
-				getOptionSecondCoordinate(), StringUtils.trim("%.1f", percentExplained[getOptionSecondCoordinate() - 1])));
+				getOptionFirstCoordinate(), StringUtils.trim("%.1f", first < percentExplained.length ? percentExplained[first] : 0.0),
+				getOptionSecondCoordinate(), StringUtils.trim("%.1f", second < percentExplained.length ? percentExplained[second] : 0.0)));
 	}
 
 
@@ -236,24 +243,22 @@ public class PCOA extends Distances2Network {
 	private Matrix computeDoubleCenteringOfSquaredMatrix(Matrix matrix) {
 		int size = matrix.getColumnDimension();
 		Matrix result = new Matrix(matrix.getColumnDimension(), matrix.getRowDimension());
+		// means of the squared entries of each column and each row, and of all entries
+		final double[] columnMean = new double[size];
+		final double[] rowMean = new double[size];
+		double totalMean = 0;
+		for (int k = 0; k < size; k++) {
+			for (int l = 0; l < size; l++) {
+				final double squared = matrix.get(k, l) * matrix.get(k, l);
+				rowMean[k] += squared / size;
+				columnMean[l] += squared / size;
+				totalMean += squared / ((double) size * size);
+			}
+		}
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-				double v1 = 0;
-				for (int k = 0; k < size; k++) {
-					v1 += matrix.get(k, j) * matrix.get(k, j) / size;
-				}
-				double v2 = 0;
-				for (int k = 0; k < size; k++) {
-					v2 += matrix.get(i, k) * matrix.get(i, k) / size;
-				}
-				double v3 = 0;
-				for (int k = 0; k < size; k++) {
-					for (int l = 0; l < size; l++) {
-						v3 += matrix.get(k, l) * matrix.get(k, l) / (size * size);
-					}
-				}
 				double v4 = matrix.get(i, j);
-				result.set(i, j, 0.5 * (v1 + v2 - v3 - (v4 * v4)));
+				result.set(i, j, 0.5 * (columnMean[j] + rowMean[i] - totalMean - (v4 * v4)));
 			}
 		}
 		return result;

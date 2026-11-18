@@ -64,7 +64,7 @@ public class MinSpanningNetwork extends Distances2Network implements IUsesCharac
 		if (!optionName.startsWith("option"))
 			optionName = "option" + optionName;
 		if (optionName.equals(optionEpsilon.getName())) {
-			return "Weighted genetic distance measure. Low: MedianJoining, High: full median network";
+			return "Once the network is connected, all further edges are added whose length exceeds that of the last one by at most this value";
 		} else if (optionName.equals(optionMinSpanningTree.getName())) {
 			return "Calculate minimum spanning tree";
 		}
@@ -122,7 +122,8 @@ public class MinSpanningNetwork extends Distances2Network implements IUsesCharac
 				final var a = pair.getFirst();
 				final var b = pair.getSecond();
 
-				if (!optionMinSpanningTree.getValue() || component[a] != component[b]) {
+				// network: an edge is in some minimum spanning tree if its ends are not connected by shorter edges
+				if (component[a] != component[b] || (!optionMinSpanningTree.getValue() && numComponentsMSN == 1)) {
 					var e = graph.newEdge(node[a], node[b]);
 					graph.setWeight(e, distancesBlock.get(a, b));
 
