@@ -89,9 +89,12 @@ public class OptionIO {
 									}
 								}
 								case Enum -> {
-									var value = option.getEnumValueForName(np.getWordRespectCase());
+									var word = np.getWordRespectCase();
+									var value = option.getEnumValueForName(word);
 									if (value != null)
 										option.getProperty().setValue(value);
+									else
+										System.err.println("WARNING: unknown value '" + word + "' for option '" + name + "' of '" + optionsCarrier.getClass().getSimpleName() + "' in line " + np.lineno() + ", using '" + option.getProperty().getValue() + "'");
 								}
 								case stringArray -> {
 									final var list = new ArrayList<String>();

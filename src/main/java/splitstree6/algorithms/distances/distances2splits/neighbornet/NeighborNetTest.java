@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.Random;
 
 import static java.lang.Math.sqrt;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetRemovedOptimizers.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.copyArray;

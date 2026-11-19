@@ -43,7 +43,7 @@ import java.util.List;
 
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
-	public enum InferenceAlgorithm {GradientProjection, ActiveSet, APGD, SplitsTree4}
+	public enum InferenceAlgorithm {ActiveSet, SplitsTree4}
 
 	public enum CircularOrderingAlgorithm {SplitsTree4, BryantHuson2023}
 
@@ -143,12 +143,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		if (getOptionInferenceAlgorithm() == InferenceAlgorithm.ActiveSet)
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.ACTIVESET;
-		else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.APGD)
-			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.APGD;
-			//else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.IPG)
-			//	params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.IPG;
-		else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.GradientProjection)
-			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.GRADPROJECTION;
 		else
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.SPLITSTREE4;
 

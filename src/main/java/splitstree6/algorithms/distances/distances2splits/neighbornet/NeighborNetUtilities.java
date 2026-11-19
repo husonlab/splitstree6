@@ -24,7 +24,7 @@ import jloda.util.CanceledException;
 import java.util.Random;
 
 import static java.lang.Math.*;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean.IPG;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetRemovedOptimizers.IPG;
 
 public class NeighborNetUtilities {
 
