@@ -35,6 +35,9 @@
         <javafx.version>22.0.2</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
         <main.class>splitstree6.main.SplitsTree6</main.class>
+        <junit.version>5.9.2</junit.version>
+        <!-- tests tagged slow are left out of mvn test; mvn test -DexcludedTestGroups=none runs them too -->
+        <excludedTestGroups>slow</excludedTestGroups>
     </properties>
 
     <dependencies>
@@ -111,6 +114,18 @@
             <artifactId>ojalgo</artifactId>
             <version>57.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -119,6 +134,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
+            </plugin>
+            <plugin>
+                <!-- the unit tests run on the class path, so that they see package-private classes and need no opens -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                    <excludedGroups>${excludedTestGroups}</excludedGroups>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
