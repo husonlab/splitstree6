@@ -24,6 +24,8 @@ import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
+import splitstree6.workflow.NetworkViewPipeline;
+import splitstree6.options.OptionDefaults;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.*;
@@ -44,6 +46,7 @@ import java.util.List;
 public class AddAlgorithmCommand {
 
 	public static UndoableRedoableCommand create(MainWindow mainWindow, DataNode<DistancesBlock> node, Algorithm algorithm) {
+		OptionDefaults.applyUserDefaults(algorithm); // added by hand: start with the user's defaults, if any
 		final Collection<WorkflowNode> addedNodes = new ArrayList<>();
 		return UndoableRedoableCommand.create("add " + algorithm.getName(),
 				() -> mainWindow.getWorkflow().deleteNodes(addedNodes),
@@ -81,10 +84,7 @@ public class AddAlgorithmCommand {
 				list.add(targetDataNode2);
 				list.add(algorithmNode2);
 			} else if (algorithm.getToClass() == NetworkBlock.class) {
-				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-				var algorithmNode2 = workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
-				list.add(targetDataNode2);
-				list.add(algorithmNode2);
+				list.addAll(NetworkViewPipeline.attachView(workflow, algorithm, targetDataNode));
 			}
 			algorithmNode.restart();
 			Platform.runLater(() -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true));

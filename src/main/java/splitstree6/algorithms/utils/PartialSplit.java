@@ -38,8 +38,8 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	BitSet A;
 	BitSet B;
-	float weight = 1;
-	float confidence = 1;
+	double weight = 1;
+	double confidence = 1;
 
 	private static final int NOT_SET_YET = -1;
 	private int hashCode = NOT_SET_YET;
@@ -61,7 +61,7 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 	 * sets only one half of the split, assumes the rest will be set later
 	 * and weight and confidence
 	 */
-	public PartialSplit(BitSet A, float weight, float confidence) {
+	public PartialSplit(BitSet A, double weight, double confidence) {
 		this.A = A;
 		this.weight = weight;
 		this.confidence = confidence;
@@ -77,7 +77,7 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 	/**
 	 * constructor given both sides A and B, a weight and confidence
 	 */
-	public PartialSplit(BitSet A, BitSet B, float weight, float confidence) {
+	public PartialSplit(BitSet A, BitSet B, double weight, double confidence) {
 		set(A, B, weight, confidence);
 	}
 
@@ -97,7 +97,7 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 	/**
 	 * set boths sides and the weight and confidence
 	 */
-	public void set(BitSet A, BitSet B, float weight, float confidence) {
+	public void set(BitSet A, BitSet B, double weight, double confidence) {
 		set(A, B);
 		this.weight = weight;
 		this.confidence = confidence;
@@ -178,19 +178,19 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 		B = b;
 	}
 
-	public float getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 
-	public void setWeight(float weight) {
+	public void setWeight(double weight) {
 		this.weight = weight;
 	}
 
-	public float getConfidence() {
+	public double getConfidence() {
 		return confidence;
 	}
 
-	public void setConfidence(float confidence) {
+	public void setConfidence(double confidence) {
 		this.confidence = confidence;
 	}
 

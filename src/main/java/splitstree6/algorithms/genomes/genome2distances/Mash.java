@@ -19,8 +19,8 @@
 
 package splitstree6.algorithms.genomes.genome2distances;
 
+import splitstree6.utils.Warnings;
 import javafx.beans.property.*;
-import jloda.fx.window.NotificationManager;
 import jloda.kmers.GenomeDistanceType;
 import jloda.kmers.mash.MashDistance;
 import jloda.kmers.mash.MashSketch;
@@ -119,7 +119,7 @@ public class Mash extends Genomes2Distances {
 
 			}
 			if (countTooSmall > 0)
-				NotificationManager.showWarning(String.format("Too few k-mers for %,d genomes- rerun with smaller sketch size", countTooSmall));
+				Warnings.show(String.format("Too few k-mers for %,d genomes- rerun with smaller sketch size", countTooSmall));
 
 			var triplets = new ArrayList<Triplet<MashSketch, MashSketch, Double>>();
 
@@ -158,7 +158,7 @@ public class Mash extends Genomes2Distances {
 					countUndefined++;
 			}
 			if (countUndefined > 0)
-				NotificationManager.showWarning(String.format("Failed to estimate distance for %d pairs (distances set to 0.75) - increase sketch size or decrease k", countUndefined));
+				Warnings.show(String.format("Failed to estimate distance for %d pairs (distances set to 0.75) - increase sketch size or decrease k", countUndefined));
 		} catch (IOException ex) {
 			throw ex;
 		} catch (Exception ex) {

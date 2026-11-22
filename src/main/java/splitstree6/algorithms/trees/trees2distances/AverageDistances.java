@@ -21,7 +21,6 @@ package splitstree6.algorithms.trees.trees2distances;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.fx.util.ProgramProperties;
 import jloda.util.CanceledException;
 import jloda.util.NumberUtils;
 import jloda.util.ProgramExecutorService;
@@ -45,11 +44,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class AverageDistances extends Trees2Distances {
-	private final BooleanProperty optionUseTopologicalDistance = new SimpleBooleanProperty(this, "optionUseTopologicalDistance");
-
-	{
-		ProgramProperties.track(optionUseTopologicalDistance, false);
-	}
+	private final BooleanProperty optionUseTopologicalDistance = new SimpleBooleanProperty(this, "optionUseTopologicalDistance", false);
 
 	@Override
 	public List<String> listOptions() {
@@ -106,8 +101,7 @@ public class AverageDistances extends Trees2Distances {
 								for (var b = 1; b <= nTax; b++) {
 									var i = taxaBlock.indexOf(tmpTaxa.getLabel(a)); // translate numbering
 									var j = taxaBlock.indexOf(tmpTaxa.getLabel(b));
-									count[threadNumber][i][j]++;
-									count[threadNumber][j][i]++;
+									count[threadNumber][i][j]++; // the loop visits both (a,b) and (b,a)
 								}
 							}
 							for (var s = 1; s <= splits.getNsplits(); s++) {

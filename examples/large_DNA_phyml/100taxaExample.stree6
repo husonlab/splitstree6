@@ -1,29 +1,28 @@
 #nexus [SplitsTree6]
 
 BEGIN SPLITSTREE6;
-DIMENSIONS nDataNodes=8 nAlgorithms=6;
-PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1646356067384'; [Fri Mar 04 14:07:47 NZDT 2022]
+DIMENSIONS nDataNodes=9 nAlgorithms=5;
+PROGRAM version='SplitsTree (version dev) - License GPL v3';
+WORKFLOW creationDate='1795328986254'; [Sun Nov 22 07:29:46 CET 2026]
 END; [SPLITSTREE6]
 
 [
 Methods:
-Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+Analysis was performed using SplitsTree (version dev)  (Huson and Bryant 2024 ; DH Huson and D. Bryant, The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods 21(10):1773-1774 2024.).
 The original input consisted of 346 taxa and 346 Protein sequences of length 897.
 The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 346 x 346 distance matrix.
-The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 633 splits, cyclic.
-The Show Splits method was used (default options) so as to obtain a Splits Network visualization (Dress & Huson 2004).
+The Neighbor Net method (Bryant & Moulton 2004, Bryant & Huson 2023) was used (default options) so as to obtain 633 splits, circular.
+The Show Splits method was used (default options) so as to obtain a Split Network visualization.
 
 References:
-Bryant & Moulton 2004: D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255– 265, 2004.
-Dress & Huson 2004: A.W.M. Dress and D.H. Huson, Constructing splits graphs, IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.
-Hamming 1950: Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
-Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+Bryant & Huson 2023: D. Bryant and DH Huson, NeighborNet- improved algorithms and implementation. Front. Bioinform. 3, 2023.
+Bryant & Moulton 2004: D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255–265, 2004.
+Hamming 1950: Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147-160. MR 0035935, 1950.
+Huson and Bryant 2024: DH Huson and D. Bryant, The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods 21(10):1773-1774 2024.
 ]
 
 BEGIN TAXA;
 TITLE 'Input Taxa';
-LINK ALGORITHM = 'Input Data Loader';
 DIMENSIONS ntax=346;
 TAXLABELS
 	[1] 'tax1'
@@ -378,16 +377,15 @@ TAXLABELS
 END; [TAXA]
 
 BEGIN ALGORITHM;
-TITLE 'Taxa Editor';
-LINK ALGORITHM = 'Input Data Loader';
-NAME 'Taxa Editor';
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
 OPTIONS
 	DisabledTaxa = 'tax101' 'tax102' 'tax103' 'tax104' 'tax105' 'tax106' 'tax107' 'tax108' 'tax109' 'tax110' 'tax111' 'tax112' 'tax113' 'tax114' 'tax115' 'tax116' 'tax117' 'tax118' 'tax119' 'tax120' 'tax121' 'tax122' 'tax123' 'tax124' 'tax125' 'tax126' 'tax127' 'tax128' 'tax129' 'tax130' 'tax131' 'tax132' 'tax133' 'tax134' 'tax135' 'tax136' 'tax137' 'tax138' 'tax139' 'tax140' 'tax141' 'tax142' 'tax143' 'tax144' 'tax145' 'tax146' 'tax147' 'tax148' 'tax149' 'tax150' 'tax151' 'tax152' 'tax153' 'tax154' 'tax155' 'tax156' 'tax157' 'tax158' 'tax159' 'tax160' 'tax161' 'tax162' 'tax163' 'tax164' 'tax165' 'tax166' 'tax167' 'tax168' 'tax169' 'tax170' 'tax171' 'tax172' 'tax173' 'tax174' 'tax175' 'tax176' 'tax177' 'tax178' 'tax179' 'tax180' 'tax181' 'tax182' 'tax183' 'tax184' 'tax185' 'tax186' 'tax187' 'tax188' 'tax189' 'tax190' 'tax191' 'tax192' 'tax193' 'tax194' 'tax195' 'tax196' 'tax197' 'tax198' 'tax199' 'tax200' 'tax201' 'tax202' 'tax203' 'tax204' 'tax205' 'tax206' 'tax207' 'tax208' 'tax209' 'tax210' 'tax211' 'tax212' 'tax213' 'tax214' 'tax215' 'tax216' 'tax217' 'tax218' 'tax219' 'tax220' 'tax221' 'tax222' 'tax223' 'tax224' 'tax225' 'tax226' 'tax227' 'tax228' 'tax229' 'tax230' 'tax231' 'tax232' 'tax233' 'tax234' 'tax235' 'tax236' 'tax237' 'tax238' 'tax239' 'tax240' 'tax241' 'tax242' 'tax243' 'tax244' 'tax245' 'tax246' 'tax247' 'tax248' 'tax249' 'tax250' 'tax251' 'tax252' 'tax253' 'tax254' 'tax255' 'tax256' 'tax257' 'tax258' 'tax259' 'tax260' 'tax261' 'tax262' 'tax263' 'tax264' 'tax265' 'tax266' 'tax267' 'tax268' 'tax269' 'tax270' 'tax271' 'tax272' 'tax273' 'tax274' 'tax275' 'tax276' 'tax277' 'tax278' 'tax279' 'tax280' 'tax281' 'tax282' 'tax283' 'tax284' 'tax285' 'tax286' 'tax287' 'tax288' 'tax289' 'tax290' 'tax291' 'tax292' 'tax293' 'tax294' 'tax295' 'tax296' 'tax297' 'tax298' 'tax299' 'tax300' 'tax301' 'tax302' 'tax303' 'tax304' 'tax305' 'tax306' 'tax307' 'tax308' 'tax309' 'tax310' 'tax311' 'tax312' 'tax313' 'tax314' 'tax315' 'tax316' 'tax317' 'tax318' 'tax319' 'tax320' 'tax321' 'tax322' 'tax323' 'tax324' 'tax325' 'tax326' 'tax327' 'tax328' 'tax329' 'tax330' 'tax331' 'tax332' 'tax333' 'tax334' 'tax335' 'tax336' 'tax337' 'tax338' 'tax339' 'tax340' 'tax341' 'tax342' 'tax343' 'tax344' 'tax345' 'tax346';
 END; [ALGORITHM]
 
 BEGIN TAXA;
 TITLE 'Working Taxa';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=346;
 TAXLABELS
 	[1] 'tax1'
@@ -743,7 +741,7 @@ END; [TAXA]
 
 BEGIN CHARACTERS;
 TITLE 'Input Characters';
-LINK ALGORITHM = 'Input Data Loader';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=346 nchar=897;
 FORMAT
 	datatype='Protein' missing=? gap=- symbols="arndcqeghilkmfpstwyvz" labels=left transpose=no interleave=yes;
@@ -4919,6 +4917,8 @@ BEGIN ALGORITHM;
 TITLE 'Input Data Filter';
 LINK CHARACTERS = 'Input Characters';
 NAME 'Characters Taxa Filter';
+OPTIONS
+;
 END; [ALGORITHM]
 
 BEGIN CHARACTERS;
@@ -9100,7 +9100,8 @@ TITLE 'Hamming Distance';
 LINK CHARACTERS = 'Working Characters';
 NAME 'Hamming Distance';
 OPTIONS
-	Normalize = 'true';
+	MatchAmbiguityCodes = 'true',
+	MatchGapToGap = 'false';
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
@@ -9463,8 +9464,7 @@ TITLE 'Neighbor Net';
 LINK DISTANCES = 'Distances';
 NAME 'Neighbor Net';
 OPTIONS
-	InferenceAlgorithm = 'BlockPivot',
-	UsePreconditioner = 'false';
+	InferenceAlgorithm = 'ActiveSet';
 END; [ALGORITHM]
 
 BEGIN SPLITS;
@@ -9472,7 +9472,7 @@ TITLE 'Splits';
 LINK ALGORITHM = 'Neighbor Net';
 DIMENSIONS ntax=346 nsplits=633;
 FORMAT labels=no weights=yes confidences=no;
-PROPERTIES fit=99.9 cyclic;
+PROPERTIES fit=99.9 circular;
 CYCLE 1 2 4 5 3 123 124 125 12 10 9 8 111 104 102 110 107 106 101 105 109 100 103 108 118 115 120 113 117 116 114 121 112 119 122 13 95 93 94 96 99 98 97 346 345 343 344 339 311 312 342 338 310 316 324 325 323 327 326 322 319 320 321 333 317 315 336 330 341 340 331 337 332 307 309 313 334 318 308 328 329 335 314 305 304 299 300 302 303 306 301 252 253 251 250 274 227 270 275 271 269 229 242 236 241 239 243 238 235 233 234 240 237 230 232 225 228 231 222 249 248 221 220 279 272 298 284 247 246 219 267 266 273 226 224 288 268 291 223 290 287 289 292 293 294 297 286 296 276 277 285 295 280 281 245 244 283 282 278 265 264 262 254 255 256 260 259 257 258 261 263 215 216 218 214 212 217 213 207 210 203 205 211 208 209 193 196 194 199 197 200 195 198 206 204 147 169 202 201 42 43 188 186 191 189 182 184 190 183 187 161 38 28 31 30 39 29 40 157 162 165 163 166 159 185 192 164 158 35 33 37 41 167 160 32 36 34 178 177 68 69 52 175 172 179 170 171 173 168 180 174 176 45 70 156 152 154 151 153 181 155 54 150 149 148 145 146 47 50 49 48 46 53 142 131 144 133 51 139 141 138 135 134 136 56 130 137 143 132 57 61 55 58 59 60 64 62 66 44 128 140 63 65 71 67 129 16 17 15 19 21 20 22 23 18 14 27 26 24 25 87 90 91 92 88 89 72 77 74 73 81 75 78 79 82 76 80 83 84 86 85 11 7 6 126 127;
 MATRIX
 [1, size=2] 	 0.00050235 	 1 2,
@@ -10120,17 +10120,18 @@ OPTIONS
 END; [ALGORITHM]
 
 BEGIN VIEW;
-TITLE 'Splits Network';
+TITLE 'SplitNetwork';
 LINK ALGORITHM = 'Show Splits';
-NAME 'Splits Network';
+NAME 'SplitNetworkView';
 INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Outline',
 	Orientation = 'Rotate0Deg',
 	Rooting = 'None',
-	ZoomFactor = 1,
+	ZoomFactor = 0.79544179,
 	FontScaleFactor = 1,
 	RootAngle = 160,
 	OutlineFill = 0xc0c0c0ff,
-	ShowConfidence = 'false';
+	LabelSplitsBy = 'None',
+	ShowQRCode = 'false';
 END; [VIEW]

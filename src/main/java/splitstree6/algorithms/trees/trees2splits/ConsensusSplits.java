@@ -19,8 +19,8 @@
 
 package splitstree6.algorithms.trees.trees2splits;
 
+import splitstree6.utils.Warnings;
 import javafx.beans.property.*;
-import jloda.fx.window.NotificationManager;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2splits.DimensionFilter;
@@ -260,7 +260,7 @@ public class ConsensusSplits extends Trees2Splits {
 								if (treeWeight == 0) {
 									synchronized (warnedAboutZeroWeight) {
 										if (!warnedAboutZeroWeight.get()) {
-											NotificationManager.showWarning("Tree[" + which + "] '" + tree.getName() + "' has zero weight (check the message window for others)");
+											Warnings.show("Tree[" + which + "] '" + tree.getName() + "' has zero weight (check the message window for others)");
 											warnedAboutZeroWeight.set(true);
 										}
 									}

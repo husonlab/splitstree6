@@ -526,4 +526,235 @@ public class TestUtils {
 		}
 		return new String[]{first.toString(), second.toString(), first.toString()};
 	}
+
+	// ---------- reports, sets and simulated sequences ----------
+
+	public static String text(ReportBlock report) {
+		return String.join("\n", report.getLines());
+	}
+
+	public static BitSet set(int... members) {
+		var set = new BitSet();
+		for (var t : members) set.set(t);
+		return set;
+	}
+
+	/**
+	 * the first number that follows the given text
+	 */
+	public static double numberAfter(String text, String prefix) {
+		var start = text.indexOf(prefix);
+		if (start < 0) throw new IllegalArgumentException("'" + prefix + "' not found in: " + text);
+		var matcher = java.util.regex.Pattern.compile("-?[0-9][0-9,]*\\.?[0-9]*([eE]-?[0-9]+)?").matcher(text.substring(start + prefix.length()));
+		if (!matcher.find()) throw new IllegalArgumentException("no number after '" + prefix + "' in: " + text);
+		return Double.parseDouble(matcher.group().replace(",", ""));
+	}
+
+	/**
+	 * nucleotide sequences evolved under the Jukes-Cantor model along a random rooted binary tree whose edges all have
+	 * the given length (expected substitutions per site); the first invariable sites never change
+	 */
+	public static String[] simulateSequences(int n, int sites, double edgeLength, int invariable, Random random) {
+		var root = new char[sites];
+		for (var i = 0; i < sites; i++) root[i] = "acgt".charAt(random.nextInt(4));
+		var rows = new String[n];
+		var taxa = new ArrayList<Integer>();
+		for (var t = 0; t < n; t++) taxa.add(t);
+		evolve(root, taxa, edgeLength, invariable, random, rows);
+		return rows;
+	}
+
+	private static void evolve(char[] sequence, List<Integer> taxa, double edgeLength, int invariable, Random random, String[] rows) {
+		if (taxa.size() == 1) {
+			rows[taxa.get(0)] = new String(sequence);
+			return;
+		}
+		var cut = 1 + random.nextInt(taxa.size() - 1);
+		for (var part : List.of(taxa.subList(0, cut), taxa.subList(cut, taxa.size()))) {
+			var child = sequence.clone();
+			var change = 0.75 * (1 - Math.exp(-4.0 * edgeLength / 3.0));
+			for (var i = invariable; i < child.length; i++)
+				if (random.nextDouble() < change) {
+					char other;
+					do other = "acgt".charAt(random.nextInt(4)); while (other == child[i]);
+					child[i] = other;
+				}
+			evolve(child, part, edgeLength, invariable, random, rows);
+		}
+	}
+
+	/**
+	 * binary characters without homoplasy: for each split, as many sites as its weight rounded up, with state 'a' on the
+	 * side of taxon 1 and 'c' on the other
+	 */
+	public static String[] perfectCharacters(Map<BitSet, Double> splits, int n) {
+		var rows = new StringBuilder[n];
+		for (var t = 0; t < n; t++) rows[t] = new StringBuilder();
+		var sides = new ArrayList<>(splits.keySet());
+		sides.sort(Comparator.comparing(BitSet::toString));
+		for (var side : sides)
+			for (var k = 0; k < Math.ceil(splits.get(side)); k++)
+				for (var t = 1; t <= n; t++) rows[t - 1].append(side.get(t) ? 'a' : 'c');
+		var result = new String[n];
+		for (var t = 0; t < n; t++) result[t] = rows[t].toString();
+		return result;
+	}
+
+	// ---------- splits blocks and trees ----------
+
+	/**
+	 * a splits block with the given weighted splits (sides containing taxon 1), in a fixed order, with its cycle and
+	 * compatibility computed
+	 */
+	public static SplitsBlock splitsBlock(Map<BitSet, Double> splits, int n) {
+		var block = new SplitsBlock();
+		var sides = new ArrayList<>(splits.keySet());
+		sides.sort(Comparator.comparing(BitSet::toString));
+		for (var side : sides) block.getSplits().add(new ASplit(side, n, splits.get(side)));
+		block.setCycle(splitstree6.algorithms.utils.SplitsBlockUtilities.computeCycle(n, block.getSplits()));
+		block.setCompatibility(splitstree6.splits.Compatibility.compute(n, block.getSplits(), block.getCycle()));
+		return block;
+	}
+
+	/**
+	 * a tree from a Newick string whose leaves are named t1, t2, ...: the leaf named tK is taxon K
+	 */
+	public static PhyloTree tree(String newick) {
+		try {
+			var tree = new PhyloTree();
+			new jloda.phylo.NewickIO().parseBracketNotation(tree, newick, true);
+			for (var v : tree.nodes()) {
+				var label = tree.getLabel(v);
+				if (label != null && label.matches("t[0-9]+")) tree.addTaxon(v, Integer.parseInt(label.substring(1)));
+			}
+			return tree;
+		} catch (java.io.IOException ex) {
+			throw new IllegalArgumentException(ex);
+		}
+	}
+
+	public static TreesBlock trees(String... newick) {
+		var block = new TreesBlock();
+		for (var line : newick) {
+			var tree = tree(line);
+			tree.setName("tree-" + (block.getNTrees() + 1));
+			block.getTrees().add(tree);
+		}
+		block.setRooted(true);
+		return block;
+	}
+
+	/**
+	 * the sets of taxa below the nodes of a rooted tree, other than the set of all taxa
+	 */
+	public static Set<BitSet> clusters(PhyloTree tree) {
+		var result = new HashSet<BitSet>();
+		var all = clustersBelow(tree, tree.getRoot(), result);
+		result.remove(all);
+		return result;
+	}
+
+	private static BitSet clustersBelow(PhyloTree tree, Node v, Set<BitSet> result) {
+		var set = new BitSet();
+		for (var t : tree.getTaxa(v)) set.set(t);
+		for (var e : v.outEdges()) set.or(clustersBelow(tree, e.getTarget(), result));
+		result.add(set);
+		return set;
+	}
+
+	/**
+	 * a random rooted binary tree on taxa 1..n as a Newick string, with edge lengths in [0.1, 1.1) or without
+	 */
+	public static String randomNewick(int n, Random random, boolean lengths) {
+		var parts = new ArrayList<String>();
+		for (var t = 1; t <= n; t++) parts.add("t" + t);
+		while (parts.size() > 1) {
+			var a = parts.remove(random.nextInt(parts.size()));
+			var b = parts.remove(random.nextInt(parts.size()));
+			if (lengths)
+				parts.add("(" + a + ":" + (0.1 + random.nextDouble()) + "," + b + ":" + (0.1 + random.nextDouble()) + ")");
+			else parts.add("(" + a + "," + b + ")");
+		}
+		return parts.get(0) + ";";
+	}
+
+	/**
+	 * the distances between the taxa along the edges of a tree
+	 */
+	public static double[][] pathDistances(PhyloTree tree, int n) {
+		return metric(weightedSplits(tree, n), n);
+	}
+
+	/**
+	 * the Newick string of the rooted tree on taxa 1..n that has exactly the given clusters (and the leaves)
+	 */
+	public static String newickFromClusters(Set<BitSet> clusters, int n) {
+		var all = new BitSet();
+		all.set(1, n + 1);
+		return newickFromClusters(all, clusters) + ";";
+	}
+
+	private static String newickFromClusters(BitSet taxa, Set<BitSet> clusters) {
+		if (taxa.cardinality() == 1) return "t" + taxa.nextSetBit(0);
+		// the children are the largest clusters properly inside, and the taxa that are in none of them
+		var inside = new ArrayList<BitSet>();
+		for (var c : clusters) {
+			var rest = (BitSet) c.clone();
+			rest.andNot(taxa);
+			if (rest.isEmpty() && !c.equals(taxa) && !c.isEmpty()) inside.add(c);
+		}
+		inside.sort(Comparator.comparing(BitSet::toString));
+		var parts = new ArrayList<String>();
+		var covered = new BitSet();
+		for (var c : inside) {
+			var maximal = true;
+			for (var d : inside) {
+				var rest = (BitSet) c.clone();
+				rest.andNot(d);
+				if (rest.isEmpty() && !c.equals(d)) maximal = false;
+			}
+			if (maximal) {
+				parts.add(newickFromClusters(c, clusters));
+				covered.or(c);
+			}
+		}
+		for (var t = taxa.nextSetBit(0); t >= 0; t = taxa.nextSetBit(t + 1)) if (!covered.get(t)) parts.add("t" + t);
+		return "(" + String.join(",", parts) + ")";
+	}
+
+	/**
+	 * rooted trees on taxa 1..n that are related and not fully resolved: each is a common random binary tree, with two
+	 * taxa exchanged in some of them, in which each cluster that is not a leaf is left out with the given probability
+	 */
+	public static List<String> relatedUnresolvedTrees(int n, int count, double leaveOut, Random random) {
+		var base = clusters(tree(randomNewick(n, random, false)));
+		var result = new ArrayList<String>();
+		for (var i = 0; i < count; i++) {
+			int a = 1 + random.nextInt(n), b = (i % 2 == 0 ? a : 1 + random.nextInt(n));
+			var kept = new HashSet<BitSet>();
+			for (var c : base) {
+				var d = (BitSet) c.clone();
+				if (c.get(a) != c.get(b)) {
+					d.flip(a);
+					d.flip(b);
+				}
+				if (d.cardinality() == 1 || random.nextDouble() >= leaveOut) kept.add(d);
+			}
+			result.add(newickFromClusters(kept, n));
+		}
+		return result;
+	}
+
+	/**
+	 * the values of all options of an algorithm, by the names of their property methods
+	 */
+	public static Map<String, String> optionValues(Object algorithm) throws Exception {
+		var result = new TreeMap<String, String>();
+		for (var method : algorithm.getClass().getMethods())
+			if (method.getName().startsWith("option") && method.getName().endsWith("Property") && method.getParameterCount() == 0) {
+				var value = ((javafx.beans.value.ObservableValue<?>) method.invoke(algorithm)).getValue();
+				result.put(method.getName(), value instanceof Object[] array ? Arrays.toString(array) : value instanceof int[] ints ? Arrays.toString(ints) : String.valueOf(value));
+			}
+		return result;
+	}
 }

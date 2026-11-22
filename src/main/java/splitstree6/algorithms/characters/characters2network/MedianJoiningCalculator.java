@@ -58,6 +58,35 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 			progressListener.incrementProgress();
 		}
 		while (changed);
+
+		mergeMedianVectorsWithTwoLinks(graph, inputSequences, weights);
+	}
+
+	/**
+	 * a median vector with two links only marks a point on the way between its two neighbors: replace it and its two
+	 * edges by one edge. Not done if the two neighbors are linked already, or if the vector does not lie between them,
+	 * that is, if they differ at fewer sites than the two edges have changes
+	 */
+	private void mergeMedianVectorsWithTwoLinks(PhyloGraph graph, Set<String> inputSequences, double[] weights) {
+		var changed = true;
+		while (changed) {
+			changed = false;
+			for (var v : graph.getNodesAsList()) {
+				if (v.getDegree() == 2 && !inputSequences.contains((String) v.getInfo())) {
+					var u = v.getFirstAdjacentEdge().getOpposite(v);
+					var w = v.getLastAdjacentEdge().getOpposite(v);
+					if (u != w && !u.isAdjacent(w)) {
+						var direct = computeDistance((String) u.getInfo(), (String) w.getInfo(), weights);
+						var viaV = computeDistance((String) u.getInfo(), (String) v.getInfo(), weights) + computeDistance((String) v.getInfo(), (String) w.getInfo(), weights);
+						if (direct == viaV) {
+							graph.deleteNode(v);
+							graph.setWeight(graph.newEdge(u, w), direct);
+							changed = true;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -66,6 +95,10 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 	private void computeMedianJoiningMainLoop(ProgressListener progress, Set<String> input,
 											  double[] weights, int epsilon, Set<String> outputSequences) throws CanceledException {
 		outputSequences.addAll(input);
+
+		// the sets of sequences from which median vectors were added. What is added depends only on the set, so a set that
+		// comes up a second time means that the vectors added from it are removed again as obsolete, without end
+		var seen = new HashSet<Set<String>>();
 
 		var changed = true;
 		while (changed) {
@@ -90,6 +123,11 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 			if (removeObsoleteNodes(graph, input, outputSequences, feasibleLinks)) {
 				changed = true;   // sequences changed, recompute graph
 				continue;
+			}
+
+			if (!seen.add(new HashSet<>(outputSequences))) {
+				System.err.println("Median joining: the same " + outputSequences.size() + " sequences reached again, stopping");
+				break;
 			}
 
 			// determine min connection cost:
@@ -276,12 +314,12 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 			for (var v : graph.nodes()) {
 				var seqV = (String) v.getInfo();
 				if (!input.contains(seqV)) {
-					var count = 0;
-					for (var e = v.getFirstAdjacentEdge(); count <= 2 && e != null; e = v.getNextAdjacentEdge(e)) {
-						// graph is already pruned to feasible links
-						count++;
-					}
-					if (count <= 2)
+					// graph is already pruned to feasible links.
+					// A median vector is removed if it has fewer than two links, as in PopART. Until 11.2026 it was
+					// removed also with two links, which is what Bandelt et al (1999) are usually read to say; such a
+					// vector was then often found again as the median of another triple, removed again, and so on
+					// without end, and the networks differed from those of PopART
+					if (v.getDegree() < 2)
 						toDelete.add(v);
 				}
 			}

@@ -19,6 +19,7 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
+import splitstree6.utils.Warnings;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
@@ -26,7 +27,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.fx.window.NotificationManager;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -177,7 +177,7 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 		if (getOptionRearrangeBy() != RearrangeBy.Off) {
 
 			if (inputData.isReticulated()) {
-				NotificationManager.showWarning("Rearrange: can't change rooted networks");
+				Warnings.show("Rearrange: can't change rooted networks");
 			}
 
 			selectionInvalidationListener.invalidated(null);
@@ -225,7 +225,7 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 
 		if (getOptionReorder() != Reorder.Off) {
 			if (inputData.isReticulated()) {
-				NotificationManager.showWarning("Reorder: can't change rooted networks");
+				Warnings.show("Reorder: can't change rooted networks");
 			}
 
 			if (getOptionReorder() == Reorder.LadderizedUp || getOptionReorder() == Reorder.LadderizedDown) {

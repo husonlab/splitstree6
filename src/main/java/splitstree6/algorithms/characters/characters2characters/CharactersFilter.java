@@ -85,29 +85,27 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 				columnMask.set(col);
 			else if (isOptionExcludeThirdCodonPosition() && (col % 3) == 0)
 				columnMask.set(col);
-			else if (isOptionExcludeConstantSites() || isOptionExcludeParsimonyUninformativeSites()) {
+			else if (isOptionExcludeGapSites() || isOptionExcludeConstantSites() || isOptionExcludeParsimonyUninformativeSites()) {
+				// the states of this site and how often each occurs; a gap or a missing state is not a state
 				ch2count.clear();
+				var hasGap = false;
 				for (int tax = 1; tax <= taxa.getNtax(); tax++) {
 					int ch = parent.get(tax, col);
-					if (ch == parent.getGapCharacter()) {
-						if (isOptionExcludeGapSites()) {
-							columnMask.set(col);
-							break;
-						}
-					}
-					if (ch2count.containsKey(ch))
-						ch2count.put(ch, ch2count.get(ch) + 1);
-					else
-						ch2count.put(ch, 1);
+					if (ch == parent.getGapCharacter())
+						hasGap = true;
+					else if (ch != parent.getMissingCharacter())
+						ch2count.merge(ch, 1, Integer::sum);
 				}
-				if (isOptionExcludeConstantSites() && ch2count.size() == 1) {
+				if (isOptionExcludeGapSites() && hasGap) {
 					columnMask.set(col);
-				} else if (isOptionExcludeParsimonyUninformativeSites() && ch2count.size() == 2 && ch2count.containsValue(1)) {
+				} else if (isOptionExcludeConstantSites() && ch2count.size() <= 1) {
+					columnMask.set(col);
+				} else if (isOptionExcludeParsimonyUninformativeSites() && ch2count.values().stream().filter(count -> count >= 2).count() < 2) {
+					// parsimony informative: at least two states that each occur at least twice
 					columnMask.set(col);
 				}
 			}
 		}
-		System.err.println("Mask size: " + columnMask.cardinality());
 
 		child.setDimension(taxa.getNtax(), parent.getNchar() - columnMask.cardinality());
 		// set this after setting the dimension:
@@ -119,6 +117,7 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 		child.setMissingCharacter(parent.getMissingCharacter());
 		child.setSymbols(parent.getSymbols());
 		child.setRespectCase(parent.isRespectCase());
+		child.setHasAmbiguityCodes(parent.isHasAmbiguityCodes());
 		child.setUseCharacterWeights(parent.isUseCharacterWeights());
 		child.setUseCharacterLabels(parent.isUseCharacterLabels());
 

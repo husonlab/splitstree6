@@ -28,6 +28,7 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.ClusterUtils;
+import splitstree6.utils.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -71,6 +72,7 @@ public class RootedConsensusTree extends Trees2Trees {
 		else {
 			var tree = computeRootedConsensusTree(parent.getTrees(), getOptionConsensus());
 			tree.setName(getOptionConsensus().name());
+			TreesUtils.addLabels(tree, taxaBlock::getLabel);
 			child.getTrees().add(tree);
 		}
 	}

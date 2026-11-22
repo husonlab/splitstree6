@@ -132,7 +132,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 						if (count + (treesBlock.getNTrees() - t) < getOptionMinNumberTrees())
 							break; // no hope to get above threshold
 					} else if ((A.cardinality() == 1 || B.cardinality() == 1)
-							   && treeTaxaAndB.cardinality() > 0 && treeTaxaAndB.cardinality() > 0) {
+							   && treeTaxaAndA.cardinality() > 0 && treeTaxaAndB.cardinality() > 0) {
 						count++; // is confirmed split
 						//System.err.print(" +");
 					} else {

@@ -168,8 +168,8 @@ public class ExportManager {
 		var exporterName = (exporterName0.equals("NexusWithTaxa") ? "Nexus" : exporterName0);
 		var exporter = getExporterByName(dataBlock.getClass(), exporterName);
 		if (exporter != null) {
-			if (prependTaxa && exporter instanceof IHasPrependTaxa nexusWriter)
-				nexusWriter.optionPrependTaxaProperty().set(true);
+			if (exporter instanceof IHasPrependTaxa nexusWriter) // set either way: the writer is shared, and the setting would stay
+				nexusWriter.optionPrependTaxaProperty().set(prependTaxa);
 			if (dataBlock.getClass() == exporter.getFromClass())
 				exporter.write(w, taxaBlock, dataBlock);
 			else

@@ -19,7 +19,7 @@
 
 package splitstree6.io.readers.distances;
 
-import jloda.fx.window.NotificationManager;
+import splitstree6.utils.Warnings;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.DistancesFormat;
 import splitstree6.data.TaxaBlock;
@@ -44,7 +44,7 @@ public abstract class DistancesReader extends DataReaderBase<DistancesBlock> {
 				}
 			}
 			if (changed)
-				NotificationManager.showWarning("Distance matrix not symmetric, using mean values");
+				Warnings.show("Distance matrix not symmetric, using mean values");
 		}
 	}
 }

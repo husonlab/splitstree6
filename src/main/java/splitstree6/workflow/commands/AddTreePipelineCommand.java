@@ -23,6 +23,7 @@ import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
+import splitstree6.options.OptionDefaults;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.*;
 import splitstree6.workflow.Algorithm;
@@ -46,6 +47,7 @@ public class AddTreePipelineCommand {
 	 * @return newly created nodes
 	 */
 	public static UndoableRedoableCommand create(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
+		OptionDefaults.applyUserDefaults(algorithm); // added by hand: start with the user's defaults, if any
 		if (dataNode.getDataBlock().getClass() != CharactersBlock.class && dataNode.getDataBlock().getClass() != DistancesBlock.class)
 			throw new RuntimeException("Bad node class");
 

@@ -19,7 +19,7 @@
 
 package splitstree6.io.readers.trees;
 
-import jloda.fx.window.NotificationManager;
+import splitstree6.utils.Warnings;
 import jloda.graph.Node;
 import jloda.graph.algorithms.IsTree;
 import jloda.phylo.PhyloTree;
@@ -86,7 +86,7 @@ public class NexmlReader extends TreesReader {
 					t.setName(FileUtils.getFileNameWithoutPathOrSuffix(fileName) + (++count));
 					trees.getTrees().add(t); // todo: problem with multiple trees import?
 				} else if (System.currentTimeMillis() > lastWarning + 5000) {
-					NotificationManager.showWarning("Skipping rooted network...");
+					Warnings.show("Skipping rooted network...");
 					lastWarning = System.currentTimeMillis();
 				}
 			}

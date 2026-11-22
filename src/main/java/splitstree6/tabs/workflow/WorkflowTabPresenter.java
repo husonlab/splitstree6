@@ -152,7 +152,7 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		mainController.getFindMenuItem().setOnAction(null);
 		mainController.getFindAgainMenuItem().setOnAction(null);
-		mainController.getFindMenuItem().setDisable(false);
+		mainController.getFindMenuItem().setDisable(true); // there is nothing to search in this tab
 
 		// controller.getReplaceMenuItem().setOnAction(null);
 

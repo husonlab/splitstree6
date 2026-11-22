@@ -62,7 +62,7 @@ public class IncompatibilityScore extends Splits2ReportBase {
 			var result = "# Total weight of splits not in a greedy tree, as a percent of the sum of weights of all non-trivial splits:\n";
 
 			result += "%.8f of %.8f (%.1f%%)".formatted(totalWeight - compatibleWeight, totalWeight,
-					100 * (totalWeight - compatibleWeight) / totalWeight);
+					totalWeight > 0 ? 100 * (totalWeight - compatibleWeight) / totalWeight : 0.0);
 			return result;
 
 		} else {

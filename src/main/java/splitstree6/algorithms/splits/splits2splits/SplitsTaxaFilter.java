@@ -28,6 +28,7 @@ import splitstree6.workflow.DataTaxaFilter;
 
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Map;
 
 public class SplitsTaxaFilter extends DataTaxaFilter<SplitsBlock, SplitsBlock> {
@@ -46,10 +47,20 @@ public class SplitsTaxaFilter extends DataTaxaFilter<SplitsBlock, SplitsBlock> {
 		} else {
 			progress.setMaximum(inputData.getNsplits());
 			final Map<Integer, Integer> originalIndex2ModifiedIndex = originalTaxaBlock.computeIndexMap(modifiedTaxaBlock);
+			// several splits can induce the same split, which then gets the sum of their weights
+			final var sideToInduced = new HashMap<BitSet, ASplit>();
 			for (ASplit split : inputData.getSplits()) {
 				ASplit induced = computeInducedSplit(split, originalIndex2ModifiedIndex, modifiedTaxaBlock.getNtax());
-				if (induced != null)
-					outputData.getSplits().add(induced);
+				if (induced != null) {
+					var previous = sideToInduced.get(induced.getPartContaining(1));
+					if (previous == null) {
+						sideToInduced.put(induced.getPartContaining(1), induced);
+						outputData.getSplits().add(induced);
+					} else {
+						previous.setWeight(previous.getWeight() + induced.getWeight());
+						previous.setConfidence(Math.max(previous.getConfidence(), induced.getConfidence()));
+					}
+				}
 				progress.incrementProgress();
 			}
 			outputData.setCycle(computeInducedCycle(inputData.getCycle(), originalIndex2ModifiedIndex, modifiedTaxaBlock.getNtax()));
@@ -74,8 +85,8 @@ public class SplitsTaxaFilter extends DataTaxaFilter<SplitsBlock, SplitsBlock> {
 			if (originalIndex2ModifiedIndex.containsKey(t))
 				inducedA.set(originalIndex2ModifiedIndex.get(t));
 		}
-		if (inducedA.cardinality() < inducedNtax) {
-			return new ASplit(inducedA, inducedNtax, originalSplit.getWeight());
+		if (inducedA.cardinality() > 0 && inducedA.cardinality() < inducedNtax) {
+			return new ASplit(inducedA, inducedNtax, originalSplit.getWeight(), originalSplit.getConfidence());
 		} else
 			return null;
 	}

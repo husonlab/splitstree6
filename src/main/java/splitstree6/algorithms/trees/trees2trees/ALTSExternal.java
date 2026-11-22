@@ -19,11 +19,11 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
+import splitstree6.utils.Warnings;
 import splitstree6.algorithms.IDesktopOnly;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import jloda.fx.util.ProgramProperties;
-import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
@@ -120,7 +120,7 @@ public class ALTSExternal extends Trees2Trees implements IExperimental, IDesktop
 				throw new IOException("Not enough full, non-reticulated, bifurcating trees in input: " + count);
 
 			if (count < treesBlock.getNTrees())
-				NotificationManager.showWarning("Ignoring input trees have missing taxa, reticulations or multi-furcations; using %,d of %d".formatted(count, treesBlock.getNTrees()));
+				Warnings.show("Ignoring input trees have missing taxa, reticulations or multi-furcations; using %,d of %d".formatted(count, treesBlock.getNTrees()));
 
 			var start = System.currentTimeMillis();
 			runExternalProgramAndWait(progress, executable.getAbsolutePath(), inputFile, String.valueOf(taxaBlock.getNtax()), outFile);

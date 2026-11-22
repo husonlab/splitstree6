@@ -22,7 +22,6 @@ package splitstree6.algorithms.characters.characters2report;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import jloda.fx.util.ProgramProperties;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
@@ -38,11 +37,7 @@ import java.util.Random;
  * Daniel Huson, 2005
  */
 public class EstimateInvariableSites extends AnalyzeCharactersBase {
-	private final IntegerProperty optionFullTaxaCutoff = new SimpleIntegerProperty(this, "optionFullTaxaCutoff");
-
-	{
-		ProgramProperties.track(optionFullTaxaCutoff, 20);
-	}
+	private final IntegerProperty optionFullTaxaCutoff = new SimpleIntegerProperty(this, "optionFullTaxaCutoff", 20);
 
 	@Override
 	public String getCitation() {
@@ -56,6 +51,8 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
+		if (charactersBlock.getNtax() < 4)
+			return "The proportion of invariable sites cannot be estimated from fewer than four sequences%n".formatted();
 		var proportion = estimatePropInvariableSites(progress, charactersBlock);
 		return "Invariable sites: %,d of %,d (%.1f%%)%n".formatted(Math.round(charactersBlock.getNchar() * proportion), charactersBlock.getNchar(), 100 * proportion);
 	}
@@ -161,19 +158,21 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 	}
 
 	/**
-	 * Computes the proportion of Invariance sites using Steel et al.'s method
+	 * Computes the proportion of Invariance sites using Steel et al.'s method.
+	 * The score of a quadruple of sequences estimates the proportion of sites that are free to vary; the proportion of
+	 * invariable sites is one minus the mean score.
 	 *
-	 * @return proportion assumed invariant
+	 * @return proportion assumed invariant, 0 if there are fewer than four sequences or no quadruple has a site without gap
 	 */
 	public double estimatePropInvariableSites(ProgressListener progress, CharactersBlock chars) throws CanceledException {
 		final int nchar = chars.getNtax();
-		final int maxsample = (nchar * (nchar - 1) * (nchar - 2) * (nchar - 3)) / 24;
+		final long maxsample = ((long) nchar * (nchar - 1) * (nchar - 2) * (nchar - 3)) / 24;
 
 		double vsum = 0.0;
 		int count = 0;
 
 		if (nchar > getOptionFullTaxaCutoff()) {
-			//Sampling          - we do a minimum of 1000, and stop once |sd| is less than 0.05 |mean|
+			//Sampling          - we do a minimum of 1000, and stop once the standard error of the mean is at most 0.05 |mean|
 			progress.setMaximum(2000);
 			progress.setProgress(0);
 
@@ -181,14 +180,17 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 			int[] q;
 			double sum2 = 0.0;
 			boolean done = false;
-			int iter = 0;
+			long iter = 0;
 
 			while (!done) {
 				iter++;
 				q = randomSubset(4, nchar, random);
 				double v = vscore(q, chars);
-				if (v > 1.0)
+				if (v > 1.0) {
+					if (iter > maxsample)
+						done = true;
 					continue; //Invalid quartet.
+				}
 				vsum += v;
 				sum2 += v * v;
 				count++;
@@ -197,7 +199,7 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 					double mean = vsum / count;
 					double var = sum2 / count - mean * mean;
 					double sd = Math.sqrt(var);
-					if (Math.abs(sd / mean) < 0.05)
+					if (sd / Math.sqrt(count) <= 0.05 * Math.abs(mean))
 						done = true;
 					// System.err.println("Mean = " + mean + " sd = " + sd);
 				}
@@ -218,7 +220,10 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 							q[1] = j;
 							q[2] = k;
 							q[3] = l;
-							vsum += vscore(q, chars);
+							double v = vscore(q, chars);
+							if (v > 1.0)
+								continue; //Invalid quartet.
+							vsum += v;
 							count++;
 						}
 					}
@@ -227,7 +232,7 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 			}
 		}
 
-		return vsum / count;
+		return count > 0 ? 1.0 - vsum / count : 0.0;
 	}
 
 	public int getOptionFullTaxaCutoff() {

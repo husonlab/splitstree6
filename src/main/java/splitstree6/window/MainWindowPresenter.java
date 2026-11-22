@@ -172,6 +172,7 @@ public class MainWindowPresenter {
 					selectedDisplayTab.get().getPresenter().setupMenuItems();
 				}
 				enableAllMenuItemsWithDefinedAction(controller);
+				disableMenuItemsWithoutAction(controller);
 			} catch (Exception ex) {
 				Basic.caught(ex);
 			}
@@ -262,6 +263,7 @@ public class MainWindowPresenter {
 						selectedDisplayTab.get().getPresenter().setupMenuItems();
 					if (false) // todo: if this is enabled, then menu items are enabled that shouldn't be...
 						enableAllMenuItemsWithDefinedAction(controller);
+					disableMenuItemsWithoutAction(controller);
 					if (true)
 						updateEnableStateAlgorithms();
 					controller.getNewMenuItem().disableProperty().bind(new SimpleBooleanProperty(false));
@@ -791,6 +793,28 @@ public class MainWindowPresenter {
 		}
 	}
 
+	/**
+	 * a menu item that has no action cannot do anything, so it is not offered: some were left enabled by the tab that
+	 * has the focus, for example Cut in a tab that shows a network. Check and radio items are left alone, they act
+	 * through their selection
+	 */
+	private void disableMenuItemsWithoutAction(MainWindowController controller) {
+		var stack = new Stack<MenuItem>();
+		stack.addAll(controller.getMenuBar().getMenus());
+		while (!stack.isEmpty()) {
+			var item = stack.pop();
+			if (item instanceof Menu menu) {
+				if (menu != controller.getOpenRecentMenu() && menu != controller.getExamplesMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
+					stack.addAll(menu.getItems());
+			} else if (!(item instanceof SeparatorMenuItem) && !(item instanceof CheckMenuItem) && !(item instanceof RadioMenuItem) && !(item instanceof CustomMenuItem)) {
+				if (item.getOnAction() == null && !item.onActionProperty().isBound() && !item.isDisable()) {
+					item.disableProperty().unbind();
+					item.setDisable(true);
+				}
+			}
+		}
+	}
+
 	private void enableAllMenuItemsWithDefinedAction(MainWindowController controller) {
 		var stack = new Stack<MenuItem>();
 		stack.addAll(controller.getMenuBar().getMenus());
@@ -923,6 +947,25 @@ public class MainWindowPresenter {
 				var menuItem = entry.getValue().getSecond();
 				menuItem.setSelected(selected.contains(name));
 				menuItem.setDisable(!applicable.contains(name));
+			}
+		} else if (!mainWindow.getWorkflow().isRunning()) {
+			// a tab that does not show a result, such as the workflow or the alignment: an algorithm is offered if it
+			// can be applied to some data of the document. (The items once kept whatever state they had before)
+			var workflow = mainWindow.getWorkflow();
+			for (var entry : nameAlgorithmMenuItemMap.entrySet()) {
+				var algorithm = entry.getValue().getFirst();
+				var applicable = false;
+				for (var dataNode : workflow.dataNodesStream().toList()) {
+					try {
+						if ((workflow.isDerivedNode(dataNode) || workflow.isWorkingDataNode(dataNode)) && algorithm.isApplicable(mainWindow.getWorkingTaxa(), dataNode)) {
+							applicable = true;
+							break;
+						}
+					} catch (RuntimeException ignored) {
+					}
+				}
+				entry.getValue().getSecond().setSelected(false);
+				entry.getValue().getSecond().setDisable(!applicable);
 			}
 		}
 	}

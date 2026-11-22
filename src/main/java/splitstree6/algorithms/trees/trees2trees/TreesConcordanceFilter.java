@@ -124,7 +124,7 @@ public class TreesConcordanceFilter extends Trees2Trees implements IFilter {
 									var treeSet = new BitSet();
 									clusterNodeClusterGraphMap.get(cluster).adjacentEdgesStream(false).
 											map(f -> (BitSet) f.getOpposite(clustGraphNode).getData()).forEach(treeSet::or);
-									if (treeSet.cardinality() >= threshold)
+									if (treeSet.cardinality() > threshold) // more trees conflict with the edge than are allowed to
 										toContract.add(e);
 								});
 						RootedNetworkProperties.contractEdges(tree, toContract, null);

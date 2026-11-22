@@ -143,6 +143,13 @@
                 <configuration>
                     <useModulePath>false</useModulePath>
                     <excludedGroups>${excludedTestGroups}</excludedGroups>
+                    <!-- a test that does not return fails after ten minutes, rather than holding up the build -->
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.execution.timeout.default = 10 m
+                            junit.jupiter.execution.timeout.thread.mode.default = SEPARATE_THREAD
+                        </configurationParameters>
+                    </properties>
                 </configuration>
             </plugin>
             <plugin>

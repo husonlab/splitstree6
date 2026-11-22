@@ -28,6 +28,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
@@ -40,6 +44,7 @@ import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.data.SplitsBlock;
 import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
+import splitstree6.options.OptionDefaults;
 import splitstree6.splits.ASplit;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.algorithms.taxafilter.TaxaFilterTab;
@@ -89,6 +94,8 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		if (algorithmTab.getAlgorithm() != null) {
 			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithm());
 		}
+		setupDefaultsButton(algorithmTab, controller);
+		controller.getDefaultsButton().disableProperty().bind(runningProperty);
 
 		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((c, o, n) -> algorithmTab.setAlgorithm((Algorithm) n));
 
@@ -99,6 +106,60 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 				label.setText(n.getName());
 			}
 		});
+	}
+
+	/**
+	 * the button with three dots before the run button: store the current option values as the user's defaults for
+	 * the algorithm, apply those, or go back to the built-in values. See {@link OptionDefaults}
+	 */
+	private void setupDefaultsButton(AlgorithmTab algorithmTab, AlgorithmTabController controller) {
+		var button = controller.getDefaultsButton();
+		if (algorithmTab instanceof TaxaFilterTab || algorithmTab instanceof TreeFilterTab) {
+			button.setVisible(false);
+			return;
+		}
+		var useAsDefaults = new MenuItem("Remember Settings");
+		var applyDefaults = new MenuItem("Use Remembered Settings");
+		var factorySettings = new MenuItem("Factory Settings");
+		var forgetDefaults = new MenuItem("Forget Remembered Settings");
+		var menu = new ContextMenu(useAsDefaults, applyDefaults, factorySettings, new SeparatorMenuItem(), forgetDefaults);
+
+		Runnable update = () -> {
+			var algorithm = algorithmTab.getAlgorithm();
+			var hasOptions = (algorithm != null && !OptionDefaults.storableOptions(algorithm).isEmpty());
+			var hasDefaults = (hasOptions && OptionDefaults.hasUserDefaults(algorithm));
+			button.setVisible(hasOptions);
+			useAsDefaults.setDisable(!hasOptions);
+			applyDefaults.setDisable(!hasDefaults);
+			forgetDefaults.setDisable(!hasDefaults);
+			factorySettings.setDisable(!hasOptions || !OptionDefaults.differsFromFactoryDefaults(algorithm));
+			// the button shows whether settings are remembered for this algorithm
+			button.setOpacity(hasDefaults ? 1.0 : 0.6);
+			button.getTooltip().setText(hasDefaults ? "Settings are remembered for " + algorithm.getName() + ": new steps of this kind start with them"
+					: "Remember these settings, or go back to the factory settings");
+		};
+		useAsDefaults.setOnAction(e -> {
+			OptionDefaults.storeAsUserDefaults(algorithmTab.getAlgorithm());
+			update.run();
+		});
+		applyDefaults.setOnAction(e -> {
+			OptionDefaults.applyUserDefaults(algorithmTab.getAlgorithm());
+			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithm());
+		});
+		factorySettings.setOnAction(e -> {
+			OptionDefaults.applyFactoryDefaults(algorithmTab.getAlgorithm());
+			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithm());
+		});
+		forgetDefaults.setOnAction(e -> {
+			OptionDefaults.forgetUserDefaults(algorithmTab.getAlgorithm());
+			update.run();
+		});
+		button.setOnAction(e -> {
+			update.run();
+			menu.show(button, Side.BOTTOM, 0, 0);
+		});
+		algorithmTab.algorithmProperty().addListener((v, o, n) -> update.run());
+		update.run();
 	}
 
 	public void setupOptionControls(AlgorithmTab algorithmTab, AlgorithmTabController controller, Algorithm algorithm) {

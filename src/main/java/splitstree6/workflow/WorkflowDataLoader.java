@@ -64,6 +64,13 @@ public class WorkflowDataLoader {
 					final var w = new StringWriter();
 					w.write("#nexus\n");
 					var exporter = new NexusExporter();
+					// the taxa with their traits and sets, then the data: the traits and sets were once left out
+					exporter.setPrependTaxa(false);
+					exporter.export(w, inputTaxa);
+					if (inputTaxa.getTraitsBlock() != null && inputTaxa.getTraitsBlock().getNTraits() > 0)
+						exporter.export(w, inputTaxa, inputTaxa.getTraitsBlock());
+					if (inputTaxa.getSetsBlock() != null && inputTaxa.getSetsBlock().size() > 0)
+						exporter.export(w, inputTaxa, inputTaxa.getSetsBlock());
 					exporter.export(w, inputTaxa, inputData);
 					try (var np = new NexusStreamParser(new StringReader(w.toString()))) {
 						NexusImporter.parse(np, inputTaxaNode.getDataBlock(), inputDataNode.getDataBlock());

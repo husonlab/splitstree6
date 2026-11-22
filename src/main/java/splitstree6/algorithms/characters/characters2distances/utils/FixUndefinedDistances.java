@@ -19,7 +19,7 @@
 
 package splitstree6.algorithms.characters.characters2distances.utils;
 
-import jloda.fx.window.NotificationManager;
+import splitstree6.utils.Warnings;
 import jloda.util.StringUtils;
 import splitstree6.data.DistancesBlock;
 
@@ -65,7 +65,7 @@ public class FixUndefinedDistances {
 					}
 				}
 			}
-			NotificationManager.showWarning("Distance calculation produced " + numUndefined + " saturated or missing entries.\n" +
+			Warnings.show("Distance calculation produced " + numUndefined + " saturated or missing entries.\n" +
 											"These have been replaced by the value '" + StringUtils.trim(largeValue) + "'.");
 		}
 

@@ -23,7 +23,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.fx.util.ProgramProperties;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeDoubleArray;
@@ -49,16 +48,12 @@ public class ClusterNetwork extends Trees2Trees {
 	public enum EdgeWeights {Mean, Count, Sum, Uniform}
 
 	private final DoubleProperty optionThresholdPercent = new SimpleDoubleProperty(this, "optionThresholdPercent", 10.0);
-	protected final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights");
+	protected final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", EdgeWeights.Count);
 
 
 	@Override
 	public List<String> listOptions() {
 		return List.of(optionEdgeWeights.getName(), optionThresholdPercent.getName());
-	}
-
-	public ClusterNetwork() {
-		ProgramProperties.track(optionEdgeWeightsProperty(), EdgeWeights::valueOf, EdgeWeights.Count);
 	}
 
 	@Override

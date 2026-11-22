@@ -136,9 +136,11 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			splits.addAll(filtered);
 		}
 
-		if (getOptionMaximumDimension() > 0 && getOptionFilterAlgorithm() == FilterAlgorithm.GreedyCompatible && parent.getCompatibility() != Compatibility.compatible && parent.getCompatibility() != Compatibility.circular && parent.getCompatibility() != Compatibility.weaklyCompatible) {
+		if (getOptionMaximumDimension() > 0 && getOptionFilterAlgorithm() != FilterAlgorithm.GreedyCompatible && parent.getCompatibility() != Compatibility.compatible && parent.getCompatibility() != Compatibility.circular && parent.getCompatibility() != Compatibility.weaklyCompatible) {
 			var filtered = new ArrayList<ASplit>();
 			DimensionFilter.apply(progress, getOptionMaximumDimension(), splits, filtered);
+			splits.clear();
+			splits.addAll(filtered);
 		}
 
 		child.getSplits().addAll(splits);

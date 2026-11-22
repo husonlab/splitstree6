@@ -637,8 +637,10 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public void setupMenuItems() {
 		mainController.getZoomInMenuItem().setOnAction(controller.getExpandVerticallyButton().getOnAction());
+		mainController.getZoomOutMenuItem().setOnAction(controller.getContractVerticallyButton().getOnAction());
 		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getContractVerticallyButton().disableProperty());
 		mainController.getZoomInHorizontalMenuItem().setOnAction(controller.getExpandHorizontallyButton().getOnAction());
+		mainController.getZoomOutHorizontalMenuItem().setOnAction(controller.getContractHorizontallyButton().getOnAction());
 		mainController.getZoomOutHorizontalMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disableProperty());
 
 		mainController.getCopyMenuItem().setOnAction(a -> {

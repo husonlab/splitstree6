@@ -65,7 +65,7 @@ public abstract class QuasiMedianBase {
 
 		final var condensed2OrigPos = invert(orig2CondensedPos);
 
-		final var weights = computeWeights(condensedCharacters[1].length(), orig2CondensedPos);
+		final var weights = computeWeights(condensedCharacters[0].length(), orig2CondensedPos);
 
 		if (false) {
 			System.err.println("Translator:\n" + translator);
@@ -278,8 +278,8 @@ public abstract class QuasiMedianBase {
 	private double[] computeWeights(int numChars, int[] origPos2CondensedPos) {
 		var counts = new int[origPos2CondensedPos.length];
 
-		for (var origPos2CondensedPo : origPos2CondensedPos)
-			counts[origPos2CondensedPo]++;
+		for (var origPos = 1; origPos < origPos2CondensedPos.length; origPos++) // positions start at 1; entry 0 is not a site
+			counts[origPos2CondensedPos[origPos]]++;
 
 		var weights = new double[numChars];
 		var pos = 0;

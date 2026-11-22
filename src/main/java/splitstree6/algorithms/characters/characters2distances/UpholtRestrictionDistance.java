@@ -21,7 +21,6 @@ package splitstree6.algorithms.characters.characters2distances;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import jloda.fx.util.ProgramProperties;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
@@ -39,11 +38,7 @@ import java.io.IOException;
  */
 
 public class UpholtRestrictionDistance extends Characters2Distances {
-	private final DoubleProperty optionRestrictionSiteLength = new SimpleDoubleProperty(this, "optionRestrictionSiteLength");
-
-	{
-		ProgramProperties.track(optionRestrictionSiteLength, 1.0);
-	}
+	private final DoubleProperty optionRestrictionSiteLength = new SimpleDoubleProperty(this, "optionRestrictionSiteLength", 1.0);
 
 	@Override
 	public String getToolTip(String optionName) {

@@ -19,6 +19,7 @@
 
 package splitstree6.options;
 
+import splitstree6.utils.Warnings;
 import javafx.beans.property.StringProperty;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.StringUtils;
@@ -94,7 +95,7 @@ public class OptionIO {
 									if (value != null)
 										option.getProperty().setValue(value);
 									else
-										System.err.println("WARNING: unknown value '" + word + "' for option '" + name + "' of '" + optionsCarrier.getClass().getSimpleName() + "' in line " + np.lineno() + ", using '" + option.getProperty().getValue() + "'");
+										Warnings.show("unknown value '" + word + "' for option '" + name + "' of '" + optionsCarrier.getClass().getSimpleName() + "' in line " + np.lineno() + ", using '" + option.getProperty().getValue() + "'");
 								}
 								case stringArray -> {
 									final var list = new ArrayList<String>();
@@ -110,7 +111,7 @@ public class OptionIO {
 							final var buf = new StringBuilder();
 							while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
 								buf.append(" ").append(np.getWordRespectCase());
-							System.err.println("WARNING: skipped unknown option for '" + optionsCarrier.getClass().getSimpleName() + "': '" + name + "=" + buf + "' in line " + np.lineno());
+							Warnings.show("skipped unknown option for '" + optionsCarrier.getClass().getSimpleName() + "': '" + name + "=" + buf + "' in line " + np.lineno());
 
 						}
 						if (np.peekMatchIgnoreCase(";"))

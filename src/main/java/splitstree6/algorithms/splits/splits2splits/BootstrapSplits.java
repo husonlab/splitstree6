@@ -192,8 +192,8 @@ public class BootstrapSplits extends Splits2Splits {
 								if (exception.isNotNull())
 									return;
 							}
-						} catch (IOException ex) {
-							exception.setIfCurrentValueIsNull(ex);
+						} catch (Exception ex) { // any failure: otherwise the replicates of this thread are missing from the counts, unnoticed
+							exception.setIfCurrentValueIsNull(ex instanceof IOException io ? io : new IOException(ex));
 						}
 					});
 				}

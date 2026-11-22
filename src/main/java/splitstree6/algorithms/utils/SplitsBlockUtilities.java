@@ -326,14 +326,10 @@ public class SplitsBlockUtilities {
 				return order;
 			} else {
 				try {
-					final var pso = Basic.hideSystemOut();
-					final var pse = Basic.hideSystemErr();
-					try {
-						return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, true).getDistances());
-					} finally {
-						Basic.restoreSystemErr(pse);
-						Basic.restoreSystemOut(pso);
-					}
+					// The output streams are not hidden here any more. The heuristic writes nothing, and hiding them
+					// meant replacing System.out and System.err for the whole program: two threads in here at once
+					// (a bootstrap) could leave both pointing at a discarding stream for the rest of the session
+					return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, true).getDistances());
 				} catch (Exception ex) {
 					Basic.caught(ex);
 					return new int[0];

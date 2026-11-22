@@ -73,7 +73,8 @@ public class RobinsonFouldsDistances extends Trees2ReportBase {
 			for (var j = i + 1; j < splitsList.size(); j++) {
 				var symm = (double) IteratorUtils.size(SetUtils.symmetricDifference(splitsList.get(i), splitsList.get(j)));
 				if (isOptionNormalize()) {
-					symm /= (IteratorUtils.size(SetUtils.union(splitsList.get(i), splitsList.get(j))) - taxaBlock.getNtax());
+					var nonTrivial = IteratorUtils.size(SetUtils.union(splitsList.get(i), splitsList.get(j))) - taxaBlock.getNtax();
+					symm = (nonTrivial > 0 ? symm / nonTrivial : 0.0);
 				}
 				buf.append("D(%s,%s) = %s%n".formatted(treesBlock.getTree(i + 1).getName(), treesBlock.getTree(j + 1).getName(),
 						StringUtils.trim(symm)));

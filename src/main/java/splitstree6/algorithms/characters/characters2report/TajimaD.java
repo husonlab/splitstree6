@@ -22,7 +22,6 @@ package splitstree6.algorithms.characters.characters2report;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.fx.util.ProgramProperties;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
@@ -39,11 +38,7 @@ import java.util.List;
  */
 public class TajimaD extends AnalyzeCharactersBase {
 
-	private final BooleanProperty optionExcludeGapSites = new SimpleBooleanProperty(this, "optionExcludeGapSites");
-
-	{
-		ProgramProperties.track(optionExcludeGapSites, true);
-	}
+	private final BooleanProperty optionExcludeGapSites = new SimpleBooleanProperty(this, "optionExcludeGapSites", true);
 
 	@Override
 	public List<String> listOptions() {
@@ -98,7 +93,11 @@ public class TajimaD extends AnalyzeCharactersBase {
 			}
 		}
 
+		if (n < 4)
+			return "Tajima's D is not defined for fewer than four sequences%n".formatted();
 		var S = calculateSegregatingSites(alignment, length);
+		if (S == 0)
+			return "Tajima's D is not defined: no segregating sites (calculation based on %d sites)%n".formatted(length);
 		var a1 = sumOfInverses(n - 1);
 		var a2 = sumOfInverseSquares(n - 1);
 		var b1 = (n + 1) / (3.0 * (n - 1));
@@ -110,7 +109,7 @@ public class TajimaD extends AnalyzeCharactersBase {
 		var variance = e1 * S + e2 * S * (S - 1);
 
 		var wattersonEstimator = S / a1;
-		var piEstimator = calculatePiEstimator(charactersBlock.getMatrix());
+		var piEstimator = calculatePiEstimator(alignment);
 
 		var D = (piEstimator - wattersonEstimator) / Math.sqrt(variance);
 

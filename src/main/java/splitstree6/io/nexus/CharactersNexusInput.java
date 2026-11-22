@@ -19,7 +19,7 @@
 
 package splitstree6.io.nexus;
 
-import jloda.fx.window.NotificationManager;
+import splitstree6.utils.Warnings;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
@@ -145,7 +145,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 				respectCase = np.findIgnoreCase(formatTokens, "respectCase", true, respectCase);
 				respectCase = np.findIgnoreCase(formatTokens, "no respectCase", false, respectCase);
 				if (respectCase)
-					System.err.println("WARNING: Format 'RespectCase' not implemented. All character-states will be converted to lower case");
+					Warnings.show("Format 'RespectCase' not implemented. All character-states will be converted to lower case");
 			}
 
 			charactersBlock.setMissingCharacter(Character.toLowerCase(np.findIgnoreCase(formatTokens, "missing=", null, '?')));
@@ -276,7 +276,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 
 		if (unknownStates.size() > 0)  // warn that stuff has been replaced!
 		{
-			NotificationManager.showWarning("Unknown states encountered in matrix:\n" + StringUtils.toString(unknownStates, " ") + "\n"
+			Warnings.show("Unknown states encountered in matrix:\n" + StringUtils.toString(unknownStates, " ") + "\n"
 											+ "All replaced by the gap-char '" + charactersBlock.getGapCharacter() + "'");
 		}
 

@@ -93,6 +93,15 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 				setShortDescription("using " + child.getNsplits() + " of " + parent.getNsplits() + " splits");
 				active = true;
 			}
+		} else { // such splits contain no high-dimensional configuration, pass them on
+			child.getSplits().addAll(parent.getSplits());
+			child.setCycle(parent.getCycle().clone());
+			child.setCompatibility(parent.getCompatibility());
+			setShortDescription("using all " + parent.getNsplits() + " splits");
+		}
+		if (!active) {
+			child.setFit(parent.getFit());
+			child.setThreshold(parent.getThreshold());
 		}
 	}
 

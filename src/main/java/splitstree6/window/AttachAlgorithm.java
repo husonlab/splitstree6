@@ -26,6 +26,8 @@ import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.window.NotificationManager;
 import jloda.util.IteratorUtils;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
+import splitstree6.utils.Warnings;
+import splitstree6.options.OptionDefaults;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.NetworkBlock;
@@ -75,6 +77,7 @@ public class AttachAlgorithm {
 	 * @param algorithmSetupCallback - select options if algorithm found
 	 */
 	public static void apply(MainWindow mainWindow, Algorithm algorithm, Consumer<Algorithm> algorithmSetupCallback, Consumer<Algorithm> targetSetupCallback) {
+		OptionDefaults.applyUserDefaults(algorithm); // chosen from a menu: start with the user's defaults, if any
 		var workflow = mainWindow.getWorkflow();
 		var algorithmNode = AttachAlgorithm.findSelectOrCreateAlgorithmNode(mainWindow.getWorkflow(), algorithm);
 		if (algorithmNode != null) {
@@ -102,14 +105,29 @@ public class AttachAlgorithm {
 			} else if (algorithm.getToClass() == NetworkBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
 				if (targetDataNode.getPreferredChild() == null) {
-					var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-					var targetAlgorithmNode = workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+					var newNodes = NetworkViewPipeline.attachView(workflow, algorithm, targetDataNode);
+					var targetAlgorithmNode = (AlgorithmNode) newNodes.get(newNodes.size() - 1); // the Show Network node
 					if (targetSetupCallback != null)
 						targetSetupCallback.accept(targetAlgorithmNode.getAlgorithm());
 				}
 			}
 			if (algorithm.isApplicable(workflow.getWorkingTaxaBlock(), algorithmNode.getPreferredParent().getDataBlock()))
 				algorithmNode.restart();
+		}
+	}
+
+	/**
+	 * can the algorithm be applied to the data of this node? Data that have not been computed yet are given the
+	 * benefit of the doubt
+	 */
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private static boolean isApplicableTo(Algorithm algorithm, Workflow workflow, DataNode dataNode) {
+		if (dataNode == null || dataNode.getDataBlock() == null)
+			return true;
+		try {
+			return dataNode.getDataBlock().size() == 0 || algorithm.isApplicable(workflow.getWorkingTaxaBlock(), dataNode.getDataBlock());
+		} catch (RuntimeException ex) {
+			return true;
 		}
 	}
 
@@ -143,6 +161,10 @@ public class AttachAlgorithm {
 		if (algorithmNodes.size() == 1) {
 			var algorithmNode = algorithmNodes.get(0);
 			if (algorithmNode.getAlgorithm().getClass() != algorithm.getClass()) {
+				if (!isApplicableTo(algorithm, workflow, algorithmNode.getPreferredParent())) {
+					Warnings.show(algorithm.getName() + " cannot be applied to the " + algorithmNode.getPreferredParent().getDataBlock().getBlockName().toLowerCase() + " of this document");
+					return null;
+				}
 				algorithmNode.setAlgorithm(algorithm);
 				algorithmNode.setTitle(algorithmNode.getAlgorithm().getName());
 				algorithmNode.restart();
@@ -153,6 +175,10 @@ public class AttachAlgorithm {
 		} else if (algorithmNodes.size() > 1) {
 			var algorithmNode = SetParameterDialog.apply(null, "There are multiple possible choices for this algorithm:", algorithmNodes, algorithmNodes.get(0));
 			if (algorithmNode != null && algorithmNode.getAlgorithm().getClass() != algorithm.getClass()) {
+				if (!isApplicableTo(algorithm, workflow, algorithmNode.getPreferredParent())) {
+					Warnings.show(algorithm.getName() + " cannot be applied to the " + algorithmNode.getPreferredParent().getDataBlock().getBlockName().toLowerCase() + " chosen");
+					return null;
+				}
 				algorithmNode.setAlgorithm(algorithm);
 				algorithmNode.setTitle(algorithmNode.getAlgorithm().getName());
 				algorithmNode.restart();
@@ -163,6 +189,14 @@ public class AttachAlgorithm {
 		} else {
 			var dataNodes = (List<DataNode>) IteratorUtils.asStream(workflow.dataNodes()).filter(d -> workflow.isDerivedNode(d) || workflow.isWorkingDataNode(d))
 					.filter(d -> d.getDataBlock().getClass() == algorithm.getFromClass()).collect(Collectors.toList());
+			if (dataNodes.size() > 0) {
+				// only the data that the algorithm can be applied to; a step added to other data fails at once
+				dataNodes = dataNodes.stream().filter(d -> isApplicableTo(algorithm, workflow, d)).collect(Collectors.toList());
+				if (dataNodes.isEmpty()) {
+					Warnings.show(algorithm.getName() + " cannot be applied to any data of this document");
+					return null;
+				}
+			}
 			if (dataNodes.size() > 0) {
 				DataNode dataNode;
 				if (dataNodes.size() == 1)

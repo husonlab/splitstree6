@@ -218,7 +218,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
 			for (String word : MainWindowManager.getPreviousSelection()) {
-				final Pattern pattern = Pattern.compile(word);
+				final Pattern pattern = Pattern.compile(Pattern.quote(word)); // the word is text to look for, not a pattern
 				String source = codeArea.getText();
 				Matcher matcher = pattern.matcher(source);
 

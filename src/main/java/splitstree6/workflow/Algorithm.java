@@ -19,7 +19,7 @@
 
 package splitstree6.workflow;
 
-import jloda.fx.window.NotificationManager;
+import splitstree6.utils.Warnings;
 import jloda.util.Basic;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IExperimental;
@@ -73,6 +73,17 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 
 	@Override
 	public void compute(ProgressListener progress, Collection<jloda.fx.workflow.DataBlock> inputData, Collection<jloda.fx.workflow.DataBlock> outputData) throws IOException {
+		// warnings that arise while this algorithm runs are shown in the window of its workflow
+		var mainWindow = (getNode() != null && getNode().getOwner() != null ? getNode().getOwner().getMainWindow() : null);
+		Warnings.setWindow(mainWindow != null ? mainWindow.getStage() : null);
+		try {
+			computeInWorkflow(progress, inputData, outputData);
+		} finally {
+			Warnings.clearWindow();
+		}
+	}
+
+	private void computeInWorkflow(ProgressListener progress, Collection<jloda.fx.workflow.DataBlock> inputData, Collection<jloda.fx.workflow.DataBlock> outputData) throws IOException {
 		progress.setTasks("Running", getName());
 
 		var taxaBlock = inputData.stream().filter(d -> d instanceof TaxaBlock).map(d -> (TaxaBlock) d).findFirst().orElse(null);
@@ -107,7 +118,7 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 			if (!isApplicable(taxaBlock, inputBlock))
 				throw new IOException("Algorithm is not applicable to given input data");
 			if (this instanceof IExperimental && !warned.contains(getName())) {
-				NotificationManager.showWarning(getName() + ": this is experimental code");
+				Warnings.show(getName() + ": this is experimental code");
 				warned.add(getName());
 			}
 			compute(progress, taxaBlock, inputBlock, outputBlock);

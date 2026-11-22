@@ -27,6 +27,8 @@ import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.AlgorithmList;
+import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.NetworkViewPipeline;
 import splitstree6.algorithms.characters.characters2distances.HammingDistance;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
@@ -123,7 +125,8 @@ public class ImportHaplotypeApply {
 							}
 						};
 
-				workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), networkNode, workflow.newDataNode(new ViewBlock()));
+				var networkAlgorithm = (networkNode.getPreferredParent() instanceof AlgorithmNode<?, ?> producer ? producer.getAlgorithm() : null);
+				NetworkViewPipeline.attachView(workflow, networkAlgorithm, networkNode);
 				workflow.restart(workflow.getInputTaxaFilterNode());
 				RunAfterAWhile.applyInFXThread(mainWindow.getStage(), () -> mainWindow.getStage().toFront());
 			}

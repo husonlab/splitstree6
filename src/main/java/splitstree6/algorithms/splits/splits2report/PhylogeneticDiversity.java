@@ -74,7 +74,7 @@ public class PhylogeneticDiversity extends Splits2ReportBase {
 
 		var diversity = compute(splitsBlock, selectedTaxa);
 		var diversityRounded = NumberUtils.roundSigFig(diversity, 5);
-		buf.append("Phylogenetic Diversity = %s (%.1f%%)%n".formatted(StringUtils.trim(diversityRounded), 100.0 * (diversity / total)));
+		buf.append("Phylogenetic Diversity = %s (%.1f%%)%n".formatted(StringUtils.trim(diversityRounded), total > 0 ? 100.0 * (diversity / total) : 0.0));
 		buf.append("Computed on %d (of %d) selected taxa:%n".formatted(selectedTaxa.cardinality(), taxaBlock.getNtax()));
 		if (selectedTaxa.cardinality() > 0) {
 			for (var t = 1; t <= taxaBlock.getNtax(); t++) {

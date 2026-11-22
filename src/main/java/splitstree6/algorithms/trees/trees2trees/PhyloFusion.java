@@ -19,11 +19,11 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
+import splitstree6.utils.Warnings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.fx.util.ProgramProperties;
 import jloda.graph.Edge;
 import jloda.graph.Graph;
 import jloda.graph.Node;
@@ -93,31 +93,19 @@ public class PhyloFusion extends Trees2Trees {
 
 	protected final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", EdgeWeights.LeastSquares);
 
-	protected final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction");
+	protected final BooleanProperty optionCladeReduction = new SimpleBooleanProperty(this, "optionCladeReduction", true);
 
-	protected final BooleanProperty optionGroupNonSeparated = new SimpleBooleanProperty(this, "optionGroupNonSeparated");
+	protected final BooleanProperty optionGroupNonSeparated = new SimpleBooleanProperty(this, "optionGroupNonSeparated", true);
 
-	protected final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
+	protected final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork", true);
 
-	protected final ObjectProperty<ReticulationPreference> optionReticulatePlacement = new SimpleObjectProperty<>(this, "optionReticulatePlacement", ReticulationPreference.None);
+	protected final ObjectProperty<ReticulationPreference> optionReticulatePlacement = new SimpleObjectProperty<>(this, "optionReticulatePlacement", ReticulationPreference.Normal);
 
 	/* todo: optionRefinementHeuristic is broken, don't allow in public UI (unless option -x) */
-	protected final BooleanProperty optionRefinementHeuristic = new SimpleBooleanProperty(this, "optionRefinementHeuristic");
 	private final boolean ALLOW_OPTION_REFINEMENT_HEURISTIC = false;
+	protected final BooleanProperty optionRefinementHeuristic = new SimpleBooleanProperty(this, "optionRefinementHeuristic", ALLOW_OPTION_REFINEMENT_HEURISTIC);
 
-	protected final BooleanProperty optionMissingTaxaHeuristic = new SimpleBooleanProperty(this, "optionMissingTaxaHeuristic");
-
-	{
-		ProgramProperties.track(optionMutualRefinement, true);
-		ProgramProperties.track(optionCladeReduction, true);
-		ProgramProperties.track(optionOnlyOneNetwork, true);
-		ProgramProperties.track(optionReticulatePlacement, ReticulationPreference::valueOf, ReticulationPreference.Normal);
-		ProgramProperties.track(optionEdgeWeights, EdgeWeights::valueOf, EdgeWeights.LeastSquares);
-		ProgramProperties.track(optionGroupNonSeparated, true);
-		ProgramProperties.track(optionMissingTaxaHeuristic, true);
-
-		ProgramProperties.track(optionRefinementHeuristic, ALLOW_OPTION_REFINEMENT_HEURISTIC);
-	}
+	protected final BooleanProperty optionMissingTaxaHeuristic = new SimpleBooleanProperty(this, "optionMissingTaxaHeuristic", true);
 
 	@Override
 	public String getCitation() {
@@ -226,7 +214,7 @@ public class PhyloFusion extends Trees2Trees {
 				for (var t = 1; t <= treesBlock.getNTrees(); t++) {
 					var tree = treesBlock.getTree(t);
 					if (!PathMultiplicityDistance.contains(taxaBlock.getTaxaSet(), network, tree)) {
-						System.err.println("Warning: Network might not contain tree: " + t);
+						Warnings.show("Network might not contain tree: " + t);
 					}
 				}
 			}

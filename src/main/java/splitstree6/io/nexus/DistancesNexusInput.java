@@ -19,6 +19,7 @@
 
 package splitstree6.io.nexus;
 
+import splitstree6.utils.Warnings;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
@@ -161,7 +162,7 @@ public class DistancesNexusInput extends NexusIOBase implements INexusInput<Dist
 			if (both) {
 				if (!isSymmetric(distancesBlock)) {
 					symmetrize(distancesBlock);
-					System.err.println("Warning: Distance matrix not symmetric: averaging between upper and lower parts");
+					Warnings.show("Distance matrix not symmetric: averaging between upper and lower parts");
 				}
 			}
 			return taxonNamesFound;

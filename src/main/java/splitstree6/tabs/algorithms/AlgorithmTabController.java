@@ -50,10 +50,14 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 	private MenuButton menuButton;
 
 	@FXML
+	private Button defaultsButton;
+
+	@FXML
 	private void initialize() {
 		MaterialIcons.setIcon(menuButton, "edit");
 		MaterialIcons.setIcon(applyButton, "play_circle", "", false);
 		menuButton.setVisible(false); // only used in taxa filter
+		MaterialIcons.setIcon(defaultsButton, "more_vert");
 	}
 
 	public ChoiceBox<Algorithm<S, T>> getAlgorithmCBox() {
@@ -70,5 +74,9 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 
 	public MenuButton getMenuButton() {
 		return menuButton;
+	}
+
+	public Button getDefaultsButton() {
+		return defaultsButton;
 	}
 }

@@ -23,7 +23,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import jloda.fx.util.ProgramProperties;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.Single;
@@ -46,15 +45,9 @@ public class AutumnAlgorithm extends Trees2Trees {
 	private final IntegerProperty optionFirstTree = new SimpleIntegerProperty(this, "optionFirstTree", 1);
 	private final IntegerProperty optionSecondTree = new SimpleIntegerProperty(this, "optionSecondTree", 2);
 
-	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork");
+	private final BooleanProperty optionOnlyOneNetwork = new SimpleBooleanProperty(this, "optionOnlyOneNetwork", true);
 	private final BooleanProperty optionRerootToMinimize = new SimpleBooleanProperty(this, "optionRerootToMinimize", false);
 	private final BooleanProperty optionTreeChildOnly = new SimpleBooleanProperty(this, "optionTreeChildOnly", false);
-
-	{
-		ProgramProperties.track(optionRerootToMinimize, false);
-		ProgramProperties.track(optionOnlyOneNetwork, true);
-		ProgramProperties.track(optionTreeChildOnly, false);
-	}
 
 	@Override
 	public List<String> listOptions() {

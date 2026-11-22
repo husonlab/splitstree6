@@ -81,11 +81,16 @@ public class UniqueTopologies extends Trees2Trees implements IFilter {
 				var unrootedClusters = new HashSet<BitSet>();
 				for (var cluster : clusters) {
 					if (!cluster.get(min)) {
-						clusters.add(cluster);
+						unrootedClusters.add(cluster);
 					} else {
-						unrootedClusters.add(BitSetUtils.minus(taxa, cluster));
+						var complement = BitSetUtils.minus(taxa, cluster);
+						if (complement.cardinality() > 0)
+							unrootedClusters.add(complement);
 					}
 				}
+				// so that the tree built from the clusters has all taxa: the first taxon, and all taxa
+				unrootedClusters.add(BitSetUtils.asBitSet(min));
+				unrootedClusters.add(taxa);
 				clusters = unrootedClusters;
 			}
 			var found = false;

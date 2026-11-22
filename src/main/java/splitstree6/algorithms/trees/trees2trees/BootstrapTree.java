@@ -37,7 +37,10 @@ import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -234,11 +237,9 @@ public class BootstrapTree extends Trees2Trees {
 											if (cluster.cardinality() == 1 || cluster.cardinality() == ntax - 1 || replicateClusters.contains(cluster)) {
 												targetEdgeSupport.get(e).add(1d);
 											} else if (transferBootstrap) {
-												if (cluster.cardinality() == 2 || cluster.cardinality() == ntax - 2) {
-													targetEdgeSupport.get(e).add(1d);
-												} else {
-													targetEdgeSupport.get(e).add(computeTransferValue(ntax, cluster, edgeClusterMap));
-												}
+												// for a pair of taxa this is 0, as it must be: a pair that is not in
+												// the replicate has no support (until 11.2026 it was counted as present)
+												targetEdgeSupport.get(e).add(computeTransferValue(ntax, cluster, edgeClusterMap));
 											}
 										}
 									}
@@ -307,24 +308,56 @@ public class BootstrapTree extends Trees2Trees {
 
 	private static void applyBootstrapValues(int numberOfReplicates, EdgeArray<DoubleAdder> edgeSupport, PhyloTree tree, double minPercent) {
 		minPercent = Math.min(100, minPercent);
-
-		var toContract = new HashSet<Edge>();
-		for (var entry : edgeSupport.entrySet()) {
-			var e = entry.getKey();
-			var v = e.getTarget();
-			if (!v.isLeaf()) {
-				var value = Math.min(100d, Math.max(0d, 100 * entry.getValue().doubleValue() / numberOfReplicates));
-
-				if (value < minPercent) {
-					toContract.add(e);
-				} else if (PhyloTree.SUPPORT_RICH_NEWICK) {
-					tree.setConfidence(e, Double.parseDouble("%.1f".formatted(value)));
-				} else {
-					tree.setLabel(v, StringUtils.trim("%.1f", value));
+		if (PhyloTree.SUPPORT_RICH_NEWICK) { // support values are confidences of the edges
+			var toContract = new HashSet<Edge>();
+			for (var entry : edgeSupport.entrySet()) {
+				var e = entry.getKey();
+				if (!e.getTarget().isLeaf()) {
+					var value = Math.min(100d, Math.max(0d, 100 * entry.getValue().doubleValue() / numberOfReplicates));
+					if (value < minPercent)
+						toContract.add(e);
+					else
+						tree.setConfidence(e, Math.round(10 * value) / 10.0);
 				}
 			}
+			contractEdges(tree, toContract, new Single<>());
+		} else {
+			// support values are labels of the nodes below the edges. When an edge is contracted, its lower node stays
+			// and stands for both; the edge above it is then the one that was above the upper node, so it takes over
+			// that node's value. Going from the root down, the value above is final when it is needed.
+			// (Until 11.2026 the value of the upper node was lost with the node)
+			var nodeValue = new HashMap<Node, Double>();
+			var lowerNodesOfEdgesToContract = new HashSet<Node>();
+			for (var entry : edgeSupport.entrySet()) {
+				var v = entry.getKey().getTarget();
+				if (!v.isLeaf()) {
+					var value = Math.min(100d, Math.max(0d, 100 * entry.getValue().doubleValue() / numberOfReplicates));
+					if (value < minPercent)
+						lowerNodesOfEdgesToContract.add(v);
+					else
+						nodeValue.put(v, value);
+				}
+			}
+			var order = new ArrayList<Node>();
+			tree.preorderTraversal(v -> {
+				if (lowerNodesOfEdgesToContract.contains(v))
+					order.add(v);
+			});
+			for (var w : order) {
+				var e = w.getFirstInEdge();
+				var above = nodeValue.get(e.getSource());
+				if (above != null)
+					nodeValue.put(w, above);
+				else
+					nodeValue.remove(w);
+				nodeValue.remove(e.getSource());
+				contractEdges(tree, new HashSet<>(Set.of(e)), new Single<>());
+			}
+			for (var entry : nodeValue.entrySet()) {
+				// with a decimal point, whatever the language of the computer: this is written into Newick strings
+				tree.setLabel(entry.getKey(), StringUtils.trim(String.format(java.util.Locale.ROOT, "%.1f", entry.getValue())));
+			}
 		}
-		contractEdges(tree, toContract, new Single<>());
 	}
 
 

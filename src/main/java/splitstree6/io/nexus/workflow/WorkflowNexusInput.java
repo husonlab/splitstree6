@@ -19,6 +19,7 @@
 
 package splitstree6.io.nexus.workflow;
 
+import splitstree6.utils.Warnings;
 import javafx.application.Platform;
 import jloda.fx.util.AService;
 import jloda.fx.util.ProgramProperties;
@@ -108,8 +109,11 @@ public class WorkflowNexusInput {
 			var inputWorkFlow = newWorkflow;
 			var service = new AService<Workflow>(mainWindow.getController().getBottomFlowPane());
 			service.setCallable(() -> {
+				Warnings.setWindow(mainWindow.getStage()); // warnings that arise while reading are shown in this window
 				try (var reader = new BufferedReader(readerSupplier.call())) {
 					input(service.getProgressListener(), inputWorkFlow, reader);
+				} finally {
+					Warnings.clearWindow();
 				}
 				return inputWorkFlow;
 			});
@@ -255,7 +259,7 @@ public class WorkflowNexusInput {
 					final var title = algorithmInput.getTitle();
 					final var queue = title2algorithmsAndLinks.computeIfAbsent(title, k -> new ArrayDeque<>());
 					if (!queue.isEmpty())
-						System.err.println("Warning: duplicate algorithm title '" + title + "' in workflow (line " + np.lineno() + "): giving each linked output its own algorithm instance");
+						Warnings.show("duplicate algorithm title '" + title + "' in workflow (line " + np.lineno() + "): giving each linked output its own algorithm instance");
 					queue.add(new Pair<>(algorithm, algorithmInput.getLink().getSecond()));
 				} else {
 					final DataBlock newDataBlock = dataInput.parse(np, workingTaxaBlock);
@@ -298,7 +302,7 @@ public class WorkflowNexusInput {
 	private static void warnIfResultsAreOutdated(String programVersion, Algorithm algorithm, DataNode parentDataNode) {
 		if (algorithm instanceof ProteinMLDistance && parentDataNode != null && parentDataNode.getDataBlock() instanceof CharactersBlock characters
 			&& isOlderThan(programVersion, 6, 10, 1) && !characters.getStateSymbols().equalsIgnoreCase("arndcqeghilkmfpstwyv")) {
-			NotificationManager.showWarning("This file was written by an earlier version of the program, in which Protein ML Distance "
+			Warnings.show("This file was written by an earlier version of the program, in which Protein ML Distance "
 											+ "gave incorrect distances for this alignment (amino acids in the order '" + characters.getStateSymbols() + "').\n"
 											+ "The distances, and all results computed from them, are shown as stored. Run Protein ML Distance again to update them.");
 		}

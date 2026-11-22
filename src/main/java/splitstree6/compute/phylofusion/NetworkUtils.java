@@ -19,6 +19,7 @@
 
 package splitstree6.compute.phylofusion;
 
+import splitstree6.utils.Warnings;
 import jloda.graph.Edge;
 import jloda.graph.EdgeArray;
 import jloda.graph.Node;
@@ -105,7 +106,7 @@ public class NetworkUtils {
 				}
 
 			if (hasUndefinedWeights > 0)
-				System.err.println("Warning: some edge weights are not correctly set");
+				Warnings.show("some edge weights are not correctly set");
 			return true;
 		} catch (CanceledException ex) {
 			System.err.println("Set network edge lengths: timed out");

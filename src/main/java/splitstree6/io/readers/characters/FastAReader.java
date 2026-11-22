@@ -19,6 +19,7 @@
 
 package splitstree6.io.readers.characters;
 
+import splitstree6.utils.Warnings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.FileLineIterator;
@@ -231,7 +232,7 @@ public class FastAReader extends CharactersReader {
 	static void addTaxaName(String line, ArrayList<String> taxonNames, int linesCounter) {
 		var sameNamesCounter = 0;
 		if (taxonNames.contains(line.substring(1))) {
-			System.err.println("Warning: Repeated taxon name " + line.substring(1) + ". Line: " + linesCounter);
+			Warnings.show("Repeated taxon name " + line.substring(1) + ". Line: " + linesCounter);
 			sameNamesCounter++;
 		}
 		while (taxonNames.contains(line.substring(1) + "(" + sameNamesCounter + ")")) {

@@ -140,6 +140,9 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	 * returns null. Use this when driving the workflow programmatically.
 	 */
 	public <T extends DataBlock> void setupInputAndWorkingNodes(TaxaBlock inputTaxaBlock, T inputDataBlock) {
+		// the blocks arrive filled, with no loader to describe them; the methods text uses the descriptions
+		inputTaxaBlock.updateShortDescription();
+		inputDataBlock.updateShortDescription();
 		sourceNode = newDataNode(new SourceBlock(), INPUT_SOURCE);
 		inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
 		inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());

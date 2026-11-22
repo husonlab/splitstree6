@@ -19,6 +19,7 @@
 
 package splitstree6.algorithms.distances.distances2report;
 
+import splitstree6.utils.Warnings;
 import jloda.util.NumberUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
@@ -137,7 +138,7 @@ public class DeltaScore extends Distances2ReportBase {
 
 		//Print out the individual taxon scores
 		if (numericalProblems) {
-			System.err.println("WARNING: Some quartets were close to 'star-like' so set to zero for delta score calculation\n");
+			Warnings.show("Some quartets were close to 'star-like' so set to zero for delta score calculation\n");
 		}
 
 		//   System.out.println("Average delta score for selection = " + Basic.roundSigFig(totalAverage[0], 5) + "\nAverage Q-residual = " + Basic.roundSigFig(totalAverage[1], 5) + "\n");

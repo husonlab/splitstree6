@@ -19,7 +19,6 @@
 
 package splitstree6.algorithms.trees.trees2splits;
 
-import jloda.fx.util.ProgramProperties;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.data.SplitsBlock;
@@ -54,7 +53,7 @@ public class ConsensusOutline extends ConsensusSplits implements IToCircularSpli
 		setOptionConsensus(Consensus.ConsensusOutline);
 		setOptionThresholdPercent(0.0);
 		setOptionHighDimensionFilter(false);
-		ProgramProperties.track(optionEdgeWeightsProperty(), EdgeWeights::valueOf, EdgeWeights.Count);
+		setOptionEdgeWeights(EdgeWeights.Count);
 	}
 
 	/**

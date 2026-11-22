@@ -19,7 +19,7 @@
 
 package splitstree6.io.readers.splits;
 
-import jloda.fx.window.NotificationManager;
+import splitstree6.utils.Warnings;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsBlockUtilities;
@@ -100,7 +100,7 @@ public class NewickReader extends SplitsReader {
 				throw new IOExceptionWithLineNumber(lineno, ex);
 			}
 		} else
-			NotificationManager.showWarning("No Newick string found");
+			Warnings.show("No Newick string found");
 	}
 
 	@Override

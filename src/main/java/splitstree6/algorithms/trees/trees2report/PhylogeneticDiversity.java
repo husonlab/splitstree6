@@ -89,13 +89,14 @@ public class PhylogeneticDiversity extends Trees2ReportBase {
 			double diversity;
 			try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
 				diversity = tree.edgeStream()
-						.filter(e -> nodeClusterMap.get(e.getTarget()).intersects(selectedTaxa) && (rooted || !BitSetUtils.contains(selectedTaxa, nodeClusterMap.get(e.getTarget()))))
+						// rooted: the edges above a selected taxon; unrooted: the edges that have selected taxa both below and elsewhere
+						.filter(e -> nodeClusterMap.get(e.getTarget()).intersects(selectedTaxa) && (rooted || !BitSetUtils.contains(nodeClusterMap.get(e.getTarget()), selectedTaxa)))
 						.mapToDouble(tree::getWeight).sum();
 			}
 			var totalRounded = NumberUtils.roundSigFig(total, 5);
 			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.trim(totalRounded)));
 			var diversityRounded = NumberUtils.roundSigFig(diversity, 5);
-			buf.append("%s Phylogenetic Diversity = %s (%.1f%%)%n".formatted(rooted ? "Rooted" : "Unrooted", StringUtils.trim(diversityRounded), 100.0 * (diversity / total)));
+			buf.append("%s Phylogenetic Diversity = %s (%.1f%%)%n".formatted(rooted ? "Rooted" : "Unrooted", StringUtils.trim(diversityRounded), total > 0 ? 100.0 * (diversity / total) : 0.0));
 			progress.incrementProgress();
 		}
 		buf.append("Computed on %d (of %d) selected taxa:%n".formatted(selectedTaxa.cardinality(), taxaBlock.getNtax()));

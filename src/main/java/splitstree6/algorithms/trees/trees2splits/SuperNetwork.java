@@ -236,6 +236,8 @@ public class SuperNetwork extends Trees2Splits {
 			setWeightsConfidences(pSplitsOfTrees, supportSet, computedSplits);
 		}
 
+		setConfidences(pSplitsOfTrees, supportSet, computedSplits);
+
 		if (isOptionHighDimensionFilter()) {
 			var dimensionsFilter = new DimensionFilter();
 			dimensionsFilter.compute(progress, taxaBlock, computedSplits, splitsBlock);
@@ -258,36 +260,54 @@ public class SuperNetwork extends Trees2Splits {
 			//new PartialSplit(splits.get(s),
 			//splits.get(s).getComplement(taxa.getNtax()));
 
-			var min = 1000000f;
-			var sum = 0f;
-			var weighted = 0f;
-			var confidence = 0f;
-			int total = 0;
+			// over the trees that contain a projection of the split: the lengths of the projection, their sum, their sum
+			// weighted by the number of taxa of the tree, and the smallest
+			var min = Double.MAX_VALUE;
+			var sum = 0.0;
+			var weighted = 0.0;
+			var count = 0;
+			var taxa = 0;
 			for (int t = 1; t < pSplits.length; t++) {
 				PartialSplit projection = current.getInduced(supportSet[t]);
-				if (projection != null)  // split cuts support set of tree t
-				{
-					if (pSplits[t].containsKey(projection)) {
-						float cur = ((PartialSplit) pSplits[t].get(projection)).getWeight();
-						weighted += supportSet[t].cardinality() * cur;
-						if (cur < min)
-							min = cur;
-						sum += cur;
-						confidence += supportSet[t].cardinality() * ((PartialSplit) pSplits[t].get(projection)).getConfidence();
-					}
-					total += supportSet[t].cardinality();
+				if (projection != null && pSplits[t].containsKey(projection)) { // split cuts support set of tree t, and tree t has it
+					var cur = ((PartialSplit) pSplits[t].get(projection)).getWeight();
+					weighted += supportSet[t].cardinality() * cur;
+					if (cur < min)
+						min = cur;
+					sum += cur;
+					count++;
+					taxa += supportSet[t].cardinality();
 				}
 			}
-
 			var value = switch (getOptionEdgeWeights()) {
-				case Min -> min;
-				case Mean -> (total > 0 ? weighted / total : 0);
-				case TreeSizeWeightedMean -> (total > 0 ? sum / total : 0);
+				case Min -> (count > 0 ? min : 0);
+				case Mean -> (count > 0 ? sum / count : 0);
+				case TreeSizeWeightedMean -> (taxa > 0 ? weighted / taxa : 0);
 				case Sum -> sum;
 				default -> 1;
 			};
 			splits.getSplits().get(s - 1).setWeight(value);
-			// splits.getSplits().get(s - 1).setConfidence(total);
+		}
+	}
+
+	/**
+	 * sets the confidence of a split to the percentage of trees that contain a projection of the split, among the
+	 * trees whose taxa the split divides. A tree that has all its taxa on one side of the split says nothing about it
+	 */
+	private void setConfidences(Map[] pSplits, BitSet[] supportSet, SplitsBlock splits) {
+		for (var split : splits.getSplits()) {
+			final var current = new PartialSplit(split.getA(), split.getB());
+			var divides = 0;
+			var contains = 0;
+			for (var t = 1; t < pSplits.length; t++) {
+				var projection = current.getInduced(supportSet[t]);
+				if (projection != null) {
+					divides++;
+					if (pSplits[t].containsKey(projection))
+						contains++;
+				}
+			}
+			split.setConfidence(divides > 0 ? 100.0 * contains / divides : 0);
 		}
 	}
 
@@ -297,12 +317,12 @@ public class SuperNetwork extends Trees2Splits {
 	 */
 	private void setWeightAverageReleativeLength(Map[] pSplits, BitSet[] supportSet, SplitsBlock splits) {
 		// compute average of weights and num of edges for each input tree
-		var averageWeight = new float[pSplits.length];
+		var averageWeight = new double[pSplits.length];
 		var numEdges = new int[pSplits.length];
 
 		for (var t = 1; t < pSplits.length; t++) {
 			numEdges[t] = pSplits[t].size();
-			var sum = 0f;
+			var sum = 0.0;
 			for (var o : pSplits[t].keySet()) {
 				PartialSplit ps = (PartialSplit) o;
 				sum += ps.getWeight();
@@ -327,14 +347,14 @@ public class SuperNetwork extends Trees2Splits {
 				}
 			}
 
-			var weight = 0f;
+			var weight = 0.0;
 			for (var t = activeTrees.nextSetBit(1); t >= 0; t = activeTrees.nextSetBit(t + 1)) {
 				var projection = current.getInduced(supportSet[t]);
 
 				weight += ((PartialSplit) pSplits[t].get(projection)).getWeight()
 						  / averageWeight[t];
 			}
-			weight /= activeTrees.cardinality();
+			weight = (activeTrees.cardinality() > 0 ? weight / activeTrees.cardinality() : 0);
 			splits.getSplits().get(s - 1).setWeight(weight); //setWeight(s, weight);
 		}
 	}
@@ -352,7 +372,11 @@ public class SuperNetwork extends Trees2Splits {
 
 		for (var ps : list) {
 			ps.setComplement(support);
-			pSplitsOfTree.put(ps, ps);
+			var previous = pSplitsOfTree.get(ps);
+			if (previous != null) // the two edges at a root of degree 2 are one split
+				previous.setWeight(previous.getWeight() + ps.getWeight());
+			else
+				pSplitsOfTree.put(ps, ps);
 		}
 	}
 
@@ -370,7 +394,7 @@ public class SuperNetwork extends Trees2Splits {
 			if (f != e) {
 				final var f_taxa = computePSplitsFromTreeRecursively(tree.getOpposite(v, f), f, trees, taxa, list, which, seen);
 				var ps = new PartialSplit(f_taxa);
-				ps.setWeight((float) tree.getWeight(f));
+				ps.setWeight(tree.getWeight(f));
 				list.add(ps);
 				for (var t = 1; t < f_taxa.length(); t++) {
 					if (f_taxa.get(t))

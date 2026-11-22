@@ -30,6 +30,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.splits.ASplit;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * compute shapley values
@@ -75,7 +76,7 @@ public class ShapleyValues extends Splits2ReportBase {
 
 	public static Map<Integer, Double> compute(BitSet taxa, Collection<ASplit> splits) {
 		var ntax = taxa.cardinality();
-		var taxonShapleyMap = new HashMap<Integer, Double>();
+		var taxonShapleyMap = new ConcurrentHashMap<Integer, Double>(); // filled by several threads
 
 		try {
 			ExecuteInParallel.apply(BitSetUtils.asList(taxa), t -> {

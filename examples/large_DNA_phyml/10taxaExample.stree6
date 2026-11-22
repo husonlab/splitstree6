@@ -1,30 +1,29 @@
 #nexus [SplitsTree6]
 
 BEGIN SPLITSTREE6;
-DIMENSIONS nDataNodes=9 nAlgorithms=6;
-PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1651700580480'; [Thu May 05 09:43:00 NZST 2022]
+DIMENSIONS nDataNodes=9 nAlgorithms=5;
+PROGRAM version='SplitsTree (version dev) - License GPL v3';
+WORKFLOW creationDate='1795328722905'; [Sun Nov 22 07:25:22 CET 2026]
 END; [SPLITSTREE6]
 
 [
 Methods:
-Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+Analysis was performed using SplitsTree (version dev)  (Huson and Bryant 2024 ; DH Huson and D. Bryant, The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods 21(10):1773-1774 2024.).
 The original input consisted of 100 taxa and 100 DNA sequences of length 897.
 After removal of 90 taxa, the input consisted of 10 taxa and 10 DNA sequences of length 897.
 The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 10 x 10 distance matrix.
-The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 27 splits, cyclic.
-The Show Splits method was used (default options) so as to obtain a Splits Network visualization (Dress & Huson 2004).
+The Neighbor Net method (Bryant & Moulton 2004, Bryant & Huson 2023) was used (default options) so as to obtain 27 splits, circular.
+The Show Splits method was used (default options) so as to obtain a Split Network visualization.
 
 References:
-Bryant & Moulton 2004: D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255– 265, 2004.
-Dress & Huson 2004: A.W.M. Dress and D.H. Huson, Constructing splits graphs, IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.
-Hamming 1950: Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
-Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+Bryant & Huson 2023: D. Bryant and DH Huson, NeighborNet- improved algorithms and implementation. Front. Bioinform. 3, 2023.
+Bryant & Moulton 2004: D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255–265, 2004.
+Hamming 1950: Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147-160. MR 0035935, 1950.
+Huson and Bryant 2024: DH Huson and D. Bryant, The SplitsTree App: interactive analysis and visualization using phylogenetic trees and networks. Nature Methods 21(10):1773-1774 2024.
 ]
 
 BEGIN TAXA;
 TITLE 'Input Taxa';
-LINK ALGORITHM = 'Input Data Loader';
 DIMENSIONS ntax=100;
 TAXLABELS
 	[1] 'tax1'
@@ -134,7 +133,6 @@ END; [TAXA]
 
 BEGIN ALGORITHM;
 TITLE 'Taxa Filter';
-LINK ALGORITHM = 'Input Data Loader';
 NAME 'Taxa Filter';
 OPTIONS
 	DisabledTaxa = 'tax100' 'tax11' 'tax12' 'tax13' 'tax14' 'tax15' 'tax16' 'tax17' 'tax18' 'tax19' 'tax20' 'tax21' 'tax22' 'tax23' 'tax24' 'tax25' 'tax26' 'tax27' 'tax28' 'tax29' 'tax30' 'tax31' 'tax32' 'tax33' 'tax34' 'tax35' 'tax36' 'tax37' 'tax38' 'tax39' 'tax40' 'tax41' 'tax42' 'tax43' 'tax44' 'tax45' 'tax46' 'tax47' 'tax48' 'tax49' 'tax50' 'tax51' 'tax52' 'tax53' 'tax54' 'tax55' 'tax56' 'tax57' 'tax58' 'tax59' 'tax60' 'tax61' 'tax62' 'tax63' 'tax64' 'tax65' 'tax66' 'tax67' 'tax68' 'tax69' 'tax70' 'tax71' 'tax72' 'tax73' 'tax74' 'tax75' 'tax76' 'tax77' 'tax78' 'tax79' 'tax80' 'tax81' 'tax82' 'tax83' 'tax84' 'tax85' 'tax86' 'tax87' 'tax88' 'tax89' 'tax90' 'tax91' 'tax92' 'tax93' 'tax94' 'tax95' 'tax96' 'tax97' 'tax98' 'tax99';
@@ -162,7 +160,7 @@ END; [TAXA]
 
 BEGIN CHARACTERS;
 TITLE 'Input Characters';
-LINK ALGORITHM = 'Input Data Loader';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=100 nchar=897;
 FORMAT
 	datatype='DNA' missing=? gap=- symbols="acgt" labels=no transpose=no interleave=yes;
@@ -1537,7 +1535,8 @@ TITLE 'Hamming Distance';
 LINK CHARACTERS = 'Working Characters';
 NAME 'Hamming Distance';
 OPTIONS
-	Normalize = 'true';
+	MatchAmbiguityCodes = 'true',
+	MatchGapToGap = 'false';
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
@@ -1564,9 +1563,7 @@ TITLE 'Neighbor Net';
 LINK DISTANCES = 'Distances';
 NAME 'Neighbor Net';
 OPTIONS
-	InferenceAlgorithm = 'BlockPivot',
-	UsePreconditioner = 'false',
-	UseDual = 'true';
+	InferenceAlgorithm = 'ActiveSet';
 END; [ALGORITHM]
 
 BEGIN SPLITS;
@@ -1574,7 +1571,7 @@ TITLE 'Splits';
 LINK ALGORITHM = 'Neighbor Net';
 DIMENSIONS ntax=10 nsplits=27;
 FORMAT labels=no weights=yes confidences=no;
-PROPERTIES fit=98.9 cyclic;
+PROPERTIES fit=98.9 circular;
 CYCLE 1 2 3 5 4 9 8 10 7 6;
 MATRIX
 [1, size=4] 	 0.00004996 	 1 6 7 10,
@@ -1618,16 +1615,17 @@ END; [ALGORITHM]
 BEGIN VIEW;
 TITLE 'SplitNetwork';
 LINK ALGORITHM = 'Show Splits';
-NAME 'SplitNetwork';
+NAME 'SplitNetworkView';
 INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Outline',
 	Orientation = 'Rotate0Deg',
 	Rooting = 'None',
-	ZoomFactor = 1,
+	ZoomFactor = 1.01,
 	FontScaleFactor = 1,
 	RootAngle = 160,
 	OutlineFill = 0xc0c0c0ff,
-	ShowConfidence = 'false',
-	ActiveTraits = '*All*';
+	ActiveTraits = '*All*',
+	LabelSplitsBy = 'None',
+	ShowQRCode = 'false';
 END; [VIEW]
