@@ -201,7 +201,6 @@ public class WorkflowTest {
 		var before = weightedSplits(p.splits().getDataBlock(), 7, 0);
 		var after = weightedSplits((SplitsBlock) copy.dataNodesStream().filter(d -> d.getDataBlock() instanceof SplitsBlock).findFirst().orElseThrow().getDataBlock(), 7, 0);
 		assertEquals(before.keySet(), after.keySet());
-		System.err.println("WorkflowTest: largest change of a split weight by saving and reading: " + maxDifference(before, after));
 		assertTrue(maxDifference(before, after) < 1e-6, "split weights change by " + maxDifference(before, after));
 		// apart from the line with the time of saving
 		assertEquals(text.replaceAll("creationDate='[0-9]+'; \\[[^\\]]*\\]", ""), save(copy, false).replaceAll("creationDate='[0-9]+'; \\[[^\\]]*\\]", ""), "saving what was read gives another text");
@@ -244,16 +243,24 @@ public class WorkflowTest {
 		workflow.newAlgorithmNode(new HammingDistance() {
 			@Override
 			public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock characters, DistancesBlock distancesBlock) throws IOException {
-				throw new IOException("fails");
+				throw new IOException("failure made by the test, on purpose");
 			}
 		}, workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distances);
 		var trees = workflow.newDataNode(new TreesBlock());
 		workflow.newAlgorithmNode(new CountingNeighborJoining(), workflow.getWorkingTaxaNode(), distances, trees);
 		treeRuns.set(0);
+		// the workflow writes the stack trace of the failure to the error stream. It is caught here and checked, so that
+		// the output of a build does not show an exception where nothing has gone wrong
+		var err = System.err;
+		var written = new java.io.ByteArrayOutputStream();
+		System.setErr(new java.io.PrintStream(written, true));
 		try {
 			workflow.getInputTaxaFilterNode().restart();
 		} catch (RuntimeException ignored) { // a run without user interface may pass the failure on
+		} finally {
+			System.setErr(err);
 		}
+		assertTrue(written.toString().contains("failure made by the test, on purpose"), "the failure is reported");
 		assertFalse(workflow.isValid());
 		assertEquals(0, treeRuns.get(), "a step was run on the output of a step that failed");
 		assertEquals(0, trees.getDataBlock().getNTrees());
