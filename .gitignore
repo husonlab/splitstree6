@@ -52,9 +52,12 @@ buildNumber.properties
 *.out
 *.toc
 
-CLAUDE.md
-
-# private AI working area (governance/lab notes); kept locally, not tracked
+# AI assistant files (Claude Code etc.): kept locally, never pushed
 /ai/
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.claude/
+.mcp.json
 
 /tmp/
