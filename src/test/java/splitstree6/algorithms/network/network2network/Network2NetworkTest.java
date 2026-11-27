@@ -193,6 +193,21 @@ public class Network2NetworkTest {
 		}
 	}
 
+	/**
+	 * a tree offers the shave filter nothing to remove: every target, None included, leaves it as it is
+	 */
+	@Test
+	void shaveFilterOnTree() throws Exception {
+		var input = network(6, 0, new Random(124));
+		for (var target : ShaveFilter.Target.values()) {
+			var filter = new ShaveFilter();
+			filter.optionTargetProperty().set(target);
+			var output = new NetworkBlock();
+			filter.compute(new ProgressSilent(), taxa(6), input, output);
+			assertEquals(5, output.getNumberOfEdges(), target + ": the tree is changed");
+		}
+	}
+
 	@Test
 	void taxaFilter() {
 		var input = network(6, 5, new Random(123));

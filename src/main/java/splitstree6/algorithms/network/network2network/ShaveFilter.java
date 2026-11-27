@@ -567,7 +567,9 @@ public class ShaveFilter extends Network2Network {
 		});
 		if (choice < 0) {
 			buf.append(switch (getOptionTarget()) {
-				case None -> ": network unchanged; Balanced would stop at %,d cycles, %,d edges, %s".formatted(
+				// an empty chain: the input is a tree on its taxa, so there is no balanced step to report
+				case None -> chain.isEmpty() ? ": network unchanged (no edge can be removed)"
+						: ": network unchanged; Balanced would stop at %,d cycles, %,d edges, %s".formatted(
 						chain.get(balanced).cycles(), chain.get(balanced).edges(), describe(chain.get(balanced), measure));
 				case Balanced -> ": network unchanged (nothing worth removing)";
 				default -> ": network unchanged (the input already meets it)";
